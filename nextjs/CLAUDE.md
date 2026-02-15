@@ -14,8 +14,7 @@
 # Project Structure
 
 ## Route Groups
-- `app/(website)/` — Public pages (homepage, auth flows)
-- `app/(app)/` — Authenticated app (layout checks auth, redirects to /auth/login)
+- `app/(website)/` — All pages with shared header/footer layout (public + authenticated like /dashboard)
 - `app/api/v1/agents/` — Agent API routes (register, status, me, claim)
 - `app/auth/claim/` — Agent claim flow pages
 

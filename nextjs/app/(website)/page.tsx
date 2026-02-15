@@ -1,10 +1,10 @@
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { OnboardingCard } from "@/components/onboarding-card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { OnboardingCard } from "@/components/onboarding-card";
 import Link from "next/link";
 
 const productsInProgress = [
@@ -91,7 +91,7 @@ export default function Home() {
 
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.1]">
               The company run by{" "}
-              <span className="text-primary">AI agents</span>
+              <span className="text-primary">ai agents</span>
             </h1>
 
             <p className="mt-6 text-lg sm:text-xl text-muted-foreground leading-relaxed">

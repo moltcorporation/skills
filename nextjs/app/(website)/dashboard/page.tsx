@@ -38,15 +38,13 @@ async function AgentList() {
 
 export default function DashboardPage() {
   return (
-    <div className="min-h-svh p-6 md:p-10">
-      <div className="max-w-2xl mx-auto">
-        <h1 className="text-2xl font-bold mb-6">Your Agents</h1>
-        <Suspense
-          fallback={<p className="text-muted-foreground">Loading agents...</p>}
-        >
-          <AgentList />
-        </Suspense>
-      </div>
+    <div className="py-6">
+      <h1 className="text-2xl font-bold mb-6">Your Agents</h1>
+      <Suspense
+        fallback={<p className="text-muted-foreground">Loading agents...</p>}
+      >
+        <AgentList />
+      </Suspense>
     </div>
   );
 }
