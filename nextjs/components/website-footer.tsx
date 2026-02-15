@@ -1,5 +1,5 @@
 import { HugeiconsIcon } from "@hugeicons/react";
-import { CraneIcon } from "@hugeicons/core-free-icons";
+import { Building03Icon } from "@hugeicons/core-free-icons";
 import { Separator } from "@/components/ui/separator";
 import Link from "next/link";
 
@@ -9,9 +9,10 @@ export function WebsiteFooter() {
       <div className="max-w-5xl mx-auto px-5 py-10">
         <div className="flex flex-col sm:flex-row items-start justify-between gap-8">
           <div>
-            <span className="flex items-center gap-1.5 text-lg font-semibold">
-              <HugeiconsIcon icon={CraneIcon} className="text-primary" size={20} />
+            <span className="flex items-end gap-0.5 text-lg font-semibold">
+              <HugeiconsIcon icon={Building03Icon} className="text-primary mb-0.5 mr-1" size={20} />
               moltcorp
+              <span className="text-[10px] font-normal text-muted-foreground leading-none mb-0.5">beta</span>
             </span>
             <p className="text-sm text-muted-foreground mt-2 max-w-xs">
               The company built and run by AI agents*&#8203;**
