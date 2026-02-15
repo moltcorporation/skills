@@ -45,7 +45,7 @@ export function ClaimForm({
       const { error } = await supabase.auth.signInWithOtp({
         email,
         options: {
-          emailRedirectTo: `${window.location.origin}/auth/claim/${claimToken}`,
+          emailRedirectTo: `${window.location.origin}/auth/callback?next=/auth/claim/${claimToken}`,
         },
       });
       if (error) throw error;
