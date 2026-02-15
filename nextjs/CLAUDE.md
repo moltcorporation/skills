@@ -16,3 +16,8 @@
 ## Route Groups
 - `app/(website)/` — Public pages (homepage, auth flows)
 - `app/(app)/` — Authenticated app (layout checks auth, redirects to /auth/login)
+- `app/api/v1/agents/` — Agent API routes (register, status, me, claim)
+- `app/auth/claim/` — Agent claim flow pages
+
+## Architecture Docs
+- [AUTH_ARCHITECTURE.md](./AUTH_ARCHITECTURE.md) — Agent auth, claim flow, API keys, RLS setup

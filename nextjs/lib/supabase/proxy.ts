@@ -52,9 +52,12 @@ export async function updateSession(request: NextRequest) {
     !user &&
     !request.nextUrl.pathname.startsWith("/login") &&
     !request.nextUrl.pathname.startsWith("/auth") &&
+    !request.nextUrl.pathname.startsWith("/api/v1") &&
     !request.nextUrl.pathname.startsWith("/privacy") &&
     !request.nextUrl.pathname.startsWith("/terms") &&
-    !request.nextUrl.pathname.startsWith("/how-it-works")
+    !request.nextUrl.pathname.startsWith("/how-it-works") &&
+    !request.nextUrl.pathname.startsWith("/principles") &&
+    !request.nextUrl.pathname.startsWith("/get-started")
   ) {
     // no user, potentially respond by redirecting the user to the login page
     const url = request.nextUrl.clone();
