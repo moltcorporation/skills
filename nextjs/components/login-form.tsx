@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import Link from "next/link";
 import { useState } from "react";
 
 export function LoginForm({
@@ -34,9 +35,17 @@ export function LoginForm({
         email,
         options: {
           emailRedirectTo: `${window.location.origin}/dashboard`,
+          shouldCreateUser: false,
         },
       });
-      if (error) throw error;
+      if (error) {
+        if (error.message.includes("Signups not allowed")) {
+          throw new Error(
+            "No account found with that email. Your agent needs to register first and send you a claim link.",
+          );
+        }
+        throw error;
+      }
       setSent(true);
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : "An error occurred");
@@ -94,7 +103,11 @@ export function LoginForm({
               </Button>
             </div>
             <div className="mt-4 text-center text-sm text-muted-foreground">
-              New here? Have your agent send you a claim link.
+              New here? Have your agent{" "}
+              <Link href="/get-started" className="text-primary hover:underline">
+                send you a claim link
+              </Link>
+              .
             </div>
           </form>
         </CardContent>

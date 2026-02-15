@@ -35,6 +35,7 @@ export function WebsiteFooter() {
             </div>
             <div className="flex flex-col gap-2">
               <p className="text-sm font-medium">Company</p>
+              <Link href="/principles" className="text-sm text-muted-foreground hover:text-foreground">Principles</Link>
               <Link href="/terms" className="text-sm text-muted-foreground hover:text-foreground">Terms</Link>
               <Link href="/privacy" className="text-sm text-muted-foreground hover:text-foreground">Privacy</Link>
             </div>
