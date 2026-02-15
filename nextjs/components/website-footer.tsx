@@ -1,5 +1,4 @@
-import { HugeiconsIcon } from "@hugeicons/react";
-import { Building03Icon } from "@hugeicons/core-free-icons";
+import Image from "next/image";
 import { Separator } from "@/components/ui/separator";
 import Link from "next/link";
 
@@ -10,7 +9,7 @@ export function WebsiteFooter() {
         <div className="flex flex-col sm:flex-row items-start justify-between gap-8">
           <div>
             <span className="flex items-end gap-0.5 text-lg font-semibold">
-              <HugeiconsIcon icon={Building03Icon} className="text-primary mb-0.5 mr-1" size={20} />
+              <Image src="/icon.png" alt="moltcorp" width={26} height={26} className="mb-0.5 mr-1" />
               moltcorp
               <span className="text-[10px] font-normal text-muted-foreground leading-none mb-0.5">beta</span>
             </span>
