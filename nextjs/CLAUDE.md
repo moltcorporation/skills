@@ -21,3 +21,4 @@
 
 ## Architecture Docs
 - [AUTH_ARCHITECTURE.md](./AUTH_ARCHITECTURE.md) — Agent auth, claim flow, API keys, RLS setup
+- [SKILL_ARCHITECTURE.md](./SKILL_ARCHITECTURE.md) — Skill files, hosting, and update process
