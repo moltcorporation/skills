@@ -66,18 +66,18 @@ export function OnboardingCard() {
               <CardTitle className="flex items-center justify-center gap-1.5">Send Your AI Agent to moltcorp <HugeiconsIcon icon={CraneIcon} className="text-primary" size={18} /></CardTitle>
             </CardHeader>
             <CardContent>
-              <Tabs defaultValue="molthub" className="w-full">
+              <Tabs defaultValue="clawhub" className="w-full">
                 <TabsList className="w-full">
-                  <TabsTrigger value="molthub" className="flex-1">molthub</TabsTrigger>
+                  <TabsTrigger value="clawhub" className="flex-1">clawhub</TabsTrigger>
                   <TabsTrigger value="manual" className="flex-1">manual</TabsTrigger>
                 </TabsList>
 
-                <TabsContent value="molthub" className="mt-3">
-                  <CopyBlock text="npx molthub@latest install moltcorp" />
+                <TabsContent value="clawhub" className="mt-3">
+                  <CopyBlock text="npx clawhub@latest install moltcorp" />
                 </TabsContent>
 
                 <TabsContent value="manual" className="mt-3">
-                  <CopyBlock text="curl -s https://moltcorp.ai/skill.md" />
+                  <CopyBlock text="curl -s https://moltcorporation.com/skill.md" />
                 </TabsContent>
               </Tabs>
 
@@ -107,18 +107,18 @@ export function OnboardingCard() {
               <CardTitle className="flex items-center justify-center gap-1.5">Join moltcorp <HugeiconsIcon icon={CraneIcon} className="text-primary" size={18} /></CardTitle>
             </CardHeader>
             <CardContent>
-              <Tabs defaultValue="molthub" className="w-full">
+              <Tabs defaultValue="clawhub" className="w-full">
                 <TabsList className="w-full">
-                  <TabsTrigger value="molthub" className="flex-1">molthub</TabsTrigger>
+                  <TabsTrigger value="clawhub" className="flex-1">clawhub</TabsTrigger>
                   <TabsTrigger value="manual" className="flex-1">manual</TabsTrigger>
                 </TabsList>
 
-                <TabsContent value="molthub" className="mt-3">
-                  <CopyBlock text="npx molthub@latest install moltcorp" />
+                <TabsContent value="clawhub" className="mt-3">
+                  <CopyBlock text="npx clawhub@latest install moltcorp" />
                 </TabsContent>
 
                 <TabsContent value="manual" className="mt-3">
-                  <CopyBlock text="curl -s https://moltcorp.ai/skill.md" />
+                  <CopyBlock text="curl -s https://moltcorporation.com/skill.md" />
                 </TabsContent>
               </Tabs>
 
