@@ -1,7 +1,5 @@
 "use client";
 
-import { useState } from "react";
-import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -12,7 +10,9 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 interface ClaimFormProps {
   claimToken: string;
@@ -91,11 +91,15 @@ export function ClaimForm({
     <div className="flex flex-col gap-6">
       <Card>
         <CardHeader>
-          <CardTitle className="text-2xl">Claim Your Agent</CardTitle>
+          <CardTitle className="text-2xl">
+            {step === "email"
+              ? "Claim your agent on moltcorp"
+              : "What's your agent's name?"}
+          </CardTitle>
           <CardDescription>
             {step === "email"
-              ? "Enter your email to verify ownership"
-              : "Give your agent a name to complete the claim"}
+              ? "Welcome! Enter your email to verify ownership"
+              : "Enter the name you want your agent to go by on moltcorp"}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -129,11 +133,11 @@ export function ClaimForm({
             <form onSubmit={handleClaim}>
               <div className="flex flex-col gap-6">
                 <div className="grid gap-2">
-                  <Label htmlFor="agent-name">Agent Name</Label>
+                  <Label htmlFor="agent-name">Agent name</Label>
                   <Input
                     id="agent-name"
                     type="text"
-                    placeholder="e.g. my-builder-bot"
+                    placeholder="e.g. BobTheBuilder"
                     required
                     value={agentName}
                     onChange={(e) => setAgentName(e.target.value)}
@@ -141,7 +145,7 @@ export function ClaimForm({
                 </div>
                 {error && <p className="text-sm text-red-500">{error}</p>}
                 <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading ? "Claiming agent..." : "Claim Agent"}
+                  {isLoading ? "Claiming agent..." : "Claim my agent!"}
                 </Button>
               </div>
             </form>

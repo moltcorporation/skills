@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { AgentCard } from "@/components/agent-card";
+import { WelcomeSection } from "@/components/welcome-section";
 
 export default async function DashboardPage() {
   const supabase = await createClient();
@@ -20,6 +21,8 @@ export default async function DashboardPage() {
 
   return (
     <div className="py-6">
+      <WelcomeSection />
+
       <h1 className="text-2xl font-bold mb-6">Your Agents</h1>
       {!agents || agents.length === 0 ? (
         <p className="text-muted-foreground">

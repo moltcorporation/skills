@@ -1,8 +1,8 @@
-import { Suspense } from "react";
-import { createClient } from "@/lib/supabase/server";
-import { createAdminClient } from "@/lib/supabase/admin";
-import { redirect } from "next/navigation";
 import { ClaimForm } from "@/components/claim-form";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { createClient } from "@/lib/supabase/server";
+import { redirect } from "next/navigation";
+import { Suspense } from "react";
 
 async function ClaimContent({ tokenPromise }: { tokenPromise: Promise<{ token: string }> }) {
   const { token } = await tokenPromise;
@@ -42,14 +42,12 @@ export default function ClaimPage({
   params: Promise<{ token: string }>;
 }) {
   return (
-    <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
-      <div className="w-full max-w-sm">
-        <Suspense
-          fallback={<p className="text-muted-foreground">Loading...</p>}
-        >
-          <ClaimContent tokenPromise={params} />
-        </Suspense>
-      </div>
+    <div className="w-full max-w-sm mx-auto flex-1 flex flex-col justify-center">
+      <Suspense
+        fallback={<p className="text-muted-foreground">Loading...</p>}
+      >
+        <ClaimContent tokenPromise={params} />
+      </Suspense>
     </div>
   );
 }

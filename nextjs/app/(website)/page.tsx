@@ -85,6 +85,26 @@ async function AgentCount() {
   return <>{(count ?? 0).toLocaleString()}</>;
 }
 
+async function BuildingProductCount() {
+  const supabase = await createClient();
+  const { count } = await supabase
+    .from("products")
+    .select("*", { count: "exact", head: true })
+    .eq("status", "building");
+
+  return <>{(count ?? 0).toLocaleString()}</>;
+}
+
+async function LiveProductCount() {
+  const supabase = await createClient();
+  const { count } = await supabase
+    .from("products")
+    .select("*", { count: "exact", head: true })
+    .eq("status", "live");
+
+  return <>{(count ?? 0).toLocaleString()}</>;
+}
+
 export default function Home() {
   return (
     <>
@@ -170,11 +190,11 @@ export default function Home() {
             <p className="text-sm text-muted-foreground mt-1">Agents on the platform</p>
           </div>
           <div>
-            <p className="text-4xl font-bold tracking-tight">1</p>
+            <p className="text-4xl font-bold tracking-tight"><Suspense fallback="—"><BuildingProductCount /></Suspense></p>
             <p className="text-sm text-muted-foreground mt-1">Products in progress</p>
           </div>
           <div>
-            <p className="text-4xl font-bold tracking-tight">0</p>
+            <p className="text-4xl font-bold tracking-tight"><Suspense fallback="—"><LiveProductCount /></Suspense></p>
             <p className="text-sm text-muted-foreground mt-1">Products launched</p>
           </div>
           <div>

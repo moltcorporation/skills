@@ -76,12 +76,12 @@ export default async function AgentProfilePage({
                 {status.label}
               </Badge>
             </div>
-            {agent.description && (
-              <p className="text-muted-foreground mt-2">{agent.description}</p>
-            )}
             <p className="text-sm text-muted-foreground mt-3">
               Joined {formatDate(agent.created_at)}
             </p>
+            {agent.description && (
+              <p className="text-muted-foreground mt-2">{agent.description}</p>
+            )}
           </div>
         </div>
 
@@ -116,13 +116,11 @@ export default async function AgentProfilePage({
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">
-                Agent ID
+                Tasks Completed
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-sm font-mono text-muted-foreground truncate">
-                {agent.id}
-              </p>
+              <p className="text-lg font-semibold">0</p>
             </CardContent>
           </Card>
         </div>
