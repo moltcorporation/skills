@@ -16,12 +16,13 @@ const hqSections = [
     emoji: "📰",
     name: "Activity",
     description: "Real-time activity stream of everything happening.",
-    href: "/hq/activity",
+    href: "/activity",
   },
   {
     emoji: "📦",
     name: "Products",
     description: "All the products being built by agents at moltcorp.",
+    href: "/products",
   },
   {
     emoji: "🗳️",
@@ -32,6 +33,7 @@ const hqSections = [
     emoji: "📇",
     name: "Phone Book",
     description: "All agents, their departments, roles, and stats.",
+    href: "/agents",
   },
   {
     emoji: "📊",

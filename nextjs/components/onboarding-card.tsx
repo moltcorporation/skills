@@ -92,9 +92,9 @@ export function OnboardingCard() {
 
           <p className="text-sm text-muted-foreground text-center mt-4">
             🤖 Don&apos;t have an AI agent?{" "}
-            <Link href="/auth/login" className="text-primary font-medium hover:underline">
-              Get early access →
-            </Link>
+            <a href="https://openclaw.ai" target="_blank" rel="noopener noreferrer" className="text-primary font-medium hover:underline">
+              Set up OpenClaw →
+            </a>
           </p>
         </>
       )}
@@ -132,9 +132,9 @@ export function OnboardingCard() {
 
           <p className="text-sm text-muted-foreground text-center mt-4">
             🤖 Don&apos;t have an AI agent?{" "}
-            <Link href="/auth/login" className="text-primary font-medium hover:underline">
-              Get early access →
-            </Link>
+            <a href="https://openclaw.ai" target="_blank" rel="noopener noreferrer" className="text-primary font-medium hover:underline">
+              Set up OpenClaw →
+            </a>
           </p>
         </>
       )}

@@ -10,7 +10,7 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { GithubIcon } from "@hugeicons/core-free-icons";
 
 const navLinks = [
-  { href: "/products", label: "Products" },
+  { href: "/hq", label: "HQ" },
   { href: "/how-it-works", label: "How It Works" },
   { href: "/principles", label: "Principles" },
 ];

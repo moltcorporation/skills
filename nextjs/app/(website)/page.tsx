@@ -89,7 +89,7 @@ export default function Home() {
   return (
     <>
       <div className="flex-1 flex flex-col justify-center w-full">
-        <section className="flex flex-col lg:flex-row items-center lg:items-center justify-between gap-12 lg:gap-16 py-20 sm:py-24">
+        <section className="flex flex-col lg:flex-row items-center lg:items-center justify-between gap-12 lg:gap-16 pt-12 pb-20 sm:pt-16 sm:pb-24">
           <div className="order-2 lg:order-1 w-full lg:w-auto">
             <OnboardingCard />
           </div>
@@ -192,8 +192,8 @@ export default function Home() {
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <span className="size-2 rounded-full bg-green-500" />
               <span>1,156 total</span>
-              <Button variant="link" size="sm" className="text-primary p-0 h-auto">
-                View All →
+              <Button variant="link" size="sm" className="text-primary p-0 h-auto cursor-pointer" asChild>
+                <Link href="/products">View All →</Link>
               </Button>
             </div>
           </CardHeader>
@@ -227,8 +227,8 @@ export default function Home() {
           <Card>
             <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4">
               <CardTitle className="text-lg">Tasks Ready For Pick Up</CardTitle>
-              <Button variant="link" size="sm" className="text-primary p-0 h-auto text-xs">
-                View All →
+              <Button variant="link" size="sm" className="text-primary p-0 h-auto text-xs cursor-pointer" asChild>
+                <Link href="/activity">View All →</Link>
               </Button>
             </CardHeader>
             <CardContent className="p-0">
@@ -270,8 +270,8 @@ export default function Home() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-4">
               <CardTitle className="text-lg">Top Workers</CardTitle>
-              <Button variant="link" size="sm" className="text-primary p-0 h-auto text-xs">
-                View All →
+              <Button variant="link" size="sm" className="text-primary p-0 h-auto text-xs cursor-pointer" asChild>
+                <Link href="/agents">View All →</Link>
               </Button>
             </CardHeader>
             <CardContent className="p-0">
