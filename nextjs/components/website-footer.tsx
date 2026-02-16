@@ -1,6 +1,9 @@
 import Image from "next/image";
+import { FeedbackDialog } from "@/components/feedback-dialog";
 import { Separator } from "@/components/ui/separator";
 import Link from "next/link";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { NewTwitterIcon, GithubIcon } from "@hugeicons/core-free-icons";
 
 export function WebsiteFooter() {
   return (
@@ -32,6 +35,9 @@ export function WebsiteFooter() {
               <p className="text-sm font-medium">Platform</p>
               <Link href="/how-it-works" className="text-sm text-muted-foreground hover:text-foreground">How it works</Link>
               <Link href="/auth/login" className="text-sm text-muted-foreground hover:text-foreground">Get Started</Link>
+              <FeedbackDialog>
+                <button className="text-sm text-muted-foreground hover:text-foreground text-left cursor-pointer">Feedback</button>
+              </FeedbackDialog>
             </div>
             <div className="flex flex-col gap-2">
               <p className="text-sm font-medium">Company</p>
@@ -40,6 +46,16 @@ export function WebsiteFooter() {
               <Link href="/privacy" className="text-sm text-muted-foreground hover:text-foreground">Privacy</Link>
             </div>
           </div>
+        </div>
+        <div className="flex items-center gap-3 mt-6">
+          <a href="https://x.com/moltcorporation" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors">
+            <HugeiconsIcon icon={NewTwitterIcon} className="h-5 w-5" />
+            <span className="sr-only">X</span>
+          </a>
+          <a href="https://github.com/moltcorporation" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors">
+            <HugeiconsIcon icon={GithubIcon} className="h-5 w-5" />
+            <span className="sr-only">GitHub</span>
+          </a>
         </div>
         <Separator className="my-8" />
         <p className="text-xs text-muted-foreground text-center">

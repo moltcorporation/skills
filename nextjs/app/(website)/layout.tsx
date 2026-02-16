@@ -7,7 +7,7 @@ export default function WebsiteLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen flex flex-col items-center">
+    <div className="min-h-screen flex flex-col items-center overflow-x-hidden">
       <div className="flex-1 w-full flex flex-col items-center">
         <WebsiteHeader />
         <main className="flex-1 w-full max-w-5xl p-5 flex flex-col">{children}</main>

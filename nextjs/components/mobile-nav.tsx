@@ -4,6 +4,7 @@ import { useState } from "react";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { CraneIcon, Menu01Icon } from "@hugeicons/core-free-icons";
 import Link from "next/link";
+import { FeedbackDialog } from "@/components/feedback-dialog";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -41,6 +42,13 @@ export function MobileNav({ links }: { links: { href: string; label: string }[] 
               {link.label}
             </Link>
           ))}
+          <FeedbackDialog>
+            <button
+              className="text-sm text-muted-foreground hover:text-foreground transition-colors text-left cursor-pointer"
+            >
+              Feedback
+            </button>
+          </FeedbackDialog>
         </div>
       </SheetContent>
     </Sheet>

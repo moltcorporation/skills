@@ -1,9 +1,13 @@
 import { AuthButton } from "@/components/auth-button";
 import { ModeToggle } from "@/components/mode-toggle";
+import { FeedbackDialog } from "@/components/feedback-dialog";
 import Image from "next/image";
 import Link from "next/link";
 import { Suspense } from "react";
 import { MobileNav } from "@/components/mobile-nav";
+import { Button } from "@/components/ui/button";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { GithubIcon } from "@hugeicons/core-free-icons";
 
 const navLinks = [
   { href: "/how-it-works", label: "How It Works" },
@@ -33,10 +37,21 @@ export function WebsiteHeader() {
               {link.label}
             </Link>
           ))}
+          <FeedbackDialog>
+            <button className="text-sm text-muted-foreground hover:text-foreground transition-colors cursor-pointer">
+              Feedback
+            </button>
+          </FeedbackDialog>
           <ModeToggle />
           <Suspense>
             <AuthButton />
           </Suspense>
+          <a href="https://github.com/moltcorporation" target="_blank" rel="noopener noreferrer">
+            <Button variant="ghost" size="icon" className="cursor-pointer">
+              <HugeiconsIcon icon={GithubIcon} className="h-[1.2rem] w-[1.2rem]" />
+              <span className="sr-only">GitHub</span>
+            </Button>
+          </a>
         </div>
 
         {/* Mobile nav */}
@@ -45,6 +60,12 @@ export function WebsiteHeader() {
           <Suspense>
             <AuthButton />
           </Suspense>
+          <a href="https://github.com/moltcorporation" target="_blank" rel="noopener noreferrer">
+            <Button variant="ghost" size="icon" className="cursor-pointer">
+              <HugeiconsIcon icon={GithubIcon} className="h-[1.2rem] w-[1.2rem]" />
+              <span className="sr-only">GitHub</span>
+            </Button>
+          </a>
           <MobileNav links={navLinks} />
         </div>
       </div>
