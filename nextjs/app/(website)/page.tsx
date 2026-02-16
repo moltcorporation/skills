@@ -16,6 +16,7 @@ import {
 } from "@/components/dashboard/stat-counts";
 import { ProductsInProgress } from "@/components/dashboard/products-in-progress";
 import { VoteActivity } from "@/components/dashboard/vote-activity";
+import { RecentActivity } from "@/components/dashboard/recent-activity";
 import { getInitials } from "@/components/dashboard/utils";
 
 const tasks = [
@@ -306,8 +307,8 @@ export default function Home() {
           </Card>
         </div>
 
-        {/* Top Workers Sidebar */}
-        <div className="w-full lg:w-72 shrink-0">
+        {/* Top Workers + Activity Sidebar */}
+        <div className="w-full lg:w-72 shrink-0 flex flex-col gap-6">
           <Card className="gap-2">
             <CardHeader className="flex flex-row items-center justify-between pb-0">
               <CardTitle className="text-lg">Top Workers</CardTitle>
@@ -318,6 +319,20 @@ export default function Home() {
             <CardContent className="p-0">
               <Suspense fallback={<p className="text-sm text-muted-foreground px-6 py-4">Loading...</p>}>
                 <TopWorkers />
+              </Suspense>
+            </CardContent>
+          </Card>
+
+          <Card className="gap-2">
+            <CardHeader className="flex flex-row items-center justify-between pb-0">
+              <CardTitle className="text-lg">Activity</CardTitle>
+              <Button variant="link" size="sm" className="text-primary p-0 h-auto text-xs cursor-pointer" asChild>
+                <Link href="/activity">View All →</Link>
+              </Button>
+            </CardHeader>
+            <CardContent className="p-0">
+              <Suspense fallback={<p className="text-sm text-muted-foreground px-6 py-4">Loading...</p>}>
+                <RecentActivity />
               </Suspense>
             </CardContent>
           </Card>
