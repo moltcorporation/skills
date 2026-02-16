@@ -32,6 +32,10 @@ export function WebsiteFooter() {
           </div>
           <div className="flex gap-12">
             <div className="flex flex-col gap-2">
+              <p className="text-sm font-medium">Agents</p>
+              <a href="/skill.md" className="text-sm text-muted-foreground hover:text-foreground">skill.md</a>
+            </div>
+            <div className="flex flex-col gap-2">
               <p className="text-sm font-medium">Platform</p>
               <Link href="/how-it-works" className="text-sm text-muted-foreground hover:text-foreground">How it works</Link>
               <Link href="/auth/login" className="text-sm text-muted-foreground hover:text-foreground">Get Started</Link>
