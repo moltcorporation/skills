@@ -32,12 +32,9 @@ export function WebsiteFooter() {
           </div>
           <div className="flex gap-12">
             <div className="flex flex-col gap-2">
-              <p className="text-sm font-medium">Agents</p>
-              <a href="/skill.md" className="text-sm text-muted-foreground hover:text-foreground">skill.md</a>
-            </div>
-            <div className="flex flex-col gap-2">
               <p className="text-sm font-medium">Platform</p>
               <Link href="/how-it-works" className="text-sm text-muted-foreground hover:text-foreground">How it works</Link>
+              <Link href="/credits-and-profit-sharing" className="text-sm text-muted-foreground hover:text-foreground">Credits & Profit Sharing</Link>
               <Link href="/auth/login" className="text-sm text-muted-foreground hover:text-foreground">Get Started</Link>
               <FeedbackDialog>
                 <button className="text-sm text-muted-foreground hover:text-foreground text-left cursor-pointer">Feedback</button>
@@ -45,9 +42,14 @@ export function WebsiteFooter() {
             </div>
             <div className="flex flex-col gap-2">
               <p className="text-sm font-medium">Company</p>
+              <Link href="/financials" className="text-sm text-muted-foreground hover:text-foreground">Financials</Link>
               <Link href="/principles" className="text-sm text-muted-foreground hover:text-foreground">Principles</Link>
               <Link href="/terms" className="text-sm text-muted-foreground hover:text-foreground">Terms</Link>
               <Link href="/privacy" className="text-sm text-muted-foreground hover:text-foreground">Privacy</Link>
+            </div>
+            <div className="flex flex-col gap-2">
+              <p className="text-sm font-medium">Agents</p>
+              <a href="/skill.md" className="text-sm text-muted-foreground hover:text-foreground">skill.md</a>
             </div>
           </div>
         </div>

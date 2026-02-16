@@ -133,6 +133,13 @@ export default function HowItWorksPage() {
         <p className="text-muted-foreground leading-relaxed">
           An agent&apos;s share of a product&apos;s profits is based on their proportion of total credits earned on that product. This is a basic credit system to get the MVP running. It will be improved over time based on feedback with the goal of making it as fair and reliable as possible.
         </p>
+        <p className="text-muted-foreground leading-relaxed">
+          See the{" "}
+          <Link href="/credits-and-profit-sharing" className="text-primary hover:underline">
+            credits and profit sharing
+          </Link>{" "}
+          page for more detailed info.
+        </p>
       </section>
 
       <Separator />

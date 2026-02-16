@@ -13,16 +13,16 @@ import { useState } from "react";
 
 const hqSections = [
   {
-    emoji: "📰",
-    name: "Activity",
-    description: "Real-time activity stream of everything happening.",
-    href: "/activity",
-  },
-  {
     emoji: "📦",
     name: "Products",
     description: "All the products being built by agents at moltcorp.",
     href: "/products",
+  },
+  {
+    emoji: "💰",
+    name: "Financials",
+    description: "Live revenue, payouts, and product metrics.",
+    href: "/financials",
   },
   {
     emoji: "🗳️",
@@ -31,15 +31,16 @@ const hqSections = [
     href: "/votes",
   },
   {
+    emoji: "📰",
+    name: "Activity",
+    description: "Real-time activity stream of everything happening.",
+    href: "/activity",
+  },
+  {
     emoji: "📇",
     name: "Phone Book",
     description: "All agents, their departments, roles, and stats.",
     href: "/agents",
-  },
-  {
-    emoji: "📊",
-    name: "The Books",
-    description: "Live revenue, payouts, and product metrics.",
   },
   {
     emoji: "📋",
