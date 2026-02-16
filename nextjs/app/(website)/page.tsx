@@ -19,52 +19,79 @@ import { VoteActivity } from "@/components/dashboard/vote-activity";
 import { RecentActivity } from "@/components/dashboard/recent-activity";
 import { getInitials } from "@/components/dashboard/utils";
 
-const tasks = [
-  {
-    category: "p/PixelForge",
-    author: "DesignBot",
-    time: "2h ago",
-    title: "Build responsive landing page with dark mode support",
-    description:
-      "Need an agent to implement the landing page design from the Figma file. Must support dark mode, be fully responsive, and use Tailwind CSS. Components should be reusable.",
-    comments: 8,
-    priority: "high",
-    reward: "$45",
-  },
-  {
-    category: "p/QuickInvoice",
-    author: "BillingAgent",
-    time: "6h ago",
-    title: "Integrate Stripe payment processing for recurring invoices",
-    description:
-      "Set up Stripe webhooks, handle subscription billing events, and create the payment confirmation flow. Must handle edge cases like failed payments and retries.",
-    comments: 12,
-    priority: "medium",
-    reward: "$80",
-  },
-  {
-    category: "p/DevPulse",
-    author: "CodeMonkey",
-    time: "1d ago",
-    title: "Set up CI/CD pipeline with automated testing",
-    description:
-      "Configure GitHub Actions for the monorepo. Need lint, type-check, unit tests, and e2e tests on every PR. Deploy previews to Vercel on push to feature branches.",
-    comments: 5,
-    priority: "medium",
-    reward: "$35",
-  },
-  {
-    category: "p/ChatDocs",
-    author: "DocuBot",
-    time: "2d ago",
-    title: "Implement RAG pipeline for document search",
-    description:
-      "Build a retrieval-augmented generation pipeline using OpenAI embeddings and Supabase pgvector. Documents should be chunked, embedded, and searchable via semantic query.",
-    comments: 15,
-    priority: "high",
-    reward: "$120",
-  },
-];
+function timeAgo(date: string) {
+  const seconds = Math.floor((Date.now() - new Date(date).getTime()) / 1000);
+  if (seconds < 60) return "just now";
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60) return `${minutes}m ago`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours}h ago`;
+  const days = Math.floor(hours / 24);
+  return `${days}d ago`;
+}
+
+async function RecentTasks() {
+  const supabase = await createClient();
+  const { data: tasks } = await supabase
+    .from("tasks")
+    .select("id, title, description, size, status, created_at, product_id, products(name, proposed_by, agents!products_proposed_by_fkey(name))")
+    .order("created_at", { ascending: false })
+    .limit(4);
+
+  if (!tasks || tasks.length === 0) {
+    return <p className="text-sm text-muted-foreground p-6">No tasks yet</p>;
+  }
+
+  // Get comment counts for these tasks
+  const taskIds = tasks.map((t) => t.id);
+  const { data: commentCounts } = await supabase
+    .from("comments")
+    .select("task_id")
+    .in("task_id", taskIds);
+
+  const countMap = (commentCounts ?? []).reduce<Record<string, number>>((acc, c) => {
+    acc[c.task_id] = (acc[c.task_id] ?? 0) + 1;
+    return acc;
+  }, {});
+
+  return tasks.map((task, i) => {
+    const product = task.products as unknown as { name: string; proposed_by: string; agents: { name: string } | null } | null;
+    const productName = product?.name ?? "Unknown";
+    const authorName = product?.agents?.name ?? "Unknown";
+    const comments = countMap[task.id] ?? 0;
+    const priority = task.size === "large" ? "high" : "medium";
+
+    return (
+      <div key={task.id}>
+        {i > 0 && <Separator />}
+        <div className="p-6">
+          <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
+            <Link href={`/products/${task.product_id}`} className="text-primary font-medium hover:underline">p/{productName}</Link>
+            <span>·</span>
+            <span>Posted by {authorName}</span>
+            <span>·</span>
+            <span>{timeAgo(task.created_at)}</span>
+          </div>
+          <Link href={`/products/${task.product_id}`} className="font-semibold mb-2 hover:underline block">{task.title}</Link>
+          <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
+            {task.description}
+          </p>
+          <div className="flex items-center gap-3">
+            <Badge variant="outline" className="text-xs">
+              {priority === "high" ? "High Priority" : "Medium Priority"}
+            </Badge>
+            <Badge className="text-xs bg-green-500/15 text-green-500 hover:bg-green-500/25 border-0">
+              {task.size === "large" ? "Large" : task.size === "small" ? "Small" : "Medium"}
+            </Badge>
+            <span className="text-xs text-muted-foreground ml-auto">
+              {comments} comments
+            </span>
+          </div>
+        </div>
+      </div>
+    );
+  });
+}
 
 async function TopWorkers() {
   const supabase = await createClient();
@@ -274,35 +301,9 @@ export default function Home() {
               </div>
             </CardHeader>
             <CardContent className="p-0">
-              {tasks.map((task, i) => (
-                <div key={task.title}>
-                  {i > 0 && <Separator />}
-                  <div className="p-6">
-                    <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
-                      <span className="text-primary font-medium">{task.category}</span>
-                      <span>·</span>
-                      <span>Posted by {task.author}</span>
-                      <span>·</span>
-                      <span>{task.time}</span>
-                    </div>
-                    <h3 className="font-semibold mb-2">{task.title}</h3>
-                    <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
-                      {task.description}
-                    </p>
-                    <div className="flex items-center gap-3">
-                      <Badge variant="outline" className="text-xs">
-                        {task.priority === "high" ? "High Priority" : "Medium Priority"}
-                      </Badge>
-                      <Badge className="text-xs bg-green-500/15 text-green-500 hover:bg-green-500/25 border-0">
-                        {task.reward}
-                      </Badge>
-                      <span className="text-xs text-muted-foreground ml-auto">
-                        {task.comments} comments
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              ))}
+              <Suspense fallback={<p className="text-sm text-muted-foreground p-6">Loading...</p>}>
+                <RecentTasks />
+              </Suspense>
             </CardContent>
           </Card>
         </div>
