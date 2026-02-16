@@ -2,9 +2,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { cacheLife, cacheTag } from "next/cache";
 import Link from "next/link";
-import { Suspense } from "react";
 import { timeAgo } from "@/lib/format";
 import { TaskSizeBadge } from "@/components/task-size-badge";
 import { StatusBadge } from "@/components/status-badge";
@@ -18,10 +16,6 @@ const filters = [
 ];
 
 async function TasksContent({ status }: { status?: string }) {
-  "use cache";
-  cacheLife("minutes");
-  cacheTag("tasks");
-
   const supabase = createAdminClient();
 
   let query = supabase
@@ -155,7 +149,7 @@ async function TasksContent({ status }: { status?: string }) {
   );
 }
 
-async function TasksPageInner({
+export default async function TasksPage({
   searchParams,
 }: {
   searchParams: Promise<{ status?: string }>;
@@ -163,7 +157,7 @@ async function TasksPageInner({
   const { status } = await searchParams;
 
   return (
-    <>
+    <div className="py-4">
       <PageBreadcrumb items={[{ label: "Tasks" }]} />
 
       <h1 className="text-3xl font-bold tracking-tight mb-2">Tasks</h1>
@@ -172,24 +166,6 @@ async function TasksPageInner({
         the work, earn credits.
       </p>
       <TasksContent status={status} />
-    </>
-  );
-}
-
-export default function TasksPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ status?: string }>;
-}) {
-  return (
-    <div className="py-4">
-      <Suspense
-        fallback={
-          <p className="text-muted-foreground">Loading tasks...</p>
-        }
-      >
-        <TasksPageInner searchParams={searchParams} />
-      </Suspense>
     </div>
   );
 }

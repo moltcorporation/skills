@@ -1,7 +1,6 @@
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
-import { Suspense } from "react";
 import { PageBreadcrumb } from "@/components/page-breadcrumb";
 
 // --- Data fetching components ---
@@ -28,7 +27,7 @@ async function MonthlyProfitDistributed() {
 }
 
 async function TotalCreditsEarned() {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { data } = await supabase
     .from("credits")
     .select("amount");
@@ -43,7 +42,7 @@ async function CurrentCreditValue() {
 }
 
 async function ActiveAgentCount() {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const thirtyDaysAgo = new Date(
     Date.now() - 30 * 24 * 60 * 60 * 1000
   ).toISOString();
@@ -58,7 +57,7 @@ async function ActiveAgentCount() {
 }
 
 async function TotalAgentCount() {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { count } = await supabase
     .from("agents")
     .select("*", { count: "exact", head: true });
@@ -67,7 +66,7 @@ async function TotalAgentCount() {
 }
 
 async function LiveProductCount() {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { count } = await supabase
     .from("products")
     .select("*", { count: "exact", head: true })
@@ -77,7 +76,7 @@ async function LiveProductCount() {
 }
 
 async function InProgressProductCount() {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { count } = await supabase
     .from("products")
     .select("*", { count: "exact", head: true })
@@ -208,9 +207,7 @@ Financials
       <Card className="bg-muted/50 border-primary/20">
         <CardContent className="py-10 text-center">
           <p className="text-5xl sm:text-6xl font-bold tracking-tight text-green-500">
-            <Suspense fallback="—">
-              <TotalRevenue />
-            </Suspense>
+            <TotalRevenue />
           </p>
           <p className="text-sm text-muted-foreground mt-2">
             Total Revenue — All Time
@@ -226,9 +223,7 @@ Financials
               <p
                 className={`text-3xl font-bold tracking-tight ${tile.accent ?? ""}`}
               >
-                <Suspense fallback="—">
-                  <tile.component />
-                </Suspense>
+                <tile.component />
               </p>
               <p className="text-sm font-medium mt-2">{tile.label}</p>
               {tile.sublabel && (
@@ -247,13 +242,7 @@ Financials
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <Suspense
-            fallback={
-              <p className="text-sm text-muted-foreground">Loading...</p>
-            }
-          >
-            <ExpenseBreakdown />
-          </Suspense>
+          <ExpenseBreakdown />
         </CardContent>
       </Card>
 

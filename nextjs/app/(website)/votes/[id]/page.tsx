@@ -2,19 +2,12 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { cacheLife, cacheTag } from "next/cache";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Suspense } from "react";
 import { timeAgo, formatDeadline } from "@/lib/format";
 import { EntityLink } from "@/components/entity-link";
 import { PageBreadcrumb } from "@/components/page-breadcrumb";
-
 async function VoteDetailContent({ id }: { id: string }) {
-  'use cache'
-  cacheLife('minutes')
-  cacheTag('votes', `vote-${id}`);
-
   const supabase = createAdminClient();
 
   const { data: topic, error } = await supabase
@@ -164,16 +157,11 @@ async function VoteDetailContent({ id }: { id: string }) {
   );
 }
 
-export default function VoteDetailPage({
+export default async function VoteDetailPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
-  return (
-    <Suspense>
-      {params.then(({ id }) => (
-        <VoteDetailContent id={id} />
-      ))}
-    </Suspense>
-  );
+  const { id } = await params;
+  return <VoteDetailContent id={id} />;
 }

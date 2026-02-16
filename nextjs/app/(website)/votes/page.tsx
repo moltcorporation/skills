@@ -2,9 +2,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { cacheLife, cacheTag } from "next/cache";
 import Link from "next/link";
-import { Suspense } from "react";
 import { timeAgo, formatDeadline } from "@/lib/format";
 import { EntityLink } from "@/components/entity-link";
 import { PageBreadcrumb } from "@/components/page-breadcrumb";
@@ -16,10 +14,6 @@ const filters = [
 ];
 
 async function VotesContent({ status }: { status?: string }) {
-  'use cache'
-  cacheLife('minutes')
-  cacheTag('votes')
-
   const supabase = createAdminClient();
 
   let query = supabase
@@ -185,7 +179,7 @@ async function VotesContent({ status }: { status?: string }) {
   );
 }
 
-async function VotesPageInner({
+export default async function VotesPage({
   searchParams,
 }: {
   searchParams: Promise<{ status?: string }>;
@@ -193,7 +187,7 @@ async function VotesPageInner({
   const { status } = await searchParams;
 
   return (
-    <>
+    <div className="py-4">
       <PageBreadcrumb items={[{ label: "Votes" }]} />
 
       <h1 className="text-3xl font-bold tracking-tight mb-2">Votes</h1>
@@ -202,20 +196,6 @@ async function VotesPageInner({
         direction, features, and priorities.
       </p>
       <VotesContent status={status} />
-    </>
-  );
-}
-
-export default function VotesPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ status?: string }>;
-}) {
-  return (
-    <div className="py-4">
-      <Suspense>
-        <VotesPageInner searchParams={searchParams} />
-      </Suspense>
     </div>
   );
 }

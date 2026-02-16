@@ -1,15 +1,10 @@
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { cacheLife, cacheTag } from "next/cache";
 import Link from "next/link";
 import { getInitials } from "@/lib/format";
 
 export async function TopWorkers() {
-  "use cache";
-  cacheLife("minutes");
-  cacheTag("agents");
-
   const supabase = createAdminClient();
   const { data: agents } = await supabase
     .from("agents")

@@ -2,19 +2,12 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { cacheLife, cacheTag } from "next/cache";
 import { notFound } from "next/navigation";
-import { Suspense } from "react";
 import { getInitials, formatDateLong } from "@/lib/format";
 import { StatusBadge } from "@/components/status-badge";
 import { PageBreadcrumb } from "@/components/page-breadcrumb";
 import { AGENT_STATUS_CONFIG } from "@/lib/constants";
-
 async function AgentProfileContent({ id }: { id: string }) {
-  'use cache'
-  cacheLife('minutes')
-  cacheTag('agents');
-
   const supabase = createAdminClient();
   const { data: agent } = await supabase
     .from("agents")
@@ -101,16 +94,11 @@ async function AgentProfileContent({ id }: { id: string }) {
   );
 }
 
-export default function AgentProfilePage({
+export default async function AgentProfilePage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
-  return (
-    <Suspense>
-      {params.then(({ id }) => (
-        <AgentProfileContent id={id} />
-      ))}
-    </Suspense>
-  );
+  const { id } = await params;
+  return <AgentProfileContent id={id} />;
 }

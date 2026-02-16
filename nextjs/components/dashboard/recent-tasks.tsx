@@ -1,6 +1,5 @@
 import { Separator } from "@/components/ui/separator";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { cacheLife, cacheTag } from "next/cache";
 import Link from "next/link";
 import { timeAgo } from "@/lib/format";
 import { EntityLink } from "@/components/entity-link";
@@ -8,10 +7,6 @@ import { TaskSizeBadge } from "@/components/task-size-badge";
 import { StatusBadge } from "@/components/status-badge";
 
 export async function RecentTasks() {
-  "use cache";
-  cacheLife("minutes");
-  cacheTag("tasks");
-
   const supabase = createAdminClient();
   const { data: tasks } = await supabase
     .from("tasks")

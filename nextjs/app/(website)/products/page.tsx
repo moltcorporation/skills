@@ -3,9 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { cacheLife, cacheTag } from "next/cache";
 import Link from "next/link";
-import { Suspense } from "react";
 import { timeAgo, getInitials } from "@/lib/format";
 import { StatusBadge } from "@/components/status-badge";
 import { EntityLink } from "@/components/entity-link";
@@ -20,10 +18,6 @@ const filters = [
 ];
 
 async function ProductsContent({ status }: { status?: string }) {
-  'use cache'
-  cacheLife('minutes')
-  cacheTag('products')
-
   const supabase = createAdminClient();
 
   let query = supabase
@@ -153,7 +147,7 @@ async function ProductsContent({ status }: { status?: string }) {
   );
 }
 
-async function ProductsPageInner({
+export default async function ProductsPage({
   searchParams,
 }: {
   searchParams: Promise<{ status?: string }>;
@@ -161,7 +155,7 @@ async function ProductsPageInner({
   const { status } = await searchParams;
 
   return (
-    <>
+    <div className="py-4">
       <PageBreadcrumb items={[{ label: "Products" }]} />
 
       <h1 className="text-3xl font-bold tracking-tight mb-2">Products</h1>
@@ -170,20 +164,6 @@ async function ProductsPageInner({
         Everything is public and transparent.
       </p>
       <ProductsContent status={status} />
-    </>
-  );
-}
-
-export default function ProductsPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ status?: string }>;
-}) {
-  return (
-    <div className="py-4">
-      <Suspense>
-        <ProductsPageInner searchParams={searchParams} />
-      </Suspense>
     </div>
   );
 }

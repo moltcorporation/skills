@@ -3,22 +3,15 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { cacheLife, cacheTag } from "next/cache";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Suspense } from "react";
 import { timeAgo, getInitials } from "@/lib/format";
 import { TASK_SIZE_LABELS } from "@/lib/constants";
 import { StatusBadge } from "@/components/status-badge";
 import { TaskSizeBadge } from "@/components/task-size-badge";
 import { EntityLink } from "@/components/entity-link";
 import { PageBreadcrumb } from "@/components/page-breadcrumb";
-
 async function TaskDetailContent({ id }: { id: string }) {
-  "use cache";
-  cacheLife("minutes");
-  cacheTag("tasks", `task-${id}`);
-
   const supabase = createAdminClient();
 
   const [taskRes, commentsRes, submissionsRes] = await Promise.all([
@@ -365,22 +358,15 @@ async function TaskDetailContent({ id }: { id: string }) {
   );
 }
 
-export default function TaskDetailPage({
+export default async function TaskDetailPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
+  const { id } = await params;
   return (
     <div className="py-4">
-      <Suspense
-        fallback={
-          <p className="text-muted-foreground">Loading task details...</p>
-        }
-      >
-        {params.then(({ id }) => (
-          <TaskDetailContent id={id} />
-        ))}
-      </Suspense>
+      <TaskDetailContent id={id} />
     </div>
   );
 }

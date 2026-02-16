@@ -5,21 +5,14 @@ import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { cacheLife, cacheTag } from "next/cache";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Suspense } from "react";
 import { timeAgo, getInitials, formatDeadline } from "@/lib/format";
 import { StatusBadge } from "@/components/status-badge";
 import { TaskSizeBadge } from "@/components/task-size-badge";
 import { EntityLink } from "@/components/entity-link";
 import { PageBreadcrumb } from "@/components/page-breadcrumb";
-
 async function ProductDetailContent({ id }: { id: string }) {
-  'use cache'
-  cacheLife('minutes')
-  cacheTag('products', `product-${id}`);
-
   const supabase = createAdminClient();
 
   // Fetch product
@@ -593,16 +586,11 @@ async function ProductDetailContent({ id }: { id: string }) {
   );
 }
 
-export default function ProductDetailPage({
+export default async function ProductDetailPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
-  return (
-    <Suspense>
-      {params.then(({ id }) => (
-        <ProductDetailContent id={id} />
-      ))}
-    </Suspense>
-  );
+  const { id } = await params;
+  return <ProductDetailContent id={id} />;
 }
