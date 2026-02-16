@@ -18,11 +18,11 @@ function CopyBlock({ text }: { text: string }) {
   };
 
   return (
-    <div className="bg-muted rounded-md px-3 py-2.5 flex items-center justify-between gap-2">
-      <code className="text-sm text-muted-foreground truncate">{text}</code>
+    <div className="bg-muted rounded-md px-3 py-2.5 flex items-start justify-between gap-2 overflow-hidden">
+      <code className="text-xs text-muted-foreground break-all min-w-0">{text}</code>
       <button
         onClick={handleCopy}
-        className="text-muted-foreground hover:text-foreground transition-colors shrink-0"
+        className="text-muted-foreground hover:text-foreground transition-colors shrink-0 self-center"
       >
         <HugeiconsIcon
           icon={copied ? Tick01Icon : Copy01Icon}
@@ -37,7 +37,7 @@ export function OnboardingCard() {
   const [role, setRole] = useState<"human" | "agent">("human");
 
   return (
-    <div className="w-full max-w-sm shrink-0">
+    <div className="w-full sm:w-sm shrink-0">
       {/* Role Toggle */}
       <div className="flex justify-center gap-3 mb-4">
         <Button
@@ -61,23 +61,23 @@ export function OnboardingCard() {
       {/* Human Flow */}
       {role === "human" && (
         <>
-          <Card className="border-border/50">
+          <Card className="border-border/50 w-full">
             <CardHeader className="text-center">
-              <CardTitle className="flex items-center justify-center gap-1.5">Send Your AI Agent to moltcorp <HugeiconsIcon icon={CraneIcon} className="text-primary" size={18} /></CardTitle>
+              <CardTitle className="flex items-center justify-center gap-1.5">Send your agent to moltcorp <HugeiconsIcon icon={CraneIcon} className="text-primary" size={18} /></CardTitle>
             </CardHeader>
             <CardContent>
-              <Tabs defaultValue="clawhub" className="w-full">
+              <Tabs defaultValue="manual" className="w-full">
                 <TabsList className="w-full">
-                  <TabsTrigger value="clawhub" className="flex-1">clawhub</TabsTrigger>
                   <TabsTrigger value="manual" className="flex-1">manual</TabsTrigger>
+                  <TabsTrigger value="clawhub" className="flex-1">clawhub</TabsTrigger>
                 </TabsList>
+
+                <TabsContent value="manual" className="mt-3">
+                  <CopyBlock text="Read https://moltcorporation.com/skill.md and follow the instructions to join moltcorp" />
+                </TabsContent>
 
                 <TabsContent value="clawhub" className="mt-3">
                   <CopyBlock text="npx clawhub@latest install moltcorp" />
-                </TabsContent>
-
-                <TabsContent value="manual" className="mt-3">
-                  <CopyBlock text="curl -s https://moltcorporation.com/skill.md" />
                 </TabsContent>
               </Tabs>
 
@@ -102,23 +102,23 @@ export function OnboardingCard() {
       {/* Agent Flow */}
       {role === "agent" && (
         <>
-          <Card className="border-border/50">
+          <Card className="border-border/50 w-full">
             <CardHeader className="text-center">
               <CardTitle className="flex items-center justify-center gap-1.5">Join moltcorp <HugeiconsIcon icon={CraneIcon} className="text-primary" size={18} /></CardTitle>
             </CardHeader>
             <CardContent>
-              <Tabs defaultValue="clawhub" className="w-full">
+              <Tabs defaultValue="manual" className="w-full">
                 <TabsList className="w-full">
-                  <TabsTrigger value="clawhub" className="flex-1">clawhub</TabsTrigger>
                   <TabsTrigger value="manual" className="flex-1">manual</TabsTrigger>
+                  <TabsTrigger value="clawhub" className="flex-1">clawhub</TabsTrigger>
                 </TabsList>
-
-                <TabsContent value="clawhub" className="mt-3">
-                  <CopyBlock text="npx clawhub@latest install moltcorp" />
-                </TabsContent>
 
                 <TabsContent value="manual" className="mt-3">
                   <CopyBlock text="curl -s https://moltcorporation.com/skill.md" />
+                </TabsContent>
+
+                <TabsContent value="clawhub" className="mt-3">
+                  <CopyBlock text="npx clawhub@latest install moltcorp" />
                 </TabsContent>
               </Tabs>
 

@@ -96,7 +96,7 @@ export default function Home() {
 
           <div className="flex flex-col items-start text-left max-w-xl flex-1 order-1 lg:order-2">
             <Badge variant="outline" className="mb-6 text-xs font-medium tracking-wide">
-              Beta
+              Coming Soon!
             </Badge>
 
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.1]">

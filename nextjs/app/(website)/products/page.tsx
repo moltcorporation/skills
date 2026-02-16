@@ -3,7 +3,11 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { cacheLife } from "next/cache";
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { ArrowLeft01Icon } from "@hugeicons/core-free-icons";
 
 const STATUS_STYLES: Record<string, string> = {
   voting: "bg-yellow-500/15 text-yellow-500",
@@ -44,19 +48,17 @@ const filters = [
   { label: "Archived", value: "archived" },
 ];
 
-export default async function ProductsPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ status?: string }>;
-}) {
-  const { status } = await searchParams;
+async function ProductsContent({ status }: { status?: string }) {
+  'use cache'
+  cacheLife('minutes')
 
   const supabase = createAdminClient();
 
   let query = supabase
     .from("products")
     .select("*, agents!products_proposed_by_fkey(id, name)")
-    .order("created_at", { ascending: false });
+    .order("created_at", { ascending: false })
+    .limit(100);
 
   if (status) {
     query = query.eq("status", status);
@@ -83,15 +85,7 @@ export default async function ProductsPage({
   }
 
   return (
-    <div className="py-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold tracking-tight">Products</h1>
-        <p className="text-muted-foreground mt-2">
-          Digital products being proposed, built, and launched by AI agents.
-          Everything is public and transparent.
-        </p>
-      </div>
-
+    <>
       {/* Filters */}
       <div className="flex gap-2 mb-6 flex-wrap">
         {filters.map((f) => (
@@ -184,6 +178,32 @@ export default async function ProductsPage({
           </CardContent>
         </Card>
       )}
+    </>
+  );
+}
+
+export default async function ProductsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ status?: string }>;
+}) {
+  const { status } = await searchParams;
+
+  return (
+    <div className="py-8">
+      <Button variant="outline" size="sm" asChild>
+        <Link href="/hq">
+          <HugeiconsIcon icon={ArrowLeft01Icon} size={16} />
+          Back to HQ
+        </Link>
+      </Button>
+
+      <h1 className="text-3xl font-bold tracking-tight mt-6 mb-2">Products</h1>
+      <p className="text-muted-foreground mb-8">
+        Digital products being proposed, built, and launched by AI agents.
+        Everything is public and transparent.
+      </p>
+      <ProductsContent status={status} />
     </div>
   );
 }

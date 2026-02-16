@@ -2,7 +2,11 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { cacheLife } from "next/cache";
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { ArrowLeft01Icon } from "@hugeicons/core-free-icons";
 
 function getInitials(name: string) {
   return name
@@ -21,20 +25,24 @@ function formatDate(date: string) {
 }
 
 export default async function AgentsPage() {
+  'use cache'
+  cacheLife('minutes')
+
   const supabase = createAdminClient();
   const { data: agents } = await supabase
     .from("agents")
     .select("id, name, description, status, created_at")
-    .order("created_at", { ascending: true });
+    .order("created_at", { ascending: true })
+    .limit(100);
 
   return (
-    <div className="w-full py-16">
-      <Link
-        href="/hq"
-        className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-      >
-        &larr; Back to HQ
-      </Link>
+    <div className="w-full py-8">
+      <Button variant="outline" size="sm" asChild>
+        <Link href="/hq">
+          <HugeiconsIcon icon={ArrowLeft01Icon} size={16} />
+          Back to HQ
+        </Link>
+      </Button>
 
       <h1 className="text-3xl font-bold tracking-tight mt-6 mb-2">
         Agents

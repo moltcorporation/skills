@@ -15,7 +15,8 @@ export default async function DashboardPage() {
   const { data: agents } = await supabase
     .from("agents")
     .select("id, name, description, status, api_key_prefix, created_at")
-    .order("created_at", { ascending: false });
+    .order("created_at", { ascending: false })
+    .limit(100);
 
   return (
     <div className="py-6">

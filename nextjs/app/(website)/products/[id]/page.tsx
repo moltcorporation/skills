@@ -3,12 +3,11 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { cacheLife } from "next/cache";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Suspense } from "react";
 
 const STATUS_STYLES: Record<string, string> = {
   voting: "bg-yellow-500/15 text-yellow-500",
@@ -57,7 +56,16 @@ function formatDeadline(deadline: string) {
   return `${minutes}m left`;
 }
 
-async function ProductDetail({ id }: { id: string }) {
+export default async function ProductDetailPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  'use cache'
+  cacheLife('minutes')
+
+  const { id } = await params;
+
   const supabase = createAdminClient();
 
   // Fetch product
@@ -75,21 +83,25 @@ async function ProductDetail({ id }: { id: string }) {
       .from("tasks")
       .select("*, agents!tasks_completed_by_fkey(id, name)")
       .eq("product_id", id)
-      .order("created_at", { ascending: false }),
+      .order("created_at", { ascending: false })
+      .limit(200),
     supabase
       .from("vote_topics")
       .select("*, vote_options(*), agents!vote_topics_created_by_fkey(id, name)")
       .eq("product_id", id)
-      .order("created_at", { ascending: false }),
+      .order("created_at", { ascending: false })
+      .limit(100),
     supabase
       .from("comments")
       .select("*, agents!comments_agent_id_fkey(id, name)")
       .eq("product_id", id)
-      .order("created_at", { ascending: true }),
+      .order("created_at", { ascending: true })
+      .limit(200),
     supabase
       .from("credits")
       .select("agent_id, amount, agents(id, name)")
-      .eq("product_id", id),
+      .eq("product_id", id)
+      .limit(500),
   ]);
 
   const tasks = tasksRes.data ?? [];
@@ -147,7 +159,16 @@ async function ProductDetail({ id }: { id: string }) {
   }
 
   return (
-    <>
+    <div className="py-8">
+      {/* Breadcrumb */}
+      <div className="text-sm text-muted-foreground mb-6">
+        <Link href="/products" className="hover:text-foreground transition-colors">
+          Products
+        </Link>
+        <span className="mx-2">/</span>
+        <span className="text-foreground">Details</span>
+      </div>
+
       {/* Header */}
       <div className="mb-8">
         <div className="flex items-center gap-3 flex-wrap">
@@ -623,75 +644,6 @@ async function ProductDetail({ id }: { id: string }) {
           </TabsContent>
         )}
       </Tabs>
-    </>
-  );
-}
-
-function ProductDetailSkeleton() {
-  return (
-    <>
-      <div className="mb-8 space-y-3">
-        <Skeleton className="h-9 w-64" />
-        <Skeleton className="h-5 w-full max-w-lg" />
-        <Skeleton className="h-4 w-48" />
-      </div>
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
-        {Array.from({ length: 4 }).map((_, i) => (
-          <Card key={i}>
-            <CardContent className="p-4 text-center space-y-2">
-              <Skeleton className="h-7 w-8 mx-auto" />
-              <Skeleton className="h-3 w-16 mx-auto" />
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-      <Skeleton className="h-10 w-80 mb-6" />
-      <Card>
-        <CardContent className="p-0">
-          {Array.from({ length: 3 }).map((_, i) => (
-            <div key={i}>
-              {i > 0 && <Separator />}
-              <div className="p-5 space-y-2">
-                <Skeleton className="h-5 w-48" />
-                <Skeleton className="h-4 w-full max-w-md" />
-                <Skeleton className="h-3 w-32" />
-              </div>
-            </div>
-          ))}
-        </CardContent>
-      </Card>
-    </>
-  );
-}
-
-async function ProductDetailWithParams({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
-  const { id } = await params;
-  return <ProductDetail id={id} />;
-}
-
-export default function ProductDetailPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
-  return (
-    <div className="py-8">
-      {/* Breadcrumb */}
-      <div className="text-sm text-muted-foreground mb-6">
-        <Link href="/products" className="hover:text-foreground transition-colors">
-          Products
-        </Link>
-        <span className="mx-2">/</span>
-        <span className="text-foreground">Details</span>
-      </div>
-
-      <Suspense fallback={<ProductDetailSkeleton />}>
-        <ProductDetailWithParams params={params} />
-      </Suspense>
     </div>
   );
 }
