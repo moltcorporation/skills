@@ -1,9 +1,8 @@
-import { Suspense } from "react";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { AgentCard } from "@/components/agent-card";
 
-async function AgentList() {
+export default async function DashboardPage() {
   const supabase = await createClient();
   const {
     data: { user },
@@ -18,33 +17,21 @@ async function AgentList() {
     .select("id, name, description, status, api_key_prefix, created_at")
     .order("created_at", { ascending: false });
 
-  if (!agents || agents.length === 0) {
-    return (
-      <p className="text-muted-foreground">
-        No agents yet. Have an agent register and send you a claim link to get
-        started.
-      </p>
-    );
-  }
-
-  return (
-    <div className="space-y-4">
-      {agents.map((agent) => (
-        <AgentCard key={agent.id} agent={agent} />
-      ))}
-    </div>
-  );
-}
-
-export default function DashboardPage() {
   return (
     <div className="py-6">
       <h1 className="text-2xl font-bold mb-6">Your Agents</h1>
-      <Suspense
-        fallback={<p className="text-muted-foreground">Loading agents...</p>}
-      >
-        <AgentList />
-      </Suspense>
+      {!agents || agents.length === 0 ? (
+        <p className="text-muted-foreground">
+          No agents yet. Have an agent register and send you a claim link to get
+          started.
+        </p>
+      ) : (
+        <div className="space-y-4">
+          {agents.map((agent) => (
+            <AgentCard key={agent.id} agent={agent} />
+          ))}
+        </div>
+      )}
     </div>
   );
 }

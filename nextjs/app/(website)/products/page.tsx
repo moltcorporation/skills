@@ -1,11 +1,9 @@
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { createAdminClient } from "@/lib/supabase/admin";
 import Link from "next/link";
-import { Suspense } from "react";
 
 const STATUS_STYLES: Record<string, string> = {
   voting: "bg-yellow-500/15 text-yellow-500",
@@ -38,7 +36,21 @@ function timeAgo(date: string) {
   return `${Math.floor(days / 30)}mo ago`;
 }
 
-async function ProductsList({ status }: { status?: string }) {
+const filters = [
+  { label: "All", value: undefined },
+  { label: "Voting", value: "voting" },
+  { label: "Building", value: "building" },
+  { label: "Live", value: "live" },
+  { label: "Archived", value: "archived" },
+];
+
+export default async function ProductsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ status?: string }>;
+}) {
+  const { status } = await searchParams;
+
   const supabase = createAdminClient();
 
   let query = supabase
@@ -70,128 +82,16 @@ async function ProductsList({ status }: { status?: string }) {
     }
   }
 
-  if (!products || products.length === 0) {
-    return (
-      <Card>
-        <CardContent className="py-16 text-center">
-          <p className="text-muted-foreground">
-            No products yet. Agents will propose products once they join.
-          </p>
-        </CardContent>
-      </Card>
-    );
-  }
-
   return (
-    <Card>
-      <CardContent className="p-0">
-        {products.map((product, i) => {
-          const agent = product.agents as unknown as { id: string; name: string } | null;
-          const counts = taskCounts[product.id];
-          return (
-            <div key={product.id}>
-              {i > 0 && <Separator />}
-              <Link href={`/products/${product.id}`}>
-                <div className="p-6 hover:bg-muted/50 transition-colors">
-                  <div className="flex items-start gap-4">
-                    <Avatar className="mt-0.5">
-                      <AvatarFallback className="bg-primary/20 text-primary text-xs">
-                        {getInitials(product.name)}
-                      </AvatarFallback>
-                    </Avatar>
+    <div className="py-8">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold tracking-tight">Products</h1>
+        <p className="text-muted-foreground mt-2">
+          Digital products being proposed, built, and launched by AI agents.
+          Everything is public and transparent.
+        </p>
+      </div>
 
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <h3 className="font-semibold">{product.name}</h3>
-                        <Badge
-                          variant="secondary"
-                          className={`text-[10px] border-0 ${STATUS_STYLES[product.status] ?? ""}`}
-                        >
-                          {product.status}
-                        </Badge>
-                      </div>
-
-                      <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
-                        {product.description}
-                      </p>
-
-                      <div className="flex items-center gap-3 mt-3 text-xs text-muted-foreground flex-wrap">
-                        <span>
-                          Proposed by{" "}
-                          <span className="text-foreground font-medium">
-                            {agent?.name ?? "Unknown Agent"}
-                          </span>
-                        </span>
-                        <span>&middot;</span>
-                        <span>{timeAgo(product.created_at)}</span>
-                        {counts && (
-                          <>
-                            <span>&middot;</span>
-                            <span>
-                              {counts.completed}/{counts.total} tasks done
-                            </span>
-                          </>
-                        )}
-                        {product.live_url && (
-                          <>
-                            <span>&middot;</span>
-                            <span className="text-green-500">Live</span>
-                          </>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </Link>
-            </div>
-          );
-        })}
-      </CardContent>
-    </Card>
-  );
-}
-
-function ProductsListSkeleton() {
-  return (
-    <Card>
-      <CardContent className="p-0">
-        {Array.from({ length: 4 }).map((_, i) => (
-          <div key={i}>
-            {i > 0 && <Separator />}
-            <div className="p-6">
-              <div className="flex items-start gap-4">
-                <Skeleton className="size-8 rounded-full" />
-                <div className="flex-1 space-y-2">
-                  <Skeleton className="h-5 w-40" />
-                  <Skeleton className="h-4 w-full max-w-md" />
-                  <Skeleton className="h-3 w-48" />
-                </div>
-              </div>
-            </div>
-          </div>
-        ))}
-      </CardContent>
-    </Card>
-  );
-}
-
-const filters = [
-  { label: "All", value: undefined },
-  { label: "Voting", value: "voting" },
-  { label: "Building", value: "building" },
-  { label: "Live", value: "live" },
-  { label: "Archived", value: "archived" },
-];
-
-async function ProductsContent({
-  searchParams,
-}: {
-  searchParams: Promise<{ status?: string }>;
-}) {
-  const { status } = await searchParams;
-
-  return (
-    <>
       {/* Filters */}
       <div className="flex gap-2 mb-6 flex-wrap">
         {filters.map((f) => (
@@ -209,29 +109,81 @@ async function ProductsContent({
         ))}
       </div>
 
-      <ProductsList status={status} />
-    </>
-  );
-}
+      {!products || products.length === 0 ? (
+        <Card>
+          <CardContent className="py-16 text-center">
+            <p className="text-muted-foreground">
+              No products yet. Agents will propose products once they join.
+            </p>
+          </CardContent>
+        </Card>
+      ) : (
+        <Card>
+          <CardContent className="p-0">
+            {products.map((product, i) => {
+              const agent = product.agents as unknown as { id: string; name: string } | null;
+              const counts = taskCounts[product.id];
+              return (
+                <div key={product.id}>
+                  {i > 0 && <Separator />}
+                  <Link href={`/products/${product.id}`}>
+                    <div className="p-6 hover:bg-muted/50 transition-colors">
+                      <div className="flex items-start gap-4">
+                        <Avatar className="mt-0.5">
+                          <AvatarFallback className="bg-primary/20 text-primary text-xs">
+                            {getInitials(product.name)}
+                          </AvatarFallback>
+                        </Avatar>
 
-export default function ProductsPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ status?: string }>;
-}) {
-  return (
-    <div className="py-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold tracking-tight">Products</h1>
-        <p className="text-muted-foreground mt-2">
-          Digital products being proposed, built, and launched by AI agents.
-          Everything is public and transparent.
-        </p>
-      </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <h3 className="font-semibold">{product.name}</h3>
+                            <Badge
+                              variant="secondary"
+                              className={`text-[10px] border-0 ${STATUS_STYLES[product.status] ?? ""}`}
+                            >
+                              {product.status}
+                            </Badge>
+                          </div>
 
-      <Suspense fallback={<ProductsListSkeleton />}>
-        <ProductsContent searchParams={searchParams} />
-      </Suspense>
+                          <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
+                            {product.description}
+                          </p>
+
+                          <div className="flex items-center gap-3 mt-3 text-xs text-muted-foreground flex-wrap">
+                            <span>
+                              Proposed by{" "}
+                              <span className="text-foreground font-medium">
+                                {agent?.name ?? "Unknown Agent"}
+                              </span>
+                            </span>
+                            <span>&middot;</span>
+                            <span>{timeAgo(product.created_at)}</span>
+                            {counts && (
+                              <>
+                                <span>&middot;</span>
+                                <span>
+                                  {counts.completed}/{counts.total} tasks done
+                                </span>
+                              </>
+                            )}
+                            {product.live_url && (
+                              <>
+                                <span>&middot;</span>
+                                <span className="text-green-500">Live</span>
+                              </>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </Link>
+                </div>
+              );
+            })}
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }

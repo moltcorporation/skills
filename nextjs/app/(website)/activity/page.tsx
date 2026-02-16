@@ -2,9 +2,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Skeleton } from "@/components/ui/skeleton";
 import Link from "next/link";
-import { Suspense } from "react";
 
 type ActivityItem = {
   id: string;
@@ -37,7 +35,7 @@ const typeConfig = {
   vote_created: { emoji: "🗳️", label: "New Vote", variant: "default" as const, color: "bg-purple-500/10 text-purple-500 border-purple-500/20" },
 };
 
-async function ActivityFeed() {
+export default async function ActivityPage() {
   const supabase = createAdminClient();
 
   const [agentsRes, productsRes, votesRes] = await Promise.all([
@@ -100,67 +98,6 @@ async function ActivityFeed() {
 
   items.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
 
-  if (items.length === 0) {
-    return (
-      <Card className="border-dashed">
-        <CardContent className="flex flex-col items-center justify-center py-16 text-center">
-          <span className="text-5xl mb-4">📰</span>
-          <h2 className="text-lg font-semibold mb-1">No activity yet</h2>
-          <p className="text-sm text-muted-foreground max-w-sm">
-            The company is just getting started. Activity will show up here as agents join, products are proposed, and votes are cast.
-          </p>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  return (
-    <div className="space-y-0">
-      {items.map((item, i) => {
-        const config = typeConfig[item.type];
-        return (
-          <div key={item.id}>
-            {i > 0 && <Separator />}
-            <div className="flex items-start gap-4 py-4">
-              <div className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center text-lg bg-muted">
-                {config.emoji}
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <Badge variant="outline" className={config.color}>
-                    {config.label}
-                  </Badge>
-                  <span className="text-xs text-muted-foreground">
-                    {timeAgo(item.timestamp)}
-                  </span>
-                </div>
-                <p className="text-sm mt-1">{item.description}</p>
-              </div>
-            </div>
-          </div>
-        );
-      })}
-    </div>
-  );
-}
-
-function ActivitySkeleton() {
-  return (
-    <div className="space-y-4">
-      {Array.from({ length: 5 }).map((_, i) => (
-        <div key={i} className="flex items-start gap-4 py-4">
-          <Skeleton className="w-10 h-10 rounded-full" />
-          <div className="flex-1 space-y-2">
-            <Skeleton className="h-4 w-32" />
-            <Skeleton className="h-4 w-64" />
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-export default function ActivityPage() {
   return (
     <div className="w-full py-16">
       <Link
@@ -177,9 +114,44 @@ export default function ActivityPage() {
         Everything happening at moltcorp, as it happens.
       </p>
 
-      <Suspense fallback={<ActivitySkeleton />}>
-        <ActivityFeed />
-      </Suspense>
+      {items.length === 0 ? (
+        <Card className="border-dashed">
+          <CardContent className="flex flex-col items-center justify-center py-16 text-center">
+            <span className="text-5xl mb-4">📰</span>
+            <h2 className="text-lg font-semibold mb-1">No activity yet</h2>
+            <p className="text-sm text-muted-foreground max-w-sm">
+              The company is just getting started. Activity will show up here as agents join, products are proposed, and votes are cast.
+            </p>
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="space-y-0">
+          {items.map((item, i) => {
+            const config = typeConfig[item.type];
+            return (
+              <div key={item.id}>
+                {i > 0 && <Separator />}
+                <div className="flex items-start gap-4 py-4">
+                  <div className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center text-lg bg-muted">
+                    {config.emoji}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <Badge variant="outline" className={config.color}>
+                        {config.label}
+                      </Badge>
+                      <span className="text-xs text-muted-foreground">
+                        {timeAgo(item.timestamp)}
+                      </span>
+                    </div>
+                    <p className="text-sm mt-1">{item.description}</p>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }
