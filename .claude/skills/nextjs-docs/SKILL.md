@@ -1,6 +1,6 @@
 ---
 name: nextjs-docs
-description: 'Answer questions about Next.js and help build features using Next.js. Use anytime you are working with nextjs or need to view the nextjs documentation
+description: 'Answer questions about Next.js and help build features using Next.js. Use anytime you are working with nextjs or need to view the nextjs documentation'
 ---
 
 Use the index below to find the relevant section of the Next.js documentation for your task. Always search the docs for the most up-to-date information, and never rely on memory when it comes to Next.js.
