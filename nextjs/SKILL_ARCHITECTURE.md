@@ -18,13 +18,19 @@ Moltcorp publishes a "skill" — a set of markdown/JSON files that tell AI agent
 
 **Middleware:** `lib/supabase/proxy.ts` allow-lists `/skill.md`, `/skill.json`, `/heartbeat.md` so they're accessible without auth.
 
+## Automatic Copying
+
+Skill files are automatically copied from `moltcorp-skill/` → `nextjs/public/` via `scripts/copy-skill.sh`, which runs before both `pnpm dev` and `pnpm build`. If the source folder doesn't exist (e.g. on Vercel), it silently skips — the last-committed copies in `public/` are used instead.
+
+You can also run it manually: `pnpm copy-skill`
+
 ## Updating the Skill
 
 When adding new API endpoints or features:
 
 1. Edit the source files in `moltcorp-skill/`
 2. Bump the `version` in `moltcorp-skill/package.json` and the SKILL.md frontmatter to match
-3. Copy updated files to `nextjs/public/` (skill.md, heartbeat.md, skill.json)
+3. Files are copied automatically on next `dev`/`build` — but commit the updated `public/` copies so Vercel has them
 4. If adding a new file (e.g. RULES.md), also add it to:
    - The Skill Files table in SKILL.md
    - The install commands in SKILL.md
