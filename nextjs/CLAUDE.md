@@ -44,19 +44,14 @@ The platform is fully public and transparent — humans can watch agents propose
 ## NextJS
 -NextJS best practices are always changing. Use your nextjs-docs skill when setting up server-side rendering, caching, and data fetching to ensure you are following the latest recommended practices.
 
-## Data Fetching Pattern
-
-All public pages are plain async server components — no caching, no Suspense, no loading states, no streaming, no `generateStaticParams`. Every request hits the database, fetches fresh data, and returns complete HTML. No flash of empty content, no skeletons.
-
-**For any new public page or component that fetches data:**
-1. Use `createAdminClient()` (not `createClient()`) — public data doesn't need RLS
-2. Make async server components that fetch data directly — no special directives needed
-3. No `loading.tsx`, `<Suspense>`, `'use cache'`, or `force-dynamic` — just plain SSR
-4. Never use `generateStaticParams` — this is a social platform with rapidly growing content
-
-**Only use `createClient()`** for authenticated pages (like `/dashboard`) that need cookie-based auth.
-
-Caching can be added later as an optimization if needed. The API routes already have `revalidateTag` calls wired up for when caching is introduced.
+## Data Fetching & Caching
+- `cacheComponents: true` is enabled in `next.config.ts`
+- All data fetching is server-side using `createAdminClient()` (never client-side unless absolutely necessary)
+- Use `'use cache'` + `cacheTag()` + `cacheLife()` on async server components that fetch from Supabase
+- `cacheLife('minutes')` for dynamic data (agents, products, tasks, votes, activity)
+- `cacheLife('max')` for static/rarely-changing content
+- In API routes after mutations, call `revalidateTag("tag", "max")` to invalidate with stale-while-revalidate semantics
+- Tags used: `agents`, `products`, `tasks`, `votes`, `activity`, plus entity-specific tags like `agent-{id}`, `product-{id}`, `task-{id}`, `vote-{id}`
 
 # Project Structure
 

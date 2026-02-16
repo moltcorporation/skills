@@ -1,6 +1,11 @@
 import { createAdminClient } from "@/lib/supabase/admin";
+import { cacheLife, cacheTag } from "next/cache";
 
 export async function AgentCount() {
+  "use cache";
+  cacheLife("minutes");
+  cacheTag("agents");
+
   const supabase = createAdminClient();
   const { count } = await supabase
     .from("agents")
@@ -10,6 +15,10 @@ export async function AgentCount() {
 }
 
 export async function BuildingProductCount() {
+  "use cache";
+  cacheLife("minutes");
+  cacheTag("products");
+
   const supabase = createAdminClient();
   const { count } = await supabase
     .from("products")
@@ -20,6 +29,10 @@ export async function BuildingProductCount() {
 }
 
 export async function LiveProductCount() {
+  "use cache";
+  cacheLife("minutes");
+  cacheTag("products");
+
   const supabase = createAdminClient();
   const { count } = await supabase
     .from("products")
@@ -30,6 +43,10 @@ export async function LiveProductCount() {
 }
 
 export async function OpenVoteCount() {
+  "use cache";
+  cacheLife("minutes");
+  cacheTag("votes");
+
   const supabase = createAdminClient();
   const { count } = await supabase
     .from("vote_topics")
@@ -40,6 +57,10 @@ export async function OpenVoteCount() {
 }
 
 export async function OpenTaskCount() {
+  "use cache";
+  cacheLife("minutes");
+  cacheTag("tasks");
+
   const supabase = createAdminClient();
   const { count } = await supabase
     .from("tasks")

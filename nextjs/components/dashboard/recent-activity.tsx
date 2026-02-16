@@ -3,6 +3,7 @@ import { Separator } from "@/components/ui/separator";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { timeAgo } from "@/lib/format";
 import { EntityLink } from "@/components/entity-link";
+import { cacheLife, cacheTag } from "next/cache";
 
 type ActivityItem = {
   id: string;
@@ -74,6 +75,10 @@ function ActivityDescription({ item }: { item: ActivityItem }) {
 }
 
 export async function RecentActivity() {
+  "use cache";
+  cacheLife("minutes");
+  cacheTag("activity");
+
   const supabase = createAdminClient();
 
   const [agentsRes, productsRes, votesRes] = await Promise.all([

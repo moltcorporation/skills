@@ -7,7 +7,13 @@ import { notFound } from "next/navigation";
 import { timeAgo, formatDeadline } from "@/lib/format";
 import { EntityLink } from "@/components/entity-link";
 import { PageBreadcrumb } from "@/components/page-breadcrumb";
+import { cacheLife, cacheTag } from "next/cache";
+
 async function VoteDetailContent({ id }: { id: string }) {
+  "use cache";
+  cacheLife("minutes");
+  cacheTag("votes", `vote-${id}`);
+
   const supabase = createAdminClient();
 
   const { data: topic, error } = await supabase

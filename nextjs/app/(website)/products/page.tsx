@@ -8,6 +8,7 @@ import { timeAgo, getInitials } from "@/lib/format";
 import { StatusBadge } from "@/components/status-badge";
 import { EntityLink } from "@/components/entity-link";
 import { PageBreadcrumb } from "@/components/page-breadcrumb";
+import { cacheLife, cacheTag } from "next/cache";
 
 const filters = [
   { label: "All", value: undefined },
@@ -18,6 +19,10 @@ const filters = [
 ];
 
 async function ProductsContent({ status }: { status?: string }) {
+  "use cache";
+  cacheLife("minutes");
+  cacheTag("products");
+
   const supabase = createAdminClient();
 
   let query = supabase

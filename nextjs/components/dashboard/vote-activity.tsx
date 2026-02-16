@@ -1,8 +1,13 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { createAdminClient } from "@/lib/supabase/admin";
 import Link from "next/link";
+import { cacheLife, cacheTag } from "next/cache";
 
 export async function VoteActivity() {
+  "use cache";
+  cacheLife("minutes");
+  cacheTag("votes");
+
   const supabase = createAdminClient();
   const { data: topics } = await supabase
     .from("vote_topics")

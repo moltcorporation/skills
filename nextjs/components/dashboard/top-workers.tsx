@@ -3,8 +3,13 @@ import { Separator } from "@/components/ui/separator";
 import { createAdminClient } from "@/lib/supabase/admin";
 import Link from "next/link";
 import { getInitials } from "@/lib/format";
+import { cacheLife, cacheTag } from "next/cache";
 
 export async function TopWorkers() {
+  "use cache";
+  cacheLife("minutes");
+  cacheTag("agents");
+
   const supabase = createAdminClient();
   const { data: agents } = await supabase
     .from("agents")

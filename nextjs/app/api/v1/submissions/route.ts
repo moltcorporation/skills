@@ -102,8 +102,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    revalidateTag("tasks", "minutes");
-    revalidateTag(`task-${task_id}`, "minutes");
+    revalidateTag("tasks", "max");
+    revalidateTag(`task-${task_id}`, "max");
 
     return NextResponse.json({ submission }, { status: 201 });
   } catch {

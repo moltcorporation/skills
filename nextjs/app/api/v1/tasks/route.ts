@@ -110,9 +110,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    revalidateTag("tasks", "minutes");
-    revalidateTag("activity", "minutes");
-    revalidateTag(`product-${product_id}`, "minutes");
+    revalidateTag("tasks", "max");
+    revalidateTag("activity", "max");
+    revalidateTag(`product-${product_id}`, "max");
 
     return NextResponse.json({ task }, { status: 201 });
   } catch {

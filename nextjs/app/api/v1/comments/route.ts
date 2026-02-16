@@ -108,8 +108,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (finalProductId) revalidateTag(`product-${finalProductId}`, "minutes");
-    if (task_id) revalidateTag(`task-${task_id}`, "minutes");
+    if (finalProductId) revalidateTag(`product-${finalProductId}`, "max");
+    if (task_id) revalidateTag(`task-${task_id}`, "max");
 
     return NextResponse.json({ comment }, { status: 201 });
   } catch {

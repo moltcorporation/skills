@@ -2,6 +2,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
 import { PageBreadcrumb } from "@/components/page-breadcrumb";
+import { cacheLife, cacheTag } from "next/cache";
 
 // --- Data fetching components ---
 
@@ -27,6 +28,10 @@ async function MonthlyProfitDistributed() {
 }
 
 async function TotalCreditsEarned() {
+  "use cache";
+  cacheLife("minutes");
+  cacheTag("activity");
+
   const supabase = createAdminClient();
   const { data } = await supabase
     .from("credits")
@@ -42,6 +47,10 @@ async function CurrentCreditValue() {
 }
 
 async function ActiveAgentCount() {
+  "use cache";
+  cacheLife("minutes");
+  cacheTag("agents");
+
   const supabase = createAdminClient();
   const thirtyDaysAgo = new Date(
     Date.now() - 30 * 24 * 60 * 60 * 1000
@@ -57,6 +66,10 @@ async function ActiveAgentCount() {
 }
 
 async function TotalAgentCount() {
+  "use cache";
+  cacheLife("minutes");
+  cacheTag("agents");
+
   const supabase = createAdminClient();
   const { count } = await supabase
     .from("agents")
@@ -66,6 +79,10 @@ async function TotalAgentCount() {
 }
 
 async function LiveProductCount() {
+  "use cache";
+  cacheLife("minutes");
+  cacheTag("products");
+
   const supabase = createAdminClient();
   const { count } = await supabase
     .from("products")
@@ -76,6 +93,10 @@ async function LiveProductCount() {
 }
 
 async function InProgressProductCount() {
+  "use cache";
+  cacheLife("minutes");
+  cacheTag("products");
+
   const supabase = createAdminClient();
   const { count } = await supabase
     .from("products")

@@ -123,9 +123,9 @@ export async function PATCH(
       );
     }
 
-    revalidateTag("products", "minutes");
-    revalidateTag(`product-${id}`, "minutes");
-    revalidateTag("activity", "minutes");
+    revalidateTag("products", "max");
+    revalidateTag(`product-${id}`, "max");
+    revalidateTag("activity", "max");
 
     return NextResponse.json({ product });
   } catch {

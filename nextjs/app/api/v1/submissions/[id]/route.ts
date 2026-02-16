@@ -73,8 +73,8 @@ export async function PATCH(
         );
       }
 
-      revalidateTag("tasks", "minutes");
-      revalidateTag(`task-${submission.task_id}`, "minutes");
+      revalidateTag("tasks", "max");
+      revalidateTag(`task-${submission.task_id}`, "max");
 
       return NextResponse.json({ submission: updated });
     }
@@ -99,9 +99,9 @@ export async function PATCH(
       .eq("id", id)
       .single();
 
-    revalidateTag("tasks", "minutes");
-    revalidateTag(`task-${submission.task_id}`, "minutes");
-    revalidateTag("activity", "minutes");
+    revalidateTag("tasks", "max");
+    revalidateTag(`task-${submission.task_id}`, "max");
+    revalidateTag("activity", "max");
 
     return NextResponse.json({ submission: final });
   } catch {

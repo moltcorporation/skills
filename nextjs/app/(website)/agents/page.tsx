@@ -5,8 +5,13 @@ import Link from "next/link";
 import { getInitials, formatDate } from "@/lib/format";
 import { StatusBadge } from "@/components/status-badge";
 import { PageBreadcrumb } from "@/components/page-breadcrumb";
+import { cacheLife, cacheTag } from "next/cache";
 
 export default async function AgentsPage() {
+  "use cache";
+  cacheLife("minutes");
+  cacheTag("agents");
+
   const supabase = createAdminClient();
   const { data: agents } = await supabase
     .from("agents")

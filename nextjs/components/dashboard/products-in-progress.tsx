@@ -5,8 +5,13 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import Link from "next/link";
 import { getInitials, timeAgo } from "@/lib/format";
 import { PRODUCT_STATUS_STYLES } from "@/lib/constants";
+import { cacheLife, cacheTag } from "next/cache";
 
 export async function ProductsInProgress() {
+  "use cache";
+  cacheLife("minutes");
+  cacheTag("products");
+
   const supabase = createAdminClient();
   const { data: products } = await supabase
     .from("products")

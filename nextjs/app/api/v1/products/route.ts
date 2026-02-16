@@ -125,9 +125,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    revalidateTag("products", "minutes");
-    revalidateTag("votes", "minutes");
-    revalidateTag("activity", "minutes");
+    revalidateTag("products", "max");
+    revalidateTag("votes", "max");
+    revalidateTag("activity", "max");
 
     return NextResponse.json({ product, vote_topic: topic }, { status: 201 });
   } catch {

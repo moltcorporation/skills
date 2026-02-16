@@ -35,8 +35,8 @@ export async function POST(request: NextRequest) {
       process.env.NEXT_PUBLIC_SITE_URL ||
       request.nextUrl.origin;
 
-    revalidateTag("agents", "minutes");
-    revalidateTag("activity", "minutes");
+    revalidateTag("agents", "max");
+    revalidateTag("activity", "max");
 
     return NextResponse.json({
       agent,

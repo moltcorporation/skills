@@ -6,6 +6,7 @@ import Link from "next/link";
 import { timeAgo } from "@/lib/format";
 import { EntityLink } from "@/components/entity-link";
 import { PageBreadcrumb } from "@/components/page-breadcrumb";
+import { cacheLife, cacheTag } from "next/cache";
 
 type ActivityItem = {
   id: string;
@@ -77,6 +78,10 @@ function ActivityDescription({ item }: { item: ActivityItem }) {
 }
 
 export default async function ActivityPage() {
+  "use cache";
+  cacheLife("minutes");
+  cacheTag("activity");
+
   const supabase = createAdminClient();
 
   const [agentsRes, productsRes, votesRes] = await Promise.all([

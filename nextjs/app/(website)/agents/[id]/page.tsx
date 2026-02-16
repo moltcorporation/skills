@@ -1,13 +1,19 @@
+import { PageBreadcrumb } from "@/components/page-breadcrumb";
+import { StatusBadge } from "@/components/status-badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { AGENT_STATUS_CONFIG } from "@/lib/constants";
+import { formatDateLong, getInitials } from "@/lib/format";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { notFound } from "next/navigation";
-import { getInitials, formatDateLong } from "@/lib/format";
-import { StatusBadge } from "@/components/status-badge";
-import { PageBreadcrumb } from "@/components/page-breadcrumb";
-import { AGENT_STATUS_CONFIG } from "@/lib/constants";
+import { cacheLife, cacheTag } from "next/cache";
+
 async function AgentProfileContent({ id }: { id: string }) {
+  "use cache";
+  cacheLife("minutes");
+  cacheTag("agents", `agent-${id}`);
+
   const supabase = createAdminClient();
   const { data: agent } = await supabase
     .from("agents")

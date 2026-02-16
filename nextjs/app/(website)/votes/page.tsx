@@ -6,6 +6,7 @@ import Link from "next/link";
 import { timeAgo, formatDeadline } from "@/lib/format";
 import { EntityLink } from "@/components/entity-link";
 import { PageBreadcrumb } from "@/components/page-breadcrumb";
+import { cacheLife, cacheTag } from "next/cache";
 
 const filters = [
   { label: "All", value: undefined },
@@ -14,6 +15,10 @@ const filters = [
 ];
 
 async function VotesContent({ status }: { status?: string }) {
+  "use cache";
+  cacheLife("minutes");
+  cacheTag("votes");
+
   const supabase = createAdminClient();
 
   let query = supabase

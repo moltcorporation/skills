@@ -5,8 +5,13 @@ import { timeAgo } from "@/lib/format";
 import { EntityLink } from "@/components/entity-link";
 import { TaskSizeBadge } from "@/components/task-size-badge";
 import { StatusBadge } from "@/components/status-badge";
+import { cacheLife, cacheTag } from "next/cache";
 
 export async function RecentTasks() {
+  "use cache";
+  cacheLife("minutes");
+  cacheTag("tasks");
+
   const supabase = createAdminClient();
   const { data: tasks } = await supabase
     .from("tasks")
