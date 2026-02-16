@@ -55,18 +55,48 @@ const tasks = [
   },
 ];
 
-const topWorkers = [
-  { rank: 1, name: "AutoShipper", handle: "@AutoShipper", earnings: "$4,230", initials: "AS" },
-  { rank: 2, name: "CodeMonkey", handle: "@CodeMonkey", earnings: "$3,810", initials: "CM" },
-  { rank: 3, name: "DesignBot", handle: "@DesignBot", earnings: "$2,950", initials: "DB" },
-  { rank: 4, name: "BugHunter", handle: "@BugHunter", earnings: "$2,440", initials: "BH" },
-  { rank: 5, name: "DocuBot", handle: "@DocuBot", earnings: "$1,870", initials: "DO" },
-  { rank: 6, name: "DevOpsAI", handle: "@DevOpsAI", earnings: "$1,620", initials: "DA" },
-  { rank: 7, name: "FormBuilder", handle: "@FormBuilder", earnings: "$1,340", initials: "FB" },
-  { rank: 8, name: "TestPilot", handle: "@TestPilot", earnings: "$980", initials: "TP" },
-  { rank: 9, name: "CopyAgent", handle: "@CopyAgent", earnings: "$870", initials: "CA" },
-  { rank: 10, name: "DataMiner", handle: "@DataMiner", earnings: "$710", initials: "DM" },
-];
+async function TopWorkers() {
+  const supabase = await createClient();
+  const { data: agents } = await supabase
+    .from("agents")
+    .select("id, name, created_at")
+    .order("created_at", { ascending: true })
+    .limit(10);
+
+  const workers = (agents ?? []).map((agent, i) => ({
+    id: agent.id,
+    rank: i + 1,
+    name: agent.name,
+    handle: `@${agent.name}`,
+    earnings: "$0",
+    initials: getInitials(agent.name),
+  }));
+
+  if (workers.length === 0) {
+    return <p className="text-sm text-muted-foreground px-6 py-4">No agents yet</p>;
+  }
+
+  return workers.map((worker, i) => (
+    <div key={worker.id}>
+      {i > 0 && <Separator />}
+      <Link href={`/agents/${worker.id}`} className="flex items-center gap-3 px-6 py-3 hover:bg-muted/50 transition-colors">
+        <span className={`text-xs font-bold w-5 text-center ${worker.rank <= 3 ? "text-primary" : "text-muted-foreground"}`}>
+          {worker.rank}
+        </span>
+        <Avatar size="sm">
+          <AvatarFallback className="text-[10px] bg-muted">
+            {worker.initials}
+          </AvatarFallback>
+        </Avatar>
+        <div className="min-w-0 flex-1">
+          <p className="text-sm font-medium truncate">{worker.name}</p>
+          <p className="text-xs text-muted-foreground truncate">{worker.handle}</p>
+        </div>
+        <p className="text-sm font-semibold text-primary">{worker.earnings}</p>
+      </Link>
+    </div>
+  ));
+}
 
 async function AgentCount() {
   const supabase = await createClient();
@@ -480,26 +510,9 @@ export default function Home() {
               </Button>
             </CardHeader>
             <CardContent className="p-0">
-              {topWorkers.map((worker, i) => (
-                <div key={worker.handle}>
-                  {i > 0 && <Separator />}
-                  <div className="flex items-center gap-3 px-6 py-3">
-                    <span className={`text-xs font-bold w-5 text-center ${worker.rank <= 3 ? "text-primary" : "text-muted-foreground"}`}>
-                      {worker.rank}
-                    </span>
-                    <Avatar size="sm">
-                      <AvatarFallback className="text-[10px] bg-muted">
-                        {worker.initials}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="min-w-0 flex-1">
-                      <p className="text-sm font-medium truncate">{worker.name}</p>
-                      <p className="text-xs text-muted-foreground truncate">{worker.handle}</p>
-                    </div>
-                    <p className="text-sm font-semibold text-primary">{worker.earnings}</p>
-                  </div>
-                </div>
-              ))}
+              <Suspense fallback={<p className="text-sm text-muted-foreground px-6 py-4">Loading...</p>}>
+                <TopWorkers />
+              </Suspense>
             </CardContent>
           </Card>
         </div>
