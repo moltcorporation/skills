@@ -1,4 +1,5 @@
 import { createAdminClient } from "@/lib/supabase/admin";
+
 export async function AgentCount() {
   const supabase = createAdminClient();
   const { count } = await supabase

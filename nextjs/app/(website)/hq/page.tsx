@@ -13,7 +13,6 @@ import { ExpenseBreakdown } from "@/components/dashboard/expense-breakdown";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
-import { Suspense } from "react";
 import { HQNavGrid } from "./hq-nav-grid";
 
 export default function HQPage() {
@@ -39,9 +38,7 @@ export default function HQPage() {
           <Card key={stat.label} className="bg-muted/50">
             <CardContent className="p-4 text-center">
               <p className="text-2xl font-bold tracking-tight">
-                <Suspense fallback="—">
-                  <stat.component />
-                </Suspense>
+                <stat.component />
               </p>
               <p className="text-xs text-muted-foreground mt-1">{stat.label}</p>
             </CardContent>
@@ -55,16 +52,14 @@ export default function HQPage() {
           <CardTitle className="text-lg">Products In Progress</CardTitle>
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <span className="size-2 rounded-full bg-green-500" />
-            <span><Suspense fallback="—"><BuildingProductCount /></Suspense> total</span>
+            <span><BuildingProductCount /> total</span>
             <Button variant="link" size="sm" className="text-primary p-0 h-auto cursor-pointer" asChild>
               <Link href="/products">View All →</Link>
             </Button>
           </div>
         </CardHeader>
         <CardContent>
-          <Suspense fallback={<p className="text-sm text-muted-foreground">Loading...</p>}>
-            <ProductsInProgress />
-          </Suspense>
+          <ProductsInProgress />
         </CardContent>
       </Card>
 
@@ -76,16 +71,14 @@ export default function HQPage() {
               <CardTitle className="text-lg">Recent Tasks</CardTitle>
               <div className="flex items-center gap-2">
                 <span className="size-2 rounded-full bg-green-500" />
-                <span className="text-sm text-muted-foreground"><Suspense fallback="—"><OpenTaskCount /></Suspense> open</span>
+                <span className="text-sm text-muted-foreground"><OpenTaskCount /> open</span>
                 <Button variant="link" size="sm" className="text-primary p-0 h-auto text-xs cursor-pointer" asChild>
                   <Link href="/activity">View All →</Link>
                 </Button>
               </div>
             </CardHeader>
             <CardContent className="p-0">
-              <Suspense fallback={<p className="text-sm text-muted-foreground p-6">Loading...</p>}>
-                <RecentTasks />
-              </Suspense>
+              <RecentTasks />
             </CardContent>
           </Card>
         </div>
@@ -99,9 +92,7 @@ export default function HQPage() {
               </Button>
             </CardHeader>
             <CardContent className="p-0">
-              <Suspense fallback={<p className="text-sm text-muted-foreground px-6 py-4">Loading...</p>}>
-                <TopWorkers />
-              </Suspense>
+              <TopWorkers />
             </CardContent>
           </Card>
 
@@ -113,9 +104,7 @@ export default function HQPage() {
               </Button>
             </CardHeader>
             <CardContent className="p-0">
-              <Suspense fallback={<p className="text-sm text-muted-foreground px-6 py-4">Loading...</p>}>
-                <RecentActivity />
-              </Suspense>
+              <RecentActivity />
             </CardContent>
           </Card>
         </div>
@@ -127,16 +116,14 @@ export default function HQPage() {
           <CardTitle className="text-lg">Recent Votes</CardTitle>
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <span className="size-2 rounded-full bg-orange-500" />
-            <span><Suspense fallback="—"><OpenVoteCount /></Suspense> open</span>
+            <span><OpenVoteCount /> open</span>
             <Button variant="link" size="sm" className="text-primary p-0 h-auto cursor-pointer" asChild>
               <Link href="/votes">View All →</Link>
             </Button>
           </div>
         </CardHeader>
         <CardContent>
-          <Suspense fallback={<p className="text-sm text-muted-foreground">Loading...</p>}>
-            <VoteActivity />
-          </Suspense>
+          <VoteActivity />
         </CardContent>
       </Card>
 
@@ -149,9 +136,7 @@ export default function HQPage() {
           </Button>
         </CardHeader>
         <CardContent>
-          <Suspense fallback={<p className="text-sm text-muted-foreground">Loading...</p>}>
-            <ExpenseBreakdown />
-          </Suspense>
+          <ExpenseBreakdown />
         </CardContent>
       </Card>
 
