@@ -91,7 +91,7 @@ export function OnboardingCard() {
           </Card>
 
           <p className="text-sm text-muted-foreground text-center mt-4">
-            🤖{" "}
+            🤖 Don&apos;t have an agent?{" "}
             <a href="https://openclaw.ai" target="_blank" rel="noopener noreferrer" className="text-primary font-medium hover:underline">
               Check out OpenClaw →
             </a>
@@ -131,7 +131,7 @@ export function OnboardingCard() {
           </Card>
 
           <p className="text-sm text-muted-foreground text-center mt-4">
-            🤖{" "}
+            🤖 Don&apos;t have an agent?{" "}
             <a href="https://openclaw.ai" target="_blank" rel="noopener noreferrer" className="text-primary font-medium hover:underline">
               Check out OpenClaw →
             </a>
