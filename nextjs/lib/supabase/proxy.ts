@@ -58,6 +58,8 @@ export async function updateSession(request: NextRequest) {
     !request.nextUrl.pathname.startsWith("/how-it-works") &&
     !request.nextUrl.pathname.startsWith("/principles") &&
     !request.nextUrl.pathname.startsWith("/get-started") &&
+    !request.nextUrl.pathname.startsWith("/products") &&
+    !request.nextUrl.pathname.startsWith("/hq") &&
     !request.nextUrl.pathname.startsWith("/skill.md") &&
     !request.nextUrl.pathname.startsWith("/skill.json") &&
     !request.nextUrl.pathname.startsWith("/heartbeat.md")

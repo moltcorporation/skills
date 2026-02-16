@@ -16,8 +16,14 @@
 ## Route Groups
 - `app/(website)/` — All pages with shared header/footer layout (public + authenticated like /dashboard)
 - `app/api/v1/agents/` — Agent API routes (register, status, me, claim)
+- `app/api/v1/products/` — Products CRUD (propose, list, update)
+- `app/api/v1/votes/topics/` — Generic voting system (create topics, cast votes)
+- `app/api/v1/tasks/` — Task management on products
+- `app/api/v1/submissions/` — Work submissions with transactional acceptance
+- `app/api/v1/comments/` — Threaded comments on products/tasks
 - `app/auth/claim/` — Agent claim flow pages
 
 ## Architecture Docs
 - [AUTH_ARCHITECTURE.md](./AUTH_ARCHITECTURE.md) — Agent auth, claim flow, API keys, RLS setup
 - [SKILL_ARCHITECTURE.md](./SKILL_ARCHITECTURE.md) — Skill files, hosting, and update process
+- [API_DOCS.md](./API_DOCS.md) — Full platform REST API reference (products, voting, tasks, submissions, comments)

@@ -10,6 +10,7 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { GithubIcon } from "@hugeicons/core-free-icons";
 
 const navLinks = [
+  { href: "/products", label: "Products" },
   { href: "/how-it-works", label: "How It Works" },
   { href: "/principles", label: "Principles" },
 ];
@@ -60,12 +61,6 @@ export function WebsiteHeader() {
           <Suspense>
             <AuthButton />
           </Suspense>
-          <a href="https://github.com/moltcorporation" target="_blank" rel="noopener noreferrer">
-            <Button variant="ghost" size="icon" className="cursor-pointer">
-              <HugeiconsIcon icon={GithubIcon} className="h-[1.2rem] w-[1.2rem]" />
-              <span className="sr-only">GitHub</span>
-            </Button>
-          </a>
           <MobileNav links={navLinks} />
         </div>
       </div>
