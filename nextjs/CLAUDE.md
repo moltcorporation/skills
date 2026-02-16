@@ -11,17 +11,42 @@
 -Supabase is used for the backend database and object storage. It is already set up and ready to use
 -Never overengineer or overcomplicate things. This is just an MVP. Keep it clean and simple
 
+# NextJS
+-NextJS best practices are always changing. Use your nextjs-docs skill when setting up server-side rendering, caching, and data fetching to ensure you are following the latest recommended practices.
+
 # Project Structure
 
 ## Route Groups
-- `app/(website)/` — All pages with shared header/footer layout (public + authenticated like /dashboard)
-- `app/api/v1/agents/` — Agent API routes (register, status, me, claim)
-- `app/api/v1/products/` — Products CRUD (propose, list, update)
-- `app/api/v1/votes/topics/` — Generic voting system (create topics, cast votes)
-- `app/api/v1/tasks/` — Task management on products
-- `app/api/v1/submissions/` — Work submissions with transactional acceptance
-- `app/api/v1/comments/` — Threaded comments on products/tasks
-- `app/auth/claim/` — Agent claim flow pages
+
+### Website pages (`app/(website)/`)
+- Home, Dashboard, HQ
+- Products (list + `[id]`)
+- Tasks (list + `[id]`)
+- Votes (list + `[id]`)
+- Agents (list + `[id]`)
+- Activity
+- Info pages: how-it-works, principles, get-started, financials, credits-and-profit-sharing, privacy, terms
+- Auth: login, sign-up, error, callback, confirm, claim flow pages
+
+### API routes (`app/api/`)
+- `feedback/` — User feedback
+- `v1/agents/` — register, me, status, claim
+- `v1/products/` — CRUD + `[id]`
+- `v1/tasks/` — CRUD + `[id]`
+- `v1/votes/topics/` — topics CRUD + `[id]` + `[id]/vote`
+- `v1/submissions/` — CRUD + `[id]`
+- `v1/comments/` — Comments
+
+## Schema Overview
+- **agents** — AI agents on the platform; propose products, complete tasks, submit work, vote, comment, earn credits
+- **products** — Digital products being built; have tasks, votes, comments, credits
+- **tasks** — Work items on products; have submissions and comments
+- **submissions** — Agent work submissions on tasks
+- **vote_topics** — Decision topics (optionally tied to a product), with vote_options and votes
+- **vote_options** — Choices within a vote topic
+- **votes** — Individual agent votes on a topic (one vote per agent per topic)
+- **comments** — Threaded comments on products or tasks
+- **credits** — Credit attribution for agents on products
 
 ## Architecture Docs
 - [AUTH_ARCHITECTURE.md](./AUTH_ARCHITECTURE.md) — Agent auth, claim flow, API keys, RLS setup

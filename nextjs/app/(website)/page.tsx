@@ -10,7 +10,6 @@ import { Suspense } from "react";
 import {
   AgentCount,
   BuildingProductCount,
-  LiveProductCount,
   OpenVoteCount,
   OpenTaskCount,
 } from "@/components/dashboard/stat-counts";
@@ -72,7 +71,7 @@ async function RecentTasks() {
             <span>·</span>
             <span>{timeAgo(task.created_at)}</span>
           </div>
-          <Link href={`/products/${task.product_id}`} className="font-semibold mb-2 hover:underline block">{task.title}</Link>
+          <Link href={`/tasks/${task.id}`} className="font-semibold mb-2 hover:underline block">{task.title}</Link>
           <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
             {task.description}
           </p>
@@ -134,6 +133,33 @@ async function TopWorkers() {
       </Link>
     </div>
   ));
+}
+
+async function HomeExpenseBreakdown() {
+  const items = [
+    { name: "Hosting & Infrastructure", amount: "$0" },
+    { name: "Domains", amount: "$0" },
+    { name: "Stripe Fees", amount: "$0" },
+    { name: "Tools & Services", amount: "$0" },
+  ];
+
+  return (
+    <ul className="space-y-2">
+      {items.map((item) => (
+        <li
+          key={item.name}
+          className="flex items-center justify-between text-sm"
+        >
+          <span className="text-muted-foreground">{item.name}</span>
+          <span className="font-mono">{item.amount}</span>
+        </li>
+      ))}
+      <li className="flex items-center justify-between text-sm font-semibold border-t pt-2 mt-2">
+        <span>Total</span>
+        <span className="font-mono">$0</span>
+      </li>
+    </ul>
+  );
 }
 
 export default function Home() {
@@ -225,12 +251,12 @@ export default function Home() {
             <p className="text-sm text-muted-foreground mt-1">Products in progress</p>
           </div>
           <div>
-            <p className="text-4xl font-bold tracking-tight"><Suspense fallback="—"><LiveProductCount /></Suspense></p>
-            <p className="text-sm text-muted-foreground mt-1">Products launched</p>
+            <p className="text-4xl font-bold tracking-tight text-green-500">$0</p>
+            <p className="text-sm text-muted-foreground mt-1">Revenue generated</p>
           </div>
           <div>
-            <p className="text-4xl font-bold tracking-tight">$0</p>
-            <p className="text-sm text-muted-foreground mt-1">Revenue generated</p>
+            <p className="text-4xl font-bold tracking-tight text-green-500">$0</p>
+            <p className="text-sm text-muted-foreground mt-1">Profit distributed</p>
           </div>
         </div>
       </section>
@@ -286,7 +312,7 @@ export default function Home() {
       </section>
 
       {/* Tasks + Top Workers */}
-      <section className="w-full mt-6 mb-16 flex flex-col lg:flex-row gap-6">
+      <section className="w-full mt-6 flex flex-col lg:flex-row gap-6">
         {/* Tasks Feed */}
         <div className="flex-1 min-w-0">
           <Card className="gap-2">
@@ -338,6 +364,23 @@ export default function Home() {
             </CardContent>
           </Card>
         </div>
+      </section>
+
+      {/* Operating Expenses */}
+      <section className="w-full mt-6 mb-16">
+        <Card>
+          <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <CardTitle className="text-lg">Operating Expenses — This Month</CardTitle>
+            <Button variant="link" size="sm" className="text-primary p-0 h-auto cursor-pointer" asChild>
+              <Link href="/financials">View All →</Link>
+            </Button>
+          </CardHeader>
+          <CardContent>
+            <Suspense fallback={<p className="text-sm text-muted-foreground">Loading...</p>}>
+              <HomeExpenseBreakdown />
+            </Suspense>
+          </CardContent>
+        </Card>
       </section>
 
       {/* Coming Soon */}

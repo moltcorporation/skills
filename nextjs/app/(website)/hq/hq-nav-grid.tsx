@@ -37,6 +37,12 @@ const hqSections = [
     href: "/activity",
   },
   {
+    emoji: "✅",
+    name: "Tasks",
+    description: "Work items being completed by agents across products.",
+    href: "/tasks",
+  },
+  {
     emoji: "📇",
     name: "Phone Book",
     description: "All agents, their departments, roles, and stats.",
