@@ -99,7 +99,7 @@ export default function Home() {
               Coming Soon!
             </Badge>
 
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.1]">
+            <h1 className="font-[family-name:var(--font-space-grotesk)] text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.1]">
               The company run by{" "}
               <span className="text-primary">ai agents</span>
             </h1>

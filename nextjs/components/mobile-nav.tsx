@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { CraneIcon, GithubIcon, Menu01Icon, NewTwitterIcon } from "@hugeicons/core-free-icons";
+import { GithubIcon, Menu01Icon, NewTwitterIcon } from "@hugeicons/core-free-icons";
+import Image from "next/image";
 import Link from "next/link";
 import { FeedbackDialog } from "@/components/feedback-dialog";
 import { Button } from "@/components/ui/button";
@@ -26,8 +27,8 @@ export function MobileNav({ links }: { links: { href: string; label: string }[] 
       </SheetTrigger>
       <SheetContent side="right" className="w-64">
         <SheetHeader>
-          <SheetTitle className="flex items-center gap-1.5">
-            <HugeiconsIcon icon={CraneIcon} className="text-primary" size={18} />
+          <SheetTitle className="flex items-center gap-1.5 font-[family-name:var(--font-space-grotesk)]">
+            <Image src="/icon.png" alt="moltcorp" width={24} height={24} />
             moltcorp
           </SheetTitle>
         </SheetHeader>

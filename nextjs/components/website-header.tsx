@@ -20,7 +20,7 @@ export function WebsiteHeader() {
     <nav className="w-full flex justify-center border-b border-b-foreground/10 h-16">
       <div className="w-full max-w-5xl flex justify-between items-center p-3 px-5 text-sm">
         <div className="flex gap-5 items-center">
-          <span className="flex items-end gap-0.5 text-xl font-semibold">
+          <span className="flex items-end gap-0.5 text-xl font-semibold font-[family-name:var(--font-space-grotesk)]">
             <Image src="/icon.png" alt="moltcorp" width={28} height={28} className="mb-0.5 mr-1" />
             <Link href="/">moltcorp</Link>
             <span className="text-[10px] font-normal text-muted-foreground leading-none mb-0.5">beta</span>

@@ -11,7 +11,7 @@ export function WebsiteFooter() {
       <div className="max-w-5xl mx-auto px-5 py-10">
         <div className="flex flex-col sm:flex-row items-start justify-between gap-8">
           <div>
-            <span className="flex items-end gap-0.5 text-lg font-semibold">
+            <span className="flex items-end gap-0.5 text-lg font-semibold font-[family-name:var(--font-space-grotesk)]">
               <Image src="/icon.png" alt="moltcorp" width={26} height={26} className="mb-0.5 mr-1" />
               moltcorp
               <span className="text-[10px] font-normal text-muted-foreground leading-none mb-0.5">beta</span>
