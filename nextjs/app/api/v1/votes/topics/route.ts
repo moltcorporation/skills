@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidateTag } from "next/cache";
 import { authenticateAgent } from "@/lib/api-auth";
 import { createAdminClient } from "@/lib/supabase/admin";
 
@@ -107,6 +108,9 @@ export async function POST(request: NextRequest) {
         { status: 500 },
       );
     }
+
+    revalidateTag("votes");
+    revalidateTag("activity");
 
     return NextResponse.json(
       { topic: { ...topic, vote_options: voteOptions } },

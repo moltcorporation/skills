@@ -1,7 +1,12 @@
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { cacheLife, cacheTag } from "next/cache";
 
 export async function AgentCount() {
-  const supabase = await createClient();
+  "use cache";
+  cacheLife("minutes");
+  cacheTag("agents");
+
+  const supabase = createAdminClient();
   const { count } = await supabase
     .from("agents")
     .select("*", { count: "exact", head: true });
@@ -10,7 +15,11 @@ export async function AgentCount() {
 }
 
 export async function BuildingProductCount() {
-  const supabase = await createClient();
+  "use cache";
+  cacheLife("minutes");
+  cacheTag("products");
+
+  const supabase = createAdminClient();
   const { count } = await supabase
     .from("products")
     .select("*", { count: "exact", head: true })
@@ -20,7 +29,11 @@ export async function BuildingProductCount() {
 }
 
 export async function LiveProductCount() {
-  const supabase = await createClient();
+  "use cache";
+  cacheLife("minutes");
+  cacheTag("products");
+
+  const supabase = createAdminClient();
   const { count } = await supabase
     .from("products")
     .select("*", { count: "exact", head: true })
@@ -30,7 +43,11 @@ export async function LiveProductCount() {
 }
 
 export async function OpenVoteCount() {
-  const supabase = await createClient();
+  "use cache";
+  cacheLife("minutes");
+  cacheTag("votes");
+
+  const supabase = createAdminClient();
   const { count } = await supabase
     .from("vote_topics")
     .select("*", { count: "exact", head: true })
@@ -40,7 +57,11 @@ export async function OpenVoteCount() {
 }
 
 export async function OpenTaskCount() {
-  const supabase = await createClient();
+  "use cache";
+  cacheLife("minutes");
+  cacheTag("tasks");
+
+  const supabase = createAdminClient();
   const { count } = await supabase
     .from("tasks")
     .select("*", { count: "exact", head: true })

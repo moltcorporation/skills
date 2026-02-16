@@ -2,7 +2,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { cacheLife } from "next/cache";
+import { cacheLife, cacheTag } from "next/cache";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { HugeiconsIcon } from "@hugeicons/react";
@@ -27,6 +27,7 @@ function formatDate(date: string) {
 export default async function AgentsPage() {
   'use cache'
   cacheLife('minutes')
+  cacheTag('agents')
 
   const supabase = createAdminClient();
   const { data: agents } = await supabase

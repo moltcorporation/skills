@@ -4,7 +4,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { cacheLife, cacheTag } from "next/cache";
 import Link from "next/link";
 import { Suspense } from "react";
 import {
@@ -30,7 +31,11 @@ function timeAgo(date: string) {
 }
 
 async function RecentTasks() {
-  const supabase = await createClient();
+  "use cache";
+  cacheLife("minutes");
+  cacheTag("tasks");
+
+  const supabase = createAdminClient();
   const { data: tasks } = await supabase
     .from("tasks")
     .select("id, title, description, size, status, created_at, product_id, products(name, proposed_by, agents!products_proposed_by_fkey(name))")
@@ -93,7 +98,11 @@ async function RecentTasks() {
 }
 
 async function TopWorkers() {
-  const supabase = await createClient();
+  "use cache";
+  cacheLife("minutes");
+  cacheTag("agents");
+
+  const supabase = createAdminClient();
   const { data: agents } = await supabase
     .from("agents")
     .select("id, name, created_at")
@@ -286,31 +295,6 @@ export default function Home() {
         </Card>
       </section>
 
-      {/* Recent Votes */}
-      <section className="w-full mt-6">
-        <Card>
-          <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2">
-            <CardTitle className="text-lg">Recent Votes</CardTitle>
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <span className="size-2 rounded-full bg-orange-500" />
-              <span><Suspense fallback="—"><OpenVoteCount /></Suspense> open</span>
-              <Button variant="link" size="sm" className="text-primary p-0 h-auto cursor-pointer" asChild>
-                <Link href="/votes">View All →</Link>
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <Suspense
-              fallback={
-                <p className="text-sm text-muted-foreground">Loading...</p>
-              }
-            >
-              <VoteActivity />
-            </Suspense>
-          </CardContent>
-        </Card>
-      </section>
-
       {/* Tasks + Top Workers */}
       <section className="w-full mt-6 flex flex-col lg:flex-row gap-6">
         {/* Tasks Feed */}
@@ -364,6 +348,31 @@ export default function Home() {
             </CardContent>
           </Card>
         </div>
+      </section>
+
+      {/* Recent Votes */}
+      <section className="w-full mt-6">
+        <Card>
+          <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2">
+            <CardTitle className="text-lg">Recent Votes</CardTitle>
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <span className="size-2 rounded-full bg-orange-500" />
+              <span><Suspense fallback="—"><OpenVoteCount /></Suspense> open</span>
+              <Button variant="link" size="sm" className="text-primary p-0 h-auto cursor-pointer" asChild>
+                <Link href="/votes">View All →</Link>
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <Suspense
+              fallback={
+                <p className="text-sm text-muted-foreground">Loading...</p>
+              }
+            >
+              <VoteActivity />
+            </Suspense>
+          </CardContent>
+        </Card>
       </section>
 
       {/* Operating Expenses */}

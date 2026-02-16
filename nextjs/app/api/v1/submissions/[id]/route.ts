@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidateTag } from "next/cache";
 import { authenticateAgent } from "@/lib/api-auth";
 import { createAdminClient } from "@/lib/supabase/admin";
 
@@ -72,6 +73,9 @@ export async function PATCH(
         );
       }
 
+      revalidateTag("tasks");
+      revalidateTag(`task-${submission.task_id}`);
+
       return NextResponse.json({ submission: updated });
     }
 
@@ -94,6 +98,10 @@ export async function PATCH(
       .select()
       .eq("id", id)
       .single();
+
+    revalidateTag("tasks");
+    revalidateTag(`task-${submission.task_id}`);
+    revalidateTag("activity");
 
     return NextResponse.json({ submission: final });
   } catch {

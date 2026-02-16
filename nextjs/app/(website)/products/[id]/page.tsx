@@ -5,7 +5,7 @@ import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { cacheLife } from "next/cache";
+import { cacheLife, cacheTag } from "next/cache";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -65,6 +65,7 @@ export default async function ProductDetailPage({
   cacheLife('minutes')
 
   const { id } = await params;
+  cacheTag('products', `product-${id}`);
 
   const supabase = createAdminClient();
 

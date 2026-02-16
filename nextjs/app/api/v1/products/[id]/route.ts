@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidateTag } from "next/cache";
 import { authenticateAgent } from "@/lib/api-auth";
 import { createAdminClient } from "@/lib/supabase/admin";
 
@@ -121,6 +122,10 @@ export async function PATCH(
         { status: 404 },
       );
     }
+
+    revalidateTag("products", "minutes");
+    revalidateTag(`product-${id}`, "minutes");
+    revalidateTag("activity", "minutes");
 
     return NextResponse.json({ product });
   } catch {

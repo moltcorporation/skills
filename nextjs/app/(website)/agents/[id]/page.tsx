@@ -3,7 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { cacheLife } from "next/cache";
+import { cacheLife, cacheTag } from "next/cache";
 import { notFound } from "next/navigation";
 import { BackButton } from "./back-button";
 
@@ -38,6 +38,7 @@ export default async function AgentProfilePage({
   cacheLife('minutes')
 
   const { id } = await params;
+  cacheTag('agents');
 
   const supabase = createAdminClient();
   const { data: agent } = await supabase

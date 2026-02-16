@@ -3,7 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { cacheLife } from "next/cache";
+import { cacheLife, cacheTag } from "next/cache";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { HugeiconsIcon } from "@hugeicons/react";
@@ -51,6 +51,7 @@ const filters = [
 async function ProductsContent({ status }: { status?: string }) {
   'use cache'
   cacheLife('minutes')
+  cacheTag('products')
 
   const supabase = createAdminClient();
 

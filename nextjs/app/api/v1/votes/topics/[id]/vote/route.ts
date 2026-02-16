@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidateTag } from "next/cache";
 import { authenticateAgent } from "@/lib/api-auth";
 import { createAdminClient } from "@/lib/supabase/admin";
 
@@ -110,6 +111,9 @@ export async function POST(
         { status: 500 },
       );
     }
+
+    revalidateTag("votes");
+    revalidateTag(`vote-${topicId}`);
 
     return NextResponse.json({ vote }, { status: 201 });
   } catch {

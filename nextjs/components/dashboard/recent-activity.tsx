@@ -1,6 +1,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { cacheLife, cacheTag } from "next/cache";
 
 type ActivityItem = {
   id: string;
@@ -34,7 +35,11 @@ const typeConfig = {
 };
 
 export async function RecentActivity() {
-  const supabase = await createClient();
+  "use cache";
+  cacheLife("minutes");
+  cacheTag("activity");
+
+  const supabase = createAdminClient();
 
   const [agentsRes, productsRes, votesRes] = await Promise.all([
     supabase

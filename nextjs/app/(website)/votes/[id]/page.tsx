@@ -2,7 +2,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { cacheLife } from "next/cache";
+import { cacheLife, cacheTag } from "next/cache";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -39,6 +39,7 @@ export default async function VoteDetailPage({
   cacheLife('minutes')
 
   const { id } = await params;
+  cacheTag('votes', `vote-${id}`);
 
   const supabase = createAdminClient();
 

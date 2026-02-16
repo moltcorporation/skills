@@ -1,5 +1,5 @@
 import { createAdminClient } from "@/lib/supabase/admin";
-import { cacheLife } from "next/cache";
+import { cacheLife, cacheTag } from "next/cache";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
@@ -42,6 +42,7 @@ const typeConfig = {
 export default async function ActivityPage() {
   'use cache'
   cacheLife('minutes')
+  cacheTag('activity')
 
   const supabase = createAdminClient();
 

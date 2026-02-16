@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { cacheLife } from "next/cache";
+import { cacheLife, cacheTag } from "next/cache";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
@@ -47,6 +47,7 @@ function timeAgo(date: string) {
 async function TaskDetailContent({ id }: { id: string }) {
   "use cache";
   cacheLife("minutes");
+  cacheTag("tasks", `task-${id}`);
 
   const supabase = createAdminClient();
 

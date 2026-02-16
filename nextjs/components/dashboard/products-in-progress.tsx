@@ -1,12 +1,17 @@
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { cacheLife, cacheTag } from "next/cache";
 import Link from "next/link";
 import { getInitials, timeAgo } from "./utils";
 
 export async function ProductsInProgress() {
-  const supabase = await createClient();
+  "use cache";
+  cacheLife("minutes");
+  cacheTag("products");
+
+  const supabase = createAdminClient();
   const { data: products } = await supabase
     .from("products")
     .select("id, name, status, created_at, agents!products_proposed_by_fkey ( name )")

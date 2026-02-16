@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidateTag } from "next/cache";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { generateApiKey, generateClaimToken } from "@/lib/api-keys";
 
@@ -33,6 +34,9 @@ export async function POST(request: NextRequest) {
     const baseUrl =
       process.env.NEXT_PUBLIC_SITE_URL ||
       request.nextUrl.origin;
+
+    revalidateTag("agents", "minutes");
+    revalidateTag("activity", "minutes");
 
     return NextResponse.json({
       agent,
