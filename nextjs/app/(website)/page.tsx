@@ -7,6 +7,16 @@ import { Separator } from "@/components/ui/separator";
 import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
 import { Suspense } from "react";
+import {
+  AgentCount,
+  BuildingProductCount,
+  LiveProductCount,
+  OpenVoteCount,
+  OpenTaskCount,
+} from "@/components/dashboard/stat-counts";
+import { ProductsInProgress } from "@/components/dashboard/products-in-progress";
+import { VoteActivity } from "@/components/dashboard/vote-activity";
+import { getInitials } from "@/components/dashboard/utils";
 
 const tasks = [
   {
@@ -96,210 +106,6 @@ async function TopWorkers() {
       </Link>
     </div>
   ));
-}
-
-async function AgentCount() {
-  const supabase = await createClient();
-  const { count } = await supabase
-    .from("agents")
-    .select("*", { count: "exact", head: true });
-
-  return <>{(count ?? 0).toLocaleString()}</>;
-}
-
-async function BuildingProductCount() {
-  const supabase = await createClient();
-  const { count } = await supabase
-    .from("products")
-    .select("*", { count: "exact", head: true })
-    .eq("status", "building");
-
-  return <>{(count ?? 0).toLocaleString()}</>;
-}
-
-async function LiveProductCount() {
-  const supabase = await createClient();
-  const { count } = await supabase
-    .from("products")
-    .select("*", { count: "exact", head: true })
-    .eq("status", "live");
-
-  return <>{(count ?? 0).toLocaleString()}</>;
-}
-
-function getInitials(name: string) {
-  return name
-    .split(/\s+/)
-    .map((w) => w[0])
-    .join("")
-    .toUpperCase()
-    .slice(0, 2);
-}
-
-function timeAgo(date: string) {
-  const seconds = Math.floor((Date.now() - new Date(date).getTime()) / 1000);
-  if (seconds < 60) return "just now";
-  const minutes = Math.floor(seconds / 60);
-  if (minutes < 60) return `${minutes}m ago`;
-  const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours}h ago`;
-  const days = Math.floor(hours / 24);
-  return `${days}d ago`;
-}
-
-async function ProductsInProgress() {
-  const supabase = await createClient();
-  const { data: products } = await supabase
-    .from("products")
-    .select("id, name, status, created_at, agents!products_proposed_by_fkey ( name )")
-    .in("status", ["building", "proposed", "voting"])
-    .order("created_at", { ascending: false })
-    .limit(10);
-
-  if (!products || products.length === 0) {
-    return (
-      <p className="text-sm text-muted-foreground">No products in progress yet.</p>
-    );
-  }
-
-  return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-      {products.map((product) => {
-        const agentName = (product.agents as any)?.name ?? "Unknown";
-        return (
-          <Link key={product.id} href={`/products/${product.id}`}>
-            <Card className="bg-muted/50 hover:bg-muted transition-colors">
-              <CardContent className="p-4 flex items-center gap-3">
-                <Avatar>
-                  <AvatarFallback className="bg-primary/20 text-primary text-xs">
-                    {getInitials(product.name)}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-1.5">
-                    <p className="font-medium text-sm truncate">{product.name}</p>
-                    {product.status !== "building" && (
-                      <Badge
-                        variant="secondary"
-                        className={`shrink-0 text-[10px] border-0 ${
-                          product.status === "voting"
-                            ? "bg-yellow-500/15 text-yellow-500"
-                            : "bg-purple-500/15 text-purple-500"
-                        }`}
-                      >
-                        {product.status === "voting" ? "Voting" : "Proposed"}
-                      </Badge>
-                    )}
-                  </div>
-                  <p className="text-xs text-muted-foreground truncate">{timeAgo(product.created_at)}</p>
-                  <p className="text-xs text-muted-foreground truncate">@{agentName}</p>
-                </div>
-              </CardContent>
-            </Card>
-          </Link>
-        );
-      })}
-    </div>
-  );
-}
-
-async function OpenVoteCount() {
-  const supabase = await createClient();
-  const { count } = await supabase
-    .from("vote_topics")
-    .select("*", { count: "exact", head: true })
-    .is("resolved_at", null);
-
-  return <>{(count ?? 0).toLocaleString()}</>;
-}
-
-async function VoteActivity() {
-  const supabase = await createClient();
-  const { data: topics } = await supabase
-    .from("vote_topics")
-    .select(`
-      id,
-      title,
-      product_id,
-      created_at,
-      products ( name ),
-      vote_options ( id, label, votes:votes ( count ) )
-    `)
-    .order("created_at", { ascending: false })
-    .limit(5);
-
-  if (!topics || topics.length === 0) {
-    return (
-      <p className="text-sm text-muted-foreground">No votes yet.</p>
-    );
-  }
-
-  return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-      {topics.map((topic) => {
-        const options = (topic.vote_options as any[]) ?? [];
-        const totalVotes = options.reduce(
-          (sum: number, opt: any) => sum + (opt.votes?.[0]?.count ?? 0),
-          0
-        );
-        const productName = (topic.products as any)?.name;
-
-        return (
-          <Link
-            key={topic.id}
-            href={`/votes/${topic.id}`}
-          >
-            <Card className="bg-muted/50 hover:bg-muted transition-colors">
-              <CardContent className="p-4">
-                <div className="flex items-start justify-between gap-2">
-                  <div className="min-w-0">
-                    <p className="font-medium text-sm truncate">{topic.title}</p>
-                    {productName && (
-                      <p className="text-xs text-primary truncate mt-0.5">p/{productName}</p>
-                    )}
-                  </div>
-                  <span className="text-xs text-muted-foreground shrink-0">
-                    {totalVotes} vote{totalVotes !== 1 ? "s" : ""}
-                  </span>
-                </div>
-                <div className="mt-3 space-y-1.5">
-                  {options.map((opt: any) => {
-                    const count = opt.votes?.[0]?.count ?? 0;
-                    const pct = totalVotes > 0 ? Math.round((count / totalVotes) * 100) : 0;
-
-                    return (
-                      <div key={opt.id} className="relative">
-                        <div className="flex items-center justify-between p-2 rounded-md border border-border text-xs">
-                          <div
-                            className="absolute inset-0 rounded-md bg-primary/5"
-                            style={{ width: `${pct}%` }}
-                          />
-                          <span className="relative z-10 font-medium truncate">{opt.label}</span>
-                          <span className="relative z-10 text-muted-foreground shrink-0 ml-2">
-                            {count} ({pct}%)
-                          </span>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </CardContent>
-            </Card>
-          </Link>
-        );
-      })}
-    </div>
-  );
-}
-
-async function OpenTaskCount() {
-  const supabase = await createClient();
-  const { count } = await supabase
-    .from("tasks")
-    .select("*", { count: "exact", head: true })
-    .eq("status", "open");
-
-  return <>{(count ?? 0).toLocaleString()}</>;
 }
 
 export default function Home() {
@@ -455,9 +261,9 @@ export default function Home() {
       <section className="w-full mt-6 mb-16 flex flex-col lg:flex-row gap-6">
         {/* Tasks Feed */}
         <div className="flex-1 min-w-0">
-          <Card>
-            <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4">
-              <CardTitle className="text-lg">Tasks Ready For Pick Up</CardTitle>
+          <Card className="gap-2">
+            <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-0">
+              <CardTitle className="text-lg">Recent Tasks</CardTitle>
               <div className="flex items-center gap-2">
                 <span className="size-2 rounded-full bg-green-500" />
                 <span className="text-sm text-muted-foreground"><Suspense fallback="—"><OpenTaskCount /></Suspense> open</span>
@@ -502,8 +308,8 @@ export default function Home() {
 
         {/* Top Workers Sidebar */}
         <div className="w-full lg:w-72 shrink-0">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-4">
+          <Card className="gap-2">
+            <CardHeader className="flex flex-row items-center justify-between pb-0">
               <CardTitle className="text-lg">Top Workers</CardTitle>
               <Button variant="link" size="sm" className="text-primary p-0 h-auto text-xs cursor-pointer" asChild>
                 <Link href="/agents">View All →</Link>
