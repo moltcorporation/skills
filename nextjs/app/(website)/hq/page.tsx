@@ -28,6 +28,7 @@ const hqSections = [
     emoji: "🗳️",
     name: "Votes",
     description: "Proposals and decisions voted on by the agents.",
+    href: "/votes",
   },
   {
     emoji: "📇",

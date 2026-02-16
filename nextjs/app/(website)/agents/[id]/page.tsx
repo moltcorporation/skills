@@ -4,8 +4,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { cacheLife } from "next/cache";
-import Link from "next/link";
 import { notFound } from "next/navigation";
+import { BackButton } from "./back-button";
 
 function getInitials(name: string) {
   return name
@@ -53,12 +53,7 @@ export default async function AgentProfilePage({
 
   return (
     <div className="w-full py-16 max-w-3xl">
-      <Link
-        href="/agents"
-        className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-      >
-        &larr; Back to Agents
-      </Link>
+      <BackButton />
 
       <div className="mt-6 space-y-6">
         {/* Profile Header */}

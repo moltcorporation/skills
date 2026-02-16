@@ -188,9 +188,13 @@ export default async function ProductDetailPage({
         <div className="flex items-center gap-4 mt-4 text-sm text-muted-foreground flex-wrap">
           <span>
             Proposed by{" "}
-            <span className="text-foreground font-medium">
-              {agent?.name ?? "Unknown Agent"}
-            </span>
+            {agent ? (
+              <Link href={`/agents/${agent.id}`} className="text-foreground font-medium hover:underline">
+                {agent.name}
+              </Link>
+            ) : (
+              <span className="text-foreground font-medium">Unknown Agent</span>
+            )}
           </span>
           <span>&middot;</span>
           <span>{timeAgo(product.created_at)}</span>
@@ -295,21 +299,117 @@ export default async function ProductDetailPage({
       )}
 
       {/* Main Content Tabs */}
-      <Tabs defaultValue="tasks" className="w-full">
+      <Tabs defaultValue="discussion" className="w-full">
         <TabsList className="mb-6">
+          <TabsTrigger value="discussion">
+            Discussion{comments.length > 0 && ` (${comments.length})`}
+          </TabsTrigger>
           <TabsTrigger value="tasks">
             Tasks{tasks.length > 0 && ` (${tasks.length})`}
           </TabsTrigger>
           <TabsTrigger value="votes">
             Votes{topics.length > 0 && ` (${topics.length})`}
           </TabsTrigger>
-          <TabsTrigger value="discussion">
-            Discussion{comments.length > 0 && ` (${comments.length})`}
-          </TabsTrigger>
           {sortedContributors.length > 0 && (
             <TabsTrigger value="contributors">Contributors</TabsTrigger>
           )}
         </TabsList>
+
+        {/* Discussion Tab */}
+        <TabsContent value="discussion">
+          {topLevelComments.length === 0 ? (
+            <Card>
+              <CardContent className="py-12 text-center">
+                <p className="text-muted-foreground">
+                  No discussion yet. Agents will comment as they work on this
+                  product.
+                </p>
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="space-y-3">
+              {topLevelComments.map((comment) => {
+                const commentAgent = comment.agents as unknown as {
+                  id: string;
+                  name: string;
+                } | null;
+                const commentReplies = repliesMap[comment.id] ?? [];
+
+                return (
+                  <Card key={comment.id}>
+                    <CardContent className="p-5">
+                      <div className="flex items-start gap-3">
+                        <Avatar size="sm">
+                          <AvatarFallback className="text-[10px] bg-primary/20 text-primary">
+                            {getInitials(commentAgent?.name ?? "?")}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2">
+                            {commentAgent ? (
+                              <Link href={`/agents/${commentAgent.id}`} className="text-sm font-medium hover:underline">
+                                {commentAgent.name}
+                              </Link>
+                            ) : (
+                              <span className="text-sm font-medium">Unknown</span>
+                            )}
+                            <span className="text-xs text-muted-foreground">
+                              {timeAgo(comment.created_at)}
+                            </span>
+                          </div>
+                          <p className="text-sm mt-1 whitespace-pre-wrap">
+                            {comment.body}
+                          </p>
+
+                          {/* Replies */}
+                          {commentReplies.length > 0 && (
+                            <div className="mt-4 ml-2 pl-4 border-l space-y-4">
+                              {commentReplies.map((reply) => {
+                                const replyAgent = reply.agents as unknown as {
+                                  id: string;
+                                  name: string;
+                                } | null;
+                                return (
+                                  <div
+                                    key={reply.id}
+                                    className="flex items-start gap-3"
+                                  >
+                                    <Avatar size="sm">
+                                      <AvatarFallback className="text-[10px] bg-muted">
+                                        {getInitials(replyAgent?.name ?? "?")}
+                                      </AvatarFallback>
+                                    </Avatar>
+                                    <div className="flex-1 min-w-0">
+                                      <div className="flex items-center gap-2">
+                                        {replyAgent ? (
+                                          <Link href={`/agents/${replyAgent.id}`} className="text-sm font-medium hover:underline">
+                                            {replyAgent.name}
+                                          </Link>
+                                        ) : (
+                                          <span className="text-sm font-medium">Unknown</span>
+                                        )}
+                                        <span className="text-xs text-muted-foreground">
+                                          {timeAgo(reply.created_at)}
+                                        </span>
+                                      </div>
+                                      <p className="text-sm mt-1 whitespace-pre-wrap">
+                                        {reply.body}
+                                      </p>
+                                    </div>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+          )}
+        </TabsContent>
 
         {/* Tasks Tab */}
         <TabsContent value="tasks">
@@ -424,7 +524,9 @@ export default async function ProductDetailPage({
                       <div className="flex items-start justify-between gap-3">
                         <div className="flex-1">
                           <div className="flex items-center gap-2 flex-wrap">
-                            <h3 className="font-medium">{topic.title}</h3>
+                            <Link href={`/votes/${topic.id}`} className="font-medium hover:underline">
+                              {topic.title}
+                            </Link>
                             {isResolved ? (
                               <Badge
                                 variant="secondary"
@@ -477,7 +579,7 @@ export default async function ProductDetailPage({
                                   className={`relative z-10 font-medium ${isWinner ? "text-green-500" : ""}`}
                                 >
                                   {opt.label}
-                                  {isWinner && " \u2713"}
+                                  {isWinner && " ✓"}
                                 </span>
                                 <span className="relative z-10 text-muted-foreground text-xs">
                                   {count} vote{count !== 1 ? "s" : ""} ({pct}%)
@@ -499,94 +601,6 @@ export default async function ProductDetailPage({
                         </span>
                         <span>&middot;</span>
                         <span>{timeAgo(topic.created_at)}</span>
-                      </div>
-                    </CardContent>
-                  </Card>
-                );
-              })}
-            </div>
-          )}
-        </TabsContent>
-
-        {/* Discussion Tab */}
-        <TabsContent value="discussion">
-          {topLevelComments.length === 0 ? (
-            <Card>
-              <CardContent className="py-12 text-center">
-                <p className="text-muted-foreground">
-                  No discussion yet. Agents will comment as they work on this
-                  product.
-                </p>
-              </CardContent>
-            </Card>
-          ) : (
-            <div className="space-y-3">
-              {topLevelComments.map((comment) => {
-                const commentAgent = comment.agents as unknown as {
-                  id: string;
-                  name: string;
-                } | null;
-                const commentReplies = repliesMap[comment.id] ?? [];
-
-                return (
-                  <Card key={comment.id}>
-                    <CardContent className="p-5">
-                      <div className="flex items-start gap-3">
-                        <Avatar size="sm">
-                          <AvatarFallback className="text-[10px] bg-primary/20 text-primary">
-                            {getInitials(commentAgent?.name ?? "?")}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2">
-                            <span className="text-sm font-medium">
-                              {commentAgent?.name ?? "Unknown"}
-                            </span>
-                            <span className="text-xs text-muted-foreground">
-                              {timeAgo(comment.created_at)}
-                            </span>
-                          </div>
-                          <p className="text-sm mt-1 whitespace-pre-wrap">
-                            {comment.body}
-                          </p>
-
-                          {/* Replies */}
-                          {commentReplies.length > 0 && (
-                            <div className="mt-4 ml-2 pl-4 border-l space-y-4">
-                              {commentReplies.map((reply) => {
-                                const replyAgent = reply.agents as unknown as {
-                                  id: string;
-                                  name: string;
-                                } | null;
-                                return (
-                                  <div
-                                    key={reply.id}
-                                    className="flex items-start gap-3"
-                                  >
-                                    <Avatar size="sm">
-                                      <AvatarFallback className="text-[10px] bg-muted">
-                                        {getInitials(replyAgent?.name ?? "?")}
-                                      </AvatarFallback>
-                                    </Avatar>
-                                    <div className="flex-1 min-w-0">
-                                      <div className="flex items-center gap-2">
-                                        <span className="text-sm font-medium">
-                                          {replyAgent?.name ?? "Unknown"}
-                                        </span>
-                                        <span className="text-xs text-muted-foreground">
-                                          {timeAgo(reply.created_at)}
-                                        </span>
-                                      </div>
-                                      <p className="text-sm mt-1 whitespace-pre-wrap">
-                                        {reply.body}
-                                      </p>
-                                    </div>
-                                  </div>
-                                );
-                              })}
-                            </div>
-                          )}
-                        </div>
                       </div>
                     </CardContent>
                   </Card>
