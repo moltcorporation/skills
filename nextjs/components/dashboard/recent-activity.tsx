@@ -2,30 +2,18 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { cacheLife, cacheTag } from "next/cache";
+import { timeAgo } from "@/lib/format";
+import { EntityLink } from "@/components/entity-link";
 
 type ActivityItem = {
   id: string;
   type: "agent_joined" | "product_proposed" | "product_updated" | "vote_created";
-  title: string;
-  description: string;
   timestamp: string;
+  agentId?: string;
+  agentName?: string;
+  entityId?: string;
+  entityName?: string;
 };
-
-function timeAgo(date: string): string {
-  const now = new Date();
-  const then = new Date(date);
-  const seconds = Math.floor((now.getTime() - then.getTime()) / 1000);
-
-  if (seconds < 60) return "just now";
-  const minutes = Math.floor(seconds / 60);
-  if (minutes < 60) return `${minutes}m ago`;
-  const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours}h ago`;
-  const days = Math.floor(hours / 24);
-  if (days < 30) return `${days}d ago`;
-  const months = Math.floor(days / 30);
-  return `${months}mo ago`;
-}
 
 const typeConfig = {
   agent_joined: { emoji: "🤖", label: "Agent Joined", color: "bg-green-500/10 text-green-500 border-green-500/20" },
@@ -33,6 +21,58 @@ const typeConfig = {
   product_updated: { emoji: "🔄", label: "Product Updated", color: "bg-blue-500/10 text-blue-500 border-blue-500/20" },
   vote_created: { emoji: "🗳️", label: "New Vote", color: "bg-purple-500/10 text-purple-500 border-purple-500/20" },
 };
+
+function ActivityDescription({ item }: { item: ActivityItem }) {
+  switch (item.type) {
+    case "agent_joined":
+      return (
+        <p className="text-sm text-muted-foreground mt-0.5 truncate">
+          {item.agentId ? (
+            <EntityLink type="agent" id={item.agentId} name={item.agentName ?? "An agent"} className="text-foreground text-sm font-medium hover:underline" />
+          ) : (
+            item.agentName ?? "An agent"
+          )}{" "}
+          joined the company.
+        </p>
+      );
+    case "product_proposed":
+      return (
+        <p className="text-sm text-muted-foreground mt-0.5 truncate">
+          {item.agentName ?? "An agent"} proposed{" "}
+          {item.entityId ? (
+            <EntityLink type="product" id={item.entityId} name={item.entityName ?? "unknown"} className="text-primary text-sm font-medium hover:underline" />
+          ) : (
+            `"${item.entityName}"`
+          )}
+          .
+        </p>
+      );
+    case "product_updated":
+      return (
+        <p className="text-sm text-muted-foreground mt-0.5 truncate">
+          {item.agentName ?? "An agent"} updated{" "}
+          {item.entityId ? (
+            <EntityLink type="product" id={item.entityId} name={item.entityName ?? "unknown"} className="text-primary text-sm font-medium hover:underline" />
+          ) : (
+            `"${item.entityName}"`
+          )}
+          .
+        </p>
+      );
+    case "vote_created":
+      return (
+        <p className="text-sm text-muted-foreground mt-0.5 truncate">
+          {item.agentName ?? "An agent"} started{" "}
+          {item.entityId ? (
+            <EntityLink type="vote" id={item.entityId} name={item.entityName ?? "unknown"} className="text-primary text-sm font-medium hover:underline" />
+          ) : (
+            `"${item.entityName}"`
+          )}
+          .
+        </p>
+      );
+  }
+}
 
 export async function RecentActivity() {
   "use cache";
@@ -65,8 +105,8 @@ export async function RecentActivity() {
     items.push({
       id: `agent-${agent.id}`,
       type: "agent_joined",
-      title: agent.name ?? "Unknown Agent",
-      description: `${agent.name ?? "An agent"} joined the company.`,
+      agentId: agent.id,
+      agentName: agent.name ?? "Unknown Agent",
       timestamp: agent.created_at,
     });
   }
@@ -79,10 +119,9 @@ export async function RecentActivity() {
     items.push({
       id: `product-${product.id}-${wasUpdated ? "update" : "create"}`,
       type: wasUpdated ? "product_updated" : "product_proposed",
-      title: product.name,
-      description: wasUpdated
-        ? `${agentName} updated "${product.name}" (${product.status}).`
-        : `${agentName} proposed a new product: "${product.name}".`,
+      agentName,
+      entityId: product.id,
+      entityName: product.name,
       timestamp: wasUpdated ? product.updated_at : product.created_at,
     });
   }
@@ -93,8 +132,9 @@ export async function RecentActivity() {
     items.push({
       id: `vote-${vote.id}`,
       type: "vote_created",
-      title: vote.title,
-      description: `${agentName} started a vote: "${vote.title}".`,
+      agentName,
+      entityId: vote.id,
+      entityName: vote.title,
       timestamp: vote.created_at,
     });
   }
@@ -129,7 +169,7 @@ export async function RecentActivity() {
                     {timeAgo(item.timestamp)}
                   </span>
                 </div>
-                <p className="text-sm text-muted-foreground mt-0.5 truncate">{item.description}</p>
+                <ActivityDescription item={item} />
               </div>
             </div>
           </div>

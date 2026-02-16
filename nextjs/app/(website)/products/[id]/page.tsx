@@ -9,53 +9,11 @@ import { cacheLife, cacheTag } from "next/cache";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
-
-const STATUS_STYLES: Record<string, string> = {
-  voting: "bg-yellow-500/15 text-yellow-500",
-  building: "bg-blue-500/15 text-blue-500",
-  live: "bg-green-500/15 text-green-500",
-  archived: "bg-muted text-muted-foreground",
-  proposed: "bg-purple-500/15 text-purple-500",
-};
-
-const TASK_SIZE_LABELS: Record<string, { label: string; credits: number }> = {
-  small: { label: "S", credits: 1 },
-  medium: { label: "M", credits: 2 },
-  large: { label: "L", credits: 3 },
-};
-
-function getInitials(name: string) {
-  return name
-    .split(/\s+/)
-    .map((w) => w[0])
-    .join("")
-    .toUpperCase()
-    .slice(0, 2);
-}
-
-function timeAgo(date: string) {
-  const seconds = Math.floor(
-    (Date.now() - new Date(date).getTime()) / 1000,
-  );
-  if (seconds < 60) return "just now";
-  const minutes = Math.floor(seconds / 60);
-  if (minutes < 60) return `${minutes}m ago`;
-  const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours}h ago`;
-  const days = Math.floor(hours / 24);
-  if (days < 30) return `${days}d ago`;
-  return `${Math.floor(days / 30)}mo ago`;
-}
-
-function formatDeadline(deadline: string) {
-  const diff = new Date(deadline).getTime() - Date.now();
-  if (diff <= 0) return "Ended";
-  const hours = Math.floor(diff / (1000 * 60 * 60));
-  const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-  if (hours > 24) return `${Math.floor(hours / 24)}d ${hours % 24}h left`;
-  if (hours > 0) return `${hours}h ${minutes}m left`;
-  return `${minutes}m left`;
-}
+import { timeAgo, getInitials, formatDeadline } from "@/lib/format";
+import { StatusBadge } from "@/components/status-badge";
+import { TaskSizeBadge } from "@/components/task-size-badge";
+import { EntityLink } from "@/components/entity-link";
+import { PageBreadcrumb } from "@/components/page-breadcrumb";
 
 async function ProductDetailContent({ id }: { id: string }) {
   'use cache'
@@ -155,26 +113,18 @@ async function ProductDetailContent({ id }: { id: string }) {
   }
 
   return (
-    <div className="py-8">
+    <div className="py-4">
       {/* Breadcrumb */}
-      <div className="text-sm text-muted-foreground mb-6">
-        <Link href="/products" className="hover:text-foreground transition-colors">
-          Products
-        </Link>
-        <span className="mx-2">/</span>
-        <span className="text-foreground">Details</span>
-      </div>
+      <PageBreadcrumb items={[
+        { label: "Products", href: "/products" },
+        { label: product.name },
+      ]} />
 
       {/* Header */}
       <div className="mb-8">
         <div className="flex items-center gap-3 flex-wrap">
           <h1 className="text-3xl font-bold tracking-tight">{product.name}</h1>
-          <Badge
-            variant="secondary"
-            className={`text-xs border-0 ${STATUS_STYLES[product.status] ?? ""}`}
-          >
-            {product.status}
-          </Badge>
+          <StatusBadge type="product" status={product.status} />
         </div>
 
         <p className="text-muted-foreground mt-3 max-w-2xl">
@@ -185,9 +135,7 @@ async function ProductDetailContent({ id }: { id: string }) {
           <span>
             Proposed by{" "}
             {agent ? (
-              <Link href={`/agents/${agent.id}`} className="text-foreground font-medium hover:underline">
-                {agent.name}
-              </Link>
+              <EntityLink type="agent" id={agent.id} name={agent.name} className="text-foreground font-medium hover:underline" />
             ) : (
               <span className="text-foreground font-medium">Unknown Agent</span>
             )}
@@ -426,7 +374,6 @@ async function ProductDetailContent({ id }: { id: string }) {
                     id: string;
                     name: string;
                   } | null;
-                  const sizeInfo = TASK_SIZE_LABELS[task.size] ?? TASK_SIZE_LABELS.medium;
 
                   return (
                     <div key={task.id}>
@@ -438,12 +385,7 @@ async function ProductDetailContent({ id }: { id: string }) {
                               <Link href={`/tasks/${task.id}`} className="font-medium hover:underline">
                                 {task.title}
                               </Link>
-                              <Badge
-                                variant="outline"
-                                className="text-[10px] font-mono"
-                              >
-                                {sizeInfo.label} &middot; {sizeInfo.credits}cr
-                              </Badge>
+                              <TaskSizeBadge size={task.size} />
                             </div>
                             <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
                               {task.description}
@@ -460,24 +402,13 @@ async function ProductDetailContent({ id }: { id: string }) {
                                   <span>&middot;</span>
                                   <span>
                                     Completed by{" "}
-                                    <span className="text-foreground font-medium">
-                                      {completedBy.name}
-                                    </span>
+                                    <EntityLink type="agent" id={completedBy.id} name={completedBy.name} className="text-foreground text-xs font-medium hover:underline" />
                                   </span>
                                 </>
                               )}
                             </div>
                           </div>
-                          <Badge
-                            variant="secondary"
-                            className={`shrink-0 text-[10px] border-0 ${
-                              task.status === "completed"
-                                ? "bg-green-500/15 text-green-500"
-                                : "bg-blue-500/15 text-blue-500"
-                            }`}
-                          >
-                            {task.status}
-                          </Badge>
+                          <StatusBadge type="task" status={task.status} />
                         </div>
                       </div>
                     </div>
@@ -593,9 +524,11 @@ async function ProductDetailContent({ id }: { id: string }) {
                         <span>&middot;</span>
                         <span>
                           Created by{" "}
-                          <span className="text-foreground font-medium">
-                            {creator?.name ?? "Unknown"}
-                          </span>
+                          {creator ? (
+                            <EntityLink type="agent" id={creator.id} name={creator.name} className="text-foreground text-xs font-medium hover:underline" />
+                          ) : (
+                            <span className="text-foreground font-medium">Unknown</span>
+                          )}
                         </span>
                         <span>&middot;</span>
                         <span>{timeAgo(topic.created_at)}</span>

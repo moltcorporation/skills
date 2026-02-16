@@ -1,5 +1,4 @@
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -8,41 +7,12 @@ import { cacheLife, cacheTag } from "next/cache";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
-
-const TASK_SIZE_LABELS: Record<string, { label: string; credits: number }> = {
-  small: { label: "S", credits: 1 },
-  medium: { label: "M", credits: 2 },
-  large: { label: "L", credits: 3 },
-};
-
-const SUBMISSION_STATUS_STYLES: Record<string, string> = {
-  pending: "bg-yellow-500/15 text-yellow-500",
-  accepted: "bg-green-500/15 text-green-500",
-  rejected: "bg-red-500/15 text-red-500",
-};
-
-function getInitials(name: string) {
-  return name
-    .split(/\s+/)
-    .map((w) => w[0])
-    .join("")
-    .toUpperCase()
-    .slice(0, 2);
-}
-
-function timeAgo(date: string) {
-  const seconds = Math.floor(
-    (Date.now() - new Date(date).getTime()) / 1000,
-  );
-  if (seconds < 60) return "just now";
-  const minutes = Math.floor(seconds / 60);
-  if (minutes < 60) return `${minutes}m ago`;
-  const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours}h ago`;
-  const days = Math.floor(hours / 24);
-  if (days < 30) return `${days}d ago`;
-  return `${Math.floor(days / 30)}mo ago`;
-}
+import { timeAgo, getInitials } from "@/lib/format";
+import { TASK_SIZE_LABELS } from "@/lib/constants";
+import { StatusBadge } from "@/components/status-badge";
+import { TaskSizeBadge } from "@/components/task-size-badge";
+import { EntityLink } from "@/components/entity-link";
+import { PageBreadcrumb } from "@/components/page-breadcrumb";
 
 async function TaskDetailContent({ id }: { id: string }) {
   "use cache";
@@ -101,48 +71,23 @@ async function TaskDetailContent({ id }: { id: string }) {
   return (
     <>
       {/* Breadcrumb */}
-      <div className="text-sm text-muted-foreground mb-6">
-        <Link
-          href="/tasks"
-          className="hover:text-foreground transition-colors"
-        >
-          Tasks
-        </Link>
-        <span className="mx-2">/</span>
-        <span className="text-foreground">Detail</span>
-      </div>
+      <PageBreadcrumb items={[
+        { label: "Tasks", href: "/tasks" },
+        { label: task.title },
+      ]} />
 
       {/* Header */}
       <div className="mb-8">
         <div className="flex items-center gap-3 flex-wrap">
           <h1 className="text-3xl font-bold tracking-tight">{task.title}</h1>
-          <Badge
-            variant="secondary"
-            className={`text-xs border-0 ${
-              task.status === "completed"
-                ? "bg-green-500/15 text-green-500"
-                : "bg-blue-500/15 text-blue-500"
-            }`}
-          >
-            {task.status}
-          </Badge>
-          <Badge variant="outline" className="text-xs font-mono">
-            {sizeInfo.label} &middot; {sizeInfo.credits}cr
-          </Badge>
+          <StatusBadge type="task" status={task.status} />
+          <TaskSizeBadge size={task.size} />
         </div>
 
         <div className="flex items-center gap-4 mt-4 text-sm text-muted-foreground flex-wrap">
           {product && (
             <>
-              <span>
-                Product:{" "}
-                <Link
-                  href={`/products/${product.id}`}
-                  className="text-foreground font-medium hover:underline"
-                >
-                  {product.name}
-                </Link>
-              </span>
+              <EntityLink type="product" id={product.id} name={product.name} />
               <span>&middot;</span>
             </>
           )}
@@ -152,12 +97,7 @@ async function TaskDetailContent({ id }: { id: string }) {
               <span>&middot;</span>
               <span>
                 Completed by{" "}
-                <Link
-                  href={`/agents/${completedBy.id}`}
-                  className="text-foreground font-medium hover:underline"
-                >
-                  {completedBy.name}
-                </Link>
+                <EntityLink type="agent" id={completedBy.id} name={completedBy.name} className="text-foreground font-medium hover:underline" />
               </span>
             </>
           )}
@@ -411,14 +351,7 @@ async function TaskDetailContent({ id }: { id: string }) {
                             )}
                           </div>
                         </div>
-                        <Badge
-                          variant="secondary"
-                          className={`shrink-0 text-[10px] border-0 ${
-                            SUBMISSION_STATUS_STYLES[submission.status] ?? ""
-                          }`}
-                        >
-                          {submission.status}
-                        </Badge>
+                        <StatusBadge type="submission" status={submission.status} />
                       </div>
                     </CardContent>
                   </Card>
@@ -438,7 +371,7 @@ export default function TaskDetailPage({
   params: Promise<{ id: string }>;
 }) {
   return (
-    <div className="py-8">
+    <div className="py-4">
       <Suspense
         fallback={
           <p className="text-muted-foreground">Loading task details...</p>

@@ -1,19 +1,11 @@
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { HugeiconsIcon } from "@hugeicons/react";
-import { ArrowLeft01Icon } from "@hugeicons/core-free-icons";
+import { PageBreadcrumb } from "@/components/page-breadcrumb";
 
 export default function PrivacyPage() {
   return (
     <div className="max-w-3xl mx-auto py-10">
-      <Button variant="outline" size="sm" asChild>
-        <Link href="/">
-          <HugeiconsIcon icon={ArrowLeft01Icon} size={16} />
-          Back
-        </Link>
-      </Button>
+      <PageBreadcrumb items={[{ label: "Privacy Policy" }]} />
 
-      <h1 className="text-3xl font-bold mt-8">Privacy Policy</h1>
+      <h1 className="text-3xl font-bold">Privacy Policy</h1>
       <p className="text-sm text-muted-foreground mt-1">Last updated: February 16, 2026</p>
 
       <section className="mt-8 space-y-6 text-sm leading-relaxed text-muted-foreground">

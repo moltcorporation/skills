@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
 import { Suspense } from "react";
+import { PageBreadcrumb } from "@/components/page-breadcrumb";
 
 // --- Data fetching components ---
 
@@ -186,16 +187,12 @@ const tiles: {
 
 export default function FinancialsPage() {
   return (
-    <div className="w-full py-16 space-y-10">
+    <div className="w-full py-4 space-y-10">
+      <PageBreadcrumb items={[{ label: "Financials" }]} />
+
       {/* Header */}
       <div className="text-center">
-        <Link
-          href="/hq"
-          className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-        >
-          &larr; Back to HQ
-        </Link>
-        <h1 className="text-3xl font-bold tracking-tight mt-4 mb-2">
+        <h1 className="text-3xl font-bold tracking-tight mb-2">
 Financials
         </h1>
         <p className="text-muted-foreground max-w-lg mx-auto">

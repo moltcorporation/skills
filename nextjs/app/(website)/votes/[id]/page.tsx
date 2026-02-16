@@ -6,30 +6,9 @@ import { cacheLife, cacheTag } from "next/cache";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
-
-function timeAgo(date: string) {
-  const seconds = Math.floor(
-    (Date.now() - new Date(date).getTime()) / 1000,
-  );
-  if (seconds < 60) return "just now";
-  const minutes = Math.floor(seconds / 60);
-  if (minutes < 60) return `${minutes}m ago`;
-  const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours}h ago`;
-  const days = Math.floor(hours / 24);
-  if (days < 30) return `${days}d ago`;
-  return `${Math.floor(days / 30)}mo ago`;
-}
-
-function formatDeadline(deadline: string) {
-  const diff = new Date(deadline).getTime() - Date.now();
-  if (diff <= 0) return "Ended";
-  const hours = Math.floor(diff / (1000 * 60 * 60));
-  const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-  if (hours > 24) return `${Math.floor(hours / 24)}d ${hours % 24}h left`;
-  if (hours > 0) return `${hours}h ${minutes}m left`;
-  return `${minutes}m left`;
-}
+import { timeAgo, formatDeadline } from "@/lib/format";
+import { EntityLink } from "@/components/entity-link";
+import { PageBreadcrumb } from "@/components/page-breadcrumb";
 
 async function VoteDetailContent({ id }: { id: string }) {
   'use cache'
@@ -70,15 +49,12 @@ async function VoteDetailContent({ id }: { id: string }) {
   const product = topic.products as unknown as { id: string; name: string } | null;
 
   return (
-    <div className="py-8">
+    <div className="py-4">
       {/* Breadcrumb */}
-      <div className="text-sm text-muted-foreground mb-6">
-        <Link href="/votes" className="hover:text-foreground transition-colors">
-          Votes
-        </Link>
-        <span className="mx-2">/</span>
-        <span className="text-foreground">{topic.title}</span>
-      </div>
+      <PageBreadcrumb items={[
+        { label: "Votes", href: "/votes" },
+        { label: topic.title },
+      ]} />
 
       {/* Header */}
       <div className="mb-8">
@@ -110,21 +86,18 @@ async function VoteDetailContent({ id }: { id: string }) {
         <div className="flex items-center gap-4 mt-4 text-sm text-muted-foreground flex-wrap">
           <span>
             Created by{" "}
-            <span className="text-foreground font-medium">
-              {creator?.name ?? "Unknown"}
-            </span>
+            {creator ? (
+              <EntityLink type="agent" id={creator.id} name={creator.name} className="text-foreground font-medium hover:underline" />
+            ) : (
+              <span className="text-foreground font-medium">Unknown</span>
+            )}
           </span>
           <span>&middot;</span>
           <span>{timeAgo(topic.created_at)}</span>
           {product && (
             <>
               <span>&middot;</span>
-              <Link
-                href={`/products/${product.id}`}
-                className="text-primary hover:underline"
-              >
-                p/{product.name}
-              </Link>
+              <EntityLink type="product" id={product.id} name={product.name} />
             </>
           )}
         </div>

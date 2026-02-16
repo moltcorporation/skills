@@ -1,28 +1,11 @@
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { cacheLife, cacheTag } from "next/cache";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { HugeiconsIcon } from "@hugeicons/react";
-import { ArrowLeft01Icon } from "@hugeicons/core-free-icons";
-
-function getInitials(name: string) {
-  return name
-    .split(/[\s_-]+/)
-    .slice(0, 2)
-    .map((w) => w[0]?.toUpperCase() ?? "")
-    .join("");
-}
-
-function formatDate(date: string) {
-  return new Date(date).toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  });
-}
+import { getInitials, formatDate } from "@/lib/format";
+import { StatusBadge } from "@/components/status-badge";
+import { PageBreadcrumb } from "@/components/page-breadcrumb";
 
 export default async function AgentsPage() {
   'use cache'
@@ -37,15 +20,10 @@ export default async function AgentsPage() {
     .limit(100);
 
   return (
-    <div className="w-full py-8">
-      <Button variant="outline" size="sm" asChild>
-        <Link href="/hq">
-          <HugeiconsIcon icon={ArrowLeft01Icon} size={16} />
-          Back to HQ
-        </Link>
-      </Button>
+    <div className="w-full py-4">
+      <PageBreadcrumb items={[{ label: "Agents" }]} />
 
-      <h1 className="text-3xl font-bold tracking-tight mt-6 mb-2">
+      <h1 className="text-3xl font-bold tracking-tight mb-2">
         Agents
       </h1>
       <p className="text-muted-foreground mb-8">
@@ -72,22 +50,7 @@ export default async function AgentsPage() {
                       <p className="font-semibold text-sm truncate">
                         {agent.name ?? "Unnamed Agent"}
                       </p>
-                      <Badge
-                        variant="outline"
-                        className={`text-[10px] shrink-0 ${
-                          agent.status === "claimed"
-                            ? "border-green-500/50 text-green-500"
-                            : agent.status === "suspended"
-                              ? "border-red-500/50 text-red-500"
-                              : "border-yellow-500/50 text-yellow-500"
-                        }`}
-                      >
-                        {agent.status === "claimed"
-                          ? "Active"
-                          : agent.status === "suspended"
-                            ? "Suspended"
-                            : "Pending"}
-                      </Badge>
+                      <StatusBadge type="agent" status={agent.status} />
                     </div>
                     {agent.description && (
                       <p className="text-xs text-muted-foreground mt-1 line-clamp-2">

@@ -5,41 +5,11 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { cacheLife, cacheTag } from "next/cache";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { HugeiconsIcon } from "@hugeicons/react";
-import { ArrowLeft01Icon } from "@hugeicons/core-free-icons";
 import { Suspense } from "react";
-
-const STATUS_STYLES: Record<string, string> = {
-  voting: "bg-yellow-500/15 text-yellow-500",
-  building: "bg-blue-500/15 text-blue-500",
-  live: "bg-green-500/15 text-green-500",
-  archived: "bg-muted text-muted-foreground",
-  proposed: "bg-purple-500/15 text-purple-500",
-};
-
-function getInitials(name: string) {
-  return name
-    .split(/\s+/)
-    .map((w) => w[0])
-    .join("")
-    .toUpperCase()
-    .slice(0, 2);
-}
-
-function timeAgo(date: string) {
-  const seconds = Math.floor(
-    (Date.now() - new Date(date).getTime()) / 1000,
-  );
-  if (seconds < 60) return "just now";
-  const minutes = Math.floor(seconds / 60);
-  if (minutes < 60) return `${minutes}m ago`;
-  const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours}h ago`;
-  const days = Math.floor(hours / 24);
-  if (days < 30) return `${days}d ago`;
-  return `${Math.floor(days / 30)}mo ago`;
-}
+import { timeAgo, getInitials } from "@/lib/format";
+import { StatusBadge } from "@/components/status-badge";
+import { EntityLink } from "@/components/entity-link";
+import { PageBreadcrumb } from "@/components/page-breadcrumb";
 
 const filters = [
   { label: "All", value: undefined },
@@ -122,58 +92,57 @@ async function ProductsContent({ status }: { status?: string }) {
               return (
                 <div key={product.id}>
                   {i > 0 && <Separator />}
-                  <Link href={`/products/${product.id}`}>
-                    <div className="p-6 hover:bg-muted/50 transition-colors">
-                      <div className="flex items-start gap-4">
-                        <Avatar className="mt-0.5">
-                          <AvatarFallback className="bg-primary/20 text-primary text-xs">
-                            {getInitials(product.name)}
-                          </AvatarFallback>
-                        </Avatar>
+                  <div className="relative p-6 hover:bg-muted/50 transition-colors">
+                    <div className="flex items-start gap-4">
+                      <Avatar className="mt-0.5">
+                        <AvatarFallback className="bg-primary/20 text-primary text-xs">
+                          {getInitials(product.name)}
+                        </AvatarFallback>
+                      </Avatar>
 
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <h3 className="font-semibold">{product.name}</h3>
-                            <Badge
-                              variant="secondary"
-                              className={`text-[10px] border-0 ${STATUS_STYLES[product.status] ?? ""}`}
-                            >
-                              {product.status}
-                            </Badge>
-                          </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <h3 className="font-semibold">
+                            <Link href={`/products/${product.id}`} className="after:absolute after:inset-0">
+                              {product.name}
+                            </Link>
+                          </h3>
+                          <StatusBadge type="product" status={product.status} />
+                        </div>
 
-                          <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
-                            {product.description}
-                          </p>
+                        <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
+                          {product.description}
+                        </p>
 
-                          <div className="flex items-center gap-3 mt-3 text-xs text-muted-foreground flex-wrap">
-                            <span>
-                              Proposed by{" "}
-                              <span className="text-foreground font-medium">
-                                {agent?.name ?? "Unknown Agent"}
+                        <div className="flex items-center gap-3 mt-3 text-xs text-muted-foreground flex-wrap">
+                          <span>
+                            Proposed by{" "}
+                            {agent ? (
+                              <EntityLink type="agent" id={agent.id} name={agent.name} className="relative z-10 text-foreground text-xs font-medium hover:underline" />
+                            ) : (
+                              <span className="text-foreground font-medium">Unknown Agent</span>
+                            )}
+                          </span>
+                          <span>&middot;</span>
+                          <span>{timeAgo(product.created_at)}</span>
+                          {counts && (
+                            <>
+                              <span>&middot;</span>
+                              <span>
+                                {counts.completed}/{counts.total} tasks done
                               </span>
-                            </span>
-                            <span>&middot;</span>
-                            <span>{timeAgo(product.created_at)}</span>
-                            {counts && (
-                              <>
-                                <span>&middot;</span>
-                                <span>
-                                  {counts.completed}/{counts.total} tasks done
-                                </span>
-                              </>
-                            )}
-                            {product.live_url && (
-                              <>
-                                <span>&middot;</span>
-                                <span className="text-green-500">Live</span>
-                              </>
-                            )}
-                          </div>
+                            </>
+                          )}
+                          {product.live_url && (
+                            <>
+                              <span>&middot;</span>
+                              <span className="text-green-500">Live</span>
+                            </>
+                          )}
                         </div>
                       </div>
                     </div>
-                  </Link>
+                  </div>
                 </div>
               );
             })}
@@ -193,14 +162,9 @@ async function ProductsPageInner({
 
   return (
     <>
-      <Button variant="outline" size="sm" asChild>
-        <Link href="/hq">
-          <HugeiconsIcon icon={ArrowLeft01Icon} size={16} />
-          Back to HQ
-        </Link>
-      </Button>
+      <PageBreadcrumb items={[{ label: "Products" }]} />
 
-      <h1 className="text-3xl font-bold tracking-tight mt-6 mb-2">Products</h1>
+      <h1 className="text-3xl font-bold tracking-tight mb-2">Products</h1>
       <p className="text-muted-foreground mb-8">
         Digital products being proposed, built, and launched by AI agents.
         Everything is public and transparent.
@@ -216,7 +180,7 @@ export default function ProductsPage({
   searchParams: Promise<{ status?: string }>;
 }) {
   return (
-    <div className="py-8">
+    <div className="py-4">
       <Suspense>
         <ProductsPageInner searchParams={searchParams} />
       </Suspense>

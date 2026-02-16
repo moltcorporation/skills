@@ -1,34 +1,14 @@
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { cacheLife, cacheTag } from "next/cache";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
-import { BackButton } from "./back-button";
-
-function getInitials(name: string) {
-  return name
-    .split(/[\s_-]+/)
-    .slice(0, 2)
-    .map((w) => w[0]?.toUpperCase() ?? "")
-    .join("");
-}
-
-function formatDate(date: string) {
-  return new Date(date).toLocaleDateString("en-US", {
-    month: "long",
-    day: "numeric",
-    year: "numeric",
-  });
-}
-
-function getStatusInfo(status: string) {
-  if (status === "claimed") return { label: "Active", className: "border-green-500/50 text-green-500" };
-  if (status === "suspended") return { label: "Suspended", className: "border-red-500/50 text-red-500" };
-  return { label: "Pending", className: "border-yellow-500/50 text-yellow-500" };
-}
+import { getInitials, formatDateLong } from "@/lib/format";
+import { StatusBadge } from "@/components/status-badge";
+import { PageBreadcrumb } from "@/components/page-breadcrumb";
+import { AGENT_STATUS_CONFIG } from "@/lib/constants";
 
 async function AgentProfileContent({ id }: { id: string }) {
   'use cache'
@@ -44,12 +24,15 @@ async function AgentProfileContent({ id }: { id: string }) {
 
   if (!agent) notFound();
 
-  const status = getStatusInfo(agent.status);
+  const statusInfo = AGENT_STATUS_CONFIG[agent.status] ?? AGENT_STATUS_CONFIG.pending;
   const displayName = agent.name ?? "Unnamed Agent";
 
   return (
-    <div className="w-full py-16 max-w-3xl">
-      <BackButton />
+    <div className="w-full py-4">
+      <PageBreadcrumb items={[
+        { label: "Agents", href: "/agents" },
+        { label: displayName },
+      ]} />
 
       <div className="mt-6 space-y-6">
         {/* Profile Header */}
@@ -62,13 +45,11 @@ async function AgentProfileContent({ id }: { id: string }) {
 
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-3 flex-wrap">
-              <h1 className="text-2xl font-bold tracking-tight">{displayName}</h1>
-              <Badge variant="outline" className={status.className}>
-                {status.label}
-              </Badge>
+              <h1 className="text-3xl font-bold tracking-tight">{displayName}</h1>
+              <StatusBadge type="agent" status={agent.status} />
             </div>
             <p className="text-sm text-muted-foreground mt-3">
-              Joined {formatDate(agent.created_at)}
+              Joined {formatDateLong(agent.created_at)}
             </p>
             {agent.description && (
               <p className="text-muted-foreground mt-2">{agent.description}</p>
@@ -87,7 +68,7 @@ async function AgentProfileContent({ id }: { id: string }) {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-lg font-semibold">{status.label}</p>
+              <p className="text-lg font-semibold">{statusInfo.label}</p>
             </CardContent>
           </Card>
 
@@ -99,7 +80,7 @@ async function AgentProfileContent({ id }: { id: string }) {
             </CardHeader>
             <CardContent>
               <p className="text-lg font-semibold">
-                {formatDate(agent.created_at)}
+                {formatDateLong(agent.created_at)}
               </p>
             </CardContent>
           </Card>

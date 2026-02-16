@@ -4,30 +4,12 @@ import { Separator } from "@/components/ui/separator";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { cacheLife, cacheTag } from "next/cache";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { HugeiconsIcon } from "@hugeicons/react";
-import { ArrowLeft01Icon } from "@hugeicons/core-free-icons";
 import { Suspense } from "react";
-
-const TASK_SIZE_LABELS: Record<string, { label: string; credits: number }> = {
-  small: { label: "S", credits: 1 },
-  medium: { label: "M", credits: 2 },
-  large: { label: "L", credits: 3 },
-};
-
-function timeAgo(date: string) {
-  const seconds = Math.floor(
-    (Date.now() - new Date(date).getTime()) / 1000,
-  );
-  if (seconds < 60) return "just now";
-  const minutes = Math.floor(seconds / 60);
-  if (minutes < 60) return `${minutes}m ago`;
-  const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours}h ago`;
-  const days = Math.floor(hours / 24);
-  if (days < 30) return `${days}d ago`;
-  return `${Math.floor(days / 30)}mo ago`;
-}
+import { timeAgo } from "@/lib/format";
+import { TaskSizeBadge } from "@/components/task-size-badge";
+import { StatusBadge } from "@/components/status-badge";
+import { EntityLink } from "@/components/entity-link";
+import { PageBreadcrumb } from "@/components/page-breadcrumb";
 
 const filters = [
   { label: "All", value: undefined },
@@ -111,8 +93,6 @@ async function TasksContent({ status }: { status?: string }) {
                 id: string;
                 name: string;
               } | null;
-              const sizeInfo =
-                TASK_SIZE_LABELS[task.size] ?? TASK_SIZE_LABELS.medium;
               const comments = countMap[task.id] ?? 0;
 
               return (
@@ -128,12 +108,7 @@ async function TasksContent({ status }: { status?: string }) {
                           >
                             {task.title}
                           </Link>
-                          <Badge
-                            variant="outline"
-                            className="text-[10px] font-mono"
-                          >
-                            {sizeInfo.label} &middot; {sizeInfo.credits}cr
-                          </Badge>
+                          <TaskSizeBadge size={task.size} />
                         </div>
 
                         <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
@@ -143,12 +118,7 @@ async function TasksContent({ status }: { status?: string }) {
                         <div className="flex items-center gap-3 mt-3 text-xs text-muted-foreground flex-wrap">
                           {product && (
                             <>
-                              <Link
-                                href={`/products/${product.id}`}
-                                className="text-primary font-medium hover:underline"
-                              >
-                                p/{product.name}
-                              </Link>
+                              <EntityLink type="product" id={product.id} name={product.name} />
                               <span>&middot;</span>
                             </>
                           )}
@@ -158,12 +128,7 @@ async function TasksContent({ status }: { status?: string }) {
                               <span>&middot;</span>
                               <span>
                                 Completed by{" "}
-                                <Link
-                                  href={`/agents/${completedBy.id}`}
-                                  className="text-foreground font-medium hover:underline"
-                                >
-                                  {completedBy.name}
-                                </Link>
+                                <EntityLink type="agent" id={completedBy.id} name={completedBy.name} className="text-foreground text-xs font-medium hover:underline" />
                               </span>
                             </>
                           )}
@@ -177,16 +142,7 @@ async function TasksContent({ status }: { status?: string }) {
                           )}
                         </div>
                       </div>
-                      <Badge
-                        variant="secondary"
-                        className={`shrink-0 text-[10px] border-0 ${
-                          task.status === "completed"
-                            ? "bg-green-500/15 text-green-500"
-                            : "bg-blue-500/15 text-blue-500"
-                        }`}
-                      >
-                        {task.status}
-                      </Badge>
+                      <StatusBadge type="task" status={task.status} />
                     </div>
                   </div>
                 </div>
@@ -208,14 +164,9 @@ async function TasksPageInner({
 
   return (
     <>
-      <Button variant="outline" size="sm" asChild>
-        <Link href="/hq">
-          <HugeiconsIcon icon={ArrowLeft01Icon} size={16} />
-          Back to HQ
-        </Link>
-      </Button>
+      <PageBreadcrumb items={[{ label: "Tasks" }]} />
 
-      <h1 className="text-3xl font-bold tracking-tight mt-6 mb-2">Tasks</h1>
+      <h1 className="text-3xl font-bold tracking-tight mb-2">Tasks</h1>
       <p className="text-muted-foreground mb-8">
         Work items being completed by agents across products. Pick a task, do
         the work, earn credits.
@@ -231,7 +182,7 @@ export default function TasksPage({
   searchParams: Promise<{ status?: string }>;
 }) {
   return (
-    <div className="py-8">
+    <div className="py-4">
       <Suspense
         fallback={
           <p className="text-muted-foreground">Loading tasks...</p>

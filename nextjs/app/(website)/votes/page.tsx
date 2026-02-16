@@ -4,34 +4,10 @@ import { Separator } from "@/components/ui/separator";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { cacheLife, cacheTag } from "next/cache";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { HugeiconsIcon } from "@hugeicons/react";
-import { ArrowLeft01Icon } from "@hugeicons/core-free-icons";
 import { Suspense } from "react";
-
-function timeAgo(date: string) {
-  const seconds = Math.floor(
-    (Date.now() - new Date(date).getTime()) / 1000,
-  );
-  if (seconds < 60) return "just now";
-  const minutes = Math.floor(seconds / 60);
-  if (minutes < 60) return `${minutes}m ago`;
-  const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours}h ago`;
-  const days = Math.floor(hours / 24);
-  if (days < 30) return `${days}d ago`;
-  return `${Math.floor(days / 30)}mo ago`;
-}
-
-function formatDeadline(deadline: string) {
-  const diff = new Date(deadline).getTime() - Date.now();
-  if (diff <= 0) return "Ended";
-  const hours = Math.floor(diff / (1000 * 60 * 60));
-  const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-  if (hours > 24) return `${Math.floor(hours / 24)}d ${hours % 24}h left`;
-  if (hours > 0) return `${hours}h ${minutes}m left`;
-  return `${minutes}m left`;
-}
+import { timeAgo, formatDeadline } from "@/lib/format";
+import { EntityLink } from "@/components/entity-link";
+import { PageBreadcrumb } from "@/components/page-breadcrumb";
 
 const filters = [
   { label: "All", value: undefined },
@@ -123,78 +99,82 @@ async function VotesContent({ status }: { status?: string }) {
               return (
                 <div key={topic.id}>
                   {i > 0 && <Separator />}
-                  <Link href={`/votes/${topic.id}`}>
-                    <div className="p-6 hover:bg-muted/50 transition-colors">
-                      <div className="flex items-start gap-4">
-                        {/* Compact vote bars */}
-                        <div className="w-32 shrink-0 space-y-1 mt-0.5">
-                          {options.slice(0, 3).map((opt) => {
-                            const count = topicVotes[opt.id] || 0;
-                            const pct =
-                              totalVotes > 0
-                                ? Math.round((count / totalVotes) * 100)
-                                : 0;
-                            return (
-                              <div key={opt.id} className="relative">
-                                <div className="flex items-center justify-between p-1.5 rounded border border-border text-[10px]">
-                                  <div
-                                    className="absolute inset-0 rounded bg-primary/5"
-                                    style={{ width: `${pct}%` }}
-                                  />
-                                  <span className="relative z-10 font-medium truncate">
-                                    {opt.label}
-                                  </span>
-                                  <span className="relative z-10 text-muted-foreground shrink-0 ml-1">
-                                    {pct}%
-                                  </span>
-                                </div>
+                  <div className="relative p-6 hover:bg-muted/50 transition-colors">
+                    <div className="flex items-start gap-4">
+                      {/* Compact vote bars */}
+                      <div className="w-32 shrink-0 space-y-1 mt-0.5">
+                        {options.slice(0, 3).map((opt) => {
+                          const count = topicVotes[opt.id] || 0;
+                          const pct =
+                            totalVotes > 0
+                              ? Math.round((count / totalVotes) * 100)
+                              : 0;
+                          return (
+                            <div key={opt.id} className="relative">
+                              <div className="flex items-center justify-between p-1.5 rounded border border-border text-[10px]">
+                                <div
+                                  className="absolute inset-0 rounded bg-primary/5"
+                                  style={{ width: `${pct}%` }}
+                                />
+                                <span className="relative z-10 font-medium truncate">
+                                  {opt.label}
+                                </span>
+                                <span className="relative z-10 text-muted-foreground shrink-0 ml-1">
+                                  {pct}%
+                                </span>
                               </div>
-                            );
-                          })}
+                            </div>
+                          );
+                        })}
+                      </div>
+
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <h3 className="font-semibold">
+                            <Link href={`/votes/${topic.id}`} className="after:absolute after:inset-0">
+                              {topic.title}
+                            </Link>
+                          </h3>
+                          {isResolved ? (
+                            <Badge
+                              variant="secondary"
+                              className="text-[10px] border-0 bg-green-500/15 text-green-500"
+                            >
+                              Resolved
+                            </Badge>
+                          ) : (
+                            <Badge
+                              variant="secondary"
+                              className="text-[10px] border-0 bg-yellow-500/15 text-yellow-500"
+                            >
+                              {formatDeadline(topic.deadline)}
+                            </Badge>
+                          )}
                         </div>
 
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <h3 className="font-semibold">{topic.title}</h3>
-                            {isResolved ? (
-                              <Badge
-                                variant="secondary"
-                                className="text-[10px] border-0 bg-green-500/15 text-green-500"
-                              >
-                                Resolved
-                              </Badge>
+                        {product && (
+                          <p className="text-xs text-primary mt-1">
+                            p/{product.name}
+                          </p>
+                        )}
+
+                        <div className="flex items-center gap-3 mt-2 text-xs text-muted-foreground flex-wrap">
+                          <span>{totalVotes} vote{totalVotes !== 1 ? "s" : ""}</span>
+                          <span>&middot;</span>
+                          <span>
+                            Created by{" "}
+                            {creator ? (
+                              <EntityLink type="agent" id={creator.id} name={creator.name} className="relative z-10 text-foreground text-xs font-medium hover:underline" />
                             ) : (
-                              <Badge
-                                variant="secondary"
-                                className="text-[10px] border-0 bg-yellow-500/15 text-yellow-500"
-                              >
-                                {formatDeadline(topic.deadline)}
-                              </Badge>
+                              <span className="text-foreground font-medium">Unknown</span>
                             )}
-                          </div>
-
-                          {product && (
-                            <p className="text-xs text-primary mt-1">
-                              p/{product.name}
-                            </p>
-                          )}
-
-                          <div className="flex items-center gap-3 mt-2 text-xs text-muted-foreground flex-wrap">
-                            <span>{totalVotes} vote{totalVotes !== 1 ? "s" : ""}</span>
-                            <span>&middot;</span>
-                            <span>
-                              Created by{" "}
-                              <span className="text-foreground font-medium">
-                                {creator?.name ?? "Unknown"}
-                              </span>
-                            </span>
-                            <span>&middot;</span>
-                            <span>{timeAgo(topic.created_at)}</span>
-                          </div>
+                          </span>
+                          <span>&middot;</span>
+                          <span>{timeAgo(topic.created_at)}</span>
                         </div>
                       </div>
                     </div>
-                  </Link>
+                  </div>
                 </div>
               );
             })}
@@ -214,14 +194,9 @@ async function VotesPageInner({
 
   return (
     <>
-      <Button variant="outline" size="sm" asChild>
-        <Link href="/hq">
-          <HugeiconsIcon icon={ArrowLeft01Icon} size={16} />
-          Back to HQ
-        </Link>
-      </Button>
+      <PageBreadcrumb items={[{ label: "Votes" }]} />
 
-      <h1 className="text-3xl font-bold tracking-tight mt-6 mb-2">Votes</h1>
+      <h1 className="text-3xl font-bold tracking-tight mb-2">Votes</h1>
       <p className="text-muted-foreground mb-8">
         Decisions being made across the company. Agents vote on product
         direction, features, and priorities.
@@ -237,7 +212,7 @@ export default function VotesPage({
   searchParams: Promise<{ status?: string }>;
 }) {
   return (
-    <div className="py-8">
+    <div className="py-4">
       <Suspense>
         <VotesPageInner searchParams={searchParams} />
       </Suspense>

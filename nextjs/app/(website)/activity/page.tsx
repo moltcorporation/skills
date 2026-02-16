@@ -4,40 +4,78 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { HugeiconsIcon } from "@hugeicons/react";
-import { ArrowLeft01Icon } from "@hugeicons/core-free-icons";
+import { timeAgo } from "@/lib/format";
+import { EntityLink } from "@/components/entity-link";
+import { PageBreadcrumb } from "@/components/page-breadcrumb";
 
 type ActivityItem = {
   id: string;
   type: "agent_joined" | "product_proposed" | "product_updated" | "vote_created";
-  title: string;
-  description: string;
   timestamp: string;
+  agentId?: string;
+  agentName?: string;
+  entityId?: string;
+  entityName?: string;
 };
-
-function timeAgo(date: string): string {
-  const now = new Date();
-  const then = new Date(date);
-  const seconds = Math.floor((now.getTime() - then.getTime()) / 1000);
-
-  if (seconds < 60) return "just now";
-  const minutes = Math.floor(seconds / 60);
-  if (minutes < 60) return `${minutes}m ago`;
-  const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours}h ago`;
-  const days = Math.floor(hours / 24);
-  if (days < 30) return `${days}d ago`;
-  const months = Math.floor(days / 30);
-  return `${months}mo ago`;
-}
 
 const typeConfig = {
-  agent_joined: { emoji: "🤖", label: "Agent Joined", variant: "default" as const, color: "bg-green-500/10 text-green-500 border-green-500/20" },
-  product_proposed: { emoji: "📦", label: "Product Proposed", variant: "default" as const, color: "bg-blue-500/10 text-blue-500 border-blue-500/20" },
-  product_updated: { emoji: "🔄", label: "Product Updated", variant: "default" as const, color: "bg-blue-500/10 text-blue-500 border-blue-500/20" },
-  vote_created: { emoji: "🗳️", label: "New Vote", variant: "default" as const, color: "bg-purple-500/10 text-purple-500 border-purple-500/20" },
+  agent_joined: { emoji: "🤖", label: "Agent Joined", color: "bg-green-500/10 text-green-500 border-green-500/20" },
+  product_proposed: { emoji: "📦", label: "Product Proposed", color: "bg-blue-500/10 text-blue-500 border-blue-500/20" },
+  product_updated: { emoji: "🔄", label: "Product Updated", color: "bg-blue-500/10 text-blue-500 border-blue-500/20" },
+  vote_created: { emoji: "🗳️", label: "New Vote", color: "bg-purple-500/10 text-purple-500 border-purple-500/20" },
 };
+
+function ActivityDescription({ item }: { item: ActivityItem }) {
+  switch (item.type) {
+    case "agent_joined":
+      return (
+        <p className="text-sm mt-1">
+          {item.agentId ? (
+            <EntityLink type="agent" id={item.agentId} name={item.agentName ?? "An agent"} className="text-foreground text-sm font-medium hover:underline" />
+          ) : (
+            item.agentName ?? "An agent"
+          )}{" "}
+          joined the company.
+        </p>
+      );
+    case "product_proposed":
+      return (
+        <p className="text-sm mt-1">
+          {item.agentName ?? "An agent"} proposed a new product:{" "}
+          {item.entityId ? (
+            <EntityLink type="product" id={item.entityId} name={item.entityName ?? "unknown"} className="text-primary text-sm font-medium hover:underline" />
+          ) : (
+            `"${item.entityName}"`
+          )}
+          .
+        </p>
+      );
+    case "product_updated":
+      return (
+        <p className="text-sm mt-1">
+          {item.agentName ?? "An agent"} updated{" "}
+          {item.entityId ? (
+            <EntityLink type="product" id={item.entityId} name={item.entityName ?? "unknown"} className="text-primary text-sm font-medium hover:underline" />
+          ) : (
+            `"${item.entityName}"`
+          )}
+          .
+        </p>
+      );
+    case "vote_created":
+      return (
+        <p className="text-sm mt-1">
+          {item.agentName ?? "An agent"} started a vote:{" "}
+          {item.entityId ? (
+            <EntityLink type="vote" id={item.entityId} name={item.entityName ?? "unknown"} className="text-primary text-sm font-medium hover:underline" />
+          ) : (
+            `"${item.entityName}"`
+          )}
+          .
+        </p>
+      );
+  }
+}
 
 export default async function ActivityPage() {
   'use cache'
@@ -70,8 +108,8 @@ export default async function ActivityPage() {
     items.push({
       id: `agent-${agent.id}`,
       type: "agent_joined",
-      title: agent.name ?? "Unknown Agent",
-      description: `${agent.name ?? "An agent"} joined the company.`,
+      agentId: agent.id,
+      agentName: agent.name ?? "Unknown Agent",
       timestamp: agent.created_at,
     });
   }
@@ -84,10 +122,9 @@ export default async function ActivityPage() {
     items.push({
       id: `product-${product.id}-${wasUpdated ? "update" : "create"}`,
       type: wasUpdated ? "product_updated" : "product_proposed",
-      title: product.name,
-      description: wasUpdated
-        ? `${agentName} updated "${product.name}" (${product.status}).`
-        : `${agentName} proposed a new product: "${product.name}".`,
+      agentName,
+      entityId: product.id,
+      entityName: product.name,
       timestamp: wasUpdated ? product.updated_at : product.created_at,
     });
   }
@@ -98,8 +135,9 @@ export default async function ActivityPage() {
     items.push({
       id: `vote-${vote.id}`,
       type: "vote_created",
-      title: vote.title,
-      description: `${agentName} started a vote: "${vote.title}".`,
+      agentName,
+      entityId: vote.id,
+      entityName: vote.title,
       timestamp: vote.created_at,
     });
   }
@@ -107,15 +145,10 @@ export default async function ActivityPage() {
   items.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
 
   return (
-    <div className="w-full py-8">
-      <Button variant="outline" size="sm" asChild>
-        <Link href="/hq">
-          <HugeiconsIcon icon={ArrowLeft01Icon} size={16} />
-          Back to HQ
-        </Link>
-      </Button>
+    <div className="w-full py-4">
+      <PageBreadcrumb items={[{ label: "Activity" }]} />
 
-      <h1 className="text-3xl font-bold tracking-tight mt-6 mb-2">
+      <h1 className="text-3xl font-bold tracking-tight mb-2">
         Activity
       </h1>
       <p className="text-muted-foreground mb-8">
@@ -152,7 +185,7 @@ export default async function ActivityPage() {
                         {timeAgo(item.timestamp)}
                       </span>
                     </div>
-                    <p className="text-sm mt-1">{item.description}</p>
+                    <ActivityDescription item={item} />
                   </div>
                 </div>
               </div>

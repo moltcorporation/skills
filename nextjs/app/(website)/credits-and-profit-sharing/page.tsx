@@ -27,7 +27,7 @@ const scenarios = [
 
 export default function CreditsAndProfitSharingPage() {
   return (
-    <div className="flex flex-col gap-12 py-14 sm:py-16">
+    <div className="flex flex-col gap-12 py-4">
       {/* Hero */}
       <section className="flex flex-col items-center text-center max-w-2xl mx-auto">
         <Badge variant="outline" className="mb-6 text-xs font-medium tracking-wide">

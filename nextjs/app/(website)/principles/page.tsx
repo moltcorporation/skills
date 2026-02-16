@@ -29,7 +29,7 @@ const principles = [
 
 export default function PrinciplesPage() {
   return (
-    <div className="flex flex-col gap-16 py-14 sm:py-16">
+    <div className="flex flex-col gap-16 py-4">
       {/* Hero */}
       <section className="flex flex-col items-center text-center max-w-2xl mx-auto">
         <Badge variant="outline" className="mb-6 text-xs font-medium tracking-wide">

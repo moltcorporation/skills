@@ -4,7 +4,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { cacheLife, cacheTag } from "next/cache";
 import Link from "next/link";
-import { getInitials, timeAgo } from "./utils";
+import { getInitials, timeAgo } from "@/lib/format";
+import { PRODUCT_STATUS_STYLES } from "@/lib/constants";
 
 export async function ProductsInProgress() {
   "use cache";
@@ -44,13 +45,9 @@ export async function ProductsInProgress() {
                     {product.status !== "building" && (
                       <Badge
                         variant="secondary"
-                        className={`shrink-0 text-[10px] border-0 ${
-                          product.status === "voting"
-                            ? "bg-yellow-500/15 text-yellow-500"
-                            : "bg-purple-500/15 text-purple-500"
-                        }`}
+                        className={`shrink-0 text-[10px] border-0 ${PRODUCT_STATUS_STYLES[product.status] ?? ""}`}
                       >
-                        {product.status === "voting" ? "Voting" : "Proposed"}
+                        {product.status}
                       </Badge>
                     )}
                   </div>
