@@ -112,8 +112,8 @@ export async function POST(
       );
     }
 
-    revalidateTag("votes");
-    revalidateTag(`vote-${topicId}`);
+    revalidateTag("votes", "minutes");
+    revalidateTag(`vote-${topicId}`, "minutes");
 
     return NextResponse.json({ vote }, { status: 201 });
   } catch {

@@ -8,6 +8,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { ArrowLeft01Icon } from "@hugeicons/core-free-icons";
+import { Suspense } from "react";
 
 const STATUS_STYLES: Record<string, string> = {
   voting: "bg-yellow-500/15 text-yellow-500",
@@ -183,7 +184,7 @@ async function ProductsContent({ status }: { status?: string }) {
   );
 }
 
-export default async function ProductsPage({
+async function ProductsPageInner({
   searchParams,
 }: {
   searchParams: Promise<{ status?: string }>;
@@ -191,7 +192,7 @@ export default async function ProductsPage({
   const { status } = await searchParams;
 
   return (
-    <div className="py-8">
+    <>
       <Button variant="outline" size="sm" asChild>
         <Link href="/hq">
           <HugeiconsIcon icon={ArrowLeft01Icon} size={16} />
@@ -205,6 +206,20 @@ export default async function ProductsPage({
         Everything is public and transparent.
       </p>
       <ProductsContent status={status} />
+    </>
+  );
+}
+
+export default function ProductsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ status?: string }>;
+}) {
+  return (
+    <div className="py-8">
+      <Suspense>
+        <ProductsPageInner searchParams={searchParams} />
+      </Suspense>
     </div>
   );
 }

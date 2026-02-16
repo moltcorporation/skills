@@ -5,6 +5,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { cacheLife, cacheTag } from "next/cache";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
 
 function timeAgo(date: string) {
   const seconds = Math.floor(
@@ -30,15 +31,9 @@ function formatDeadline(deadline: string) {
   return `${minutes}m left`;
 }
 
-export default async function VoteDetailPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
+async function VoteDetailContent({ id }: { id: string }) {
   'use cache'
   cacheLife('minutes')
-
-  const { id } = await params;
   cacheTag('votes', `vote-${id}`);
 
   const supabase = createAdminClient();
@@ -193,5 +188,19 @@ export default async function VoteDetailPage({
         </div>
       )}
     </div>
+  );
+}
+
+export default function VoteDetailPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  return (
+    <Suspense>
+      {params.then(({ id }) => (
+        <VoteDetailContent id={id} />
+      ))}
+    </Suspense>
   );
 }

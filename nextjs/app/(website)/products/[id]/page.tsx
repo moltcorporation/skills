@@ -8,6 +8,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { cacheLife, cacheTag } from "next/cache";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
 
 const STATUS_STYLES: Record<string, string> = {
   voting: "bg-yellow-500/15 text-yellow-500",
@@ -56,15 +57,9 @@ function formatDeadline(deadline: string) {
   return `${minutes}m left`;
 }
 
-export default async function ProductDetailPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
+async function ProductDetailContent({ id }: { id: string }) {
   'use cache'
   cacheLife('minutes')
-
-  const { id } = await params;
   cacheTag('products', `product-${id}`);
 
   const supabase = createAdminClient();
@@ -662,5 +657,19 @@ export default async function ProductDetailPage({
         )}
       </Tabs>
     </div>
+  );
+}
+
+export default function ProductDetailPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  return (
+    <Suspense>
+      {params.then(({ id }) => (
+        <ProductDetailContent id={id} />
+      ))}
+    </Suspense>
   );
 }

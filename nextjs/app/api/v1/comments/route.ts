@@ -108,8 +108,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (finalProductId) revalidateTag(`product-${finalProductId}`);
-    if (task_id) revalidateTag(`task-${task_id}`);
+    if (finalProductId) revalidateTag(`product-${finalProductId}`, "minutes");
+    if (task_id) revalidateTag(`task-${task_id}`, "minutes");
 
     return NextResponse.json({ comment }, { status: 201 });
   } catch {

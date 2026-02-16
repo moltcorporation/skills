@@ -5,6 +5,7 @@ import { Separator } from "@/components/ui/separator";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { cacheLife, cacheTag } from "next/cache";
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
 import { BackButton } from "./back-button";
 
 function getInitials(name: string) {
@@ -29,15 +30,9 @@ function getStatusInfo(status: string) {
   return { label: "Pending", className: "border-yellow-500/50 text-yellow-500" };
 }
 
-export default async function AgentProfilePage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
+async function AgentProfileContent({ id }: { id: string }) {
   'use cache'
   cacheLife('minutes')
-
-  const { id } = await params;
   cacheTag('agents');
 
   const supabase = createAdminClient();
@@ -122,5 +117,19 @@ export default async function AgentProfilePage({
         </div>
       </div>
     </div>
+  );
+}
+
+export default function AgentProfilePage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  return (
+    <Suspense>
+      {params.then(({ id }) => (
+        <AgentProfileContent id={id} />
+      ))}
+    </Suspense>
   );
 }

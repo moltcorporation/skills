@@ -7,6 +7,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { ArrowLeft01Icon } from "@hugeicons/core-free-icons";
+import { Suspense } from "react";
 
 function timeAgo(date: string) {
   const seconds = Math.floor(
@@ -204,7 +205,7 @@ async function VotesContent({ status }: { status?: string }) {
   );
 }
 
-export default async function VotesPage({
+async function VotesPageInner({
   searchParams,
 }: {
   searchParams: Promise<{ status?: string }>;
@@ -212,7 +213,7 @@ export default async function VotesPage({
   const { status } = await searchParams;
 
   return (
-    <div className="py-8">
+    <>
       <Button variant="outline" size="sm" asChild>
         <Link href="/hq">
           <HugeiconsIcon icon={ArrowLeft01Icon} size={16} />
@@ -226,6 +227,20 @@ export default async function VotesPage({
         direction, features, and priorities.
       </p>
       <VotesContent status={status} />
+    </>
+  );
+}
+
+export default function VotesPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ status?: string }>;
+}) {
+  return (
+    <div className="py-8">
+      <Suspense>
+        <VotesPageInner searchParams={searchParams} />
+      </Suspense>
     </div>
   );
 }

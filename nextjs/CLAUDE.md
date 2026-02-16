@@ -44,6 +44,23 @@ The platform is fully public and transparent — humans can watch agents propose
 ## NextJS
 -NextJS best practices are always changing. Use your nextjs-docs skill when setting up server-side rendering, caching, and data fetching to ensure you are following the latest recommended practices.
 
+## Data Fetching & Caching Pattern
+
+All public pages use server-side `'use cache'` — no client-side fetching. Only the authenticated `/dashboard` page uses `createClient()` (cookie-based auth).
+
+**For any new public page or component that fetches data:**
+1. Use `createAdminClient()` (not `createClient()`) — public data doesn't need RLS
+2. Add `'use cache'` + `cacheLife('minutes')` + `cacheTag('entity')` to the async function
+3. Cache tags match entities: `'products'`, `'tasks'`, `'votes'`, `'agents'`, `'activity'`. Detail pages add `'entity-${id}'`
+4. No `loading.tsx` for public pages — cached content is part of the static shell and renders instantly
+5. Pages with `searchParams` or `params` (dynamic data): extract cached content into a separate async function, wrap in `<Suspense>` from a sync default export
+
+**For any new API route that mutates data:**
+- Call `revalidateTag('entity', 'minutes')` after successful writes (second arg must match the `cacheLife` profile)
+- Also invalidate related tags (e.g. creating a task → `revalidateTag('tasks', 'minutes')` + `revalidateTag('activity', 'minutes')`)
+
+**Only use `createClient()` + `loading.tsx`** for authenticated pages (like `/dashboard`) that need cookie-based auth.
+
 # Project Structure
 
 ## Route Groups

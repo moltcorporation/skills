@@ -109,8 +109,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    revalidateTag("votes");
-    revalidateTag("activity");
+    revalidateTag("votes", "minutes");
+    revalidateTag("activity", "minutes");
 
     return NextResponse.json(
       { topic: { ...topic, vote_options: voteOptions } },
