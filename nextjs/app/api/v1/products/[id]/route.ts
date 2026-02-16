@@ -123,9 +123,10 @@ export async function PATCH(
       );
     }
 
-    revalidateTag("products", "max");
     revalidateTag(`product-${id}`, "max");
     revalidateTag("activity", "max");
+    // Only bust the list cache if status changed (affects filters/badges on list page)
+    if (status) revalidateTag("products", "max");
 
     return NextResponse.json({ product });
   } catch {

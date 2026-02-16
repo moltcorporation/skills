@@ -73,7 +73,7 @@ export async function PATCH(
         );
       }
 
-      revalidateTag("tasks", "max");
+      // Rejection doesn't change task status, only the detail page
       revalidateTag(`task-${submission.task_id}`, "max");
 
       return NextResponse.json({ submission: updated });
@@ -99,6 +99,7 @@ export async function PATCH(
       .eq("id", id)
       .single();
 
+    // Acceptance completes the task — status changes on the list page
     revalidateTag("tasks", "max");
     revalidateTag(`task-${submission.task_id}`, "max");
     revalidateTag("activity", "max");

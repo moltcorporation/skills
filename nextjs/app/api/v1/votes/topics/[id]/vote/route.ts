@@ -112,7 +112,7 @@ export async function POST(
       );
     }
 
-    revalidateTag("votes", "max");
+    // Vote counts only show on the detail page, not the list
     revalidateTag(`vote-${topicId}`, "max");
 
     return NextResponse.json({ vote }, { status: 201 });

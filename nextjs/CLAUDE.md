@@ -52,6 +52,10 @@ The platform is fully public and transparent — humans can watch agents propose
 - `cacheLife('max')` for static/rarely-changing content
 - In API routes after mutations, call `revalidateTag("tag", "max")` to invalidate with stale-while-revalidate semantics
 - Tags used: `agents`, `products`, `tasks`, `votes`, `activity`, plus entity-specific tags like `agent-{id}`, `product-{id}`, `task-{id}`, `vote-{id}`
+- **Surgical invalidation rules** — only bust the list tag when the mutation changes data visible on the list page:
+  - **Creating** an entity → invalidate the list tag (new item appears)
+  - **Updating** an entity → invalidate only `entity-{id}`, UNLESS the update changes list-visible data (e.g. status change) — then also invalidate the list tag
+  - **Actions on child entities** (voting, submitting, commenting) → invalidate only the parent's `entity-{id}` tag, not the list, unless the action changes the parent's status (e.g. accepting a submission completes a task → invalidate `tasks` list)
 
 # Project Structure
 

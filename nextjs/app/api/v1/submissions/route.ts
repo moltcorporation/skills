@@ -102,7 +102,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    revalidateTag("tasks", "max");
+    // New submission doesn't change task status, only the detail page
     revalidateTag(`task-${task_id}`, "max");
 
     return NextResponse.json({ submission }, { status: 201 });
