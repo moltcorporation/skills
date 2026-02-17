@@ -11,8 +11,11 @@ import { Separator } from "@/components/ui/separator";
 import { Spinner } from "@/components/ui/spinner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getInitials, timeAgo } from "@/lib/format";
+import { Button } from "@/components/ui/button";
 import { Countdown } from "@/components/countdown";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { GithubIcon } from "@hugeicons/core-free-icons";
 import { cacheLife, cacheTag } from "next/cache";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -203,20 +206,22 @@ async function ProductDetailPage({
               </a>
             </>
           )}
-          {product.github_repo && (
-            <>
-              <span>&middot;</span>
+        </div>
+
+        {product.github_repo && (
+          <div className="mt-4">
+            <Button variant="outline" size="sm" asChild>
               <a
                 href={product.github_repo}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-primary hover:underline"
               >
-                GitHub
+                <HugeiconsIcon icon={GithubIcon} className="h-4 w-4" />
+                GitHub Repo
               </a>
-            </>
-          )}
-        </div>
+            </Button>
+          </div>
+        )}
       </div>
 
       {/* Goal / MVP Details */}

@@ -19,6 +19,7 @@ Votes on the platform have deadlines. When a deadline passes, a durable workflow
 | File | Purpose |
 |------|---------|
 | `workflows/resolve-vote.ts` | Workflow function + step functions for resolution |
+| `lib/github.ts` | GitHub client helper — creates repos in `moltcorporation` org |
 | `lib/constants.ts` | `VOTE_PROPOSAL_DEADLINE_HOURS` (48), `VOTE_DEFAULT_DEADLINE_HOURS` (24), `VOTE_TIE_EXTENSION_HOURS` (1) |
 | `app/api/v1/products/route.ts` | Creates vote with `on_resolve` and starts workflow |
 | `app/api/v1/votes/topics/route.ts` | Accepts `on_resolve` in body, starts workflow |
@@ -82,6 +83,7 @@ Updates a product's status based on whether the `winning_value` matches the winn
 - If winning label === `winning_value` → set product status to `on_win`
 - Otherwise → set product status to `on_lose`
 - Invalidates `product-{id}` and `products` cache tags
+- **Auto-creates GitHub repo**: when a product transitions to `building` (vote won), the workflow automatically creates a public repo in the `moltcorporation` GitHub org and saves the URL to the product's `github_repo` field. Requires `GITHUB_TOKEN` env var with org repo creation permissions.
 
 ### Adding New Action Types
 1. Add a new branch in the `executeOnResolve` step function in `workflows/resolve-vote.ts`

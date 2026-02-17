@@ -113,7 +113,7 @@ async function resolveVoteTopic(topicId: string, winningOptionId: string) {
 async function executeOnResolve(
   action: OnResolveAction,
   winningLabel: string,
-) {
+): Promise<{ createRepo?: { productId: string } }> {
   "use step";
   const { createAdminClient } = await import("@/lib/supabase/admin");
   const supabase = createAdminClient();
@@ -134,7 +134,69 @@ async function executeOnResolve(
 
     revalidateTag(`product-${product_id}`, "max");
     revalidateTag("products", "max");
+
+    // If the product won the vote and moved to "building", signal repo creation
+    if (newStatus === "building") {
+      return { createRepo: { productId: product_id } };
+    }
   }
+
+  return {};
+}
+
+async function createProductRepo(productId: string) {
+  "use step";
+  const { createAdminClient } = await import("@/lib/supabase/admin");
+  const { createGitHubRepo } = await import("@/lib/github");
+  const { revalidateTag } = await import("next/cache");
+  const supabase = createAdminClient();
+
+  // Fetch product details
+  const { data: product, error: fetchError } = await supabase
+    .from("products")
+    .select("name, description")
+    .eq("id", productId)
+    .single();
+
+  if (fetchError || !product) {
+    throw new Error(`Failed to fetch product: ${fetchError?.message}`);
+  }
+
+  // Determine a unique repo name
+  const { GITHUB_ORG, slugify } = await import("@/lib/github");
+  const baseSlug = slugify(product.name);
+  let repoName = baseSlug;
+  let suffix = 2;
+
+  // eslint-disable-next-line no-constant-condition
+  while (true) {
+    const candidateUrl = `https://github.com/${GITHUB_ORG}/${repoName}`;
+    const { count } = await supabase
+      .from("products")
+      .select("id", { count: "exact", head: true })
+      .eq("github_repo", candidateUrl);
+
+    if (!count) break;
+
+    console.warn(`[github] Repo name collision: "${repoName}" already taken, trying "${baseSlug}-${suffix}"`);
+    repoName = `${baseSlug}-${suffix}`;
+    suffix++;
+  }
+
+  // Create the GitHub repo
+  const repoUrl = await createGitHubRepo(product.name, product.description ?? "", repoName);
+
+  // Update the product with the repo URL
+  const { error: updateError } = await supabase
+    .from("products")
+    .update({ github_repo: repoUrl })
+    .eq("id", productId);
+
+  if (updateError) {
+    throw new Error(`Failed to update product github_repo: ${updateError.message}`);
+  }
+
+  revalidateTag(`product-${productId}`, "max");
 }
 
 // -- Workflow function --
@@ -172,7 +234,12 @@ export async function resolveVoteWorkflow(topicId: string, deadline: string) {
 
     // Execute post-resolution action if configured
     if (on_resolve) {
-      await executeOnResolve(on_resolve, winner.label);
+      const result = await executeOnResolve(on_resolve, winner.label);
+
+      // Create GitHub repo if the product vote was won
+      if (result.createRepo) {
+        await createProductRepo(result.createRepo.productId);
+      }
     }
 
     break;
