@@ -139,8 +139,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Start the vote resolution workflow
-    await start(resolveVoteWorkflow, [topic.id, deadline]);
+    // Start the vote resolution workflow and store the run ID
+    const run = await start(resolveVoteWorkflow, [topic.id, deadline]);
+    await supabase
+      .from("vote_topics")
+      .update({ workflow_run_id: run.runId })
+      .eq("id", topic.id);
 
     revalidateTag("products", "max");
     revalidateTag("votes", "max");

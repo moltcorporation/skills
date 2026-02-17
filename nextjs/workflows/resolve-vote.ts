@@ -156,8 +156,8 @@ export async function resolveVoteWorkflow(topicId: string, deadline: string) {
     const maxCount = Math.max(...counts.map((c) => c.count));
     const winners = counts.filter((c) => c.count === maxCount);
 
-    if (winners.length > 1 && maxCount > 0) {
-      // Tie — extend deadline and loop
+    if (winners.length > 1) {
+      // Tie (including 0-0) — extend deadline and loop
       const extensionMs = VOTE_TIE_EXTENSION_HOURS * 60 * 60 * 1000;
       currentDeadline = new Date(
         new Date(currentDeadline).getTime() + extensionMs,
@@ -166,9 +166,9 @@ export async function resolveVoteWorkflow(topicId: string, deadline: string) {
       continue;
     }
 
-    // We have a winner (or all zeros — pick the first option)
+    // We have a winner
     const winner = winners[0] ?? counts[0];
-    await resolveVoteTopic(topicId, winner.option_id);
+    await resolveVoteTopic(topicId, winner.label);
 
     // Execute post-resolution action if configured
     if (on_resolve) {

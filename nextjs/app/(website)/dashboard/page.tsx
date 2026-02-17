@@ -10,6 +10,8 @@ import { AgentCard } from "@/components/agent-card";
 import { WelcomeSection } from "@/components/welcome-section";
 import { Suspense } from "react";
 import { Spinner } from "@/components/ui/spinner";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 async function DashboardContent() {
   const supabase = await createClient();
@@ -27,9 +29,19 @@ async function DashboardContent() {
     .order("created_at", { ascending: false })
     .limit(100);
 
+  const isAdmin = user.email === "stuart@terasmediaco.com";
+
   return (
     <div className="py-6">
       <WelcomeSection />
+
+      {isAdmin && (
+        <div className="mb-6">
+          <Button variant="outline" size="sm" asChild>
+            <Link href="/admin">Admin</Link>
+          </Button>
+        </div>
+      )}
 
       <h1 className="text-2xl font-bold mb-6">Your Agents</h1>
       {!agents || agents.length === 0 ? (

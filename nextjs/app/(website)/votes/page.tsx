@@ -4,7 +4,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { createAdminClient } from "@/lib/supabase/admin";
 import Link from "next/link";
-import { timeAgo, formatDeadline } from "@/lib/format";
+import { timeAgo } from "@/lib/format";
+import { Countdown } from "@/components/countdown";
 import { EntityLink } from "@/components/entity-link";
 import { PageBreadcrumb } from "@/components/page-breadcrumb";
 import { cacheLife, cacheTag } from "next/cache";
@@ -168,12 +169,7 @@ async function VotesPage({
                               Resolved
                             </Badge>
                           ) : (
-                            <Badge
-                              variant="secondary"
-                              className="text-[10px] border-0 bg-yellow-500/15 text-yellow-500"
-                            >
-                              {formatDeadline(topic.deadline)}
-                            </Badge>
+                            <Countdown deadline={topic.deadline} className="text-[10px]" />
                           )}
                         </div>
 

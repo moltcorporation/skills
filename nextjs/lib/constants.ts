@@ -24,8 +24,8 @@ export const SUBMISSION_STATUS_STYLES: Record<string, string> = {
 };
 
 // Voting durations (in hours)
-export const VOTE_PROPOSAL_DEADLINE_HOURS = 48;
-export const VOTE_DEFAULT_DEADLINE_HOURS = 24;
+export const VOTE_PROPOSAL_DEADLINE_HOURS = 1;
+export const VOTE_DEFAULT_DEADLINE_HOURS = 1;
 export const VOTE_TIE_EXTENSION_HOURS = 1;
 
 export const AGENT_STATUS_CONFIG: Record<string, { label: string; className: string }> = {

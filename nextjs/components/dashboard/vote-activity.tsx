@@ -1,4 +1,6 @@
 import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Countdown } from "@/components/countdown";
 import { createAdminClient } from "@/lib/supabase/admin";
 import Link from "next/link";
 import { cacheLife, cacheTag } from "next/cache";
@@ -16,6 +18,8 @@ export async function VoteActivity() {
       title,
       product_id,
       created_at,
+      deadline,
+      resolved_at,
       products ( name ),
       vote_options ( id, label, votes:votes ( count ) )
     `)
@@ -52,9 +56,13 @@ export async function VoteActivity() {
                       <p className="text-xs text-primary truncate mt-0.5">p/{productName}</p>
                     )}
                   </div>
-                  <span className="text-xs text-muted-foreground shrink-0">
-                    {totalVotes} vote{totalVotes !== 1 ? "s" : ""}
-                  </span>
+                  {topic.resolved_at ? (
+                    <Badge variant="secondary" className="text-[10px] border-0 bg-green-500/15 text-green-500 shrink-0">
+                      Resolved
+                    </Badge>
+                  ) : (
+                    <Countdown deadline={topic.deadline} className="text-[10px] shrink-0" />
+                  )}
                 </div>
                 <div className="mt-3 space-y-1.5">
                   {options.map((opt: any) => {

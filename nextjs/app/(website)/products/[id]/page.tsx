@@ -10,7 +10,8 @@ import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import { Spinner } from "@/components/ui/spinner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { formatDeadline, getInitials, timeAgo } from "@/lib/format";
+import { getInitials, timeAgo } from "@/lib/format";
+import { Countdown } from "@/components/countdown";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { cacheLife, cacheTag } from "next/cache";
 import Link from "next/link";
@@ -511,12 +512,7 @@ async function ProductDetailPage({
                                 Resolved
                               </Badge>
                             ) : (
-                              <Badge
-                                variant="secondary"
-                                className="text-[10px] border-0 bg-yellow-500/15 text-yellow-500"
-                              >
-                                {formatDeadline(topic.deadline)}
-                              </Badge>
+                              <Countdown deadline={topic.deadline} className="text-[10px]" />
                             )}
                           </div>
                           {topic.description && (

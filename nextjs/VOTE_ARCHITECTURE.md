@@ -6,7 +6,7 @@ Votes on the platform have deadlines. When a deadline passes, a durable workflow
 
 ## How It Works
 
-1. **Vote created** → API route inserts the `vote_topics` row and calls `start(resolveVoteWorkflow, [topicId, deadline])`
+1. **Vote created** → API route inserts the `vote_topics` row, calls `start(resolveVoteWorkflow, [topicId, deadline])`, and stores `run.runId` in `workflow_run_id`
 2. **Workflow sleeps** → `await sleep(new Date(deadline))` suspends the workflow until the exact deadline, consuming zero resources
 3. **Deadline fires** → workflow wakes up, queries vote counts from the DB
 4. **Tie check** → if the top vote counts are tied, the deadline extends by `VOTE_TIE_EXTENSION_HOURS` (1h), the DB is updated, and the workflow loops back to sleep
@@ -25,7 +25,9 @@ Votes on the platform have deadlines. When a deadline passes, a durable workflow
 
 ## Database
 
-The `vote_topics` table has an `on_resolve` JSONB column (nullable). This stores the action to execute when the vote resolves.
+The `vote_topics` table has:
+- `on_resolve` (JSONB, nullable) — the action to execute when the vote resolves
+- `workflow_run_id` (text, nullable) — the Workflow DevKit run ID for the resolution workflow, used to cancel runs when deadlines change
 
 ### `on_resolve` Shape
 
@@ -48,7 +50,9 @@ The `vote_topics` table has an `on_resolve` JSONB column (nullable). This stores
 - Workflow functions use `"use workflow"` directive (sandboxed, deterministic)
 - Step functions use `"use step"` directive (full Node.js access, auto-retry)
 - `sleep()` accepts a `Date` object and suspends until that time
-- `start()` from `workflow/api` enqueues a workflow run from API routes
+- `start()` from `workflow/api` enqueues a workflow run from API routes — returns a `Run` object with `runId`
+- `getRun(runId)` from `workflow/api` retrieves a run by ID — call `.cancel()` to cancel it
+- When changing a vote's deadline, cancel the old run via `getRun(oldRunId).cancel()`, start a new one, and update `workflow_run_id`
 - Inspect runs locally with `npx workflow web`
 
 ## Local Development & Debugging

@@ -5,7 +5,8 @@ import { Button } from "@/components/ui/button";
 import { createAdminClient } from "@/lib/supabase/admin";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { timeAgo, formatDeadline } from "@/lib/format";
+import { timeAgo } from "@/lib/format";
+import { Countdown } from "@/components/countdown";
 import { EntityLink } from "@/components/entity-link";
 import { PageBreadcrumb } from "@/components/page-breadcrumb";
 import { cacheLife, cacheTag } from "next/cache";
@@ -93,12 +94,7 @@ async function VoteDetailPage({
               Resolved
             </Badge>
           ) : (
-            <Badge
-              variant="secondary"
-              className="text-xs border-0 bg-yellow-500/15 text-yellow-500"
-            >
-              {formatDeadline(topic.deadline)}
-            </Badge>
+            <Countdown deadline={topic.deadline} className="text-xs" />
           )}
         </div>
 
