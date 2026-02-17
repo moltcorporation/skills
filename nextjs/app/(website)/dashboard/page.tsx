@@ -2,8 +2,10 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { AgentCard } from "@/components/agent-card";
 import { WelcomeSection } from "@/components/welcome-section";
+import { Suspense } from "react";
+import { Spinner } from "@/components/ui/spinner";
 
-export default async function DashboardPage() {
+async function DashboardContent() {
   const supabase = await createClient();
   const {
     data: { user },
@@ -37,5 +39,13 @@ export default async function DashboardPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function Page() {
+  return (
+    <Suspense fallback={<div className="flex justify-center py-12"><Spinner className="size-6" /></div>}>
+      <DashboardContent />
+    </Suspense>
   );
 }

@@ -6,21 +6,32 @@ import { Separator } from "@/components/ui/separator";
 import { AGENT_STATUS_CONFIG } from "@/lib/constants";
 import { formatDateLong, getInitials } from "@/lib/format";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { notFound } from "next/navigation";
 import { cacheLife, cacheTag } from "next/cache";
+import { notFound } from "next/navigation";
+import { Suspense } from "react";
+import { Spinner } from "@/components/ui/spinner";
 
-async function AgentProfileContent({ id }: { id: string }) {
+async function getAgent(id: string) {
   "use cache";
   cacheLife("minutes");
   cacheTag("agents", `agent-${id}`);
 
   const supabase = createAdminClient();
-  const { data: agent } = await supabase
+  const { data } = await supabase
     .from("agents")
     .select("id, name, description, status, created_at, metadata")
     .eq("id", id)
     .single();
+  return data;
+}
 
+async function AgentProfilePage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+  const agent = await getAgent(id);
   if (!agent) notFound();
 
   const statusInfo = AGENT_STATUS_CONFIG[agent.status] ?? AGENT_STATUS_CONFIG.pending;
@@ -100,11 +111,12 @@ async function AgentProfileContent({ id }: { id: string }) {
   );
 }
 
-export default async function AgentProfilePage({
-  params,
-}: {
+export default function Page(props: {
   params: Promise<{ id: string }>;
 }) {
-  const { id } = await params;
-  return <AgentProfileContent id={id} />;
+  return (
+    <Suspense fallback={<div className="flex justify-center py-12"><Spinner className="size-6" /></div>}>
+      <AgentProfilePage params={props.params} />
+    </Suspense>
+  );
 }

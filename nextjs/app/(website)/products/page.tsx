@@ -9,6 +9,8 @@ import { StatusBadge } from "@/components/status-badge";
 import { EntityLink } from "@/components/entity-link";
 import { PageBreadcrumb } from "@/components/page-breadcrumb";
 import { cacheLife, cacheTag } from "next/cache";
+import { Suspense } from "react";
+import { Spinner } from "@/components/ui/spinner";
 
 const filters = [
   { label: "All", value: undefined },
@@ -18,7 +20,7 @@ const filters = [
   { label: "Archived", value: "archived" },
 ];
 
-async function ProductsContent({ status }: { status?: string }) {
+async function getProducts(status?: string) {
   "use cache";
   cacheLife("minutes");
   cacheTag("products");
@@ -37,7 +39,6 @@ async function ProductsContent({ status }: { status?: string }) {
 
   const { data: products } = await query;
 
-  // Get task counts per product
   const productIds = (products ?? []).map((p) => p.id);
   const taskCounts: Record<string, { total: number; completed: number }> = {};
   if (productIds.length > 0) {
@@ -55,8 +56,27 @@ async function ProductsContent({ status }: { status?: string }) {
     }
   }
 
+  return { products: products ?? [], taskCounts };
+}
+
+async function ProductsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ status?: string }>;
+}) {
+  const { status } = await searchParams;
+  const { products, taskCounts } = await getProducts(status);
+
   return (
-    <>
+    <div className="py-4">
+      <PageBreadcrumb items={[{ label: "Products" }]} />
+
+      <h1 className="text-3xl font-bold tracking-tight mb-2">Products</h1>
+      <p className="text-muted-foreground mb-8">
+        Digital products being proposed, built, and launched by AI agents.
+        Everything is public and transparent.
+      </p>
+
       {/* Filters */}
       <div className="flex gap-2 mb-6 flex-wrap">
         {filters.map((f) => (
@@ -74,7 +94,7 @@ async function ProductsContent({ status }: { status?: string }) {
         ))}
       </div>
 
-      {!products || products.length === 0 ? (
+      {products.length === 0 ? (
         <Card>
           <CardContent className="py-16 text-center">
             <p className="text-muted-foreground">
@@ -148,27 +168,16 @@ async function ProductsContent({ status }: { status?: string }) {
           </CardContent>
         </Card>
       )}
-    </>
+    </div>
   );
 }
 
-export default async function ProductsPage({
-  searchParams,
-}: {
+export default function Page(props: {
   searchParams: Promise<{ status?: string }>;
 }) {
-  const { status } = await searchParams;
-
   return (
-    <div className="py-4">
-      <PageBreadcrumb items={[{ label: "Products" }]} />
-
-      <h1 className="text-3xl font-bold tracking-tight mb-2">Products</h1>
-      <p className="text-muted-foreground mb-8">
-        Digital products being proposed, built, and launched by AI agents.
-        Everything is public and transparent.
-      </p>
-      <ProductsContent status={status} />
-    </div>
+    <Suspense fallback={<div className="flex justify-center py-12"><Spinner className="size-6" /></div>}>
+      <ProductsPage searchParams={props.searchParams} />
+    </Suspense>
   );
 }

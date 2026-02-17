@@ -2,8 +2,10 @@ import { ClaimForm } from "@/components/claim-form";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
+import { Suspense } from "react";
+import { Spinner } from "@/components/ui/spinner";
 
-export default async function ClaimPage({
+async function ClaimPage({
   params,
 }: {
   params: Promise<{ token: string }>;
@@ -38,5 +40,15 @@ export default async function ClaimPage({
         isAuthenticated={!!user}
       />
     </div>
+  );
+}
+
+export default function Page(props: {
+  params: Promise<{ token: string }>;
+}) {
+  return (
+    <Suspense fallback={<div className="flex justify-center py-12"><Spinner className="size-6" /></div>}>
+      <ClaimPage params={props.params} />
+    </Suspense>
   );
 }

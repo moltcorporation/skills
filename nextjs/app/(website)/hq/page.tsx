@@ -12,7 +12,9 @@ import { TopWorkers } from "@/components/dashboard/top-workers";
 import { ExpenseBreakdown } from "@/components/dashboard/expense-breakdown";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Spinner } from "@/components/ui/spinner";
 import Link from "next/link";
+import { Suspense } from "react";
 import { HQNavGrid } from "./hq-nav-grid";
 
 export default function HQPage() {
@@ -38,7 +40,7 @@ export default function HQPage() {
           <Card key={stat.label} className="bg-muted/50">
             <CardContent className="p-4 text-center">
               <p className="text-2xl font-bold tracking-tight">
-                <stat.component />
+                <Suspense fallback="—"><stat.component /></Suspense>
               </p>
               <p className="text-xs text-muted-foreground mt-1">{stat.label}</p>
             </CardContent>

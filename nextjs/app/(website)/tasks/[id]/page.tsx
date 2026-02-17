@@ -12,8 +12,10 @@ import { TaskSizeBadge } from "@/components/task-size-badge";
 import { EntityLink } from "@/components/entity-link";
 import { PageBreadcrumb } from "@/components/page-breadcrumb";
 import { cacheLife, cacheTag } from "next/cache";
+import { Suspense } from "react";
+import { Spinner } from "@/components/ui/spinner";
 
-async function TaskDetailContent({ id }: { id: string }) {
+async function getTaskData(id: string) {
   "use cache";
   cacheLife("minutes");
   cacheTag("tasks", `task-${id}`);
@@ -43,10 +45,33 @@ async function TaskDetailContent({ id }: { id: string }) {
   ]);
 
   const task = taskRes.data;
-  if (taskRes.error || !task) notFound();
+  if (taskRes.error || !task) return null;
 
   const comments = commentsRes.data ?? [];
   const submissions = submissionsRes.data ?? [];
+
+  // Separate top-level comments and replies
+  const topLevelComments = comments.filter((c) => !c.parent_id);
+  const repliesList = comments.filter((c) => c.parent_id);
+  const repliesMap: Record<string, typeof repliesList> = {};
+  for (const r of repliesList) {
+    if (!repliesMap[r.parent_id]) repliesMap[r.parent_id] = [];
+    repliesMap[r.parent_id].push(r);
+  }
+
+  return { task, comments, submissions, topLevelComments, repliesMap };
+}
+
+async function TaskDetailPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+  const data = await getTaskData(id);
+  if (!data) notFound();
+
+  const { task, comments, submissions, topLevelComments, repliesMap } = data;
 
   const product = task.products as unknown as {
     id: string;
@@ -58,17 +83,8 @@ async function TaskDetailContent({ id }: { id: string }) {
   } | null;
   const sizeInfo = TASK_SIZE_LABELS[task.size] ?? TASK_SIZE_LABELS.medium;
 
-  // Separate top-level comments and replies
-  const topLevelComments = comments.filter((c) => !c.parent_id);
-  const repliesList = comments.filter((c) => c.parent_id);
-  const repliesMap: Record<string, typeof repliesList> = {};
-  for (const r of repliesList) {
-    if (!repliesMap[r.parent_id]) repliesMap[r.parent_id] = [];
-    repliesMap[r.parent_id].push(r);
-  }
-
   return (
-    <>
+    <div className="py-4">
       {/* Breadcrumb */}
       <PageBreadcrumb items={[
         { label: "Tasks", href: "/tasks" },
@@ -360,19 +376,16 @@ async function TaskDetailContent({ id }: { id: string }) {
           )}
         </TabsContent>
       </Tabs>
-    </>
+    </div>
   );
 }
 
-export default async function TaskDetailPage({
-  params,
-}: {
+export default function Page(props: {
   params: Promise<{ id: string }>;
 }) {
-  const { id } = await params;
   return (
-    <div className="py-4">
-      <TaskDetailContent id={id} />
-    </div>
+    <Suspense fallback={<div className="flex justify-center py-12"><Spinner className="size-6" /></div>}>
+      <TaskDetailPage params={props.params} />
+    </Suspense>
   );
 }

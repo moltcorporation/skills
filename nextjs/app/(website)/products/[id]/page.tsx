@@ -1,36 +1,36 @@
+import { EntityLink } from "@/components/entity-link";
+import { PageBreadcrumb } from "@/components/page-breadcrumb";
+import { StatusBadge } from "@/components/status-badge";
+import { TaskSizeBadge } from "@/components/task-size-badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
+import { Spinner } from "@/components/ui/spinner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { formatDeadline, getInitials, timeAgo } from "@/lib/format";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { cacheLife, cacheTag } from "next/cache";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { timeAgo, getInitials, formatDeadline } from "@/lib/format";
-import { StatusBadge } from "@/components/status-badge";
-import { TaskSizeBadge } from "@/components/task-size-badge";
-import { EntityLink } from "@/components/entity-link";
-import { PageBreadcrumb } from "@/components/page-breadcrumb";
-import { cacheLife, cacheTag } from "next/cache";
+import { Suspense } from "react";
 
-async function ProductDetailContent({ id }: { id: string }) {
+async function getProductData(id: string) {
   "use cache";
   cacheLife("minutes");
   cacheTag("products", `product-${id}`);
 
   const supabase = createAdminClient();
 
-  // Fetch product
   const { data: product, error } = await supabase
     .from("products")
     .select("*, agents!products_proposed_by_fkey(id, name)")
     .eq("id", id)
     .single();
 
-  if (error || !product) notFound();
+  if (error || !product) return null;
 
-  // Fetch tasks, votes, comments, credits in parallel
   const [tasksRes, topicsRes, commentsRes, creditsRes] = await Promise.all([
     supabase
       .from("tasks")
@@ -99,7 +99,6 @@ async function ProductDetailContent({ id }: { id: string }) {
     (a, b) => b.credits - a.credits,
   );
 
-  const agent = product.agents as unknown as { id: string; name: string } | null;
   const completedTasks = tasks.filter((t) => t.status === "completed").length;
 
   // Separate top-level comments and replies
@@ -110,6 +109,44 @@ async function ProductDetailContent({ id }: { id: string }) {
     if (!repliesMap[r.parent_id]) repliesMap[r.parent_id] = [];
     repliesMap[r.parent_id].push(r);
   }
+
+  return {
+    product,
+    tasks,
+    topics,
+    comments,
+    votesMap,
+    totalCredits,
+    sortedContributors,
+    completedTasks,
+    topLevelComments,
+    repliesMap,
+  };
+}
+
+async function ProductDetailPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+  const data = await getProductData(id);
+  if (!data) notFound();
+
+  const {
+    product,
+    tasks,
+    topics,
+    comments,
+    votesMap,
+    totalCredits,
+    sortedContributors,
+    completedTasks,
+    topLevelComments,
+    repliesMap,
+  } = data;
+
+  const agent = product.agents as unknown as { id: string; name: string } | null;
 
   return (
     <div className="py-4">
@@ -493,11 +530,10 @@ async function ProductDetailContent({ id }: { id: string }) {
                           return (
                             <div key={opt.id} className="relative">
                               <div
-                                className={`flex items-center justify-between p-3 rounded-md border text-sm ${
-                                  isWinner
+                                className={`flex items-center justify-between p-3 rounded-md border text-sm ${isWinner
                                     ? "border-green-500/50 bg-green-500/5"
                                     : "border-border"
-                                }`}
+                                  }`}
                               >
                                 <div
                                   className="absolute inset-0 rounded-md bg-primary/5"
@@ -592,11 +628,12 @@ async function ProductDetailContent({ id }: { id: string }) {
   );
 }
 
-export default async function ProductDetailPage({
-  params,
-}: {
+export default function Page(props: {
   params: Promise<{ id: string }>;
 }) {
-  const { id } = await params;
-  return <ProductDetailContent id={id} />;
+  return (
+    <Suspense fallback={<div className="flex justify-center py-12"><Spinner className="size-6" /></div>}>
+      <ProductDetailPage params={props.params} />
+    </Suspense>
+  );
 }

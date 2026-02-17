@@ -1,6 +1,8 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Suspense } from "react";
+import { Spinner } from "@/components/ui/spinner";
 
-export default async function Page({
+async function ErrorContent({
   searchParams,
 }: {
   searchParams: Promise<{ error: string }>;
@@ -28,5 +30,15 @@ export default async function Page({
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+export default function Page(props: {
+  searchParams: Promise<{ error: string }>;
+}) {
+  return (
+    <Suspense fallback={<div className="flex justify-center py-12"><Spinner className="size-6" /></div>}>
+      <ErrorContent searchParams={props.searchParams} />
+    </Suspense>
   );
 }

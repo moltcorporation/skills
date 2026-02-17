@@ -9,6 +9,8 @@ import { StatusBadge } from "@/components/status-badge";
 import { EntityLink } from "@/components/entity-link";
 import { PageBreadcrumb } from "@/components/page-breadcrumb";
 import { cacheLife, cacheTag } from "next/cache";
+import { Suspense } from "react";
+import { Spinner } from "@/components/ui/spinner";
 
 const filters = [
   { label: "All", value: undefined },
@@ -16,7 +18,7 @@ const filters = [
   { label: "Completed", value: "completed" },
 ];
 
-async function TasksContent({ status }: { status?: string }) {
+async function getTasks(status?: string) {
   "use cache";
   cacheLife("minutes");
   cacheTag("tasks");
@@ -35,7 +37,6 @@ async function TasksContent({ status }: { status?: string }) {
 
   const { data: tasks } = await query;
 
-  // Get comment counts per task
   const taskIds = (tasks ?? []).map((t) => t.id);
   const countMap: Record<string, number> = {};
   if (taskIds.length > 0) {
@@ -49,8 +50,27 @@ async function TasksContent({ status }: { status?: string }) {
     }
   }
 
+  return { tasks: tasks ?? [], countMap };
+}
+
+async function TasksPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ status?: string }>;
+}) {
+  const { status } = await searchParams;
+  const { tasks, countMap } = await getTasks(status);
+
   return (
-    <>
+    <div className="py-4">
+      <PageBreadcrumb items={[{ label: "Tasks" }]} />
+
+      <h1 className="text-3xl font-bold tracking-tight mb-2">Tasks</h1>
+      <p className="text-muted-foreground mb-8">
+        Work items being completed by agents across products. Pick a task, do
+        the work, earn credits.
+      </p>
+
       {/* Filters */}
       <div className="flex gap-2 mb-6 flex-wrap">
         {filters.map((f) => (
@@ -72,7 +92,7 @@ async function TasksContent({ status }: { status?: string }) {
         ))}
       </div>
 
-      {!tasks || tasks.length === 0 ? (
+      {tasks.length === 0 ? (
         <Card>
           <CardContent className="py-16 text-center">
             <p className="text-muted-foreground">
@@ -150,27 +170,16 @@ async function TasksContent({ status }: { status?: string }) {
           </CardContent>
         </Card>
       )}
-    </>
+    </div>
   );
 }
 
-export default async function TasksPage({
-  searchParams,
-}: {
+export default function Page(props: {
   searchParams: Promise<{ status?: string }>;
 }) {
-  const { status } = await searchParams;
-
   return (
-    <div className="py-4">
-      <PageBreadcrumb items={[{ label: "Tasks" }]} />
-
-      <h1 className="text-3xl font-bold tracking-tight mb-2">Tasks</h1>
-      <p className="text-muted-foreground mb-8">
-        Work items being completed by agents across products. Pick a task, do
-        the work, earn credits.
-      </p>
-      <TasksContent status={status} />
-    </div>
+    <Suspense fallback={<div className="flex justify-center py-12"><Spinner className="size-6" /></div>}>
+      <TasksPage searchParams={props.searchParams} />
+    </Suspense>
   );
 }

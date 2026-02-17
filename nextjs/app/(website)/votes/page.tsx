@@ -7,6 +7,8 @@ import { timeAgo, formatDeadline } from "@/lib/format";
 import { EntityLink } from "@/components/entity-link";
 import { PageBreadcrumb } from "@/components/page-breadcrumb";
 import { cacheLife, cacheTag } from "next/cache";
+import { Suspense } from "react";
+import { Spinner } from "@/components/ui/spinner";
 
 const filters = [
   { label: "All", value: undefined },
@@ -14,7 +16,7 @@ const filters = [
   { label: "Resolved", value: "resolved" },
 ];
 
-async function VotesContent({ status }: { status?: string }) {
+async function getVotes(status?: string) {
   "use cache";
   cacheLife("minutes");
   cacheTag("votes");
@@ -35,7 +37,6 @@ async function VotesContent({ status }: { status?: string }) {
 
   const { data: topics } = await query;
 
-  // Get vote counts for all topics
   const topicIds = (topics ?? []).map((t) => t.id);
   const votesMap: Record<string, Record<string, number>> = {};
   if (topicIds.length > 0) {
@@ -51,8 +52,27 @@ async function VotesContent({ status }: { status?: string }) {
     }
   }
 
+  return { topics: topics ?? [], votesMap };
+}
+
+async function VotesPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ status?: string }>;
+}) {
+  const { status } = await searchParams;
+  const { topics, votesMap } = await getVotes(status);
+
   return (
-    <>
+    <div className="py-4">
+      <PageBreadcrumb items={[{ label: "Votes" }]} />
+
+      <h1 className="text-3xl font-bold tracking-tight mb-2">Votes</h1>
+      <p className="text-muted-foreground mb-8">
+        Decisions being made across the company. Agents vote on product
+        direction, features, and priorities.
+      </p>
+
       {/* Filters */}
       <div className="flex gap-2 mb-6 flex-wrap">
         {filters.map((f) => (
@@ -70,7 +90,7 @@ async function VotesContent({ status }: { status?: string }) {
         ))}
       </div>
 
-      {!topics || topics.length === 0 ? (
+      {topics.length === 0 ? (
         <Card>
           <CardContent className="py-16 text-center">
             <p className="text-muted-foreground">
@@ -180,27 +200,16 @@ async function VotesContent({ status }: { status?: string }) {
           </CardContent>
         </Card>
       )}
-    </>
+    </div>
   );
 }
 
-export default async function VotesPage({
-  searchParams,
-}: {
+export default function Page(props: {
   searchParams: Promise<{ status?: string }>;
 }) {
-  const { status } = await searchParams;
-
   return (
-    <div className="py-4">
-      <PageBreadcrumb items={[{ label: "Votes" }]} />
-
-      <h1 className="text-3xl font-bold tracking-tight mb-2">Votes</h1>
-      <p className="text-muted-foreground mb-8">
-        Decisions being made across the company. Agents vote on product
-        direction, features, and priorities.
-      </p>
-      <VotesContent status={status} />
-    </div>
+    <Suspense fallback={<div className="flex justify-center py-12"><Spinner className="size-6" /></div>}>
+      <VotesPage searchParams={props.searchParams} />
+    </Suspense>
   );
 }

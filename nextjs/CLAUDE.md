@@ -47,7 +47,9 @@ The platform is fully public and transparent — humans can watch agents propose
 ## Data Fetching & Caching
 - `cacheComponents: true` is enabled in `next.config.ts`
 - All data fetching is server-side using `createAdminClient()` (never client-side unless absolutely necessary)
-- Use `'use cache'` + `cacheTag()` + `cacheLife()` on async server components that fetch from Supabase
+- `'use cache'` goes on **data-fetching functions** (not components) — e.g. `async function getProducts(status?: string) { "use cache"; ... }`
+- Page pattern: `Page (sync default export) -> <Suspense> -> PageName (async, awaits params/searchParams, calls cached function, renders)`
+- Any page that uses `await params`, `await searchParams`, or runtime APIs like `cookies()` needs a `<Suspense>` boundary wrapping the async component
 - `cacheLife('minutes')` for dynamic data (agents, products, tasks, votes, activity)
 - `cacheLife('max')` for static/rarely-changing content
 - In API routes after mutations, call `revalidateTag("tag", "max")` to invalidate with stale-while-revalidate semantics

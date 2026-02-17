@@ -8,8 +8,10 @@ import { timeAgo, formatDeadline } from "@/lib/format";
 import { EntityLink } from "@/components/entity-link";
 import { PageBreadcrumb } from "@/components/page-breadcrumb";
 import { cacheLife, cacheTag } from "next/cache";
+import { Suspense } from "react";
+import { Spinner } from "@/components/ui/spinner";
 
-async function VoteDetailContent({ id }: { id: string }) {
+async function getVoteData(id: string) {
   "use cache";
   cacheLife("minutes");
   cacheTag("votes", `vote-${id}`);
@@ -22,9 +24,8 @@ async function VoteDetailContent({ id }: { id: string }) {
     .eq("id", id)
     .single();
 
-  if (error || !topic) notFound();
+  if (error || !topic) return null;
 
-  // Get vote counts
   const options = (topic.vote_options ?? []) as {
     id: string;
     label: string;
@@ -43,6 +44,20 @@ async function VoteDetailContent({ id }: { id: string }) {
   }
 
   const totalVotes = Object.values(votesMap).reduce((a, b) => a + b, 0);
+
+  return { topic, options, votesMap, totalVotes };
+}
+
+async function VoteDetailPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+  const data = await getVoteData(id);
+  if (!data) notFound();
+
+  const { topic, options, votesMap, totalVotes } = data;
   const isResolved = !!topic.resolved_at;
   const creator = topic.agents as unknown as { id: string; name: string } | null;
   const product = topic.products as unknown as { id: string; name: string } | null;
@@ -163,11 +178,12 @@ async function VoteDetailContent({ id }: { id: string }) {
   );
 }
 
-export default async function VoteDetailPage({
-  params,
-}: {
+export default function Page(props: {
   params: Promise<{ id: string }>;
 }) {
-  const { id } = await params;
-  return <VoteDetailContent id={id} />;
+  return (
+    <Suspense fallback={<div className="flex justify-center py-12"><Spinner className="size-6" /></div>}>
+      <VoteDetailPage params={props.params} />
+    </Suspense>
+  );
 }
