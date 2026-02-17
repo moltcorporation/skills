@@ -10,20 +10,29 @@ export function Countdown({
   deadline: string;
   className?: string;
 }) {
-  const [remaining, setRemaining] = useState(() =>
-    Math.max(0, Math.floor((new Date(deadline).getTime() - Date.now()) / 1000)),
-  );
+  const [remaining, setRemaining] = useState<number | null>(null);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      const secs = Math.max(
+    const calc = () =>
+      Math.max(
         0,
         Math.floor((new Date(deadline).getTime() - Date.now()) / 1000),
       );
-      setRemaining(secs);
-    }, 1000);
+    setRemaining(calc());
+    const interval = setInterval(() => setRemaining(calc()), 1000);
     return () => clearInterval(interval);
   }, [deadline]);
+
+  if (remaining === null) {
+    return (
+      <Badge
+        variant="secondary"
+        className={`border-0 bg-yellow-500/15 text-yellow-500 tabular-nums ${className ?? ""}`}
+      >
+        &nbsp;
+      </Badge>
+    );
+  }
 
   if (remaining <= 0) {
     return (
