@@ -54,14 +54,14 @@ export default function HQPage() {
           <CardTitle className="text-lg">Products In Progress</CardTitle>
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <span className="size-2 rounded-full bg-green-500" />
-            <span><BuildingProductCount /> total</span>
+            <span><Suspense fallback="—"><BuildingProductCount /></Suspense> total</span>
             <Button variant="link" size="sm" className="text-primary p-0 h-auto cursor-pointer" asChild>
               <Link href="/products">View All →</Link>
             </Button>
           </div>
         </CardHeader>
         <CardContent>
-          <ProductsInProgress />
+          <Suspense fallback={<div className="flex justify-center py-8"><Spinner className="size-5" /></div>}><ProductsInProgress /></Suspense>
         </CardContent>
       </Card>
 
@@ -73,14 +73,14 @@ export default function HQPage() {
               <CardTitle className="text-lg">Recent Tasks</CardTitle>
               <div className="flex items-center gap-2">
                 <span className="size-2 rounded-full bg-green-500" />
-                <span className="text-sm text-muted-foreground"><OpenTaskCount /> open</span>
+                <span className="text-sm text-muted-foreground"><Suspense fallback="—"><OpenTaskCount /></Suspense> open</span>
                 <Button variant="link" size="sm" className="text-primary p-0 h-auto text-xs cursor-pointer" asChild>
                   <Link href="/activity">View All →</Link>
                 </Button>
               </div>
             </CardHeader>
             <CardContent className="p-0">
-              <RecentTasks />
+              <Suspense fallback={<div className="flex justify-center py-8"><Spinner className="size-5" /></div>}><RecentTasks /></Suspense>
             </CardContent>
           </Card>
         </div>
@@ -94,7 +94,7 @@ export default function HQPage() {
               </Button>
             </CardHeader>
             <CardContent className="p-0">
-              <TopWorkers />
+              <Suspense fallback={<div className="flex justify-center py-8"><Spinner className="size-5" /></div>}><TopWorkers /></Suspense>
             </CardContent>
           </Card>
 
@@ -106,7 +106,7 @@ export default function HQPage() {
               </Button>
             </CardHeader>
             <CardContent className="p-0">
-              <RecentActivity />
+              <Suspense fallback={<div className="flex justify-center py-8"><Spinner className="size-5" /></div>}><RecentActivity /></Suspense>
             </CardContent>
           </Card>
         </div>
@@ -118,14 +118,14 @@ export default function HQPage() {
           <CardTitle className="text-lg">Recent Votes</CardTitle>
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <span className="size-2 rounded-full bg-orange-500" />
-            <span><OpenVoteCount /> open</span>
+            <span><Suspense fallback="—"><OpenVoteCount /></Suspense> open</span>
             <Button variant="link" size="sm" className="text-primary p-0 h-auto cursor-pointer" asChild>
               <Link href="/votes">View All →</Link>
             </Button>
           </div>
         </CardHeader>
         <CardContent>
-          <VoteActivity />
+          <Suspense fallback={<div className="flex justify-center py-8"><Spinner className="size-5" /></div>}><VoteActivity /></Suspense>
         </CardContent>
       </Card>
 
@@ -138,7 +138,7 @@ export default function HQPage() {
           </Button>
         </CardHeader>
         <CardContent>
-          <ExpenseBreakdown />
+          <Suspense fallback={<div className="flex justify-center py-8"><Spinner className="size-5" /></div>}><ExpenseBreakdown /></Suspense>
         </CardContent>
       </Card>
 
