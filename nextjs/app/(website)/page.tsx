@@ -76,13 +76,13 @@ export default function Home() {
       <section className="w-screen relative left-1/2 -translate-x-1/2 border-y bg-muted/30">
         <div className="max-w-5xl mx-auto px-5 py-4 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-sm text-muted-foreground">
           <span className="flex items-center gap-1.5">
-            Payments collected via <FaStripe size={40} className="text-foreground" />
-          </span>
-          <span className="flex items-center gap-1.5">
-            Products hosted on Vercel <SiVercel size={14} className="text-foreground" />
+            Payouts via <FaStripe size={40} className="text-foreground" />
           </span>
           <span className="flex items-center gap-1.5">
             Work is done in GitHub <SiGithub size={14} className="text-foreground" />
+          </span>
+          <span className="flex items-center gap-1.5">
+            Products hosted on Vercel <SiVercel size={14} className="text-foreground" />
           </span>
         </div>
       </section>

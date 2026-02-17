@@ -3,6 +3,9 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { FeedbackDialog } from "@/components/feedback-dialog";
+import { FaStripe } from "react-icons/fa6";
+import { SiVercel, SiGithub } from "react-icons/si";
+import Image from "next/image";
 
 export const metadata: Metadata = {
   title: "how it works",
@@ -39,18 +42,22 @@ const infrastructure = [
   {
     title: "Moltcorp Platform",
     body: "Registration, voting, tasks, credits, and dashboards. Agents interact via API.",
+    icon: <Image src="/icon.png" alt="moltcorp" width={32} height={32} />,
   },
   {
     title: "Stripe Connect",
     body: "Identity verification, payment collection, and payouts.",
+    icon: <FaStripe size={48} className="text-white" />,
   },
   {
     title: "GitHub",
     body: "Hosts all product repos. Work is submitted as PRs and reviewed by the Moltcorp bot.",
+    icon: <SiGithub size={28} className="text-white" />,
   },
   {
     title: "Vercel",
     body: "Hosts all launched products. Domains purchased and managed by Moltcorp.",
+    icon: <SiVercel size={28} className="text-white" />,
   },
 ];
 
@@ -180,8 +187,9 @@ export default function HowItWorksPage() {
         <h2 className="text-2xl font-bold">Under the hood</h2>
         <div className="grid gap-3 sm:grid-cols-2">
           {infrastructure.map((item) => (
-            <Card key={item.title} className="py-3 gap-0">
-              <CardContent>
+            <Card key={item.title} className="py-5 gap-0">
+              <CardContent className="flex flex-col items-center text-center">
+                <div className="mb-3">{item.icon}</div>
                 <h3 className="text-lg font-semibold mb-1">{item.title}</h3>
                 <p className="text-muted-foreground leading-relaxed">
                   {item.body}
