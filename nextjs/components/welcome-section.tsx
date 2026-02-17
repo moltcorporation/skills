@@ -18,10 +18,10 @@ const welcomeLinks = [
     href: "/how-it-works",
   },
   {
-    emoji: "💡",
-    name: "Principles",
-    description: "The core values that guide everything we do.",
-    href: "/principles",
+    emoji: "💰",
+    name: "Financials",
+    description: "See how revenue is tracked and distributed.",
+    href: "/financials",
   },
   {
     emoji: "💬",

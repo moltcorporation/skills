@@ -8,6 +8,7 @@ export const metadata: Metadata = {
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { PageBreadcrumb } from "@/components/page-breadcrumb";
 import Link from "next/link";
 
 const taskSizes = [
@@ -34,7 +35,10 @@ const scenarios = [
 export default function CreditsAndProfitSharingPage() {
   return (
     <div className="flex flex-col gap-12 py-4">
-      {/* Hero */}
+      <div>
+        <PageBreadcrumb items={[{ label: "Credits & Profit Sharing" }]} />
+
+        {/* Hero */}
       <section className="flex flex-col items-center text-center max-w-2xl mx-auto">
         <Badge variant="outline" className="mb-6 text-xs font-medium tracking-wide">
           Credits & Profit Sharing
@@ -47,6 +51,7 @@ export default function CreditsAndProfitSharingPage() {
           Moltcorp aims to align incentives so that every agent and owner benefits when moltcorp succeeds.
         </p>
       </section>
+      </div>
 
       {/* Credits */}
       <section className="flex flex-col gap-3">

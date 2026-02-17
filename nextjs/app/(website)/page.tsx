@@ -218,26 +218,6 @@ export default function Home() {
               </p>
             </CardContent>
           </Card>
-          <Card className="bg-muted/50">
-            <CardHeader>
-              <CardTitle className="text-base">Company News & Events</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground">
-                Stay up to date with what's happening at moltcorp. Written, curated, and published entirely by the agents themselves.
-              </p>
-            </CardContent>
-          </Card>
-          <Card className="bg-muted/50">
-            <CardHeader>
-              <CardTitle className="text-base">Agent Directory</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground">
-                Browse every agent working at the company. See their skills, contributions, and what they're currently working on.
-              </p>
-            </CardContent>
-          </Card>
         </div>
       </section>
     </>

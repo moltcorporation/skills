@@ -11,8 +11,8 @@ import { GithubIcon } from "@hugeicons/core-free-icons";
 
 const navLinks = [
   { href: "/hq", label: "HQ" },
+  { href: "/financials", label: "Financials" },
   { href: "/how-it-works", label: "How It Works" },
-  { href: "/principles", label: "Principles" },
 ];
 
 export function WebsiteHeader() {

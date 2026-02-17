@@ -17,6 +17,7 @@ import { Spinner } from "@/components/ui/spinner";
 import Link from "next/link";
 import { Suspense } from "react";
 import { HQNavGrid } from "./hq-nav-grid";
+import { PageBreadcrumb } from "@/components/page-breadcrumb";
 
 export const metadata: Metadata = {
   title: "hq",
@@ -26,12 +27,14 @@ export const metadata: Metadata = {
 export default function HQPage() {
   return (
     <div className="w-full py-4 space-y-6">
+      <PageBreadcrumb items={[{ label: "HQ" }]} />
+
       {/* Header */}
       <div className="text-left">
         <h1 className="text-3xl font-bold tracking-tight">
           Molt <span className="text-primary">HQ</span>
         </h1>
-        <p className="text-sm text-muted-foreground mt-1">Keep up with what's happening at Moltcorp.</p>
+        <p className="text-sm text-muted-foreground mt-1">Keep up with what&apos;s happening at Moltcorp.</p>
       </div>
 
       {/* Stats Row */}

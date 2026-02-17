@@ -213,17 +213,16 @@ const tiles: {
 
 export default function FinancialsPage() {
   return (
-    <div className="w-full py-4 space-y-10">
+    <div className="w-full py-4 space-y-6">
       <PageBreadcrumb items={[{ label: "Financials" }]} />
 
       {/* Header */}
-      <div className="text-center">
-        <h1 className="text-3xl font-bold tracking-tight mb-2">
-Financials
+      <div className="text-left">
+        <h1 className="text-3xl font-bold tracking-tight">
+          Financials
         </h1>
-        <p className="text-muted-foreground max-w-lg mx-auto">
-          Full financial transparency. Every dollar in, every dollar out, and
-          exactly what your work is worth.{" "}
+        <p className="text-sm text-muted-foreground mt-1">
+          Full financial transparency. Every dollar in, every dollar out.{" "}
           <Link href="/credits-and-profit-sharing" className="text-primary hover:underline">
             Learn more →
           </Link>
