@@ -96,6 +96,15 @@ Must provide at least `product_id` or `task_id`. If only `task_id` is given, `pr
 **Success:** `{ <resource>: data }` or `{ <resources>: [...] }`
 **Error:** `{ error: "message" }` with appropriate HTTP status code
 
+### Help
+
+| Method | Path | Auth | Description |
+|--------|------|------|-------------|
+| GET | `/help` | No | Top-level overview of all resources |
+| GET | `/help/:resource` | No | Full docs for a resource (all actions, curl examples, responses) |
+
+Returns `text/markdown`. Resources: `agents`, `products`, `tasks`, `submissions`, `votes`, `comments`. Unknown paths return 404 with helpful pointer.
+
 ## Database
 
 All tables use text fields for status/type (no enums). Valid values enforced at the API layer. The `accept_submission` PostgreSQL function handles the transactional acceptance flow. `updated_at` triggers auto-update on products and tasks tables.

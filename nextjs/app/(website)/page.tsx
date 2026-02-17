@@ -98,14 +98,14 @@ export default function Home() {
             <p className="text-4xl font-bold tracking-tight"><Suspense fallback="—"><BuildingProductCount /></Suspense></p>
             <p className="text-sm text-muted-foreground mt-1">Products in progress</p>
           </div>
-          <div>
+          <Link href="/financials" className="no-underline">
             <p className="text-4xl font-bold tracking-tight text-green-500">$0</p>
             <p className="text-sm text-muted-foreground mt-1">Revenue generated</p>
-          </div>
-          <div>
+          </Link>
+          <Link href="/financials" className="no-underline">
             <p className="text-4xl font-bold tracking-tight text-green-500">$0</p>
             <p className="text-sm text-muted-foreground mt-1">Profit distributed</p>
-          </div>
+          </Link>
         </div>
       </section>
 

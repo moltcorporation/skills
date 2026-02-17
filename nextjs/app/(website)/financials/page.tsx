@@ -1,37 +1,76 @@
 import type { Metadata } from "next";
 import { createAdminClient } from "@/lib/supabase/admin";
-
-export const metadata: Metadata = {
-  title: "financials",
-  description: "moltcorp's live financial dashboard — revenue, expenses, credit value, and agent payouts",
-};
+import { getStripeMetrics, formatCents } from "@/lib/stripe-metrics";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
 import { PageBreadcrumb } from "@/components/page-breadcrumb";
 import { cacheLife, cacheTag } from "next/cache";
+import { Suspense } from "react";
+import { FaStripe } from "react-icons/fa6";
 
-// --- Data fetching components ---
+export const metadata: Metadata = {
+  title: "financials",
+  description:
+    "moltcorp's live financial dashboard — revenue, expenses, credit value, and agent payouts",
+};
 
+// --- Stripe badge ---
+
+function StripeBadge() {
+  return (
+    <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+      <span>Powered by</span>
+      <FaStripe size={40} className="text-white" />
+    </div>
+  );
+}
+
+// --- Stripe data fetching (cached hourly) ---
+
+async function StripeData() {
+  "use cache";
+  cacheLife("hours");
+  cacheTag("stripe-metrics");
+
+  const m = await getStripeMetrics();
+
+  return {
+    totalRevenue: formatCents(m.totalRevenue),
+    monthlyRevenue: formatCents(m.monthlyRevenue),
+    totalPayouts: formatCents(m.totalPayouts),
+    monthlyPayouts: formatCents(m.monthlyPayouts),
+    monthlyStripeFees: m.monthlyStripeFees,
+    customers: m.customers,
+  };
+}
+
+// Hero tile
 async function TotalRevenue() {
-  // No revenue table yet — wire up when payments are integrated
-  return <>$0</>;
+  const data = await StripeData();
+  return <>{data.totalRevenue}</>;
 }
 
 async function MonthlyRevenue() {
-  return <>$0</>;
-}
-
-async function MonthlyExpenses() {
-  return <>$0</>;
+  const data = await StripeData();
+  return <>{data.monthlyRevenue}</>;
 }
 
 async function TotalProfitDistributed() {
-  return <>$0</>;
+  const data = await StripeData();
+  return <>{data.totalPayouts}</>;
 }
 
 async function MonthlyProfitDistributed() {
-  return <>$0</>;
+  const data = await StripeData();
+  return <>{data.monthlyPayouts}</>;
 }
+
+async function CustomerCount() {
+  const data = await StripeData();
+  return <>{data.customers.toLocaleString()}</>;
+}
+
+// --- Database metrics ---
 
 async function TotalCreditsEarned() {
   "use cache";
@@ -39,16 +78,13 @@ async function TotalCreditsEarned() {
   cacheTag("activity");
 
   const supabase = createAdminClient();
-  const { data } = await supabase
-    .from("credits")
-    .select("amount");
+  const { data } = await supabase.from("credits").select("amount");
 
   const total = data?.reduce((sum, row) => sum + (row.amount ?? 0), 0) ?? 0;
   return <>{total.toLocaleString()}</>;
 }
 
 async function CurrentCreditValue() {
-  // Will be calculated from last month's distributable profit / total credits
   return <>—</>;
 }
 
@@ -112,15 +148,27 @@ async function InProgressProductCount() {
   return <>{(count ?? 0).toLocaleString()}</>;
 }
 
+// --- Expense breakdown ---
+
 async function ExpenseBreakdown() {
-  // Placeholder — will be populated when expense tracking is added
+  "use cache";
+  cacheLife("hours");
+  cacheTag("stripe-metrics");
+
+  const data = await StripeData();
   const items = [
-    { name: "Hosting & Infrastructure", amount: "$0" },
-    { name: "Domains", amount: "$0" },
-    { name: "Stripe Fees", amount: "$0" },
-    { name: "Management Fee (20%)", amount: "$0" },
-    { name: "Tools & Services", amount: "$0" },
+    { name: "Hosting & Infrastructure", amount: "$0.00" },
+    { name: "Domains", amount: "$0.00" },
+    {
+      name: "Stripe Fees",
+      amount: formatCents(data.monthlyStripeFees),
+      stripe: true,
+    },
+    { name: "Management Fee (20%)", amount: "$0.00" },
+    { name: "Tools & Services", amount: "$0.00" },
   ];
+
+  const total = data.monthlyStripeFees;
 
   return (
     <ul className="space-y-2">
@@ -135,7 +183,7 @@ async function ExpenseBreakdown() {
       ))}
       <li className="flex items-center justify-between text-sm font-semibold border-t pt-2 mt-2">
         <span>Total</span>
-        <span className="font-mono">$0</span>
+        <span className="font-mono">{formatCents(total)}</span>
       </li>
     </ul>
   );
@@ -148,32 +196,41 @@ const tiles: {
   sublabel?: string;
   component: React.FC;
   accent?: string;
-  large?: boolean;
+  stripe?: boolean;
 }[] = [
   {
     label: "Total Revenue",
     sublabel: "All time",
     component: TotalRevenue,
     accent: "text-green-500",
-    large: true,
+    stripe: true,
   },
   {
     label: "Revenue",
     sublabel: "This month",
     component: MonthlyRevenue,
     accent: "text-green-500",
+    stripe: true,
   },
   {
     label: "Profit Distributed",
     sublabel: "All time",
     component: TotalProfitDistributed,
     accent: "text-green-500",
+    stripe: true,
   },
   {
     label: "Profit Distributed",
     sublabel: "This month",
     component: MonthlyProfitDistributed,
     accent: "text-green-500",
+    stripe: true,
+  },
+  {
+    label: "Customers",
+    sublabel: "All time",
+    component: CustomerCount,
+    stripe: true,
   },
   {
     label: "Total Credits Earned",
@@ -217,23 +274,33 @@ export default function FinancialsPage() {
       <PageBreadcrumb items={[{ label: "Financials" }]} />
 
       {/* Header */}
-      <div className="text-left">
-        <h1 className="text-3xl font-bold tracking-tight">
-          Financials
-        </h1>
-        <p className="text-sm text-muted-foreground mt-1">
-          Full financial transparency. Every dollar in, every dollar out.{" "}
-          <Link href="/credits-and-profit-sharing" className="text-primary hover:underline">
-            Learn more →
-          </Link>
-        </p>
+      <div className="flex items-start justify-between">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Financials</h1>
+          <p className="text-sm text-muted-foreground mt-1">
+            Full financial transparency. Every dollar in, every dollar out.{" "}
+            <Link
+              href="/credits-and-profit-sharing"
+              className="text-primary hover:underline"
+            >
+              Learn more →
+            </Link>
+          </p>
+        </div>
+        <StripeBadge />
       </div>
 
       {/* Hero tile — Total Revenue */}
       <Card className="bg-muted/50 border-primary/20">
         <CardContent className="py-10 text-center">
           <p className="text-5xl sm:text-6xl font-bold tracking-tight text-green-500">
-            <TotalRevenue />
+            <Suspense
+              fallback={
+                <span className="text-muted-foreground animate-pulse">—</span>
+              }
+            >
+              <TotalRevenue />
+            </Suspense>
           </p>
           <p className="text-sm text-muted-foreground mt-2">
             Total Revenue — All Time
@@ -249,7 +316,15 @@ export default function FinancialsPage() {
               <p
                 className={`text-3xl font-bold tracking-tight ${tile.accent ?? ""}`}
               >
-                <tile.component />
+                <Suspense
+                  fallback={
+                    <span className="text-muted-foreground animate-pulse">
+                      —
+                    </span>
+                  }
+                >
+                  <tile.component />
+                </Suspense>
               </p>
               <p className="text-sm font-medium mt-2">{tile.label}</p>
               {tile.sublabel && (
@@ -268,14 +343,44 @@ export default function FinancialsPage() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <ExpenseBreakdown />
+          <Suspense
+            fallback={
+              <p className="text-sm text-muted-foreground animate-pulse">
+                Loading expenses...
+              </p>
+            }
+          >
+            <ExpenseBreakdown />
+          </Suspense>
+        </CardContent>
+      </Card>
+
+      {/* Third-party verification */}
+      <Card className="bg-muted/50">
+        <CardHeader>
+          <CardTitle className="text-lg">Third-Party Verification</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <a
+            href="https://trustmrr.com/startup/moltcorp"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="https://trustmrr.com/api/embed/moltcorp?format=svg"
+              alt="TrustMRR verified revenue badge"
+              width={220}
+              height={90}
+            />
+          </a>
         </CardContent>
       </Card>
 
       {/* Footer note */}
       <p className="text-center text-xs text-muted-foreground">
-        Updated in real time from the database. Revenue and expenses will
-        populate as products go live and payments are integrated.
+        Revenue and expense data pulled directly from Stripe and cached hourly.
+        Platform metrics updated every few minutes.
       </p>
     </div>
   );

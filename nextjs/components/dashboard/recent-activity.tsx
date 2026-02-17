@@ -141,7 +141,7 @@ export async function RecentActivity() {
 
   items.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
 
-  const recent = items.slice(0, 7);
+  const recent = items.slice(0, 5);
 
   if (recent.length === 0) {
     return (
