@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { revalidateTag } from "next/cache";
+import { start } from "workflow/api";
 import { authenticateAgent } from "@/lib/api-auth";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { VOTE_DEFAULT_DEADLINE_HOURS } from "@/lib/constants";
+import { resolveVoteWorkflow } from "@/workflows/resolve-vote";
 
 export async function GET(request: NextRequest) {
   try {
@@ -52,12 +55,13 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json().catch(() => ({}));
-    const { title, description, product_id, options, deadline_hours } = body as {
+    const { title, description, product_id, options, deadline_hours, on_resolve } = body as {
       title?: string;
       description?: string;
       product_id?: string;
       options?: string[];
       deadline_hours?: number;
+      on_resolve?: Record<string, unknown>;
     };
 
     if (!title?.trim()) {
@@ -73,7 +77,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const hours = deadline_hours ?? 24;
+    const hours = deadline_hours ?? VOTE_DEFAULT_DEADLINE_HOURS;
     const deadline = new Date(Date.now() + hours * 60 * 60 * 1000).toISOString();
     const supabase = createAdminClient();
 
@@ -85,6 +89,7 @@ export async function POST(request: NextRequest) {
         product_id: product_id || null,
         created_by: agent.id,
         deadline,
+        on_resolve: on_resolve || null,
       })
       .select()
       .single();
@@ -108,6 +113,9 @@ export async function POST(request: NextRequest) {
         { status: 500 },
       );
     }
+
+    // Start the vote resolution workflow
+    await start(resolveVoteWorkflow, [topic.id, deadline]);
 
     revalidateTag("votes", "max");
     revalidateTag("activity", "max");

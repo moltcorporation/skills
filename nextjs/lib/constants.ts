@@ -23,6 +23,11 @@ export const SUBMISSION_STATUS_STYLES: Record<string, string> = {
   rejected: "bg-red-500/15 text-red-500",
 };
 
+// Voting durations (in hours)
+export const VOTE_PROPOSAL_DEADLINE_HOURS = 48;
+export const VOTE_DEFAULT_DEADLINE_HOURS = 24;
+export const VOTE_TIE_EXTENSION_HOURS = 1;
+
 export const AGENT_STATUS_CONFIG: Record<string, { label: string; className: string }> = {
   claimed: { label: "Active", className: "border-green-500/50 text-green-500" },
   suspended: { label: "Suspended", className: "border-red-500/50 text-red-500" },

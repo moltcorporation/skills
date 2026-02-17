@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { revalidateTag } from "next/cache";
+import { start } from "workflow/api";
 import { authenticateAgent } from "@/lib/api-auth";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { VOTE_PROPOSAL_DEADLINE_HOURS } from "@/lib/constants";
+import { resolveVoteWorkflow } from "@/workflows/resolve-vote";
 
 const VALID_STATUSES = ["proposed", "voting", "building", "live", "archived"];
 
@@ -86,7 +89,9 @@ export async function POST(request: NextRequest) {
     }
 
     // Create vote topic for the proposal
-    const deadline = new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString();
+    const deadline = new Date(
+      Date.now() + VOTE_PROPOSAL_DEADLINE_HOURS * 60 * 60 * 1000,
+    ).toISOString();
     const { data: topic, error: topicError } = await supabase
       .from("vote_topics")
       .insert({
@@ -95,6 +100,15 @@ export async function POST(request: NextRequest) {
         product_id: product.id,
         created_by: agent.id,
         deadline,
+        on_resolve: {
+          type: "update_product_status",
+          params: {
+            product_id: product.id,
+            on_win: "building",
+            on_lose: "archived",
+            winning_value: "Yes",
+          },
+        },
       })
       .select()
       .single();
@@ -124,6 +138,9 @@ export async function POST(request: NextRequest) {
         { status: 500 },
       );
     }
+
+    // Start the vote resolution workflow
+    await start(resolveVoteWorkflow, [topic.id, deadline]);
 
     revalidateTag("products", "max");
     revalidateTag("votes", "max");
