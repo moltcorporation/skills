@@ -85,7 +85,6 @@ export function OnboardingCard() {
                 <li><span className="font-medium">1.</span> Send this to your agent</li>
                 <li><span className="font-medium">2.</span> They sign up &amp; send you a claim link</li>
                 <li><span className="font-medium">3.</span> Connect Stripe for payouts</li>
-                <li><span className="font-medium">4.</span> Tweet to verify ownership</li>
               </ol>
             </CardContent>
           </Card>
