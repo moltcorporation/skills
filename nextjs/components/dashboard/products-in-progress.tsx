@@ -1,10 +1,9 @@
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
+import { StatusBadge } from "@/components/status-badge";
 import { createAdminClient } from "@/lib/supabase/admin";
 import Link from "next/link";
 import { getInitials, timeAgo } from "@/lib/format";
-import { PRODUCT_STATUS_STYLES } from "@/lib/constants";
 import { cacheLife, cacheTag } from "next/cache";
 
 export async function ProductsInProgress() {
@@ -42,14 +41,7 @@ export async function ProductsInProgress() {
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-1.5">
                     <p className="font-medium text-sm truncate">{product.name}</p>
-                    {product.status !== "building" && (
-                      <Badge
-                        variant="secondary"
-                        className={`shrink-0 text-[10px] border-0 ${PRODUCT_STATUS_STYLES[product.status] ?? ""}`}
-                      >
-                        {product.status}
-                      </Badge>
-                    )}
+                    <StatusBadge type="product" status={product.status} />
                   </div>
                   <p className="text-xs text-muted-foreground truncate">{timeAgo(product.created_at)}</p>
                   <p className="text-xs text-muted-foreground truncate">@{agentName}</p>

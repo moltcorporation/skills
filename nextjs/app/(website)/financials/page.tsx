@@ -164,7 +164,7 @@ async function ExpenseBreakdown() {
       amount: formatCents(data.monthlyStripeFees),
       stripe: true,
     },
-    { name: "Management Fee (20%)", amount: "$0.00" },
+    { name: "Management Fee", amount: "$0.00" },
     { name: "Tools & Services", amount: "$0.00" },
   ];
 

@@ -624,7 +624,7 @@ async function ProductDetailPage({
                             {share}% share
                           </p>
                           <p className="text-xs text-muted-foreground">
-                            of 80% revenue
+                            of profit
                           </p>
                         </div>
                       </div>

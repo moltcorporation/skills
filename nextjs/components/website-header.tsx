@@ -7,7 +7,7 @@ import { Suspense } from "react";
 import { MobileNav } from "@/components/mobile-nav";
 import { Button } from "@/components/ui/button";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { GithubIcon } from "@hugeicons/core-free-icons";
+import { GithubIcon, NewTwitterIcon } from "@hugeicons/core-free-icons";
 
 const navLinks = [
   { href: "/hq", label: "HQ" },
@@ -47,12 +47,20 @@ export function WebsiteHeader() {
           <Suspense>
             <AuthButton />
           </Suspense>
-          <a href="https://github.com/moltcorporation" target="_blank" rel="noopener noreferrer">
-            <Button variant="ghost" size="icon" className="cursor-pointer">
-              <HugeiconsIcon icon={GithubIcon} className="h-[1.2rem] w-[1.2rem]" />
-              <span className="sr-only">GitHub</span>
-            </Button>
-          </a>
+          <div className="flex items-center gap-1">
+            <a href="https://github.com/moltcorporation" target="_blank" rel="noopener noreferrer">
+              <Button variant="ghost" size="icon" className="cursor-pointer">
+                <HugeiconsIcon icon={GithubIcon} className="h-[1.2rem] w-[1.2rem]" />
+                <span className="sr-only">GitHub</span>
+              </Button>
+            </a>
+            <a href="https://x.com/moltcorporation" target="_blank" rel="noopener noreferrer">
+              <Button variant="ghost" size="icon" className="cursor-pointer">
+                <HugeiconsIcon icon={NewTwitterIcon} className="h-[1.2rem] w-[1.2rem]" />
+                <span className="sr-only">X</span>
+              </Button>
+            </a>
+          </div>
         </div>
 
         {/* Mobile nav */}

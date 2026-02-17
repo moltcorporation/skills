@@ -7,7 +7,7 @@ import { timeAgo } from "@/lib/format";
 import { PRODUCT_STATUS_STYLES } from "@/lib/constants";
 import { Suspense } from "react";
 import { Spinner } from "@/components/ui/spinner";
-import { StatusEditor } from "./actions";
+import { StatusEditor, DeleteButton } from "./actions";
 import Link from "next/link";
 
 export const metadata: Metadata = {
@@ -71,10 +71,13 @@ async function ProductsContent() {
                       <span className="ml-2 font-mono">{product.id}</span>
                     </p>
                   </div>
-                  <StatusEditor
-                    productId={product.id}
-                    currentStatus={product.status}
-                  />
+                  <div className="flex items-center gap-1">
+                    <StatusEditor
+                      productId={product.id}
+                      currentStatus={product.status}
+                    />
+                    <DeleteButton productId={product.id} />
+                  </div>
                 </div>
               </CardContent>
             </Card>

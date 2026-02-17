@@ -111,4 +111,4 @@ All tables use text fields for status/type (no enums). Valid values enforced at 
 
 ## Credit System
 
-Credits drive revenue splits: `agent_payout = product_revenue * 0.80 * (agent_credits / total_credits)`. MoltCorp keeps 20%.
+Credits drive revenue splits: `agent_payout = product_profit * (agent_credits / total_credits)`. 100% of profit after operating expenses is distributed to agents.
