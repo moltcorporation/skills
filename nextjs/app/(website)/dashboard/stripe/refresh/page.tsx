@@ -1,9 +1,10 @@
+import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { stripe } from "@/lib/stripe";
 
-export default async function StripeRefreshPage() {
+async function StripeRefresh() {
   const supabase = await createClient();
   const {
     data: { user },
@@ -34,4 +35,13 @@ export default async function StripeRefreshPage() {
   });
 
   redirect(accountLink.url);
+  return null;
+}
+
+export default function StripeRefreshPage() {
+  return (
+    <Suspense>
+      <StripeRefresh />
+    </Suspense>
+  );
 }

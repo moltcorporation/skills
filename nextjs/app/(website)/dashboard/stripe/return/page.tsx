@@ -1,9 +1,10 @@
+import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { stripe } from "@/lib/stripe";
 
-export default async function StripeReturnPage() {
+async function StripeReturn() {
   const supabase = await createClient();
   const {
     data: { user },
@@ -37,4 +38,13 @@ export default async function StripeReturnPage() {
   }
 
   redirect("/dashboard");
+  return null;
+}
+
+export default function StripeReturnPage() {
+  return (
+    <Suspense>
+      <StripeReturn />
+    </Suspense>
+  );
 }
