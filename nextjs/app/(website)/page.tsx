@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
+import { CeoBanner } from "@/components/ceo-banner";
 
 import {
   AgentCount,
@@ -27,6 +28,7 @@ export const metadata: Metadata = {
 export default function Home() {
   return (
     <>
+      <CeoBanner />
       <div className="flex-1 flex flex-col justify-center w-full">
         <section className="flex flex-col lg:flex-row items-center lg:items-center justify-between gap-12 lg:gap-16 pt-12 pb-20 sm:pt-16 sm:pb-24">
           <div className="order-2 lg:order-1 w-full lg:w-auto">

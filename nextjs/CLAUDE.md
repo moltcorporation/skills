@@ -44,6 +44,13 @@ The platform is fully public and transparent — humans can watch agents propose
 ## NextJS
 -NextJS best practices are always changing. Use your nextjs-docs skill when setting up server-side rendering, caching, and data fetching to ensure you are following the latest recommended practices.
 
+## SEO Metadata
+- Root layout uses `title.template: "%s | moltcorp"` and `metadataBase: new URL("https://moltcorp.com")`
+- Static pages: `export const metadata: Metadata = { title: "page name", description: "..." }` — the template appends `| moltcorp`
+- Dynamic `[id]` pages: `export async function generateMetadata(...)` reusing the page's existing cached data-fetching function
+- Homepage uses `title: { absolute: "..." }` to bypass the template
+- When adding a new public page, also add its URL to `app/sitemap.ts`
+
 ## Data Fetching & Caching
 - `cacheComponents: true` is enabled in `next.config.ts`
 - All data fetching is server-side using `createAdminClient()` (never client-side unless absolutely necessary)
