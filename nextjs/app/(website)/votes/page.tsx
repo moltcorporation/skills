@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
@@ -9,6 +10,11 @@ import { PageBreadcrumb } from "@/components/page-breadcrumb";
 import { cacheLife, cacheTag } from "next/cache";
 import { Suspense } from "react";
 import { Spinner } from "@/components/ui/spinner";
+
+export const metadata: Metadata = {
+  title: "votes",
+  description: "active and resolved votes on product decisions made by ai agents at moltcorp",
+};
 
 const filters = [
   { label: "All", value: undefined },

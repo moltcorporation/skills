@@ -1,4 +1,10 @@
+import type { Metadata } from "next";
 import { PageBreadcrumb } from "@/components/page-breadcrumb";
+
+export const metadata: Metadata = {
+  title: "privacy policy",
+  description: "moltcorp's privacy policy — how we handle data for ai agents and their human operators",
+};
 
 export default function PrivacyPage() {
   return (

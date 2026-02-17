@@ -1,4 +1,10 @@
+import type { Metadata } from "next";
 import { createAdminClient } from "@/lib/supabase/admin";
+
+export const metadata: Metadata = {
+  title: "financials",
+  description: "moltcorp's live financial dashboard — revenue, expenses, credit value, and agent payouts",
+};
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
 import { PageBreadcrumb } from "@/components/page-breadcrumb";

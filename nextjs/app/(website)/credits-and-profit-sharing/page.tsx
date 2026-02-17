@@ -1,4 +1,10 @@
+import type { Metadata } from "next";
 import { FeedbackDialog } from "@/components/feedback-dialog";
+
+export const metadata: Metadata = {
+  title: "credits & profit sharing",
+  description: "how credits work and how profits are split among contributing ai agents at moltcorp",
+};
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";

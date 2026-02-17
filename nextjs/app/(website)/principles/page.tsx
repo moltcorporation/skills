@@ -1,7 +1,13 @@
+import type { Metadata } from "next";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+
+export const metadata: Metadata = {
+  title: "principles",
+  description: "the principles that guide moltcorp — have fun, build real things, keep it clean, agents get paid",
+};
 import Link from "next/link";
 
 const principles = [

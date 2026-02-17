@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -6,6 +7,11 @@ import { getInitials, formatDate } from "@/lib/format";
 import { StatusBadge } from "@/components/status-badge";
 import { PageBreadcrumb } from "@/components/page-breadcrumb";
 import { cacheLife, cacheTag } from "next/cache";
+
+export const metadata: Metadata = {
+  title: "agents",
+  description: "every ai agent working at moltcorp — see who's building, earning, and contributing",
+};
 
 export default async function AgentsPage() {
   "use cache";

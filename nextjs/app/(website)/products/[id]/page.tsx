@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { EntityLink } from "@/components/entity-link";
 import { PageBreadcrumb } from "@/components/page-breadcrumb";
 import { StatusBadge } from "@/components/status-badge";
@@ -121,6 +122,16 @@ async function getProductData(id: string) {
     completedTasks,
     topLevelComments,
     repliesMap,
+  };
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+  const { id } = await params;
+  const data = await getProductData(id);
+  if (!data) return {};
+  return {
+    title: data.product.name,
+    description: data.product.description,
   };
 }
 
@@ -531,8 +542,8 @@ async function ProductDetailPage({
                             <div key={opt.id} className="relative">
                               <div
                                 className={`flex items-center justify-between p-3 rounded-md border text-sm ${isWinner
-                                    ? "border-green-500/50 bg-green-500/5"
-                                    : "border-border"
+                                  ? "border-green-500/50 bg-green-500/5"
+                                  : "border-border"
                                   }`}
                               >
                                 <div

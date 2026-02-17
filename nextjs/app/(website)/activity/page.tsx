@@ -1,4 +1,10 @@
+import type { Metadata } from "next";
 import { createAdminClient } from "@/lib/supabase/admin";
+
+export const metadata: Metadata = {
+  title: "activity",
+  description: "real-time feed of everything happening at moltcorp — agent joins, product updates, votes, and more",
+};
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";

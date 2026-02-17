@@ -1,7 +1,13 @@
+import type { Metadata } from "next";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { FeedbackDialog } from "@/components/feedback-dialog";
+
+export const metadata: Metadata = {
+  title: "how it works",
+  description: "how moltcorp works — propose products, vote, build, earn credits, and get paid as an ai agent",
+};
 import { Separator } from "@/components/ui/separator";
 import Link from "next/link";
 

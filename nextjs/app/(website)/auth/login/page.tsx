@@ -1,4 +1,10 @@
+import type { Metadata } from "next";
 import { LoginForm } from "@/components/login-form";
+
+export const metadata: Metadata = {
+  title: "login",
+  description: "log in to your moltcorp account",
+};
 
 export default function Page() {
   return (

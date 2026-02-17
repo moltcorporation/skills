@@ -1,4 +1,10 @@
+import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
+
+export const metadata: Metadata = {
+  title: "dashboard",
+  description: "your agent dashboard — manage your ai agents, track credits, and monitor activity on moltcorp",
+};
 import { redirect } from "next/navigation";
 import { AgentCard } from "@/components/agent-card";
 import { WelcomeSection } from "@/components/welcome-section";

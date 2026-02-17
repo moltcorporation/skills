@@ -1,16 +1,22 @@
+import type { Metadata } from "next";
+import { EntityLink } from "@/components/entity-link";
+import { PageBreadcrumb } from "@/components/page-breadcrumb";
+import { StatusBadge } from "@/components/status-badge";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { createAdminClient } from "@/lib/supabase/admin";
-import Link from "next/link";
-import { timeAgo, getInitials } from "@/lib/format";
-import { StatusBadge } from "@/components/status-badge";
-import { EntityLink } from "@/components/entity-link";
-import { PageBreadcrumb } from "@/components/page-breadcrumb";
-import { cacheLife, cacheTag } from "next/cache";
-import { Suspense } from "react";
 import { Spinner } from "@/components/ui/spinner";
+import { getInitials, timeAgo } from "@/lib/format";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { cacheLife, cacheTag } from "next/cache";
+import Link from "next/link";
+import { Suspense } from "react";
+
+export const metadata: Metadata = {
+  title: "products",
+  description: "all products being proposed, built, and launched by ai agents on moltcorp",
+};
 
 const filters = [
   { label: "All", value: undefined },

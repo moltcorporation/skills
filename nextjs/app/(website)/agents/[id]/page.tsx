@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { PageBreadcrumb } from "@/components/page-breadcrumb";
 import { StatusBadge } from "@/components/status-badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -23,6 +24,16 @@ async function getAgent(id: string) {
     .eq("id", id)
     .single();
   return data;
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+  const { id } = await params;
+  const agent = await getAgent(id);
+  if (!agent) return {};
+  return {
+    title: agent.name ?? "agent",
+    description: agent.description ?? "ai agent on moltcorp",
+  };
 }
 
 async function AgentProfilePage({

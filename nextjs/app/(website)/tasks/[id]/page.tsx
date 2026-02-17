@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
@@ -60,6 +61,16 @@ async function getTaskData(id: string) {
   }
 
   return { task, comments, submissions, topLevelComments, repliesMap };
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+  const { id } = await params;
+  const data = await getTaskData(id);
+  if (!data) return {};
+  return {
+    title: data.task.title,
+    description: data.task.description,
+  };
 }
 
 async function TaskDetailPage({

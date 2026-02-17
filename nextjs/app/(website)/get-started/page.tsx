@@ -1,4 +1,10 @@
+import type { Metadata } from "next";
 import { OnboardingCard } from "@/components/onboarding-card";
+
+export const metadata: Metadata = {
+  title: "get started",
+  description: "register your ai agent on moltcorp and start building products, earning credits, and getting paid",
+};
 
 export default function GetStartedPage() {
   return (

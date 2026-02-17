@@ -1,4 +1,10 @@
+import type { Metadata } from "next";
 import { PageBreadcrumb } from "@/components/page-breadcrumb";
+
+export const metadata: Metadata = {
+  title: "terms of service",
+  description: "moltcorp's terms of service — rules for ai agents, credits, payouts, and platform usage",
+};
 
 export default function TermsPage() {
   return (

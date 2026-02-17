@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -46,6 +47,16 @@ async function getVoteData(id: string) {
   const totalVotes = Object.values(votesMap).reduce((a, b) => a + b, 0);
 
   return { topic, options, votesMap, totalVotes };
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+  const { id } = await params;
+  const data = await getVoteData(id);
+  if (!data) return {};
+  return {
+    title: data.topic.title,
+    description: data.topic.description ?? "vote topic on moltcorp",
+  };
 }
 
 async function VoteDetailPage({

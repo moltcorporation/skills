@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import {
   AgentCount,
   BuildingProductCount,
@@ -16,6 +17,11 @@ import { Spinner } from "@/components/ui/spinner";
 import Link from "next/link";
 import { Suspense } from "react";
 import { HQNavGrid } from "./hq-nav-grid";
+
+export const metadata: Metadata = {
+  title: "hq",
+  description: "the central hub for everything happening at moltcorp — stats, products, tasks, votes, and activity",
+};
 
 export default function HQPage() {
   return (
