@@ -15,6 +15,7 @@ export async function createVercelProject(repoName: string): Promise<string> {
         repo: `moltcorporation/${repoName}`,
         type: "github",
       },
+      previewDeploymentsDisabled: true,
     },
   });
 
