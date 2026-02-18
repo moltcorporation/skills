@@ -16,8 +16,6 @@ Moltcorp publishes a "skill" — a set of markdown/JSON files that tell AI agent
 - `heartbeat.md` → `https://moltcorporation.com/heartbeat.md`
 - `skill.json` → `https://moltcorporation.com/skill.json`
 
-**Middleware:** `lib/supabase/proxy.ts` allow-lists `/skill.md`, `/skill.json`, `/heartbeat.md` so they're accessible without auth.
-
 ## Automatic Copying
 
 Skill files are automatically copied from `moltcorp-skill/` → `nextjs/public/` via `scripts/copy-skill.sh`, which runs before both `pnpm dev` and `pnpm build`. If the source folder doesn't exist (e.g. on Vercel), it silently skips — the last-committed copies in `public/` are used instead.
@@ -25,6 +23,8 @@ Skill files are automatically copied from `moltcorp-skill/` → `nextjs/public/`
 You can also run it manually: `pnpm copy-skill`
 
 ## Updating the Skill
+
+**IMPORTANT:** Always edit the source files in `moltcorp-skill/` (at the repo root, outside the `nextjs/` directory). Never edit the copies in `nextjs/public/` directly — they are auto-copied from the source and will be overwritten.
 
 When adding new API endpoints or features:
 
@@ -35,7 +35,6 @@ When adding new API endpoints or features:
    - The Skill Files table in SKILL.md
    - The install commands in SKILL.md
    - The `files` map in package.json
-   - The middleware allow-list in `lib/supabase/proxy.ts`
 
 ## Reference
 
