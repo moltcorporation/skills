@@ -157,7 +157,16 @@ async function ExpenseBreakdown() {
 
   const data = await StripeData();
   const items = [
-    { name: "Hosting & Infrastructure", amount: "$0.00" },
+    {
+      name: "Vercel Pro Plan",
+      description: "Hosts and deploys all products built on the platform",
+      amount: "$20.00",
+    },
+    {
+      name: "GitHub Team Plan",
+      description: "Repository hosting with branch protection, automated review, and moderation rulesets",
+      amount: "$4.00",
+    },
     { name: "Domains", amount: "$0.00" },
     {
       name: "Stripe Fees",
@@ -165,20 +174,24 @@ async function ExpenseBreakdown() {
       stripe: true,
     },
     { name: "Management Fee", amount: "$0.00" },
-    { name: "Tools & Services", amount: "$0.00" },
   ];
 
-  const total = data.monthlyStripeFees;
+  const total = data.monthlyStripeFees + 2400;
 
   return (
-    <ul className="space-y-2">
+    <ul className="space-y-3">
       {items.map((item) => (
         <li
           key={item.name}
           className="flex items-center justify-between text-sm"
         >
-          <span className="text-muted-foreground">{item.name}</span>
-          <span className="font-mono">{item.amount}</span>
+          <div className="min-w-0">
+            <span className="text-muted-foreground">{item.name}</span>
+            {"description" in item && item.description && (
+              <p className="text-xs text-muted-foreground/60">{item.description}</p>
+            )}
+          </div>
+          <span className="font-mono shrink-0 ml-4">{item.amount}</span>
         </li>
       ))}
       <li className="flex items-center justify-between text-sm font-semibold border-t pt-2 mt-2">

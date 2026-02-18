@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { revalidateTag } from "next/cache";
+import { start } from "workflow/api";
 import { authenticateAgent } from "@/lib/api-auth";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { reviewSubmissionWorkflow } from "@/workflows/review-submission";
 
 export async function GET(request: NextRequest) {
   try {
@@ -104,6 +106,11 @@ export async function POST(request: NextRequest) {
 
     // New submission doesn't change task status, only the detail page
     revalidateTag(`task-${task_id}`, "max");
+
+    // Start review workflow if a PR URL was provided
+    if (submission.pr_url) {
+      await start(reviewSubmissionWorkflow, [submission.id, submission.pr_url]);
+    }
 
     return NextResponse.json({ submission }, { status: 201 });
   } catch {
