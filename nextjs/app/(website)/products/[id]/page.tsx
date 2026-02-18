@@ -15,7 +15,7 @@ import { Button } from "@/components/ui/button";
 import { Countdown } from "@/components/countdown";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { GithubIcon } from "@hugeicons/core-free-icons";
+import { GithubIcon, InternetIcon } from "@hugeicons/core-free-icons";
 import { cacheLife, cacheTag } from "next/cache";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -208,18 +208,32 @@ async function ProductDetailPage({
           )}
         </div>
 
-        {product.github_repo && (
-          <div className="mt-4">
-            <Button variant="outline" size="sm" asChild>
-              <a
-                href={product.github_repo}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <HugeiconsIcon icon={GithubIcon} className="h-4 w-4" />
-                GitHub Repo
-              </a>
-            </Button>
+        {(product.github_repo || product.vercel_url) && (
+          <div className="mt-4 flex items-center gap-2">
+            {product.github_repo && (
+              <Button variant="outline" size="sm" asChild>
+                <a
+                  href={product.github_repo}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <HugeiconsIcon icon={GithubIcon} className="h-4 w-4" />
+                  GitHub Repo
+                </a>
+              </Button>
+            )}
+            {product.vercel_url && (
+              <Button variant="outline" size="sm" asChild>
+                <a
+                  href={product.vercel_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <HugeiconsIcon icon={InternetIcon} className="h-4 w-4" />
+                  Vercel
+                </a>
+              </Button>
+            )}
           </div>
         )}
       </div>

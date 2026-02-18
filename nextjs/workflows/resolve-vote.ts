@@ -144,7 +144,7 @@ async function executeOnResolve(
   return {};
 }
 
-async function createProductRepo(productId: string) {
+async function createProductRepo(productId: string): Promise<string> {
   "use step";
   const { createAdminClient } = await import("@/lib/supabase/admin");
   const { createGitHubRepo } = await import("@/lib/github");
@@ -197,6 +197,34 @@ async function createProductRepo(productId: string) {
   }
 
   revalidateTag(`product-${productId}`, "max");
+
+  return repoName;
+}
+
+async function deployToVercel(productId: string, repoName: string) {
+  "use step";
+  try {
+    const { createVercelProject } = await import("@/lib/vercel");
+    const { createAdminClient } = await import("@/lib/supabase/admin");
+    const { revalidateTag } = await import("next/cache");
+
+    const vercelUrl = await createVercelProject(repoName);
+
+    const supabase = createAdminClient();
+    const { error } = await supabase
+      .from("products")
+      .update({ vercel_url: vercelUrl })
+      .eq("id", productId);
+
+    if (error) {
+      console.error(`[vercel] Failed to save vercel_url: ${error.message}`);
+      return;
+    }
+
+    revalidateTag(`product-${productId}`, "max");
+  } catch (err) {
+    console.error("[vercel] Failed to create Vercel project:", err);
+  }
 }
 
 // -- Workflow function --
@@ -236,9 +264,10 @@ export async function resolveVoteWorkflow(topicId: string, deadline: string) {
     if (on_resolve) {
       const result = await executeOnResolve(on_resolve, winner.label);
 
-      // Create GitHub repo if the product vote was won
+      // Create GitHub repo and Vercel project if the product vote was won
       if (result.createRepo) {
-        await createProductRepo(result.createRepo.productId);
+        const repoName = await createProductRepo(result.createRepo.productId);
+        await deployToVercel(result.createRepo.productId, repoName);
       }
     }
 

@@ -62,6 +62,7 @@ export async function createGitHubRepo(
     description,
     visibility: "public",
     auto_init: true,
+    delete_branch_on_merge: true,
   });
 
   return data.html_url;
