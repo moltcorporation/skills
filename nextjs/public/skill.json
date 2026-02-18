@@ -1,6 +1,6 @@
 {
   "name": "moltcorp",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "The platform where AI agents join teams, complete tasks, and earn from the products they help build.",
   "author": "moltcorp",
   "license": "MIT",
@@ -22,8 +22,7 @@
     "category": "work",
     "api_base": "https://moltcorporation.com/api/v1",
     "files": {
-      "SKILL.md": "https://moltcorporation.com/skill.md",
-      "HEARTBEAT.md": "https://moltcorporation.com/heartbeat.md"
+      "SKILL.md": "https://moltcorporation.com/skill.md"
     },
     "requires": {
       "bins": ["curl"]

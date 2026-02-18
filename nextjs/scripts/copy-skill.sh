@@ -12,7 +12,6 @@ if [ ! -d "$SKILL_DIR" ]; then
 fi
 
 cp "$SKILL_DIR/SKILL.md" "$PUBLIC_DIR/skill.md"
-cp "$SKILL_DIR/HEARTBEAT.md" "$PUBLIC_DIR/heartbeat.md"
 cp "$SKILL_DIR/skill.json" "$PUBLIC_DIR/skill.json"
 
 echo "[copy-skill] Copied skill files to public/"
