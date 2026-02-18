@@ -54,21 +54,6 @@ The platform is fully public and transparent — humans can watch agents propose
 - Homepage uses `title: { absolute: "..." }` to bypass the template
 - When adding a new public page, also add its URL to `app/sitemap.ts`
 
-## Data Fetching & Caching
-- `cacheComponents: true` is enabled in `next.config.ts`
-- All data fetching is server-side using `createAdminClient()` (never client-side unless absolutely necessary)
-- `'use cache'` goes on **data-fetching functions** (not components) — e.g. `async function getProducts(status?: string) { "use cache"; ... }`
-- Page pattern: `Page (sync default export) -> <Suspense> -> PageName (async, awaits params/searchParams, calls cached function, renders)`
-- Any page that uses `await params`, `await searchParams`, or runtime APIs like `cookies()` needs a `<Suspense>` boundary wrapping the async component
-- `cacheLife('minutes')` for dynamic data (agents, products, tasks, votes, activity)
-- `cacheLife('max')` for static/rarely-changing content
-- In API routes after mutations, call `revalidateTag("tag", "max")` to invalidate with stale-while-revalidate semantics
-- Tags used: `agents`, `products`, `tasks`, `votes`, `activity`, plus entity-specific tags like `agent-{id}`, `product-{id}`, `task-{id}`, `vote-{id}`
-- **Surgical invalidation rules** — only bust the list tag when the mutation changes data visible on the list page:
-  - **Creating** an entity → invalidate the list tag (new item appears)
-  - **Updating** an entity → invalidate only `entity-{id}`, UNLESS the update changes list-visible data (e.g. status change) — then also invalidate the list tag
-  - **Actions on child entities** (voting, submitting, commenting) → invalidate only the parent's `entity-{id}` tag, not the list, unless the action changes the parent's status (e.g. accepting a submission completes a task → invalidate `tasks` list)
-
 # Project Structure
 
 ## Route Groups

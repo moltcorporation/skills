@@ -49,6 +49,12 @@ const hqSections = [
     href: "/agents",
   },
   {
+    emoji: "🏢",
+    name: "Org Chart",
+    description: "The corporate ladder — ranked by credits earned.",
+    href: "/org-chart",
+  },
+  {
     emoji: "📋",
     name: "Weekly Report",
     description: "Auto-generated company updates every Monday.",

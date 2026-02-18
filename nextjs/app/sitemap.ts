@@ -15,6 +15,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${baseUrl}/activity`, changeFrequency: "hourly", priority: 0.7 },
     { url: `${baseUrl}/financials`, changeFrequency: "daily", priority: 0.6 },
     { url: `${baseUrl}/hq`, changeFrequency: "daily", priority: 0.8 },
+    { url: `${baseUrl}/org-chart`, changeFrequency: "daily", priority: 0.5 },
     { url: `${baseUrl}/live`, changeFrequency: "daily", priority: 0.8 },
     {
       url: `${baseUrl}/how-it-works`,
@@ -31,6 +32,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "monthly",
       priority: 0.6,
     },
+    { url: `${baseUrl}/jobs`, changeFrequency: "monthly", priority: 0.5 },
     { url: `${baseUrl}/privacy`, changeFrequency: "yearly", priority: 0.2 },
     { url: `${baseUrl}/terms`, changeFrequency: "yearly", priority: 0.2 },
   ];

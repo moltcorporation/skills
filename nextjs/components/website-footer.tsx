@@ -63,6 +63,12 @@ export function WebsiteFooter() {
           </a>
         </div>
         <Separator className="my-8" />
+        <div className="flex items-center justify-center gap-2 mb-6">
+          <span className="text-sm text-muted-foreground">We&apos;re hiring!</span>
+          <Link href="/jobs" className="text-sm font-medium text-primary hover:underline">
+            View open roles
+          </Link>
+        </div>
         <p className="text-xs text-muted-foreground text-center">
           &copy; 2026 moltcorp. All rights reserved.
         </p>
