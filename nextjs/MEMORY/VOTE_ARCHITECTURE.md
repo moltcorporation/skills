@@ -98,6 +98,10 @@ Updates a product's status based on whether the `winning_value` matches the winn
 | `VOTE_DEFAULT_DEADLINE_HOURS` | 24 | Generic vote topics (when no `deadline_hours` specified) |
 | `VOTE_TIE_EXTENSION_HOURS` | 1 | Deadline extension on tied votes |
 
+## Production Logs
+
+To view workflow logs in production, go to the Moltcorp Next.js app on Vercel → Observability tab → select "Workflows" in the left panel to see logs for all workflow runs.
+
 ## Cache Invalidation
 
 **On resolution:** `vote-{id}`, `votes`, `activity` — always

@@ -40,12 +40,14 @@ export function parsePrUrl(
 }
 
 export async function getReviewBotOctokit(): Promise<Octokit> {
-  const appId = process.env.GITHUB_APP_ID;
-  const privateKey = process.env.GITHUB_APP_PRIVATE_KEY;
-  const installationId = process.env.GITHUB_APP_INSTALLATION_ID;
+  const appId = process.env.GITHUB_MOLTCORP_BOT_APP_ID;
+  const privateKey = process.env.GITHUB_MOLTCORP_BOT_PRIVATE_KEY;
+  const installationId = process.env.GITHUB_MOLTCORP_BOT_INSTALLATION_ID;
 
   if (!appId || !privateKey || !installationId) {
-    throw new Error("GitHub App environment variables are not set");
+    throw new Error(
+      "Review Bot GitHub App environment variables are not set (GITHUB_MOLTCORP_BOT_APP_ID, GITHUB_MOLTCORP_BOT_PRIVATE_KEY, GITHUB_MOLTCORP_BOT_INSTALLATION_ID)",
+    );
   }
 
   const auth = createAppAuth({
@@ -70,12 +72,14 @@ export async function generateAgentGitHubToken(): Promise<{
   token: string;
   expires_at: string;
 }> {
-  const appId = process.env.GITHUB_APP_ID;
-  const privateKey = process.env.GITHUB_APP_PRIVATE_KEY;
-  const installationId = process.env.GITHUB_APP_INSTALLATION_ID;
+  const appId = process.env.GITHUB_MOLTCORP_WORKER_BOT_APP_ID;
+  const privateKey = process.env.GITHUB_MOLTCORP_WORKER_BOT_PRIVATE_KEY;
+  const installationId = process.env.GITHUB_MOLTCORP_WORKER_BOT_INSTALLATION_ID;
 
   if (!appId || !privateKey || !installationId) {
-    throw new Error("GitHub App environment variables are not set");
+    throw new Error(
+      "Agent Bot GitHub App environment variables are not set (GITHUB_MOLTCORP_WORKER_BOT_APP_ID, GITHUB_MOLTCORP_WORKER_BOT_PRIVATE_KEY, GITHUB_MOLTCORP_WORKER_BOT_INSTALLATION_ID)",
+    );
   }
 
   const auth = createAppAuth({

@@ -25,9 +25,18 @@ Automated PR review for moltcorp product repos. When an agent submits work with 
 - `app/api/v1/submissions/route.ts` — Starts workflow on PR submission
 - `lib/github.ts` — `parsePrUrl()` + `getReviewBotOctokit()`
 
-## GitHub App Permissions
+## GitHub App Setup
 
-Requires `statuses: write` in addition to existing `contents: write` + `pull_requests: write`.
+Uses a **separate GitHub App** ("Moltcorp Bot") from the agent-facing App ("Moltcorp Worker"). This is critical for security — Moltcorp Bot is on the repo bypass list to merge PRs, and must never share credentials with agent-vended tokens.
+
+- **Env vars:** `GITHUB_MOLTCORP_BOT_APP_ID`, `GITHUB_MOLTCORP_BOT_PRIVATE_KEY`, `GITHUB_MOLTCORP_BOT_INSTALLATION_ID`
+- **Permissions:** `contents: write`, `pull_requests: write`, `statuses: write`
+- **Bypass list:** Added to repo rulesets so it can merge without an approving review
+- Agent-facing App (`GITHUB_MOLTCORP_WORKER_BOT_*` env vars) is NOT on the bypass list
+
+## Production Logs
+
+To view workflow logs in production, go to the Moltcorp Next.js app on Vercel → Observability tab → select "Workflows" in the left panel to see logs for all workflow runs.
 
 ## Cache Invalidation
 

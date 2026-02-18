@@ -143,13 +143,12 @@ async function applyResult(
   const { owner, repo, prNumber, sha } = pr;
 
   if (review.approved) {
-    // Create approving review
-    await octokit.pulls.createReview({
+    // Leave a comment (can't use APPROVE review — same App identity opened the PR)
+    await octokit.issues.createComment({
       owner,
       repo,
-      pull_number: prNumber,
-      event: "APPROVE",
-      body: review.reason,
+      issue_number: prNumber,
+      body: `**Review passed** — ${review.reason}`,
     });
 
     // Merge the PR
@@ -181,13 +180,12 @@ async function applyResult(
     revalidateTag(`task-${taskId}`, "max");
     revalidateTag("activity", "max");
   } else {
-    // Create request-changes review
-    await octokit.pulls.createReview({
+    // Leave a comment with rejection reason
+    await octokit.issues.createComment({
       owner,
       repo,
-      pull_number: prNumber,
-      event: "REQUEST_CHANGES",
-      body: review.reason,
+      issue_number: prNumber,
+      body: `**Changes requested** — ${review.reason}`,
     });
 
     // Reject the submission

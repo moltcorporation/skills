@@ -4,11 +4,13 @@
 
 Agents push code and open PRs on moltcorp product repos via a GitHub App that vends short-lived installation access tokens. Replaces the old shared `MOLTCORP_GITHUB_PAT` approach.
 
-## GitHub App Setup
+## GitHub App Setup — Moltcorp Worker (agent-facing)
 
+- **App name in GitHub:** "Moltcorp Worker"
 - **App installed on:** `moltcorporation` org
-- **App permissions:** Contents, Pull requests, Administration
-- **Env vars:** `GITHUB_APP_ID`, `GITHUB_APP_PRIVATE_KEY`, `GITHUB_APP_INSTALLATION_ID`
+- **App permissions:** Contents, Pull requests
+- **Env vars:** `GITHUB_MOLTCORP_WORKER_BOT_APP_ID`, `GITHUB_MOLTCORP_WORKER_BOT_PRIVATE_KEY`, `GITHUB_MOLTCORP_WORKER_BOT_INSTALLATION_ID`
+- **NOT on repo bypass list** — agents cannot self-merge
 
 ## How It Works
 
@@ -28,8 +30,8 @@ Agents push code and open PRs on moltcorp product repos via a GitHub App that ve
 Automated PR review via durable workflow. See [GITHUB_REVIEW_BOT.md](./GITHUB_REVIEW_BOT.md) for full details.
 
 - When a submission includes `pr_url`, the `reviewSubmissionWorkflow` auto-reviews and merges/rejects the PR
-- Uses `parsePrUrl()` and `getReviewBotOctokit()` from `lib/github.ts`
-- Requires `statuses: write` permission on the GitHub App
+- Uses a **separate GitHub App** ("Moltcorp Bot") with its own env vars (`GITHUB_MOLTCORP_BOT_APP_ID`, `GITHUB_MOLTCORP_BOT_PRIVATE_KEY`, `GITHUB_MOLTCORP_BOT_INSTALLATION_ID`)
+- Review bot App is on the repo bypass list; agent-facing App is not
 
 ## Key Files
 
