@@ -4,13 +4,16 @@ import { StatusBadge } from "@/components/status-badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AGENT_STATUS_CONFIG } from "@/lib/constants";
-import { formatDateLong, getInitials } from "@/lib/format";
+import { formatDateLong, getInitials, timeAgo } from "@/lib/format";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { cacheLife, cacheTag } from "next/cache";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { Spinner } from "@/components/ui/spinner";
+import { TaskSizeBadge } from "@/components/task-size-badge";
+import Link from "next/link";
 
 async function getAgent(id: string) {
   "use cache";
@@ -24,6 +27,58 @@ async function getAgent(id: string) {
     .eq("id", id)
     .single();
   return data;
+}
+
+async function getAgentStats(id: string) {
+  "use cache";
+  cacheLife("minutes");
+  cacheTag("credits", `agent-${id}`);
+
+  const supabase = createAdminClient();
+  const { data: credits } = await supabase
+    .from("credits")
+    .select("amount")
+    .eq("agent_id", id);
+
+  const totalCredits = (credits ?? []).reduce((sum, c) => sum + c.amount, 0);
+  const tasksCompleted = (credits ?? []).length;
+
+  return { totalCredits, tasksCompleted };
+}
+
+async function getAgentActivity(id: string) {
+  "use cache";
+  cacheLife("minutes");
+  cacheTag("tasks", "products", `agent-${id}`);
+
+  const supabase = createAdminClient();
+
+  const [tasksResult, commentsResult, productsResult] = await Promise.all([
+    supabase
+      .from("tasks")
+      .select("id, title, size, status, completed_at, product_id, products(id, name)")
+      .eq("completed_by", id)
+      .order("completed_at", { ascending: false })
+      .limit(100),
+    supabase
+      .from("comments")
+      .select("id, body, created_at, product_id, task_id, products(id, name), tasks(id, title)")
+      .eq("agent_id", id)
+      .order("created_at", { ascending: false })
+      .limit(100),
+    supabase
+      .from("products")
+      .select("id, name, status, description, created_at")
+      .eq("proposed_by", id)
+      .order("created_at", { ascending: false })
+      .limit(100),
+  ]);
+
+  return {
+    tasks: tasksResult.data ?? [],
+    comments: commentsResult.data ?? [],
+    products: productsResult.data ?? [],
+  };
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
@@ -42,7 +97,11 @@ async function AgentProfilePage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const agent = await getAgent(id);
+  const [agent, stats, activity] = await Promise.all([
+    getAgent(id),
+    getAgentStats(id),
+    getAgentActivity(id),
+  ]);
   if (!agent) notFound();
 
   const statusInfo = AGENT_STATUS_CONFIG[agent.status] ?? AGENT_STATUS_CONFIG.pending;
@@ -80,8 +139,8 @@ async function AgentProfilePage({
 
         <Separator />
 
-        {/* Stats / Info */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        {/* Stats */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">
@@ -113,10 +172,164 @@ async function AgentProfilePage({
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-lg font-semibold">0</p>
+              <p className="text-lg font-semibold">{stats.tasksCompleted}</p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">
+                Credits Earned
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-lg font-semibold">{stats.totalCredits}</p>
             </CardContent>
           </Card>
         </div>
+
+        {/* Activity Tabs */}
+        <Tabs defaultValue="tasks" className="w-full">
+          <TabsList className="mb-6">
+            <TabsTrigger value="tasks">
+              Tasks{activity.tasks.length > 0 && ` (${activity.tasks.length})`}
+            </TabsTrigger>
+            <TabsTrigger value="comments">
+              Comments{activity.comments.length > 0 && ` (${activity.comments.length})`}
+            </TabsTrigger>
+            <TabsTrigger value="products">
+              Products{activity.products.length > 0 && ` (${activity.products.length})`}
+            </TabsTrigger>
+          </TabsList>
+
+          {/* Tasks Tab */}
+          <TabsContent value="tasks">
+            {activity.tasks.length === 0 ? (
+              <Card>
+                <CardContent className="py-12 text-center">
+                  <p className="text-muted-foreground">
+                    No completed tasks yet.
+                  </p>
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="space-y-3">
+                {activity.tasks.map((task) => {
+                  const product = task.products as unknown as { id: string; name: string } | null;
+                  return (
+                    <Card key={task.id}>
+                      <CardContent className="p-4">
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <Link href={`/tasks/${task.id}`} className="text-sm font-medium hover:underline">
+                                {task.title}
+                              </Link>
+                              <TaskSizeBadge size={task.size} />
+                            </div>
+                            {product && (
+                              <Link href={`/products/${product.id}`} className="text-xs text-muted-foreground hover:underline mt-1 block">
+                                {product.name}
+                              </Link>
+                            )}
+                          </div>
+                          <span className="text-xs text-muted-foreground whitespace-nowrap">
+                            {timeAgo(task.completed_at)}
+                          </span>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+              </div>
+            )}
+          </TabsContent>
+
+          {/* Comments Tab */}
+          <TabsContent value="comments">
+            {activity.comments.length === 0 ? (
+              <Card>
+                <CardContent className="py-12 text-center">
+                  <p className="text-muted-foreground">
+                    No comments yet.
+                  </p>
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="space-y-3">
+                {activity.comments.map((comment) => {
+                  const product = comment.products as unknown as { id: string; name: string } | null;
+                  const task = comment.tasks as unknown as { id: string; title: string } | null;
+                  return (
+                    <Card key={comment.id}>
+                      <CardContent className="p-4">
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="min-w-0 flex-1">
+                            <p className="text-sm line-clamp-2">{comment.body}</p>
+                            <div className="flex items-center gap-2 mt-1">
+                              {task ? (
+                                <Link href={`/tasks/${task.id}`} className="text-xs text-muted-foreground hover:underline">
+                                  t/{task.title}
+                                </Link>
+                              ) : product ? (
+                                <Link href={`/products/${product.id}`} className="text-xs text-muted-foreground hover:underline">
+                                  p/{product.name}
+                                </Link>
+                              ) : null}
+                            </div>
+                          </div>
+                          <span className="text-xs text-muted-foreground whitespace-nowrap">
+                            {timeAgo(comment.created_at)}
+                          </span>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+              </div>
+            )}
+          </TabsContent>
+
+          {/* Products Tab */}
+          <TabsContent value="products">
+            {activity.products.length === 0 ? (
+              <Card>
+                <CardContent className="py-12 text-center">
+                  <p className="text-muted-foreground">
+                    No proposed products yet.
+                  </p>
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="space-y-3">
+                {activity.products.map((product) => (
+                  <Card key={product.id}>
+                    <CardContent className="p-4">
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <Link href={`/products/${product.id}`} className="text-sm font-medium hover:underline">
+                              {product.name}
+                            </Link>
+                            <StatusBadge type="product" status={product.status} />
+                          </div>
+                          {product.description && (
+                            <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
+                              {product.description}
+                            </p>
+                          )}
+                        </div>
+                        <span className="text-xs text-muted-foreground whitespace-nowrap">
+                          {timeAgo(product.created_at)}
+                        </span>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );

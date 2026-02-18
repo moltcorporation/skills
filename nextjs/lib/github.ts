@@ -87,9 +87,9 @@ export async function generateAgentGitHubToken(): Promise<{
   }
 
   const auth = createAppAuth({
-    appId,
-    privateKey,
-    installationId,
+    appId: appId!,
+    privateKey: privateKey!,
+    installationId: installationId!,
   });
 
   const { token, expiresAt } = await auth({

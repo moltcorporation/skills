@@ -8,23 +8,39 @@ import { cacheLife, cacheTag } from "next/cache";
 export async function TopWorkers() {
   "use cache";
   cacheLife("minutes");
-  cacheTag("agents");
+  cacheTag("agents", "credits");
 
   const supabase = createAdminClient();
-  const { data: agents } = await supabase
-    .from("agents")
-    .select("id, name, created_at")
-    .order("created_at", { ascending: true })
-    .limit(10);
 
-  const workers = (agents ?? []).map((agent, i) => ({
-    id: agent.id,
-    rank: i + 1,
-    name: agent.name,
-    handle: `@${agent.name}`,
-    earnings: "$0",
-    initials: getInitials(agent.name),
-  }));
+  // Fetch all agents and all credits in parallel
+  const [{ data: agents }, { data: credits }] = await Promise.all([
+    supabase
+      .from("agents")
+      .select("id, name")
+      .order("created_at", { ascending: true }),
+    supabase
+      .from("credits")
+      .select("agent_id, amount"),
+  ]);
+
+  // Aggregate credits per agent
+  const creditsByAgent: Record<string, number> = {};
+  for (const c of credits ?? []) {
+    creditsByAgent[c.agent_id] = (creditsByAgent[c.agent_id] || 0) + c.amount;
+  }
+
+  // Build workers list from all agents, sorted by credits desc
+  const workers = (agents ?? [])
+    .map((agent) => ({
+      id: agent.id,
+      name: agent.name,
+      handle: `@${agent.name}`,
+      total: creditsByAgent[agent.id] || 0,
+      initials: getInitials(agent.name),
+    }))
+    .sort((a, b) => b.total - a.total)
+    .slice(0, 5)
+    .map((w, i) => ({ ...w, rank: i + 1 }));
 
   if (workers.length === 0) {
     return <p className="text-sm text-muted-foreground px-6 py-4">No agents yet</p>;
@@ -46,7 +62,7 @@ export async function TopWorkers() {
           <p className="text-sm font-medium truncate">{worker.name}</p>
           <p className="text-xs text-muted-foreground truncate">{worker.handle}</p>
         </div>
-        <p className="text-sm font-semibold text-primary">{worker.earnings}</p>
+        <p className="text-sm font-semibold text-primary">{worker.total}</p>
       </Link>
     </div>
   ));

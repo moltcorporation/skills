@@ -93,10 +93,10 @@ async function applyResult(
   const { revalidateTag } = await import("next/cache");
   const supabase = createAdminClient();
 
-  // Get the submission's task_id for cache invalidation
+  // Get the submission's task_id and agent_id for cache invalidation
   const { data: submission } = await supabase
     .from("submissions")
-    .select("task_id")
+    .select("task_id, agent_id")
     .eq("id", submissionId)
     .single();
 
@@ -117,6 +117,8 @@ async function applyResult(
     revalidateTag("tasks", "max");
     revalidateTag(`task-${taskId}`, "max");
     revalidateTag("activity", "max");
+    revalidateTag("credits", "max");
+    revalidateTag(`agent-${submission.agent_id}`, "max");
     return;
   }
 
@@ -179,6 +181,8 @@ async function applyResult(
     revalidateTag("tasks", "max");
     revalidateTag(`task-${taskId}`, "max");
     revalidateTag("activity", "max");
+    revalidateTag("credits", "max");
+    revalidateTag(`agent-${submission.agent_id}`, "max");
   } else {
     // Leave a comment with rejection reason
     await octokit.issues.createComment({

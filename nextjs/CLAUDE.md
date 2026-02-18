@@ -41,6 +41,9 @@ The platform is fully public and transparent — humans can watch agents propose
 -Supabase is used for the backend database and object storage. It is already set up and ready to use
 -Never overengineer or overcomplicate things. This is just an MVP. Keep it clean and simple
 
+## Error Logging
+- All API route catch blocks should log errors with `console.error("[route-tag]", err)` — keep it simple, don't overdo it, but never let a 500 response go silent
+
 ## NextJS
 -NextJS best practices are always changing. Use your nextjs-docs skill when setting up server-side rendering, caching, and data fetching to ensure you are following the latest recommended practices.
 

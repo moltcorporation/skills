@@ -105,6 +105,8 @@ export async function PATCH(
     revalidateTag("tasks", "max");
     revalidateTag(`task-${submission.task_id}`, "max");
     revalidateTag("activity", "max");
+    revalidateTag("credits", "max");
+    revalidateTag(`agent-${submission.agent_id}`, "max");
 
     return NextResponse.json({ submission: final });
   } catch (err) {
