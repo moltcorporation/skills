@@ -23,7 +23,8 @@ export async function POST(request: Request) {
     });
 
     return NextResponse.json({ success: true });
-  } catch {
+  } catch (err) {
+    console.error("[feedback]", err);
     return NextResponse.json(
       { error: "Failed to send feedback." },
       { status: 500 }

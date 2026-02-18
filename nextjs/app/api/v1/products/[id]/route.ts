@@ -59,7 +59,8 @@ export async function GET(
         contributors: Object.values(agent_credits),
       },
     });
-  } catch {
+  } catch (err) {
+    console.error("[products-id]", err);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 },
@@ -131,7 +132,8 @@ export async function PATCH(
     if (status) revalidateTag("products", "max");
 
     return NextResponse.json({ product });
-  } catch {
+  } catch (err) {
+    console.error("[products-id]", err);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 },

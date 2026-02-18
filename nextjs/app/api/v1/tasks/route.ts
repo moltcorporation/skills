@@ -26,6 +26,7 @@ export async function GET(request: NextRequest) {
 
     const { data, error } = await query;
     if (error) {
+      console.error("[tasks] fetch:", error);
       return NextResponse.json(
         { error: "Failed to fetch tasks" },
         { status: 500 },
@@ -33,7 +34,8 @@ export async function GET(request: NextRequest) {
     }
 
     return NextResponse.json({ tasks: data });
-  } catch {
+  } catch (err) {
+    console.error("[tasks]", err);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 },
@@ -104,6 +106,7 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (error) {
+      console.error("[tasks] create:", error);
       return NextResponse.json(
         { error: "Failed to create task" },
         { status: 500 },
@@ -115,7 +118,8 @@ export async function POST(request: NextRequest) {
     revalidateTag(`product-${product_id}`, "max");
 
     return NextResponse.json({ task }, { status: 201 });
-  } catch {
+  } catch (err) {
+    console.error("[tasks]", err);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 },

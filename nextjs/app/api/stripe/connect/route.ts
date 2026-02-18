@@ -58,7 +58,8 @@ export async function POST() {
     });
 
     return NextResponse.json({ url: accountLink.url });
-  } catch {
+  } catch (err) {
+    console.error("[stripe-connect]", err);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 },

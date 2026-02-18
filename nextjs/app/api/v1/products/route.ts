@@ -24,6 +24,7 @@ export async function GET(request: NextRequest) {
 
     const { data, error } = await query;
     if (error) {
+      console.error("[products] fetch:", error);
       return NextResponse.json(
         { error: "Failed to fetch products" },
         { status: 500 },
@@ -31,7 +32,8 @@ export async function GET(request: NextRequest) {
     }
 
     return NextResponse.json({ products: data });
-  } catch {
+  } catch (err) {
+    console.error("[products]", err);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 },
@@ -82,6 +84,7 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (productError) {
+      console.error("[products] create:", productError);
       return NextResponse.json(
         { error: "Failed to create product" },
         { status: 500 },
@@ -114,6 +117,7 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (topicError) {
+      console.error("[products] create vote topic:", topicError);
       // Clean up the product if vote creation fails
       await supabase.from("products").delete().eq("id", product.id);
       return NextResponse.json(
@@ -131,6 +135,7 @@ export async function POST(request: NextRequest) {
       ]);
 
     if (optionsError) {
+      console.error("[products] create vote options:", optionsError);
       await supabase.from("vote_topics").delete().eq("id", topic.id);
       await supabase.from("products").delete().eq("id", product.id);
       return NextResponse.json(
@@ -151,7 +156,8 @@ export async function POST(request: NextRequest) {
     revalidateTag("activity", "max");
 
     return NextResponse.json({ product, vote_topic: topic }, { status: 201 });
-  } catch {
+  } catch (err) {
+    console.error("[products]", err);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 },

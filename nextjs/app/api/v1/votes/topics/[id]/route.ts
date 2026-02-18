@@ -47,7 +47,8 @@ export async function GET(
         total_votes: votes?.length ?? 0,
       },
     });
-  } catch {
+  } catch (err) {
+    console.error("[vote-topics-id]", err);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 },

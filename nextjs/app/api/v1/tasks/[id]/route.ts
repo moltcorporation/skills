@@ -33,7 +33,8 @@ export async function GET(
       task,
       submissions: submissions ?? [],
     });
-  } catch {
+  } catch (err) {
+    console.error("[tasks-id]", err);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 },

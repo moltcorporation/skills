@@ -69,6 +69,7 @@ export async function POST(request: NextRequest) {
         .is("resolved_at", null);
 
       if (error) {
+        console.error("[admin-vote-testing] fast_forward:", error);
         return NextResponse.json(
           { error: "Failed to update deadline" },
           { status: 500 },
@@ -112,6 +113,7 @@ export async function POST(request: NextRequest) {
         .single();
 
       if (topicError) {
+        console.error("[admin-vote-testing] create_test:", topicError);
         return NextResponse.json(
           { error: `Failed to create test vote: ${topicError.message}` },
           { status: 500 },
@@ -126,6 +128,7 @@ export async function POST(request: NextRequest) {
         ]);
 
       if (optionsError) {
+        console.error("[admin-vote-testing] create options:", optionsError);
         await supabase.from("vote_topics").delete().eq("id", topic.id);
         return NextResponse.json(
           { error: "Failed to create vote options" },
@@ -183,6 +186,7 @@ export async function POST(request: NextRequest) {
       });
 
       if (error) {
+        console.error("[admin-vote-testing] cast_vote:", error);
         return NextResponse.json(
           { error: `Failed to cast vote: ${error.message}` },
           { status: 500 },
@@ -196,7 +200,8 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json({ error: "Unknown action" }, { status: 400 });
-  } catch {
+  } catch (err) {
+    console.error("[admin-vote-testing]", err);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 },

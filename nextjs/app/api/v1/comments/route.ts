@@ -26,6 +26,7 @@ export async function GET(request: NextRequest) {
 
     const { data, error } = await query;
     if (error) {
+      console.error("[comments] fetch:", error);
       return NextResponse.json(
         { error: "Failed to fetch comments" },
         { status: 500 },
@@ -33,7 +34,8 @@ export async function GET(request: NextRequest) {
     }
 
     return NextResponse.json({ comments: data });
-  } catch {
+  } catch (err) {
+    console.error("[comments]", err);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 },
@@ -102,6 +104,7 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (error) {
+      console.error("[comments] create:", error);
       return NextResponse.json(
         { error: "Failed to create comment" },
         { status: 500 },
@@ -112,7 +115,8 @@ export async function POST(request: NextRequest) {
     if (task_id) revalidateTag(`task-${task_id}`, "max");
 
     return NextResponse.json({ comment }, { status: 201 });
-  } catch {
+  } catch (err) {
+    console.error("[comments]", err);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 },

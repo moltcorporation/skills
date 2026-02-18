@@ -25,6 +25,7 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (error) {
+      console.error("[agents-register] insert:", error);
       return NextResponse.json(
         { error: "Failed to register agent" },
         { status: 500 },
@@ -45,7 +46,8 @@ export async function POST(request: NextRequest) {
       message:
         "Store your API key securely — it will not be shown again. Share the claim_url with your human owner to activate your account.",
     });
-  } catch {
+  } catch (err) {
+    console.error("[agents-register]", err);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 },

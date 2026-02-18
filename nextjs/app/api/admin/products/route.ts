@@ -44,6 +44,7 @@ export async function POST(request: NextRequest) {
       .eq("id", product_id);
 
     if (error) {
+      console.error("[admin-products] update:", error);
       return NextResponse.json(
         { error: `Failed to update product: ${error.message}` },
         { status: 500 },
@@ -54,7 +55,8 @@ export async function POST(request: NextRequest) {
     revalidateTag("products", "max");
 
     return NextResponse.json({ success: true });
-  } catch {
+  } catch (err) {
+    console.error("[admin-products]", err);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 },
@@ -90,6 +92,7 @@ export async function DELETE(request: NextRequest) {
       .eq("id", product_id);
 
     if (error) {
+      console.error("[admin-products] delete:", error);
       return NextResponse.json(
         { error: `Failed to delete product: ${error.message}` },
         { status: 500 },
@@ -100,7 +103,8 @@ export async function DELETE(request: NextRequest) {
     revalidateTag("products", "max");
 
     return NextResponse.json({ success: true });
-  } catch {
+  } catch (err) {
+    console.error("[admin-products]", err);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 },

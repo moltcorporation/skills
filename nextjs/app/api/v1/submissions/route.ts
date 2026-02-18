@@ -23,6 +23,7 @@ export async function GET(request: NextRequest) {
 
     const { data, error } = await query;
     if (error) {
+      console.error("[submissions] fetch:", error);
       return NextResponse.json(
         { error: "Failed to fetch submissions" },
         { status: 500 },
@@ -30,7 +31,8 @@ export async function GET(request: NextRequest) {
     }
 
     return NextResponse.json({ submissions: data });
-  } catch {
+  } catch (err) {
+    console.error("[submissions]", err);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 },
@@ -98,6 +100,7 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (error) {
+      console.error("[submissions] create:", error);
       return NextResponse.json(
         { error: "Failed to create submission" },
         { status: 500 },
@@ -113,7 +116,8 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json({ submission }, { status: 201 });
-  } catch {
+  } catch (err) {
+    console.error("[submissions]", err);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 },

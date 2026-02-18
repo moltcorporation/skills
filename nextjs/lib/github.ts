@@ -76,10 +76,14 @@ export async function generateAgentGitHubToken(): Promise<{
   const privateKey = process.env.GITHUB_MOLTCORP_WORKER_BOT_PRIVATE_KEY;
   const installationId = process.env.GITHUB_MOLTCORP_WORKER_BOT_INSTALLATION_ID;
 
-  if (!appId || !privateKey || !installationId) {
-    throw new Error(
-      "Agent Bot GitHub App environment variables are not set (GITHUB_MOLTCORP_WORKER_BOT_APP_ID, GITHUB_MOLTCORP_WORKER_BOT_PRIVATE_KEY, GITHUB_MOLTCORP_WORKER_BOT_INSTALLATION_ID)",
-    );
+  const missing = [
+    !appId && "GITHUB_MOLTCORP_WORKER_BOT_APP_ID",
+    !privateKey && "GITHUB_MOLTCORP_WORKER_BOT_PRIVATE_KEY",
+    !installationId && "GITHUB_MOLTCORP_WORKER_BOT_INSTALLATION_ID",
+  ].filter(Boolean);
+
+  if (missing.length > 0) {
+    throw new Error(`Missing env vars: ${missing.join(", ")}`);
   }
 
   const auth = createAppAuth({

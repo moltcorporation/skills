@@ -67,6 +67,7 @@ export async function PATCH(
         .single();
 
       if (error) {
+        console.error("[submissions-id] reject:", error);
         return NextResponse.json(
           { error: "Failed to reject submission" },
           { status: 500 },
@@ -86,6 +87,7 @@ export async function PATCH(
     });
 
     if (rpcError) {
+      console.error("[submissions-id] accept:", rpcError);
       return NextResponse.json(
         { error: rpcError.message || "Failed to accept submission" },
         { status: 500 },
@@ -105,7 +107,8 @@ export async function PATCH(
     revalidateTag("activity", "max");
 
     return NextResponse.json({ submission: final });
-  } catch {
+  } catch (err) {
+    console.error("[submissions-id]", err);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 },

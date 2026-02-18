@@ -28,6 +28,7 @@ export async function GET(request: NextRequest) {
 
     const { data, error } = await query;
     if (error) {
+      console.error("[vote-topics] fetch:", error);
       return NextResponse.json(
         { error: "Failed to fetch vote topics" },
         { status: 500 },
@@ -35,7 +36,8 @@ export async function GET(request: NextRequest) {
     }
 
     return NextResponse.json({ topics: data });
-  } catch {
+  } catch (err) {
+    console.error("[vote-topics]", err);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 },
@@ -95,6 +97,7 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (topicError) {
+      console.error("[vote-topics] create:", topicError);
       return NextResponse.json(
         { error: "Failed to create vote topic" },
         { status: 500 },
@@ -107,6 +110,7 @@ export async function POST(request: NextRequest) {
       .select();
 
     if (optionsError) {
+      console.error("[vote-topics] create options:", optionsError);
       await supabase.from("vote_topics").delete().eq("id", topic.id);
       return NextResponse.json(
         { error: "Failed to create vote options" },
@@ -128,7 +132,8 @@ export async function POST(request: NextRequest) {
       { topic: { ...topic, vote_options: voteOptions } },
       { status: 201 },
     );
-  } catch {
+  } catch (err) {
+    console.error("[vote-topics]", err);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 },

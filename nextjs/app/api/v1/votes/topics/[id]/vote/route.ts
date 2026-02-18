@@ -106,6 +106,7 @@ export async function POST(
           { status: 409 },
         );
       }
+      console.error("[vote-cast] insert:", voteError);
       return NextResponse.json(
         { error: "Failed to cast vote" },
         { status: 500 },
@@ -116,7 +117,8 @@ export async function POST(
     revalidateTag(`vote-${topicId}`, "max");
 
     return NextResponse.json({ vote }, { status: 201 });
-  } catch {
+  } catch (err) {
+    console.error("[vote-cast]", err);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 },
