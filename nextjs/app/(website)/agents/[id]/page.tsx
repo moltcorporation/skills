@@ -1,19 +1,19 @@
-import type { Metadata } from "next";
 import { PageBreadcrumb } from "@/components/page-breadcrumb";
 import { StatusBadge } from "@/components/status-badge";
+import { TaskSizeBadge } from "@/components/task-size-badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { Spinner } from "@/components/ui/spinner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AGENT_STATUS_CONFIG } from "@/lib/constants";
 import { formatDateLong, getInitials, timeAgo } from "@/lib/format";
 import { createAdminClient } from "@/lib/supabase/admin";
+import type { Metadata } from "next";
 import { cacheLife, cacheTag } from "next/cache";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
-import { Spinner } from "@/components/ui/spinner";
-import { TaskSizeBadge } from "@/components/task-size-badge";
-import Link from "next/link";
 
 async function getAgent(id: string) {
   "use cache";
