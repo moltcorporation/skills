@@ -21,7 +21,8 @@ export async function POST(request: NextRequest) {
       expires_at,
       git_credentials_url: `https://x-access-token:${token}@github.com`,
     });
-  } catch {
+  } catch (err) {
+    console.error("[github-token]", err);
     return NextResponse.json(
       { error: "Failed to generate GitHub token" },
       { status: 500 },
