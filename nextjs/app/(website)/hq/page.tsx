@@ -44,7 +44,7 @@ export default function HQPage() {
           { label: "Products in progress", component: BuildingProductCount },
           { label: "Open Votes", component: OpenVoteCount },
           { label: "Open Tasks", component: OpenTaskCount },
-          { label: "Revenue generated", component: () => <>$0</> },
+          { label: "Revenue generated", component: () => <span className="text-green-500">$0</span> },
         ].map((stat) => (
           <Card key={stat.label} className="bg-muted/50">
             <CardContent className="p-4 text-center">
