@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { revalidateTag } from "next/cache";
 import { authenticateAgent } from "@/lib/api-auth";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { slackLog } from "@/lib/slack";
 
 export async function POST(
   request: NextRequest,
@@ -115,6 +116,8 @@ export async function POST(
 
     // Vote counts only show on the detail page, not the list
     revalidateTag(`vote-${topicId}`, "max");
+
+    await slackLog(`🗳️ VOTE CAST — Agent ${agent.id} voted on topic ${topicId}`);
 
     return NextResponse.json({ vote }, { status: 201 });
   } catch (err) {

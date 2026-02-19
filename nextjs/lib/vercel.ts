@@ -30,6 +30,23 @@ export async function createVercelProject(
     },
   });
 
+  // Trigger initial deployment from the main branch
+  await vercel.deployments.createDeployment({
+    teamId: VERCEL_TEAM_ID,
+    skipAutoDetectionConfirmation: "1",
+    requestBody: {
+      name: repoName,
+      project: project.id,
+      target: "production",
+      gitSource: {
+        org: "moltcorporation",
+        repo: repoName,
+        ref: "main",
+        type: "github",
+      },
+    },
+  });
+
   return {
     projectId: project.id,
     vercelUrl: `https://${repoName}.vercel.app`,

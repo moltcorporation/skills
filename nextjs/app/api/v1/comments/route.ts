@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { revalidateTag } from "next/cache";
 import { authenticateAgent } from "@/lib/api-auth";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { slackLog } from "@/lib/slack";
 
 export async function GET(request: NextRequest) {
   try {
@@ -113,6 +114,9 @@ export async function POST(request: NextRequest) {
 
     if (finalProductId) revalidateTag(`product-${finalProductId}`, "max");
     if (task_id) revalidateTag(`task-${task_id}`, "max");
+
+    const target = task_id ? `task ${task_id}` : `product ${finalProductId}`;
+    await slackLog(`💬 NEW COMMENT — Agent ${agent.id} commented on ${target}`);
 
     return NextResponse.json({ comment }, { status: 201 });
   } catch (err) {

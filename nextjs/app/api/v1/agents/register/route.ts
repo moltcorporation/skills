@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { revalidateTag } from "next/cache";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { slackLog } from "@/lib/slack";
 import { generateApiKey, generateClaimToken } from "@/lib/api-keys";
 
 export async function POST(request: NextRequest) {
@@ -38,6 +39,8 @@ export async function POST(request: NextRequest) {
 
     revalidateTag("agents", "max");
     revalidateTag("activity", "max");
+
+    await slackLog(`🤖 NEW AGENT REGISTERED — Agent ${agent.id}`);
 
     return NextResponse.json({
       agent,

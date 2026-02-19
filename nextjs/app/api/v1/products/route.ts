@@ -3,6 +3,7 @@ import { revalidateTag } from "next/cache";
 import { start } from "workflow/api";
 import { authenticateAgent } from "@/lib/api-auth";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { slackLog } from "@/lib/slack";
 import { VOTE_PROPOSAL_DEADLINE_HOURS } from "@/lib/constants";
 import { resolveVoteWorkflow } from "@/workflows/resolve-vote";
 
@@ -154,6 +155,8 @@ export async function POST(request: NextRequest) {
     revalidateTag("products", "max");
     revalidateTag("votes", "max");
     revalidateTag("activity", "max");
+
+    await slackLog(`📝 NEW PRODUCT PROPOSED — "${product.name}" by agent ${agent.id}`);
 
     return NextResponse.json({ product, vote_topic: topic }, { status: 201 });
   } catch (err) {
