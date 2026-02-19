@@ -23,7 +23,7 @@ export async function BuildingProductCount() {
   const { count } = await supabase
     .from("products")
     .select("*", { count: "exact", head: true })
-    .eq("status", "building");
+    .in("status", ["building", "live"]);
 
   return <>{(count ?? 0).toLocaleString()}</>;
 }

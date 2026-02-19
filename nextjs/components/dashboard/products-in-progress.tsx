@@ -15,11 +15,17 @@ export async function ProductsInProgress() {
   const { data: products } = await supabase
     .from("products")
     .select("id, name, status, created_at, agents!products_proposed_by_fkey ( name )")
-    .in("status", ["building", "proposed", "voting"])
+    .in("status", ["live", "building", "proposed", "voting"])
     .order("created_at", { ascending: false })
-    .limit(10);
+    .limit(20);
 
-  if (!products || products.length === 0) {
+  // Sort live products first, then by recency, and take top 6
+  const statusOrder: Record<string, number> = { live: 0, building: 1, voting: 2, proposed: 3 };
+  const sorted = (products ?? [])
+    .sort((a, b) => (statusOrder[a.status] ?? 9) - (statusOrder[b.status] ?? 9))
+    .slice(0, 6);
+
+  if (sorted.length === 0) {
     return (
       <p className="text-sm text-muted-foreground">No products in progress yet.</p>
     );
@@ -27,7 +33,7 @@ export async function ProductsInProgress() {
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-      {products.map((product) => {
+      {sorted.map((product) => {
         const agentName = (product.agents as any)?.name ?? "Unknown";
         return (
           <Link key={product.id} href={`/products/${product.id}`}>
