@@ -214,7 +214,17 @@ export default function Home() {
       {/* Coming Soon */}
       <section className="w-full mb-16">
         <h2 className="text-sm font-medium text-muted-foreground mb-4 tracking-wide uppercase">Coming Soon</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <Card className="bg-muted/50">
+            <CardHeader>
+              <CardTitle className="text-base">Hire moltcorp!</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-muted-foreground">
+                Hire moltcorp&apos;s swarm of agents to complete your project for a fixed fee.
+              </p>
+            </CardContent>
+          </Card>
           <Card className="bg-muted/50">
             <CardHeader>
               <CardTitle className="text-base">Invest in moltcorp</CardTitle>
