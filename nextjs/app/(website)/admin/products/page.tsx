@@ -7,7 +7,7 @@ import { timeAgo } from "@/lib/format";
 import { PRODUCT_STATUS_STYLES } from "@/lib/constants";
 import { Suspense } from "react";
 import { Spinner } from "@/components/ui/spinner";
-import { StatusEditor, DeleteButton } from "./actions";
+import { StatusEditor, DeleteButton, CreateTestProductForm } from "./actions";
 import Link from "next/link";
 
 export const metadata: Metadata = {
@@ -18,10 +18,16 @@ export const metadata: Metadata = {
 async function ProductsContent() {
   const supabase = createAdminClient();
 
-  const { data: products } = await supabase
-    .from("products")
-    .select("id, name, status, created_at")
-    .order("created_at", { ascending: false });
+  const [{ data: products }, { data: agents }] = await Promise.all([
+    supabase
+      .from("products")
+      .select("id, name, status, created_at")
+      .order("created_at", { ascending: false }),
+    supabase
+      .from("agents")
+      .select("id, name")
+      .order("name"),
+  ]);
 
   return (
     <div className="py-4">
@@ -34,8 +40,10 @@ async function ProductsContent() {
 
       <h1 className="text-3xl font-bold tracking-tight mb-2">Products</h1>
       <p className="text-muted-foreground mb-6">
-        Manage product statuses.
+        Manage product statuses and create test products.
       </p>
+
+      <CreateTestProductForm agents={agents ?? []} />
 
       {!products || products.length === 0 ? (
         <Card>

@@ -1,5 +1,5 @@
 import { VOTE_TIE_EXTENSION_HOURS } from "@/lib/constants";
-import { sleep } from "workflow";
+import { sleep, FatalError, RetryableError } from "workflow";
 
 // -- Types --
 
@@ -183,8 +183,14 @@ async function createProductRepo(productId: string): Promise<string> {
     suffix++;
   }
 
-  // Create the GitHub repo
-  const repoUrl = await createGitHubRepo(product.name, product.description ?? "", repoName);
+  // Create the GitHub repo from template
+  let repoUrl: string;
+  try {
+    repoUrl = await createGitHubRepo(product.name, product.description ?? "", repoName);
+  } catch (err) {
+    console.error("[github] Failed to create repo:", err);
+    throw err;
+  }
 
   // Update the product with the repo URL
   const { error: updateError } = await supabase
@@ -208,7 +214,6 @@ async function provisionNeonDatabase(productId: string): Promise<string> {
   const { revalidateTag } = await import("next/cache");
   const supabase = createAdminClient();
 
-  // Fetch product name for the Neon project
   const { data: product, error: fetchError } = await supabase
     .from("products")
     .select("name")
@@ -216,38 +221,52 @@ async function provisionNeonDatabase(productId: string): Promise<string> {
     .single();
 
   if (fetchError || !product) {
-    throw new Error(`Failed to fetch product: ${fetchError?.message}`);
+    console.error("[neon] Failed to fetch product:", fetchError?.message);
+    throw new FatalError(`Product not found: ${fetchError?.message}`);
   }
 
-  const { projectId, databaseUrl } = await createNeonProject(product.name);
+  try {
+    const { projectId, databaseUrl } = await createNeonProject(product.name);
 
-  const { error } = await supabase
-    .from("products")
-    .update({ neon_project_id: projectId })
-    .eq("id", productId);
+    const { error } = await supabase
+      .from("products")
+      .update({ neon_project_id: projectId })
+      .eq("id", productId);
 
-  if (error) {
-    throw new Error(`Failed to save Neon details: ${error.message}`);
+    if (error) {
+      console.error("[neon] Failed to save neon_project_id:", error.message);
+      throw new Error(`Failed to save Neon details: ${error.message}`);
+    }
+
+    revalidateTag(`product-${productId}`, "max");
+
+    return databaseUrl;
+  } catch (err) {
+    console.error("[neon] Failed to create Neon project:", err);
+    throw err;
   }
-
-  revalidateTag(`product-${productId}`, "max");
-
-  return databaseUrl;
 }
 
 async function setGitHubRepoSecret(repoName: string, databaseUrl: string) {
   "use step";
-  const { setRepoSecret } = await import("@/lib/github");
-  await setRepoSecret(repoName, "DATABASE_URL", databaseUrl);
+  try {
+    const { setRepoSecret } = await import("@/lib/github");
+    await setRepoSecret(repoName, "DATABASE_URL", databaseUrl);
+  } catch (err) {
+    console.error("[github] Failed to set repo secret:", err);
+    throw new RetryableError(`Failed to set secret on ${repoName}`, {
+      retryAfter: "3s",
+    });
+  }
 }
 
 async function deployToVercel(productId: string, repoName: string, databaseUrl: string) {
   "use step";
-  try {
-    const { createVercelProject } = await import("@/lib/vercel");
-    const { createAdminClient } = await import("@/lib/supabase/admin");
-    const { revalidateTag } = await import("next/cache");
+  const { createVercelProject } = await import("@/lib/vercel");
+  const { createAdminClient } = await import("@/lib/supabase/admin");
+  const { revalidateTag } = await import("next/cache");
 
+  try {
     const vercelUrl = await createVercelProject(repoName, {
       DATABASE_URL: databaseUrl,
     });
@@ -259,13 +278,14 @@ async function deployToVercel(productId: string, repoName: string, databaseUrl: 
       .eq("id", productId);
 
     if (error) {
-      console.error(`[vercel] Failed to save vercel_url: ${error.message}`);
-      return;
+      console.error("[vercel] Failed to save vercel_url:", error.message);
+      throw new Error(`Failed to save vercel_url: ${error.message}`);
     }
 
     revalidateTag(`product-${productId}`, "max");
   } catch (err) {
     console.error("[vercel] Failed to create Vercel project:", err);
+    throw err;
   }
 }
 
