@@ -5,6 +5,17 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -79,12 +90,30 @@ export function StatusEditor({
   );
 }
 
-export function DeleteButton({ productId }: { productId: string }) {
+export function DeleteButton({
+  productId,
+  productName,
+  hasGithub,
+  hasNeon,
+  hasVercel,
+}: {
+  productId: string;
+  productName: string;
+  hasGithub: boolean;
+  hasNeon: boolean;
+  hasVercel: boolean;
+}) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [open, setOpen] = useState(false);
+
+  const resources = [
+    hasGithub && "GitHub repo",
+    hasNeon && "Neon database",
+    hasVercel && "Vercel project",
+  ].filter(Boolean);
 
   async function handleDelete() {
-    if (!confirm("Are you sure you want to delete this product? This cannot be undone.")) return;
     setLoading(true);
     try {
       const res = await fetch("/api/admin/products", {
@@ -93,7 +122,16 @@ export function DeleteButton({ productId }: { productId: string }) {
         body: JSON.stringify({ product_id: productId }),
       });
       const data = await res.json();
-      if (!res.ok) alert(data.error || "Something went wrong");
+      if (!res.ok) {
+        alert(data.error || "Something went wrong");
+      } else if (data.cleanup?.some((r: { success: boolean }) => !r.success)) {
+        const failed = data.cleanup
+          .filter((r: { success: boolean }) => !r.success)
+          .map((r: { resource: string }) => r.resource)
+          .join(", ");
+        alert(`Product deleted, but failed to clean up: ${failed}. Check logs.`);
+      }
+      setOpen(false);
       router.refresh();
     } catch {
       alert("Request failed");
@@ -103,15 +141,52 @@ export function DeleteButton({ productId }: { productId: string }) {
   }
 
   return (
-    <Button
-      variant="ghost"
-      size="icon"
-      className="h-8 w-8 text-muted-foreground hover:text-destructive"
-      disabled={loading}
-      onClick={handleDelete}
-    >
-      <HugeiconsIcon icon={Delete02Icon} className="size-4" />
-    </Button>
+    <AlertDialog open={open} onOpenChange={setOpen}>
+      <AlertDialogTrigger asChild>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-8 w-8 text-muted-foreground hover:text-destructive"
+        >
+          <HugeiconsIcon icon={Delete02Icon} className="size-4" />
+        </Button>
+      </AlertDialogTrigger>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Delete &quot;{productName}&quot;?</AlertDialogTitle>
+          <AlertDialogDescription asChild>
+            <div className="space-y-2">
+              <p>
+                This is a destructive action that cannot be undone. All product
+                data will be permanently deleted.
+              </p>
+              {resources.length > 0 && (
+                <div>
+                  <p className="font-medium text-destructive">
+                    The following external resources will also be deleted:
+                  </p>
+                  <ul className="list-disc list-inside mt-1 space-y-0.5">
+                    {resources.map((r) => (
+                      <li key={r}>{r}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel disabled={loading}>Cancel</AlertDialogCancel>
+          <AlertDialogAction
+            onClick={handleDelete}
+            disabled={loading}
+            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+          >
+            {loading ? "Deleting..." : "Delete everything"}
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 }
 

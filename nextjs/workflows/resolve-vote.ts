@@ -185,17 +185,18 @@ async function createProductRepo(productId: string): Promise<string> {
 
   // Create the GitHub repo from template
   let repoUrl: string;
+  let repoId: number;
   try {
-    repoUrl = await createGitHubRepo(product.name, product.description ?? "", repoName);
+    ({ repoId, repoUrl } = await createGitHubRepo(product.name, product.description ?? "", repoName));
   } catch (err) {
     console.error("[github] Failed to create repo:", err);
     throw err;
   }
 
-  // Update the product with the repo URL
+  // Update the product with the repo URL and ID
   const { error: updateError } = await supabase
     .from("products")
-    .update({ github_repo: repoUrl })
+    .update({ github_repo: repoUrl, github_repo_id: repoId })
     .eq("id", productId);
 
   if (updateError) {
@@ -267,14 +268,14 @@ async function deployToVercel(productId: string, repoName: string, databaseUrl: 
   const { revalidateTag } = await import("next/cache");
 
   try {
-    const vercelUrl = await createVercelProject(repoName, {
+    const { projectId, vercelUrl } = await createVercelProject(repoName, {
       DATABASE_URL: databaseUrl,
     });
 
     const supabase = createAdminClient();
     const { error } = await supabase
       .from("products")
-      .update({ vercel_url: vercelUrl })
+      .update({ vercel_url: vercelUrl, vercel_project_id: projectId })
       .eq("id", productId);
 
     if (error) {

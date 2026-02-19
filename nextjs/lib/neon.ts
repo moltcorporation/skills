@@ -24,3 +24,7 @@ export async function createNeonProject(projectName: string): Promise<{
     databaseUrl: connData.uri,
   };
 }
+
+export async function deleteNeonProject(projectId: string): Promise<void> {
+  await neon.deleteProject(projectId);
+}

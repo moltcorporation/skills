@@ -5,6 +5,9 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { VOTE_PROPOSAL_DEADLINE_HOURS } from "@/lib/constants";
 import { resolveVoteWorkflow } from "@/workflows/resolve-vote";
+import { deleteGitHubRepo } from "@/lib/github";
+import { deleteNeonProject } from "@/lib/neon";
+import { deleteVercelProject } from "@/lib/vercel";
 
 const ADMIN_EMAIL = "stuart@terasmediaco.com";
 const VALID_STATUSES = ["proposed", "voting", "building", "live", "archived"];
@@ -194,12 +197,8 @@ export async function POST(request: NextRequest) {
 
 export async function DELETE(request: NextRequest) {
   try {
-    const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user || user.email !== ADMIN_EMAIL) {
+    const user = await requireAdmin();
+    if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
     }
 
@@ -214,6 +213,66 @@ export async function DELETE(request: NextRequest) {
     }
 
     const admin = createAdminClient();
+
+    // Fetch product to get associated resource IDs
+    const { data: product, error: fetchError } = await admin
+      .from("products")
+      .select("id, github_repo_id, neon_project_id, vercel_project_id")
+      .eq("id", product_id)
+      .single();
+
+    if (fetchError || !product) {
+      console.error("[admin-products] fetch for delete:", fetchError);
+      return NextResponse.json(
+        { error: "Product not found" },
+        { status: 404 },
+      );
+    }
+
+    // Delete external resources in parallel, collecting errors
+    const cleanupResults: { resource: string; success: boolean; error?: string }[] = [];
+
+    const cleanupTasks: Promise<void>[] = [];
+
+    // Delete GitHub repo by numeric ID (works even if repo was renamed)
+    if (product.github_repo_id) {
+      cleanupTasks.push(
+        deleteGitHubRepo(product.github_repo_id)
+          .then(() => { cleanupResults.push({ resource: "github", success: true }); })
+          .catch((err) => {
+            console.error("[admin-products] delete github repo:", err);
+            cleanupResults.push({ resource: "github", success: false, error: String(err) });
+          }),
+      );
+    }
+
+    // Delete Neon project
+    if (product.neon_project_id) {
+      cleanupTasks.push(
+        deleteNeonProject(product.neon_project_id)
+          .then(() => { cleanupResults.push({ resource: "neon", success: true }); })
+          .catch((err) => {
+            console.error("[admin-products] delete neon project:", err);
+            cleanupResults.push({ resource: "neon", success: false, error: String(err) });
+          }),
+      );
+    }
+
+    // Delete Vercel project
+    if (product.vercel_project_id) {
+      cleanupTasks.push(
+        deleteVercelProject(product.vercel_project_id)
+          .then(() => { cleanupResults.push({ resource: "vercel", success: true }); })
+          .catch((err) => {
+            console.error("[admin-products] delete vercel project:", err);
+            cleanupResults.push({ resource: "vercel", success: false, error: String(err) });
+          }),
+      );
+    }
+
+    await Promise.all(cleanupTasks);
+
+    // Delete the product from the database
     const { error } = await admin
       .from("products")
       .delete()
@@ -229,8 +288,9 @@ export async function DELETE(request: NextRequest) {
 
     revalidateTag(`product-${product_id}`, "max");
     revalidateTag("products", "max");
+    revalidateTag("activity", "max");
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true, cleanup: cleanupResults });
   } catch (err) {
     console.error("[admin-products]", err);
     return NextResponse.json(

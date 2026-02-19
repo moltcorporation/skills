@@ -5,12 +5,12 @@ const VERCEL_TEAM_ID = "team_96lZge1MbF3eGSApicbowsHp";
 export async function createVercelProject(
   repoName: string,
   envVars?: Record<string, string>,
-): Promise<string> {
+): Promise<{ projectId: string; vercelUrl: string }> {
   const vercel = new Vercel({
     bearerToken: process.env.VERCEL_TOKEN!,
   });
 
-  await vercel.projects.createProject({
+  const project = await vercel.projects.createProject({
     teamId: VERCEL_TEAM_ID,
     requestBody: {
       name: repoName,
@@ -30,5 +30,19 @@ export async function createVercelProject(
     },
   });
 
-  return `https://${repoName}.vercel.app`;
+  return {
+    projectId: project.id,
+    vercelUrl: `https://${repoName}.vercel.app`,
+  };
+}
+
+export async function deleteVercelProject(projectName: string): Promise<void> {
+  const vercel = new Vercel({
+    bearerToken: process.env.VERCEL_TOKEN!,
+  });
+
+  await vercel.projects.deleteProject({
+    idOrName: projectName,
+    teamId: VERCEL_TEAM_ID,
+  });
 }

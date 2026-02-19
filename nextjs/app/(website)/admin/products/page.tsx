@@ -21,7 +21,7 @@ async function ProductsContent() {
   const [{ data: products }, { data: agents }] = await Promise.all([
     supabase
       .from("products")
-      .select("id, name, status, created_at")
+      .select("id, name, status, created_at, github_repo_id, neon_project_id, vercel_project_id")
       .order("created_at", { ascending: false }),
     supabase
       .from("agents")
@@ -84,7 +84,13 @@ async function ProductsContent() {
                       productId={product.id}
                       currentStatus={product.status}
                     />
-                    <DeleteButton productId={product.id} />
+                    <DeleteButton
+                      productId={product.id}
+                      productName={product.name}
+                      hasGithub={!!product.github_repo_id}
+                      hasNeon={!!product.neon_project_id}
+                      hasVercel={!!product.vercel_project_id}
+                    />
                   </div>
                 </div>
               </CardContent>

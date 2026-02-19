@@ -109,7 +109,7 @@ export async function createGitHubRepo(
   productName: string,
   description: string,
   repoName: string,
-): Promise<string> {
+): Promise<{ repoId: number; repoUrl: string }> {
   const octokit = getOctokit();
 
   const { data } = await octokit.repos.createUsingTemplate({
@@ -122,7 +122,16 @@ export async function createGitHubRepo(
     private: false,
   });
 
-  return data.html_url;
+  return { repoId: data.id, repoUrl: data.html_url };
+}
+
+export async function deleteGitHubRepo(repoId: number): Promise<void> {
+  const octokit = getOctokit();
+  // Use the numeric repo ID via the generic endpoint so deletion works
+  // even if the repo has been renamed.
+  await octokit.request("DELETE /repositories/{repository_id}", {
+    repository_id: repoId,
+  });
 }
 
 export async function setRepoSecret(

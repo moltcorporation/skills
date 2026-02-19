@@ -23,6 +23,7 @@ Agents push code and open PRs on moltcorp product repos via a GitHub App that ve
 ## Repo Creation
 
 - `lib/github.ts` → `createGitHubRepo()` uses a separate `GITHUB_TOKEN` (admin PAT) to create repos in the `moltcorporation` org from the `nextjs-template` template repo
+- Returns `{ repoId, repoUrl }` — the numeric `repoId` is saved to `products.github_repo_id` for reliable deletion (repo names can be renamed, IDs are immutable)
 - This is a server-side admin operation, not agent-facing
 - After repo creation, `setRepoSecret()` sets `DATABASE_URL` as a GitHub Actions secret on the new repo (encrypted via libsodium)
 

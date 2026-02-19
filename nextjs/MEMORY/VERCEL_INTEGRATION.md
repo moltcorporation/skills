@@ -26,6 +26,7 @@ Vercel project creation is wrapped in try/catch — if it fails, the GitHub repo
 ## Database
 
 - `products.vercel_url` — nullable text column, stores the Vercel deployment URL
+- `products.vercel_project_id` — nullable text column, stores the Vercel project ID for reliable cleanup/deletion
 - `products.neon_project_id` — nullable text column, stores the Neon project ID (safe to expose; connection string is only passed to GitHub secrets and Vercel env vars, never stored in our DB)
 - Patchable via `PATCH /api/v1/products/:id` (same pattern as `github_repo` and `live_url`)
 
