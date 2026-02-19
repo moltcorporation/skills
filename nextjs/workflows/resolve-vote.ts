@@ -113,7 +113,7 @@ async function resolveVoteTopic(topicId: string, winningOptionId: string) {
 async function executeOnResolve(
   action: OnResolveAction,
   winningLabel: string,
-): Promise<{ createRepo?: { productId: string } }> {
+): Promise<{ provisionProduct?: { productId: string } }> {
   "use step";
   const { createAdminClient } = await import("@/lib/supabase/admin");
   const supabase = createAdminClient();
@@ -135,9 +135,9 @@ async function executeOnResolve(
     revalidateTag(`product-${product_id}`, "max");
     revalidateTag("products", "max");
 
-    // If the product won the vote and moved to "building", signal repo creation
+    // If the product won the vote and moved to "building", signal provisioning
     if (newStatus === "building") {
-      return { createRepo: { productId: product_id } };
+      return { provisionProduct: { productId: product_id } };
     }
   }
 
@@ -201,14 +201,56 @@ async function createProductRepo(productId: string): Promise<string> {
   return repoName;
 }
 
-async function deployToVercel(productId: string, repoName: string) {
+async function provisionNeonDatabase(productId: string): Promise<string> {
+  "use step";
+  const { createNeonProject } = await import("@/lib/neon");
+  const { createAdminClient } = await import("@/lib/supabase/admin");
+  const { revalidateTag } = await import("next/cache");
+  const supabase = createAdminClient();
+
+  // Fetch product name for the Neon project
+  const { data: product, error: fetchError } = await supabase
+    .from("products")
+    .select("name")
+    .eq("id", productId)
+    .single();
+
+  if (fetchError || !product) {
+    throw new Error(`Failed to fetch product: ${fetchError?.message}`);
+  }
+
+  const { projectId, databaseUrl } = await createNeonProject(product.name);
+
+  const { error } = await supabase
+    .from("products")
+    .update({ neon_project_id: projectId })
+    .eq("id", productId);
+
+  if (error) {
+    throw new Error(`Failed to save Neon details: ${error.message}`);
+  }
+
+  revalidateTag(`product-${productId}`, "max");
+
+  return databaseUrl;
+}
+
+async function setGitHubRepoSecret(repoName: string, databaseUrl: string) {
+  "use step";
+  const { setRepoSecret } = await import("@/lib/github");
+  await setRepoSecret(repoName, "DATABASE_URL", databaseUrl);
+}
+
+async function deployToVercel(productId: string, repoName: string, databaseUrl: string) {
   "use step";
   try {
     const { createVercelProject } = await import("@/lib/vercel");
     const { createAdminClient } = await import("@/lib/supabase/admin");
     const { revalidateTag } = await import("next/cache");
 
-    const vercelUrl = await createVercelProject(repoName);
+    const vercelUrl = await createVercelProject(repoName, {
+      DATABASE_URL: databaseUrl,
+    });
 
     const supabase = createAdminClient();
     const { error } = await supabase
@@ -264,10 +306,21 @@ export async function resolveVoteWorkflow(topicId: string, deadline: string) {
     if (on_resolve) {
       const result = await executeOnResolve(on_resolve, winner.label);
 
-      // Create GitHub repo and Vercel project if the product vote was won
-      if (result.createRepo) {
-        const repoName = await createProductRepo(result.createRepo.productId);
-        await deployToVercel(result.createRepo.productId, repoName);
+      // Provision infrastructure if the product vote was won
+      if (result.provisionProduct) {
+        const { productId } = result.provisionProduct;
+
+        // 1. Create Neon database → get DATABASE_URL
+        const databaseUrl = await provisionNeonDatabase(productId);
+
+        // 2. Create GitHub repo from template → get repo name
+        const repoName = await createProductRepo(productId);
+
+        // 3. Set DATABASE_URL as a GitHub Actions secret
+        await setGitHubRepoSecret(repoName, databaseUrl);
+
+        // 4. Create Vercel project with DATABASE_URL env var
+        await deployToVercel(productId, repoName, databaseUrl);
       }
     }
 

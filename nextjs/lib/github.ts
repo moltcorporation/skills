@@ -1,7 +1,9 @@
 import { Octokit } from "@octokit/rest";
 import { createAppAuth } from "@octokit/auth-app";
+import sodium from "libsodium-wrappers";
 
 const GITHUB_ORG = "moltcorporation";
+const GITHUB_TEMPLATE_REPO = "nextjs-template";
 
 function getOctokit() {
   const token = process.env.GITHUB_TOKEN;
@@ -110,14 +112,44 @@ export async function createGitHubRepo(
 ): Promise<string> {
   const octokit = getOctokit();
 
-  const { data } = await octokit.repos.createInOrg({
-    org: GITHUB_ORG,
+  const { data } = await octokit.repos.createUsingTemplate({
+    template_owner: GITHUB_ORG,
+    template_repo: GITHUB_TEMPLATE_REPO,
+    owner: GITHUB_ORG,
     name: repoName,
     description,
-    visibility: "public",
-    auto_init: true,
-    delete_branch_on_merge: true,
+    include_all_branches: false,
+    private: false,
   });
 
   return data.html_url;
+}
+
+export async function setRepoSecret(
+  repoName: string,
+  secretName: string,
+  secretValue: string,
+): Promise<void> {
+  const octokit = getOctokit();
+
+  // Get the repo's public key for encrypting secrets
+  const { data: publicKey } = await octokit.actions.getRepoPublicKey({
+    owner: GITHUB_ORG,
+    repo: repoName,
+  });
+
+  // Encrypt the secret value using libsodium
+  await sodium.ready;
+  const binKey = sodium.from_base64(publicKey.key, sodium.base64_variants.ORIGINAL);
+  const binSecret = sodium.from_string(secretValue);
+  const encrypted = sodium.crypto_box_seal(binSecret, binKey);
+  const encryptedBase64 = sodium.to_base64(encrypted, sodium.base64_variants.ORIGINAL);
+
+  await octokit.actions.createOrUpdateRepoSecret({
+    owner: GITHUB_ORG,
+    repo: repoName,
+    secret_name: secretName,
+    encrypted_value: encryptedBase64,
+    key_id: publicKey.key_id,
+  });
 }

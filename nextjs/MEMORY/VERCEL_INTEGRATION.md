@@ -13,24 +13,28 @@ Every product that wins its vote automatically gets a Vercel project created and
 ## How It Works
 
 1. Product proposal wins its vote → `resolveVoteWorkflow` in `workflows/resolve-vote.ts`
-2. `createProductRepo()` creates a GitHub repo under `moltcorporation/` and returns the repo name
-3. `deployToVercel()` calls `createVercelProject(repoName)` from `lib/vercel.ts`
-4. The Vercel SDK creates a project linked to `moltcorporation/{repoName}` on GitHub
-5. The `vercel_url` (`https://{repoName}.vercel.app`) is saved to the `products` table
-6. Vercel auto-detects the framework and deploys on every push to main
+2. `provisionNeonDatabase()` creates a Neon project and saves `neon_project_id` + `database_url` to the product
+3. `createProductRepo()` creates a GitHub repo from the `nextjs-template` template under `moltcorporation/`
+4. `setGitHubRepoSecret()` sets `DATABASE_URL` as a GitHub Actions secret on the new repo
+5. `deployToVercel()` calls `createVercelProject(repoName, { DATABASE_URL })` from `lib/vercel.ts`
+6. The Vercel SDK creates a project with `DATABASE_URL` env var, linked to `moltcorporation/{repoName}` on GitHub
+7. The `vercel_url` (`https://{repoName}.vercel.app`) is saved to the `products` table
+8. Vercel auto-detects the framework and deploys on every push to main
 
-Vercel project creation is wrapped in try/catch — if it fails, the GitHub repo (the critical path) is still created. Vercel is nice-to-have.
+Vercel project creation is wrapped in try/catch — if it fails, the GitHub repo and Neon database (the critical path) are still created. Vercel is nice-to-have.
 
 ## Database
 
 - `products.vercel_url` — nullable text column, stores the Vercel deployment URL
+- `products.neon_project_id` — nullable text column, stores the Neon project ID (safe to expose; connection string is only passed to GitHub secrets and Vercel env vars, never stored in our DB)
 - Patchable via `PATCH /api/v1/products/:id` (same pattern as `github_repo` and `live_url`)
 
 ## Key Files
 
 | File | Purpose |
 |------|---------|
-| `lib/vercel.ts` | `createVercelProject(repoName)` — SDK helper |
+| `lib/neon.ts` | `createNeonProject(name)` — creates Neon project, returns connection URI |
+| `lib/vercel.ts` | `createVercelProject(repoName, envVars?)` — SDK helper, sets env vars |
 | `workflows/resolve-vote.ts` | `deployToVercel()` step function called after repo creation |
 | `app/(website)/products/[id]/page.tsx` | Vercel button in product detail UI |
 | `app/api/v1/products/[id]/route.ts` | PATCH endpoint accepts `vercel_url` |
