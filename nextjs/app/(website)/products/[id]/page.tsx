@@ -173,67 +173,57 @@ async function ProductDetailPage({
 
       {/* Header */}
       <div className="mb-8">
-        <div className="flex items-center gap-3 flex-wrap">
-          <h1 className="text-3xl font-bold tracking-tight">{product.name}</h1>
-          <StatusBadge type="product" status={product.status} />
-        </div>
+        <div className="flex items-center justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-3 flex-wrap">
+              <h1 className="text-3xl font-bold tracking-tight">{product.name}</h1>
+              <StatusBadge type="product" status={product.status} />
+            </div>
 
-        <p className="text-muted-foreground mt-3 max-w-2xl">
-          {product.description}
-        </p>
+            <p className="text-muted-foreground mt-3 max-w-2xl">
+              {product.description}
+            </p>
 
-        <div className="flex items-center gap-4 mt-4 text-sm text-muted-foreground flex-wrap">
-          <span>
-            Proposed by{" "}
-            {agent ? (
-              <EntityLink type="agent" id={agent.id} name={agent.name} className="text-foreground font-medium hover:underline" />
-            ) : (
-              <span className="text-foreground font-medium">Unknown Agent</span>
-            )}
-          </span>
-          <span>&middot;</span>
-          <span>{timeAgo(product.created_at)}</span>
-          {product.live_url && (
-            <>
+            <div className="flex items-center gap-4 mt-4 text-sm text-muted-foreground flex-wrap">
+              <span>
+                Proposed by{" "}
+                {agent ? (
+                  <EntityLink type="agent" id={agent.id} name={agent.name} className="text-foreground font-medium hover:underline" />
+                ) : (
+                  <span className="text-foreground font-medium">Unknown Agent</span>
+                )}
+              </span>
               <span>&middot;</span>
+              <span>{timeAgo(product.created_at)}</span>
+            </div>
+          </div>
+
+          {product.live_url && (
+            <Button asChild>
               <a
                 href={product.live_url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-primary hover:underline"
               >
+                <HugeiconsIcon icon={InternetIcon} className="h-4 w-4" />
                 Visit Site
               </a>
-            </>
+            </Button>
           )}
         </div>
 
-        {(product.github_repo || product.vercel_url) && (
+        {product.github_repo && (
           <div className="mt-4 flex items-center gap-2">
-            {product.github_repo && (
-              <Button variant="outline" size="sm" asChild>
-                <a
-                  href={product.github_repo}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <HugeiconsIcon icon={GithubIcon} className="h-4 w-4" />
-                  GitHub Repo
-                </a>
-              </Button>
-            )}
-            {product.vercel_url && (
-              <Button variant="outline" size="sm" asChild>
-                <a
-                  href={product.vercel_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <HugeiconsIcon icon={InternetIcon} className="h-4 w-4" />
-                  Vercel
-                </a>
-              </Button>
-            )}
+            <Button variant="outline" size="sm" asChild>
+              <a
+                href={product.github_repo}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <HugeiconsIcon icon={GithubIcon} className="h-4 w-4" />
+                GitHub Repo
+              </a>
+            </Button>
           </div>
         )}
       </div>

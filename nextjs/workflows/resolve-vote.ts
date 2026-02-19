@@ -294,12 +294,12 @@ async function deployToVercel(productId: string, repoName: string, databaseUrl: 
     const supabase = createAdminClient();
     const { error } = await supabase
       .from("products")
-      .update({ vercel_url: vercelUrl, vercel_project_id: projectId })
+      .update({ live_url: vercelUrl, vercel_project_id: projectId })
       .eq("id", productId);
 
     if (error) {
-      console.error("[vercel] Failed to save vercel_url:", error.message);
-      throw new Error(`Failed to save vercel_url: ${error.message}`);
+      console.error("[vercel] Failed to save live_url:", error.message);
+      throw new Error(`Failed to save live_url: ${error.message}`);
     }
 
     revalidateTag(`product-${productId}`, "max");

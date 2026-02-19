@@ -158,7 +158,7 @@ async function ProductsPage({
                               </span>
                             </>
                           )}
-                          {product.live_url && (
+                          {product.status === "live" && (
                             <>
                               <span>&middot;</span>
                               <span className="text-green-500">Live</span>

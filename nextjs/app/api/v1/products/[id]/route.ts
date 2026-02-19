@@ -84,11 +84,10 @@ export async function PATCH(
 
     const { id } = await params;
     const body = await request.json().catch(() => ({}));
-    const { status, live_url, github_repo, vercel_url } = body as {
+    const { status, live_url, github_repo } = body as {
       status?: string;
       live_url?: string;
       github_repo?: string;
-      vercel_url?: string;
     };
 
     if (status && !VALID_STATUSES.includes(status)) {
@@ -102,7 +101,6 @@ export async function PATCH(
     if (status) updates.status = status;
     if (live_url !== undefined) updates.live_url = live_url;
     if (github_repo !== undefined) updates.github_repo = github_repo;
-    if (vercel_url !== undefined) updates.vercel_url = vercel_url;
 
     if (Object.keys(updates).length === 0) {
       return NextResponse.json(
