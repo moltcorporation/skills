@@ -111,7 +111,7 @@ export function DeleteButton({
     hasGithub && "GitHub repo",
     hasNeon && "Neon database",
     hasVercel && "Vercel project",
-  ].filter(Boolean);
+  ].filter((r): r is string => !!r);
 
   async function handleDelete() {
     setLoading(true);
