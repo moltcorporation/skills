@@ -16,9 +16,12 @@ type ReviewResult = {
 
 // -- Step functions --
 
-async function fetchAndValidatePR(prUrl: string): Promise<PRDetails> {
+async function fetchAndValidatePR(prUrl: string, submissionId: string): Promise<PRDetails> {
   "use step";
   const { parsePrUrl, getReviewBotOctokit } = await import("@/lib/github");
+  const { slackLog } = await import("@/lib/slack");
+
+  await slackLog(`🔍 REVIEW STARTED — Submission ${submissionId} (PR: ${prUrl})`);
 
   const parsed = parsePrUrl(prUrl);
   if (!parsed) {
@@ -90,6 +93,7 @@ async function applyResult(
   "use step";
   const { getReviewBotOctokit } = await import("@/lib/github");
   const { createAdminClient } = await import("@/lib/supabase/admin");
+  const { slackLog } = await import("@/lib/slack");
   const { revalidateTag } = await import("next/cache");
   const supabase = createAdminClient();
 
@@ -119,6 +123,8 @@ async function applyResult(
     revalidateTag("activity", "max");
     revalidateTag("credits", "max");
     revalidateTag(`agent-${submission.agent_id}`, "max");
+
+    await slackLog(`✅ SUBMISSION ACCEPTED — PR already merged (submission ${submissionId})`);
     return;
   }
 
@@ -128,6 +134,8 @@ async function applyResult(
       .update({ status: "rejected", review_notes: "PR is closed" })
       .eq("id", submissionId);
     revalidateTag(`task-${taskId}`, "max");
+
+    await slackLog(`❌ SUBMISSION REJECTED — PR is closed (submission ${submissionId})`);
     return;
   }
 
@@ -137,6 +145,8 @@ async function applyResult(
       .update({ status: "rejected", review_notes: "Invalid PR URL or wrong organization" })
       .eq("id", submissionId);
     revalidateTag(`task-${taskId}`, "max");
+
+    await slackLog(`❌ SUBMISSION REJECTED — Invalid PR URL or wrong organization (submission ${submissionId})`);
     return;
   }
 
@@ -183,6 +193,8 @@ async function applyResult(
     revalidateTag("activity", "max");
     revalidateTag("credits", "max");
     revalidateTag(`agent-${submission.agent_id}`, "max");
+
+    await slackLog(`✅ SUBMISSION ACCEPTED — PR merged (submission ${submissionId})`);
   } else {
     // Leave a comment with rejection reason
     await octokit.issues.createComment({
@@ -209,6 +221,8 @@ async function applyResult(
     });
 
     revalidateTag(`task-${taskId}`, "max");
+
+    await slackLog(`❌ SUBMISSION REJECTED — ${review.reason} (submission ${submissionId})`);
   }
 }
 
@@ -220,7 +234,7 @@ export async function reviewSubmissionWorkflow(
 ) {
   "use workflow";
 
-  const pr = await fetchAndValidatePR(prUrl);
+  const pr = await fetchAndValidatePR(prUrl, submissionId);
   const review = await reviewCode(pr.diff, {
     owner: pr.owner,
     repo: pr.repo,

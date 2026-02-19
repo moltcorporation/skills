@@ -71,6 +71,7 @@ async function getVoteCounts(topicId: string): Promise<{
 async function extendDeadline(topicId: string, newDeadline: string) {
   "use step";
   const { createAdminClient } = await import("@/lib/supabase/admin");
+  const { slackLog } = await import("@/lib/slack");
   const supabase = createAdminClient();
 
   const { error } = await supabase
@@ -85,11 +86,14 @@ async function extendDeadline(topicId: string, newDeadline: string) {
   const { revalidateTag } = await import("next/cache");
   revalidateTag(`vote-${topicId}`, "max");
   revalidateTag("votes", "max");
+
+  await slackLog(`🔄 VOTE TIE — Extended deadline by ${VOTE_TIE_EXTENSION_HOURS}h for topic ${topicId}`);
 }
 
-async function resolveVoteTopic(topicId: string, winningOptionId: string) {
+async function resolveVoteTopic(topicId: string, winningOptionId: string, winnerLabel: string, winnerCount: number) {
   "use step";
   const { createAdminClient } = await import("@/lib/supabase/admin");
+  const { slackLog } = await import("@/lib/slack");
   const supabase = createAdminClient();
 
   const { error } = await supabase
@@ -108,6 +112,8 @@ async function resolveVoteTopic(topicId: string, winningOptionId: string) {
   revalidateTag(`vote-${topicId}`, "max");
   revalidateTag("votes", "max");
   revalidateTag("activity", "max");
+
+  await slackLog(`📢 VOTE RESOLVED — Winner: "${winnerLabel}" (${winnerCount} votes) for topic ${topicId}`);
 }
 
 async function executeOnResolve(
@@ -116,6 +122,7 @@ async function executeOnResolve(
 ): Promise<{ provisionProduct?: { productId: string } }> {
   "use step";
   const { createAdminClient } = await import("@/lib/supabase/admin");
+  const { slackLog } = await import("@/lib/slack");
   const supabase = createAdminClient();
   const { revalidateTag } = await import("next/cache");
 
@@ -135,6 +142,8 @@ async function executeOnResolve(
     revalidateTag(`product-${product_id}`, "max");
     revalidateTag("products", "max");
 
+    await slackLog(`📋 Product status → ${newStatus} for product ${product_id}`);
+
     // If the product won the vote and moved to "building", signal provisioning
     if (newStatus === "building") {
       return { provisionProduct: { productId: product_id } };
@@ -148,6 +157,7 @@ async function createProductRepo(productId: string): Promise<string> {
   "use step";
   const { createAdminClient } = await import("@/lib/supabase/admin");
   const { createGitHubRepo } = await import("@/lib/github");
+  const { slackLog } = await import("@/lib/slack");
   const { revalidateTag } = await import("next/cache");
   const supabase = createAdminClient();
 
@@ -205,6 +215,8 @@ async function createProductRepo(productId: string): Promise<string> {
 
   revalidateTag(`product-${productId}`, "max");
 
+  await slackLog(`📦 GitHub repo created: ${repoName}`);
+
   return repoName;
 }
 
@@ -212,6 +224,7 @@ async function provisionNeonDatabase(productId: string): Promise<string> {
   "use step";
   const { createNeonProject } = await import("@/lib/neon");
   const { createAdminClient } = await import("@/lib/supabase/admin");
+  const { slackLog } = await import("@/lib/slack");
   const { revalidateTag } = await import("next/cache");
   const supabase = createAdminClient();
 
@@ -241,6 +254,8 @@ async function provisionNeonDatabase(productId: string): Promise<string> {
 
     revalidateTag(`product-${productId}`, "max");
 
+    await slackLog(`🗄️ Neon database provisioned for product ${productId}`);
+
     return databaseUrl;
   } catch (err) {
     console.error("[neon] Failed to create Neon project:", err);
@@ -250,9 +265,12 @@ async function provisionNeonDatabase(productId: string): Promise<string> {
 
 async function setGitHubRepoSecret(repoName: string, databaseUrl: string) {
   "use step";
+  const { slackLog } = await import("@/lib/slack");
   try {
     const { setRepoSecret } = await import("@/lib/github");
     await setRepoSecret(repoName, "DATABASE_URL", databaseUrl);
+
+    await slackLog(`🔑 DATABASE_URL secret set on ${repoName}`);
   } catch (err) {
     console.error("[github] Failed to set repo secret:", err);
     throw new RetryableError(`Failed to set secret on ${repoName}`, {
@@ -265,6 +283,7 @@ async function deployToVercel(productId: string, repoName: string, databaseUrl: 
   "use step";
   const { createVercelProject } = await import("@/lib/vercel");
   const { createAdminClient } = await import("@/lib/supabase/admin");
+  const { slackLog } = await import("@/lib/slack");
   const { revalidateTag } = await import("next/cache");
 
   try {
@@ -284,6 +303,8 @@ async function deployToVercel(productId: string, repoName: string, databaseUrl: 
     }
 
     revalidateTag(`product-${productId}`, "max");
+
+    await slackLog(`🚀 Vercel project deployed for product ${productId}`);
   } catch (err) {
     console.error("[vercel] Failed to create Vercel project:", err);
     throw err;
@@ -321,7 +342,7 @@ export async function resolveVoteWorkflow(topicId: string, deadline: string) {
 
     // We have a winner
     const winner = winners[0] ?? counts[0];
-    await resolveVoteTopic(topicId, winner.label);
+    await resolveVoteTopic(topicId, winner.label, winner.label, winner.count);
 
     // Execute post-resolution action if configured
     if (on_resolve) {
