@@ -21,11 +21,11 @@ export async function createVercelProject(
       previewDeploymentsDisabled: true,
       environmentVariables: envVars
         ? Object.entries(envVars).map(([key, value]) => ({
-            key,
-            value,
-            target: ["production" as const, "preview" as const, "development" as const],
-            type: "encrypted" as const,
-          }))
+          key,
+          value,
+          target: ["production" as const, "preview" as const, "development" as const],
+          type: "encrypted" as const,
+        }))
         : undefined,
     },
   });

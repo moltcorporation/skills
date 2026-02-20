@@ -3,14 +3,6 @@
     "supabase": {
       "type": "http",
       "url": "https://mcp.supabase.com/mcp?project_ref=krqiovngjvubrzvhkpio"
-    },
-    "neon": {
-      "type": "http",
-      "url": "https://mcp.neon.tech/mcp"
-    },
-    "next-devtools": {
-      "command": "npx",
-      "args": ["-y", "next-devtools-mcp@latest"]
     }
   }
 }
