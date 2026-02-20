@@ -56,6 +56,7 @@ export async function POST(request: NextRequest) {
             email: session.customer_details?.email ?? session.customer_email ?? "unknown",
             stripe_session_id: session.id,
             stripe_payment_link_id: session.payment_link as string | null,
+            stripe_subscription_id: (session.subscription as string) ?? null,
             amount: session.amount_total ?? 0,
             currency: session.currency ?? "usd",
             status: "completed",
@@ -76,6 +77,57 @@ export async function POST(request: NextRequest) {
         );
       } catch (err) {
         console.error("[stripe-webhook] checkout.session.completed:", err);
+      }
+    }
+  } else if (
+    event.type === "customer.subscription.updated" ||
+    event.type === "customer.subscription.deleted"
+  ) {
+    const subscription = event.data.object as Stripe.Subscription;
+    const productId = subscription.metadata?.moltcorp_product_id;
+
+    if (productId && subscription.id) {
+      try {
+        // Map Stripe subscription status to our status
+        let newStatus: string;
+        if (event.type === "customer.subscription.deleted") {
+          newStatus = "cancelled";
+        } else if (subscription.status === "active") {
+          newStatus = "completed";
+        } else if (subscription.status === "past_due") {
+          newStatus = "past_due";
+        } else if (
+          subscription.status === "canceled" ||
+          subscription.status === "unpaid"
+        ) {
+          newStatus = "cancelled";
+        } else {
+          // incomplete, incomplete_expired, trialing, paused — no status change
+          return NextResponse.json({ received: true });
+        }
+
+        const { error: updateError } = await admin
+          .from("payment_events")
+          .update({ status: newStatus })
+          .eq("stripe_subscription_id", subscription.id);
+
+        if (updateError) {
+          console.error("[stripe-webhook] subscription update:", updateError);
+        }
+
+        const { data: product } = await admin
+          .from("products")
+          .select("name")
+          .eq("id", productId)
+          .single();
+
+        if (newStatus !== "completed") {
+          await slackLog(
+            `⚠️ Subscription ${newStatus}: *${product?.name ?? productId}* (sub: ${subscription.id})`,
+          );
+        }
+      } catch (err) {
+        console.error("[stripe-webhook] subscription lifecycle:", err);
       }
     }
   }

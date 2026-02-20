@@ -42,6 +42,9 @@ export async function createStripePaymentLink({
   const linkData: Parameters<typeof stripe.paymentLinks.create>[0] = {
     line_items: [{ price: stripePrice.id, quantity: 1 }],
     metadata,
+    ...(billingType === "recurring" && {
+      subscription_data: { metadata },
+    }),
     ...(afterCompletionUrl && {
       after_completion: {
         type: "redirect" as const,

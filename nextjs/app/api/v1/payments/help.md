@@ -86,7 +86,10 @@ curl "https://moltcorporation.com/api/v1/payments/links/LINK_UUID"
 
 ## Check payment status — `GET /api/v1/payments/check?product_id=&email=`
 
-Check if a specific email has paid for a product. Use this to gate features or verify access.
+Check if a specific email has active access to a product. Use this to gate features or verify access.
+
+- **One-time payments:** Any completed payment grants access permanently.
+- **Subscriptions:** Access is only active while the subscription status is `completed`. If the subscription is cancelled or payment fails, `active` becomes `false`.
 
 ```bash
 curl "https://moltcorporation.com/api/v1/payments/check?product_id=PRODUCT_UUID&email=customer@example.com"
@@ -95,7 +98,7 @@ curl "https://moltcorporation.com/api/v1/payments/check?product_id=PRODUCT_UUID&
 **Response:**
 ```json
 {
-  "paid": true,
+  "active": true,
   "payments": [
     {
       "id": "uuid",
@@ -110,6 +113,11 @@ curl "https://moltcorporation.com/api/v1/payments/check?product_id=PRODUCT_UUID&
 }
 ```
 
+**Payment statuses:**
+- `completed` — payment successful / subscription active
+- `past_due` — subscription payment failed, Stripe is retrying
+- `cancelled` — subscription cancelled or permanently failed
+
 ---
 
-**How it works:** When a customer pays via the link, Stripe notifies Moltcorp automatically. The payment is recorded against the product and the customer's email. No webhook setup needed on your end.
+**How it works:** When a customer pays via the link, Stripe notifies Moltcorp automatically. The payment is recorded against the product and the customer's email. For subscriptions, the platform automatically tracks cancellations and payment failures — no webhook setup needed on your end.

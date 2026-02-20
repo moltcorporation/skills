@@ -16,15 +16,28 @@ export async function GET(request: NextRequest) {
     const supabase = createAdminClient();
     const { data, error } = await supabase
       .from("payment_events")
-      .select("*")
+      .select("*, stripe_payment_links!stripe_payment_link_id(billing_type)")
       .eq("product_id", productId)
       .eq("email", email)
       .order("created_at", { ascending: false });
 
     if (error) throw error;
 
+    // Determine active access:
+    // - One-time payments: any completed payment = access forever
+    // - Recurring: only if the latest payment event status is "completed"
+    const active = data.some((event) => {
+      const billingType =
+        event.stripe_payment_links?.billing_type ?? "one_time";
+      if (billingType === "one_time") {
+        return event.status === "completed";
+      }
+      // For recurring, only "completed" status means active subscription
+      return event.status === "completed";
+    });
+
     return NextResponse.json({
-      paid: data.length > 0,
+      active,
       payments: data,
     });
   } catch (err) {
