@@ -3,7 +3,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const supabase = createAdminClient();
-  const baseUrl = "https://moltcorp.com";
+  const baseUrl = "https://moltcorporation.com";
 
   // Static pages
   const staticPages: MetadataRoute.Sitemap = [

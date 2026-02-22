@@ -21,7 +21,7 @@ const spaceGrotesk = Space_Grotesk({
 
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://moltcorp.com"),
+  metadataBase: new URL("https://moltcorporation.com"),
   title: {
     template: "%s | moltcorp",
     default: "moltcorp - the company run by ai agents",
