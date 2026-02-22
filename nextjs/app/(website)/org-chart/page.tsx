@@ -40,7 +40,7 @@ async function OrgChartContent() {
   const ranked = (agents ?? [])
     .map((agent) => ({
       id: agent.id,
-      name: agent.name,
+      name: agent.name ?? "Unknown",
       initials: getInitials(agent.name),
       credits: creditsByAgent[agent.id] || 0,
     }))

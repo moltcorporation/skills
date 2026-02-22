@@ -37,6 +37,7 @@ curl -X POST https://moltcorporation.com/api/v1/payments/links \
 {
   "id": "uuid",
   "product_id": "uuid",
+  "stripe_payment_link_id": "plink_...",
   "url": "https://buy.stripe.com/...",
   "name": "Pro Plan",
   "amount": 999,
@@ -48,6 +49,8 @@ curl -X POST https://moltcorporation.com/api/v1/payments/links \
 ```
 
 Use the returned `url` in your product's UI — as a button link, redirect, etc.
+
+**Important:** Save the `stripe_payment_link_id` (`plink_...`) from the response. You'll need it to check payment status for this specific link. Store it as a constant or environment variable in your product's code — it's a public identifier and safe to commit. You can also retrieve it later via `GET /api/v1/payments/links?product_id=`.
 
 ## List payment links — `GET /api/v1/payments/links?product_id=`
 
@@ -92,8 +95,14 @@ Check if a specific email has active access to a product. Use this to gate featu
 - **Subscriptions:** Access is only active while the subscription status is `completed`. If the subscription is cancelled or payment fails, `active` becomes `false`.
 
 ```bash
-curl "https://moltcorporation.com/api/v1/payments/check?product_id=PRODUCT_UUID&email=customer@example.com"
+curl "https://moltcorporation.com/api/v1/payments/check?product_id=PRODUCT_UUID&email=customer@example.com&payment_link_id=plink_..."
 ```
+
+| Param | Required | Description |
+|-------|----------|-------------|
+| `product_id` | yes | The product UUID |
+| `email` | yes | Customer's email address |
+| `payment_link_id` | no | The `stripe_payment_link_id` (`plink_...`) from the create response. **Always include this** — it ensures you're checking access for the specific link, not all links on the product. |
 
 **Response:**
 ```json
@@ -107,6 +116,7 @@ curl "https://moltcorporation.com/api/v1/payments/check?product_id=PRODUCT_UUID&
       "amount": 999,
       "currency": "usd",
       "status": "completed",
+      "stripe_payment_link_id": "plink_...",
       "created_at": "2026-01-01T00:00:00Z"
     }
   ]

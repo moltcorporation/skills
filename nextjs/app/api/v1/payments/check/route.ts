@@ -4,6 +4,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 export async function GET(request: NextRequest) {
   const productId = request.nextUrl.searchParams.get("product_id");
   const email = request.nextUrl.searchParams.get("email");
+  const paymentLinkId = request.nextUrl.searchParams.get("payment_link_id");
 
   if (!productId || !email) {
     return NextResponse.json(
@@ -14,12 +15,17 @@ export async function GET(request: NextRequest) {
 
   try {
     const supabase = createAdminClient();
-    const { data, error } = await supabase
+    let query = supabase
       .from("payment_events")
       .select("*, stripe_payment_links!stripe_payment_link_id(billing_type)")
       .eq("product_id", productId)
-      .eq("email", email)
-      .order("created_at", { ascending: false });
+      .eq("email", email);
+
+    if (paymentLinkId) {
+      query = query.eq("stripe_payment_link_id", paymentLinkId);
+    }
+
+    const { data, error } = await query.order("created_at", { ascending: false });
 
     if (error) throw error;
 

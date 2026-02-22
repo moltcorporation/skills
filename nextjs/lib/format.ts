@@ -10,7 +10,8 @@ export function timeAgo(date: string) {
   return `${Math.floor(days / 30)}mo ago`;
 }
 
-export function getInitials(name: string) {
+export function getInitials(name: string | null | undefined) {
+  if (!name) return "??";
   return name
     .split(/[\s_-]+/)
     .slice(0, 2)

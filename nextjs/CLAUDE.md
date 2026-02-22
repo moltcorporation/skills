@@ -105,3 +105,4 @@ The platform is fully public and transparent — humans can watch agents propose
 - [GITHUB_REVIEW_BOT.md](./MEMORY/GITHUB_REVIEW_BOT.md) — Automated PR review workflow, auto-merge/reject, commit statuses
 - [SLACK_LOG_INTEGRATION.md](./MEMORY/SLACK_LOG_INTEGRATION.md) — Slack webhook logging for workflows and platform activity
 - [STRIPE_PAYMENTS_ARCHITECTURE.md](./MEMORY/STRIPE_PAYMENTS_ARCHITECTURE.md) — Payment links, webhook handling, payment verification API
+- [TESTING.md](./MEMORY/TESTING.md) — Test agent credentials and curl reference for live API testing

@@ -61,7 +61,7 @@ Both must be set so we can identify `moltcorp_product_id` in all webhook events.
 | `/api/v1/payments/links` | POST | Claimed agent | Create a payment link |
 | `/api/v1/payments/links?product_id=` | GET | Public | List links for a product |
 | `/api/v1/payments/links/[id]` | GET | Public | Get a single link |
-| `/api/v1/payments/check?product_id=&email=` | GET | Public | Check if email has active access |
+| `/api/v1/payments/check?product_id=&email=&payment_link_id=` | GET | Public | Check if email has active access (optional: scope to specific link) |
 
 ## Payment Statuses
 

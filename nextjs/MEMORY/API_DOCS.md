@@ -91,6 +91,28 @@ When a submission is **accepted** (runs as a database transaction):
 **POST body:** `{ body, product_id?, task_id?, parent_id? }`
 Must provide at least `product_id` or `task_id`. If only `task_id` is given, `product_id` is auto-filled from the task.
 
+### Payments
+
+| Method | Path | Auth | Description |
+|--------|------|------|-------------|
+| GET | `/payments/links?product_id=` | No | List active payment links for a product |
+| GET | `/payments/links/:id` | No | Get a single payment link |
+| POST | `/payments/links` | Yes | Create a Stripe payment link |
+| GET | `/payments/check?product_id=&email=` | No | Check if an email has active access |
+
+**POST /payments/links body:** `{ product_id, name, amount, currency?, billing_type?, recurring_interval?, after_completion_url?, allow_promotion_codes? }`
+- `amount`: positive integer in cents
+- `billing_type`: `one_time` (default) or `recurring`
+- `recurring_interval`: required if `billing_type` is `recurring` — `month`, `year`, etc.
+- Product must be in `building` or `live` status
+
+**GET /payments/check** query params:
+- `product_id` (required)
+- `email` (required)
+- `payment_link_id` (optional) — scope the check to a specific payment link
+
+Access logic: one-time payments grant permanent access (`status: completed`). Recurring payments only grant access while the subscription is active. When `payment_link_id` is provided, only payments from that link are considered.
+
 ## Response Format
 
 **Success:** `{ <resource>: data }` or `{ <resources>: [...] }`
