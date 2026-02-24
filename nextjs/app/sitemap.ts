@@ -7,34 +7,26 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   // Static pages
   const staticPages: MetadataRoute.Sitemap = [
-    { url: baseUrl, changeFrequency: "daily", priority: 1 },
-    { url: `${baseUrl}/products`, changeFrequency: "daily", priority: 0.9 },
-    { url: `${baseUrl}/tasks`, changeFrequency: "daily", priority: 0.8 },
-    { url: `${baseUrl}/agents`, changeFrequency: "daily", priority: 0.8 },
-    { url: `${baseUrl}/votes`, changeFrequency: "daily", priority: 0.7 },
-    { url: `${baseUrl}/activity`, changeFrequency: "hourly", priority: 0.7 },
-    { url: `${baseUrl}/financials`, changeFrequency: "daily", priority: 0.6 },
-    { url: `${baseUrl}/hq`, changeFrequency: "daily", priority: 0.8 },
-    { url: `${baseUrl}/org-chart`, changeFrequency: "daily", priority: 0.5 },
-    { url: `${baseUrl}/live`, changeFrequency: "daily", priority: 0.8 },
-    {
-      url: `${baseUrl}/how-it-works`,
-      changeFrequency: "monthly",
-      priority: 0.5,
-    },
-    {
-      url: `${baseUrl}/credits-and-profit-sharing`,
-      changeFrequency: "monthly",
-      priority: 0.5,
-    },
-    {
-      url: `${baseUrl}/get-started`,
-      changeFrequency: "monthly",
-      priority: 0.6,
-    },
-    { url: `${baseUrl}/jobs`, changeFrequency: "monthly", priority: 0.5 },
-    { url: `${baseUrl}/privacy`, changeFrequency: "yearly", priority: 0.2 },
-    { url: `${baseUrl}/terms`, changeFrequency: "yearly", priority: 0.2 },
+    { url: baseUrl, priority: 1 },
+    { url: `${baseUrl}/products` },
+    { url: `${baseUrl}/tasks` },
+    { url: `${baseUrl}/agents` },
+    { url: `${baseUrl}/votes` },
+    { url: `${baseUrl}/activity` },
+    { url: `${baseUrl}/financials` },
+    { url: `${baseUrl}/hq` },
+    { url: `${baseUrl}/org-chart` },
+    { url: `${baseUrl}/live` },
+    { url: `${baseUrl}/how-it-works` },
+    { url: `${baseUrl}/credits-and-profit-sharing` },
+    { url: `${baseUrl}/get-started` },
+    { url: `${baseUrl}/jobs` },
+    { url: `${baseUrl}/privacy` },
+    { url: `${baseUrl}/terms` },
+    { url: `${baseUrl}/api/v1/help` },
+    ...["agents", "products", "tasks", "votes", "comments", "submissions", "github", "payments"].map((resource) => ({
+      url: `${baseUrl}/api/v1/help/${resource}`,
+    })),
   ];
 
   // Dynamic pages
@@ -49,26 +41,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...(products.data ?? []).map((p) => ({
       url: `${baseUrl}/products/${p.id}`,
       lastModified: new Date(p.updated_at),
-      changeFrequency: "daily" as const,
-      priority: 0.8,
     })),
     ...(agents.data ?? []).map((a) => ({
       url: `${baseUrl}/agents/${a.id}`,
       lastModified: new Date(a.created_at),
-      changeFrequency: "weekly" as const,
-      priority: 0.6,
     })),
     ...(tasks.data ?? []).map((t) => ({
       url: `${baseUrl}/tasks/${t.id}`,
       lastModified: new Date(t.updated_at),
-      changeFrequency: "daily" as const,
-      priority: 0.7,
     })),
     ...(votes.data ?? []).map((v) => ({
       url: `${baseUrl}/votes/${v.id}`,
       lastModified: new Date(v.updated_at),
-      changeFrequency: "daily" as const,
-      priority: 0.5,
     })),
   ];
 
