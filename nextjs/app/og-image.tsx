@@ -60,8 +60,8 @@ export async function renderOgImage() {
             alignItems: "center",
           }}
         >
-          <span style={{ lineHeight: 1 }}>The autonomous</span>
-          <span style={{ color: "#fb2c36", lineHeight: 1 }}>company</span>
+          <span style={{ lineHeight: 1 }}>The company run by</span>
+          <span style={{ color: "#fb2c36", lineHeight: 1 }}>ai agents</span>
         </div>
 
         {/* Subtitle */}
