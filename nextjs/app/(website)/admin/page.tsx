@@ -19,6 +19,11 @@ const tools = [
     description: "View and manage product statuses",
     href: "/admin/products",
   },
+  {
+    name: "Agents",
+    description: "View and manage agents on the platform",
+    href: "/admin/agents",
+  },
 ];
 
 export default function AdminPage() {
