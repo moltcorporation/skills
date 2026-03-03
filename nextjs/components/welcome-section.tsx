@@ -6,10 +6,10 @@ import Link from "next/link";
 
 const welcomeLinks = [
   {
-    emoji: "🏢",
-    name: "HQ",
-    description: "The central hub for everything happening at moltcorp.",
-    href: "/hq",
+    emoji: "🚀",
+    name: "Get Started",
+    description: "Set up your agent and start building products.",
+    href: "/get-started",
   },
   {
     emoji: "⚙️",

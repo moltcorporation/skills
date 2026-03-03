@@ -1,16 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { revalidateTag } from "next/cache";
-import { start } from "workflow/api";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { VOTE_PROPOSAL_DEADLINE_HOURS } from "@/lib/constants";
-import { resolveVoteWorkflow } from "@/workflows/resolve-vote";
 import { deleteGitHubRepo } from "@/lib/github";
 import { deleteNeonProject } from "@/lib/neon";
 import { deleteVercelProject } from "@/lib/vercel";
+import { provisionProduct } from "@/lib/provisioning";
 
 const ADMIN_EMAIL = "stuart@terasmediaco.com";
-const VALID_STATUSES = ["proposed", "voting", "building", "live", "archived"];
+const VALID_STATUSES = ["concept", "building", "live", "archived"];
 
 async function requireAdmin() {
   const supabase = await createClient();
@@ -31,14 +29,11 @@ export async function POST(request: NextRequest) {
     const body = await request.json().catch(() => ({}));
     const { action } = body as { action?: string };
 
-    // Create a test product (with voting workflow)
+    // Create a product
     if (action === "create_product") {
-      const { name, description, goal, mvp_details, proposed_by } = body as {
+      const { name, description } = body as {
         name?: string;
         description?: string;
-        goal?: string;
-        mvp_details?: string;
-        proposed_by?: string;
       };
 
       if (!name?.trim() || !description?.trim()) {
@@ -48,25 +43,14 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      if (!proposed_by) {
-        return NextResponse.json(
-          { error: "proposed_by (agent) is required" },
-          { status: 400 },
-        );
-      }
-
       const admin = createAdminClient();
 
-      // Create the product
       const { data: product, error: productError } = await admin
         .from("products")
         .insert({
           name: name.trim(),
           description: description.trim(),
-          goal: goal?.trim() || null,
-          mvp_details: mvp_details?.trim() || null,
-          proposed_by,
-          status: "voting",
+          status: "concept",
         })
         .select()
         .single();
@@ -79,73 +63,14 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      // Create vote topic
-      const deadline = new Date(
-        Date.now() + VOTE_PROPOSAL_DEADLINE_HOURS * 60 * 60 * 1000,
-      ).toISOString();
-      const { data: topic, error: topicError } = await admin
-        .from("vote_topics")
-        .insert({
-          title: `Should we build ${name.trim()}?`,
-          description: `Vote on whether to build: ${description.trim()}`,
-          product_id: product.id,
-          created_by: proposed_by,
-          deadline,
-          on_resolve: {
-            type: "update_product_status",
-            params: {
-              product_id: product.id,
-              on_win: "building",
-              on_lose: "archived",
-              winning_value: "Yes",
-            },
-          },
-        })
-        .select()
-        .single();
-
-      if (topicError) {
-        console.error("[admin-products] create vote topic:", topicError);
-        await admin.from("products").delete().eq("id", product.id);
-        return NextResponse.json(
-          { error: `Failed to create vote topic: ${topicError.message}` },
-          { status: 500 },
-        );
-      }
-
-      // Create Yes/No options
-      const { error: optionsError } = await admin
-        .from("vote_options")
-        .insert([
-          { topic_id: topic.id, label: "Yes" },
-          { topic_id: topic.id, label: "No" },
-        ]);
-
-      if (optionsError) {
-        console.error("[admin-products] create vote options:", optionsError);
-        await admin.from("vote_topics").delete().eq("id", topic.id);
-        await admin.from("products").delete().eq("id", product.id);
-        return NextResponse.json(
-          { error: `Failed to create vote options: ${optionsError.message}` },
-          { status: 500 },
-        );
-      }
-
-      // Start vote resolution workflow
-      const run = await start(resolveVoteWorkflow, [topic.id, deadline]);
-      await admin
-        .from("vote_topics")
-        .update({ workflow_run_id: run.runId })
-        .eq("id", topic.id);
-
       revalidateTag("products", "max");
-      revalidateTag("votes", "max");
-      revalidateTag("activity", "max");
 
-      return NextResponse.json(
-        { product, vote_topic: topic },
-        { status: 201 },
-      );
+      // Trigger provisioning in background
+      provisionProduct(product.id).catch((err) => {
+        console.error("[admin-products] provisioning failed:", err);
+      });
+
+      return NextResponse.json({ product }, { status: 201 });
     }
 
     // Update product status (default action)
@@ -214,7 +139,6 @@ export async function DELETE(request: NextRequest) {
 
     const admin = createAdminClient();
 
-    // Fetch product to get associated resource IDs
     const { data: product, error: fetchError } = await admin
       .from("products")
       .select("id, github_repo_id, neon_project_id, vercel_project_id")
@@ -222,19 +146,12 @@ export async function DELETE(request: NextRequest) {
       .single();
 
     if (fetchError || !product) {
-      console.error("[admin-products] fetch for delete:", fetchError);
-      return NextResponse.json(
-        { error: "Product not found" },
-        { status: 404 },
-      );
+      return NextResponse.json({ error: "Product not found" }, { status: 404 });
     }
 
-    // Delete external resources in parallel, collecting errors
     const cleanupResults: { resource: string; success: boolean; error?: string }[] = [];
-
     const cleanupTasks: Promise<void>[] = [];
 
-    // Delete GitHub repo by numeric ID (works even if repo was renamed)
     if (product.github_repo_id) {
       cleanupTasks.push(
         deleteGitHubRepo(product.github_repo_id)
@@ -246,7 +163,6 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
-    // Delete Neon project
     if (product.neon_project_id) {
       cleanupTasks.push(
         deleteNeonProject(product.neon_project_id)
@@ -258,7 +174,6 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
-    // Delete Vercel project
     if (product.vercel_project_id) {
       cleanupTasks.push(
         deleteVercelProject(product.vercel_project_id)
@@ -272,7 +187,6 @@ export async function DELETE(request: NextRequest) {
 
     await Promise.all(cleanupTasks);
 
-    // Delete the product from the database
     const { error } = await admin
       .from("products")
       .delete()
@@ -288,7 +202,6 @@ export async function DELETE(request: NextRequest) {
 
     revalidateTag(`product-${product_id}`, "max");
     revalidateTag("products", "max");
-    revalidateTag("activity", "max");
 
     return NextResponse.json({ success: true, cleanup: cleanupResults });
   } catch (err) {

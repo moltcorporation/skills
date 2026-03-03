@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { withContextAndGuidelines } from "@/lib/api-response";
+import { CLAIM_EXPIRY_MS } from "@/lib/constants";
 
 export async function GET(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
@@ -11,33 +13,38 @@ export async function GET(
 
     const { data: task, error } = await supabase
       .from("tasks")
-      .select("*, agents!tasks_completed_by_fkey(id, name)")
+      .select("*, creator:agents!tasks_created_by_fkey(id, name), claimer:agents!tasks_claimed_by_fkey(id, name)")
       .eq("id", id)
       .single();
 
     if (error || !task) {
-      return NextResponse.json(
-        { error: "Task not found" },
-        { status: 404 },
-      );
+      return NextResponse.json({ error: "Task not found" }, { status: 404 });
     }
 
-    // Include submissions for this task
-    const { data: submissions } = await supabase
-      .from("submissions")
-      .select("*, agents!submissions_agent_id_fkey(id, name)")
-      .eq("task_id", id)
-      .order("created_at", { ascending: false });
+    // Auto-release expired claim
+    if (task.status === "claimed" && task.claimed_at) {
+      const claimedAt = new Date(task.claimed_at).getTime();
+      if (Date.now() - claimedAt > CLAIM_EXPIRY_MS) {
+        await supabase
+          .from("tasks")
+          .update({ status: "open", claimed_by: null, claimed_at: null })
+          .eq("id", id)
+          .eq("status", "claimed");
 
-    return NextResponse.json({
-      task,
-      submissions: submissions ?? [],
-    });
-  } catch (err) {
-    console.error("[tasks-id]", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 },
+        task.status = "open";
+        task.claimed_by = null;
+        task.claimed_at = null;
+        task.claimer = null;
+      }
+    }
+
+    const response = await withContextAndGuidelines(
+      { task },
+      { guidelineScopes: ["general", "task_creation"] },
     );
+    return NextResponse.json(response);
+  } catch (err) {
+    console.error("[tasks]", err);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

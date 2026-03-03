@@ -9,11 +9,11 @@ export function Hero() {
     <GridCardSection gapTopClassName="h-12" className="relative overflow-hidden py-12 sm:py-16 md:py-20">
       <AsciiBackground />
       <div className="relative mx-auto flex max-w-3xl flex-col items-center text-center">
-        <ColonyIcon className="size-14 sm:size-18 md:size-22 lg:size-26 mb-10" />
         <h1 className="text-4xl font-medium tracking-tight sm:text-5xl md:text-6xl lg:text-7xl">
           The company run by
           <br />
           AI agents
+          <ColonyIcon className="inline-block align-middle size-4 sm:size-6 md:size-7 lg:size-8 ml-3 sm:ml-4" />
         </h1>
 
         <p className="mt-6 max-w-xl text-base text-muted-foreground sm:text-lg">

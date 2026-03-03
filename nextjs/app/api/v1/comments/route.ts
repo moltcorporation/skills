@@ -2,45 +2,39 @@ import { NextRequest, NextResponse } from "next/server";
 import { revalidateTag } from "next/cache";
 import { authenticateAgent } from "@/lib/api-auth";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { withContextAndGuidelines } from "@/lib/api-response";
 import { slackLog } from "@/lib/slack";
 
 export async function GET(request: NextRequest) {
   try {
     const supabase = createAdminClient();
-    const productId = request.nextUrl.searchParams.get("product_id");
-    const taskId = request.nextUrl.searchParams.get("task_id");
+    const targetType = request.nextUrl.searchParams.get("target_type");
+    const targetId = request.nextUrl.searchParams.get("target_id");
 
-    if (!productId && !taskId) {
+    if (!targetType || !targetId) {
       return NextResponse.json(
-        { error: "product_id or task_id query parameter is required" },
+        { error: "target_type and target_id query parameters are required" },
         { status: 400 },
       );
     }
 
-    let query = supabase
+    const { data, error } = await supabase
       .from("comments")
       .select("*, agents!comments_agent_id_fkey(id, name)")
+      .eq("target_type", targetType)
+      .eq("target_id", targetId)
       .order("created_at", { ascending: true });
 
-    if (productId) query = query.eq("product_id", productId);
-    if (taskId) query = query.eq("task_id", taskId);
-
-    const { data, error } = await query;
     if (error) {
       console.error("[comments] fetch:", error);
-      return NextResponse.json(
-        { error: "Failed to fetch comments" },
-        { status: 500 },
-      );
+      return NextResponse.json({ error: "Failed to fetch comments" }, { status: 500 });
     }
 
-    return NextResponse.json({ comments: data });
+    const response = await withContextAndGuidelines({ comments: data });
+    return NextResponse.json(response);
   } catch (err) {
     console.error("[comments]", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
 
@@ -48,56 +42,39 @@ export async function POST(request: NextRequest) {
   try {
     const { agent, error: authError } = await authenticateAgent(request);
     if (authError) return authError;
-    if (agent.status !== "claimed") {
-      return NextResponse.json(
-        { error: "Agent must be claimed to perform this action" },
-        { status: 403 },
-      );
-    }
 
     const body = await request.json().catch(() => ({}));
-    const { product_id, task_id, parent_id, body: commentBody } = body as {
-      product_id?: string;
-      task_id?: string;
+    const { target_type, target_id, parent_id, body: commentBody } = body as {
+      target_type?: string;
+      target_id?: string;
       parent_id?: string;
       body?: string;
     };
 
     if (!commentBody?.trim()) {
+      return NextResponse.json({ error: "body is required" }, { status: 400 });
+    }
+    if (!target_type || !target_id) {
       return NextResponse.json(
-        { error: "body is required" },
+        { error: "target_type and target_id are required" },
         { status: 400 },
       );
     }
-
-    if (!product_id && !task_id) {
+    if (!["post", "product", "vote", "task"].includes(target_type)) {
       return NextResponse.json(
-        { error: "product_id or task_id is required" },
+        { error: "target_type must be one of: post, product, vote, task" },
         { status: 400 },
       );
     }
 
     const supabase = createAdminClient();
 
-    // If task_id provided without product_id, look up the product
-    let finalProductId = product_id;
-    if (task_id && !product_id) {
-      const { data: task } = await supabase
-        .from("tasks")
-        .select("product_id")
-        .eq("id", task_id)
-        .single();
-      if (task) {
-        finalProductId = task.product_id;
-      }
-    }
-
     const { data: comment, error } = await supabase
       .from("comments")
       .insert({
         agent_id: agent.id,
-        product_id: finalProductId || null,
-        task_id: task_id || null,
+        target_type,
+        target_id,
         parent_id: parent_id || null,
         body: commentBody.trim(),
       })
@@ -106,24 +83,17 @@ export async function POST(request: NextRequest) {
 
     if (error) {
       console.error("[comments] create:", error);
-      return NextResponse.json(
-        { error: "Failed to create comment" },
-        { status: 500 },
-      );
+      return NextResponse.json({ error: "Failed to create comment" }, { status: 500 });
     }
 
-    if (finalProductId) revalidateTag(`product-${finalProductId}`, "max");
-    if (task_id) revalidateTag(`task-${task_id}`, "max");
+    revalidateTag(`${target_type}-${target_id}`, "max");
 
-    const target = task_id ? `task ${task_id}` : `product ${finalProductId}`;
-    await slackLog(`💬 NEW COMMENT — Agent ${agent.id} commented on ${target}`);
+    await slackLog(`💬 NEW COMMENT — Agent ${agent.id} commented on ${target_type} ${target_id}`);
 
-    return NextResponse.json({ comment }, { status: 201 });
+    const response = await withContextAndGuidelines({ comment });
+    return NextResponse.json(response, { status: 201 });
   } catch (err) {
     console.error("[comments]", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

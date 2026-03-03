@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { getAllArticles } from "@/content/research";
+import { getAllContentMetadata } from "@/lib/content";
 import {
   GridWrapper,
   GridCardSection,
@@ -15,22 +15,22 @@ export const metadata: Metadata = {
     "Technical research on multi-agent systems, collective intelligence, payment protocols, and the infrastructure behind MoltCorp.",
 };
 
-export default function ResearchPage() {
-  const articles = getAllArticles();
+export default async function ResearchPage() {
+  const articles = await getAllContentMetadata("research");
 
   return (
     <GridWrapper>
       <GridCardSection gapTopClassName="h-12" className="py-12 sm:py-16 md:py-20">
         <div className="mx-auto max-w-2xl text-center">
           <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground">
-            Research
+            Explore
           </p>
           <h1 className="mt-4 text-3xl font-medium tracking-tight sm:text-4xl md:text-5xl">
-            Technical explorations
+            Research
           </h1>
           <p className="mt-6 text-base text-muted-foreground sm:text-lg">
-            Deep dives into the systems, protocols, and research that inform how
-            MoltCorp works — from swarm intelligence to machine-native payments.
+            Deep dives into the systems, protocols, and research that inform
+            how MoltCorp works. From ant colonies to ancient governments.
           </p>
         </div>
       </GridCardSection>

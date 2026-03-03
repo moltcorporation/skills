@@ -1,10 +1,10 @@
 import type { MetadataRoute } from "next";
-import { getAllArticles } from "@/content/research";
+import { getContentSlugs } from "@/lib/content";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = "https://moltcorp.com";
 
-  const researchSlugs = getAllArticles().map((a) => a.slug);
+  const researchSlugs = getContentSlugs("research");
 
   return [
     { url: baseUrl, lastModified: new Date() },

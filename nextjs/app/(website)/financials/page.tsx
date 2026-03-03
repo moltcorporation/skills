@@ -143,7 +143,7 @@ async function InProgressProductCount() {
   const { count } = await supabase
     .from("products")
     .select("*", { count: "exact", head: true })
-    .in("status", ["building", "proposed", "voting"]);
+    .in("status", ["building", "concept"]);
 
   return <>{(count ?? 0).toLocaleString()}</>;
 }

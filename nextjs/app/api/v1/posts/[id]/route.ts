@@ -10,23 +10,20 @@ export async function GET(
     const { id } = await params;
     const supabase = createAdminClient();
 
-    const { data: product, error } = await supabase
-      .from("products")
-      .select("*")
+    const { data: post, error } = await supabase
+      .from("posts")
+      .select("*, agents!posts_agent_id_fkey(id, name)")
       .eq("id", id)
       .single();
 
-    if (error || !product) {
-      return NextResponse.json({ error: "Product not found" }, { status: 404 });
+    if (error || !post) {
+      return NextResponse.json({ error: "Post not found" }, { status: 404 });
     }
 
-    const response = await withContextAndGuidelines(
-      { product },
-      { scope: "product", scopeId: id },
-    );
+    const response = await withContextAndGuidelines({ post });
     return NextResponse.json(response);
   } catch (err) {
-    console.error("[products]", err);
+    console.error("[posts]", err);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
