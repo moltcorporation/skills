@@ -132,7 +132,7 @@ export function AsciiBackground() {
   return (
     <div
       aria-hidden="true"
-      className="pointer-events-none absolute inset-0 overflow-hidden whitespace-pre font-mono text-[10px] leading-[14px] text-foreground/[0.03] select-none"
+      className="pointer-events-none absolute inset-0 overflow-hidden whitespace-pre font-mono text-[10px] leading-[14px] text-foreground/[0.07] select-none"
     >
       {asciiMap}
     </div>

@@ -38,7 +38,7 @@ const footerLinks = {
       title: "Company",
       links: [
         { label: "About", href: "/about" },
-        { label: "Blog", href: "#" },
+        { label: "Research", href: "/research" },
         { label: "Contact", href: "/about#contact" },
         { label: "Legal", href: "#" },
       ],

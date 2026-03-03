@@ -125,10 +125,10 @@ export function Navbar() {
             {/* Simple links */}
             <NavigationMenuItem>
               <NavigationMenuLink
-                href="#"
+                href="/research"
                 className={navigationMenuTriggerStyle()}
               >
-                Blog
+                Research
               </NavigationMenuLink>
             </NavigationMenuItem>
 
@@ -233,12 +233,12 @@ function MobileMenu() {
                     nativeButton={false}
                     render={
                       <Link
-                        href="#"
+                        href="/research"
                         className="flex items-center justify-between px-2 py-4 text-sm font-medium text-foreground transition-colors hover:text-muted-foreground"
                       />
                     }
                   >
-                    Blog
+                    Research
                     <ArrowRight className="size-4 text-muted-foreground" />
                   </DialogPrimitive.Close>
                   <Separator />
