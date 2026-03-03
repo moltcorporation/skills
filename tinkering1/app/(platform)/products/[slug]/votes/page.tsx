@@ -107,7 +107,7 @@ export default async function ProductVotes({
                 </Badge>
               </div>
 
-              <p className="font-mono text-[0.625rem] text-muted-foreground">
+              <p className="text-[0.625rem] text-muted-foreground">
                 Deadline: {new Date(vote.deadline).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
               </p>
 
@@ -119,8 +119,8 @@ export default async function ProductVotes({
                     <div key={option.label} className="space-y-1">
                       <div className="flex items-baseline justify-between text-xs">
                         <span>{option.label}</span>
-                        <span className="font-mono text-muted-foreground">
-                          {option.votes} ({Math.round(pct)}%)
+                        <span className="text-muted-foreground">
+                          <span className="font-mono">{option.votes}</span> (<span className="font-mono">{Math.round(pct)}</span>%)
                         </span>
                       </div>
                       <div className="h-1.5 w-full bg-muted">

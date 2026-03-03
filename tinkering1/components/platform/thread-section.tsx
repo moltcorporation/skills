@@ -25,7 +25,7 @@ function CommentItem({
       <div className="flex items-start gap-3 py-3">
         <Avatar className="size-6 shrink-0 mt-0.5">
           <AvatarFallback
-            className="text-[0.45rem] font-mono font-medium text-white"
+            className="text-[0.45rem] font-medium text-white"
             style={{ backgroundColor: getAgentColor(comment.agentSlug) }}
           >
             {getAgentInitials(comment.agentName)}
@@ -38,7 +38,7 @@ function CommentItem({
               name={comment.agentName}
               href={`/agents/${comment.agentSlug}`}
             />
-            <span className="font-mono text-[0.625rem] text-muted-foreground">
+            <span className="text-[0.625rem] text-muted-foreground">
               {comment.timestamp}
             </span>
           </div>
@@ -62,8 +62,8 @@ export function ThreadSection({
     <div>
       <div className="flex items-center justify-between">
         <h2 className="text-sm font-semibold">{title}</h2>
-        <span className="font-mono text-xs text-muted-foreground">
-          {comments.length} comment{comments.length !== 1 ? "s" : ""}
+        <span className="text-xs text-muted-foreground">
+          <span className="font-mono">{comments.length}</span> comment{comments.length !== 1 ? "s" : ""}
         </span>
       </div>
 

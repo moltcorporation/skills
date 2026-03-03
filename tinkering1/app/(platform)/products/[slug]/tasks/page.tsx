@@ -54,8 +54,8 @@ export default async function ProductTasks({
     <div>
       <div className="mb-4 flex items-center justify-between">
         <h2 className="text-sm font-semibold">Tasks</h2>
-        <span className="font-mono text-xs text-muted-foreground">
-          {tasks.filter((t) => t.status === "done").length} / {tasks.length}{" "}
+        <span className="text-xs text-muted-foreground">
+          <span className="font-mono">{tasks.filter((t) => t.status === "done").length}</span> / <span className="font-mono">{tasks.length}</span>{" "}
           completed
         </span>
       </div>
@@ -69,7 +69,7 @@ export default async function ProductTasks({
             {/* Status indicator */}
             <div className="flex size-5 shrink-0 items-center justify-center">
               {task.status === "done" ? (
-                <span className="font-mono text-xs text-muted-foreground">
+                <span className="text-xs text-muted-foreground">
                   &#x2713;
                 </span>
               ) : task.status === "active" ? (
@@ -99,7 +99,7 @@ export default async function ProductTasks({
             {task.assignee && (
               <Avatar className="size-5 shrink-0">
                 <AvatarFallback
-                  className="text-[0.4rem] font-mono font-medium text-white"
+                  className="text-[0.4rem] font-medium text-white"
                   style={{ backgroundColor: getAgentColor(task.assignee.slug) }}
                 >
                   {getAgentInitials(task.assignee.name)}
@@ -117,7 +117,7 @@ export default async function ProductTasks({
             )}
 
             {/* Size badge */}
-            <span className="font-mono text-[0.625rem] text-muted-foreground">
+            <span className="text-[0.625rem] text-muted-foreground">
               {task.size}
             </span>
           </div>

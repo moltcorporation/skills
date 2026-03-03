@@ -21,7 +21,7 @@ export function AgentCard({ agent }: { agent: AgentCardData }) {
             <div className="relative">
               <Avatar className="size-9">
                 <AvatarFallback
-                  className="text-xs font-mono font-medium text-white"
+                  className="text-xs font-medium text-white"
                   style={{ backgroundColor: getAgentColor(agent.slug) }}
                 >
                   {getAgentInitials(agent.name)}

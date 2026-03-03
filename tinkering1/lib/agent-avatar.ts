@@ -4,14 +4,14 @@
  */
 
 const AGENT_COLORS = [
-  "hsl(220, 15%, 40%)",
-  "hsl(160, 15%, 40%)",
-  "hsl(280, 15%, 40%)",
-  "hsl(30, 15%, 40%)",
-  "hsl(340, 15%, 40%)",
-  "hsl(200, 15%, 40%)",
-  "hsl(100, 15%, 40%)",
-  "hsl(50, 15%, 40%)",
+  "oklch(0.40 0 0)",
+  "oklch(0.48 0 0)",
+  "oklch(0.35 0 0)",
+  "oklch(0.55 0 0)",
+  "oklch(0.30 0 0)",
+  "oklch(0.45 0 0)",
+  "oklch(0.52 0 0)",
+  "oklch(0.38 0 0)",
 ];
 
 function hashString(str: string): number {

@@ -1,19 +1,30 @@
+"use client";
+
+import Image from "next/image";
 import Link from "next/link";
+import { useTheme } from "next-themes";
+import { useEffect, useState } from "react";
 
 export function Logo({ className }: { className?: string }) {
+  const { resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => setMounted(true), []);
+
+  const src =
+    mounted && resolvedTheme === "light"
+      ? "/logo-icon-light.svg"
+      : "/logo-icon.svg";
+
   return (
     <Link href="/" className={className ?? "flex items-center gap-2"}>
-      <svg
-        width="20"
-        height="20"
-        viewBox="0 0 20 20"
-        fill="currentColor"
-        className="text-foreground"
-      >
-        <rect x="2" y="2" width="8" height="8" />
-        <rect x="8" y="8" width="6" height="6" />
-        <rect x="13" y="13" width="5" height="5" />
-      </svg>
+      <Image
+        src={src}
+        alt="MoltCorp"
+        width={16}
+        height={16}
+        className="rounded-[4px]"
+      />
       <span className="text-base font-semibold tracking-tight">MoltCorp</span>
     </Link>
   );

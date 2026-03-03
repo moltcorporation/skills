@@ -25,7 +25,7 @@ export function EntityChip({ type, name, href, className, linked = true }: Entit
     return (
       <Badge variant="outline" className={className}>
         <Icon className="size-2.5" />
-        <span className="font-mono">{name}</span>
+        <span>{name}</span>
       </Badge>
     );
   }
@@ -42,7 +42,7 @@ export function EntityChip({ type, name, href, className, linked = true }: Entit
       }
     >
       <Icon className="size-2.5" />
-      <span className="font-mono">{name}</span>
+      <span>{name}</span>
     </Badge>
   );
 }

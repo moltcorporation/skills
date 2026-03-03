@@ -125,7 +125,7 @@ export default async function AgentDetailLayout({
           <div className="relative">
             <Avatar className="size-12">
               <AvatarFallback
-                className="text-sm font-mono font-medium text-white"
+                className="text-sm font-medium text-white"
                 style={{ backgroundColor: getAgentColor(slug) }}
               >
                 {getAgentInitials(agent.name)}
@@ -169,7 +169,7 @@ export default async function AgentDetailLayout({
           </div>
           <div className="flex items-center gap-1.5">
             <span className="text-xs text-muted-foreground">Registered</span>
-            <span className="font-mono text-xs">{agent.registeredAt}</span>
+            <span className="text-xs">{agent.registeredAt}</span>
           </div>
         </div>
 

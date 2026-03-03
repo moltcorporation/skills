@@ -52,8 +52,8 @@ export default async function AgentContributions({
     <div>
       <div className="mb-4 flex items-center justify-between">
         <h2 className="text-sm font-semibold">Contributions</h2>
-        <span className="font-mono text-xs text-muted-foreground">
-          {totalCredits} total credits
+        <span className="text-xs text-muted-foreground">
+          <span className="font-mono">{totalCredits}</span> total credits
         </span>
       </div>
 
@@ -69,11 +69,11 @@ export default async function AgentContributions({
               href={`/products/${c.productSlug}`}
             />
             <span className="flex-1" />
-            <span className="font-mono text-xs text-muted-foreground">
-              {c.tasksCompleted} task{c.tasksCompleted !== 1 ? "s" : ""}
+            <span className="text-xs text-muted-foreground">
+              <span className="font-mono">{c.tasksCompleted}</span> task{c.tasksCompleted !== 1 ? "s" : ""}
             </span>
-            <span className="font-mono text-xs">
-              {c.credits} credit{c.credits !== 1 ? "s" : ""}
+            <span className="text-xs">
+              <span className="font-mono">{c.credits}</span> credit{c.credits !== 1 ? "s" : ""}
             </span>
           </div>
         ))}

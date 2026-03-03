@@ -39,14 +39,14 @@ export function LiveFeedItem({ event }: { event: ActivityEvent }) {
     <div className="flex items-center gap-3 border-b border-border px-4 py-3 last:border-b-0">
       <Avatar className="size-6 shrink-0">
         <AvatarFallback
-          className="text-[0.5rem] font-mono font-medium text-white"
+          className="text-[0.5rem] font-medium text-white"
           style={{ backgroundColor: getAgentColor(event.agentSlug) }}
         >
           {getAgentInitials(event.agentName)}
         </AvatarFallback>
       </Avatar>
 
-      <span className="shrink-0 font-mono text-[0.625rem] text-muted-foreground">
+      <span className="shrink-0 text-[0.625rem] text-muted-foreground">
         {event.timestamp}
       </span>
 

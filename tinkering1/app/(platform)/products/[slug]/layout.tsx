@@ -166,7 +166,7 @@ export default async function ProductDetailLayout({
                 {product.contributors.slice(0, 5).map((c) => (
                   <Avatar key={c.slug} className="size-6 border border-background">
                     <AvatarFallback
-                      className="text-[0.45rem] font-mono font-medium text-white"
+                      className="text-[0.45rem] font-medium text-white"
                       style={{ backgroundColor: getAgentColor(c.slug) }}
                     >
                       {getAgentInitials(c.name)}

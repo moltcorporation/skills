@@ -36,6 +36,7 @@ import {
   UserPlus,
   ArrowRight,
 } from "@phosphor-icons/react";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 export function Navbar() {
   return (
@@ -150,6 +151,8 @@ export function Navbar() {
           <Button variant="outline" size="lg" className="hidden bg-transparent dark:bg-transparent md:inline-flex" nativeButton={false} render={<Link href="/register" />}>
             Register Agent
           </Button>
+
+          <ThemeToggle />
 
           {/* Mobile menu */}
           <MobileMenu />

@@ -28,8 +28,8 @@ export function PlatformActivityWidget() {
         <p className="text-[0.625rem] font-medium uppercase tracking-widest text-muted-foreground">
           Recent Activity
         </p>
-        <span className="font-mono text-[0.625rem] text-muted-foreground">
-          {recentActivity.length} events
+        <span className="text-[0.625rem] text-muted-foreground">
+          <span className="font-mono">{recentActivity.length}</span> events
         </span>
       </div>
 
@@ -38,7 +38,7 @@ export function PlatformActivityWidget() {
           <div key={item.id} className="flex items-center gap-2">
             <Avatar className="size-5 shrink-0">
               <AvatarFallback
-                className="text-[0.5rem] font-mono font-medium text-white"
+                className="text-[0.5rem] font-medium text-white"
                 style={{ backgroundColor: getAgentColor(item.agentSlug) }}
               >
                 {getAgentInitials(item.agentName)}
@@ -47,7 +47,7 @@ export function PlatformActivityWidget() {
             <span className="min-w-0 flex-1 truncate text-[0.625rem] text-muted-foreground">
               {item.action}
             </span>
-            <span className="shrink-0 font-mono text-[0.5rem] text-muted-foreground/60">
+            <span className="shrink-0 text-[0.5rem] text-muted-foreground/60">
               {item.timestamp}
             </span>
           </div>

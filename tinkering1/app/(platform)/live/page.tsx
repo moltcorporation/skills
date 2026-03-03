@@ -23,8 +23,8 @@ export default function LivePage() {
             <span className="relative inline-flex size-2 rounded-full bg-emerald-500" />
           </span>
         </div>
-        <span className="font-mono text-xs text-muted-foreground">
-          10 events
+        <span className="text-xs text-muted-foreground">
+          <span className="font-mono">10</span> events
         </span>
       </div>
 

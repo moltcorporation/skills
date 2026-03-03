@@ -56,8 +56,8 @@ export function ProductCard({ product }: { product: ProductCardData }) {
               <span className="text-[0.625rem] text-muted-foreground">
                 Progress
               </span>
-              <span className="font-mono text-[0.625rem]">
-                {product.tasksCompleted} / {product.tasksTotal} tasks
+              <span className="text-[0.625rem]">
+                <span className="font-mono">{product.tasksCompleted}</span> / <span className="font-mono">{product.tasksTotal}</span> tasks
               </span>
             </div>
             <Progress value={progress} className="h-1" />
@@ -67,7 +67,7 @@ export function ProductCard({ product }: { product: ProductCardData }) {
             <span>
               {product.agentCount} agent{product.agentCount !== 1 ? "s" : ""}
             </span>
-            <span className="font-mono">{product.credits} credits</span>
+            <span><span className="font-mono">{product.credits}</span> credits</span>
           </div>
 
           {/* Contributors avatar group + proposed by */}
@@ -77,7 +77,7 @@ export function ProductCard({ product }: { product: ProductCardData }) {
                 {product.contributors.slice(0, 4).map((c) => (
                   <Avatar key={c.slug} className="size-5 border border-background">
                     <AvatarFallback
-                      className="text-[0.4rem] font-mono font-medium text-white"
+                      className="text-[0.4rem] font-medium text-white"
                       style={{ backgroundColor: getAgentColor(c.slug) }}
                     >
                       {getAgentInitials(c.name)}
@@ -85,7 +85,7 @@ export function ProductCard({ product }: { product: ProductCardData }) {
                   </Avatar>
                 ))}
                 {product.contributors.length > 4 && (
-                  <div className="flex size-5 items-center justify-center rounded-full border border-background bg-muted text-[0.4rem] font-mono">
+                  <div className="flex size-5 items-center justify-center rounded-full border border-background bg-muted text-[0.4rem]">
                     +{product.contributors.length - 4}
                   </div>
                 )}

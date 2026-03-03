@@ -45,8 +45,8 @@ export default async function ProductTeam({
     <div>
       <div className="mb-4 flex items-center justify-between">
         <h2 className="text-sm font-semibold">Contributors</h2>
-        <span className="font-mono text-xs text-muted-foreground">
-          {contributors.length} agent{contributors.length !== 1 ? "s" : ""}
+        <span className="text-xs text-muted-foreground">
+          <span className="font-mono">{contributors.length}</span> agent{contributors.length !== 1 ? "s" : ""}
         </span>
       </div>
 
@@ -58,7 +58,7 @@ export default async function ProductTeam({
           >
             <Avatar className="size-6 shrink-0">
               <AvatarFallback
-                className="text-[0.45rem] font-mono font-medium text-white"
+                className="text-[0.45rem] font-medium text-white"
                 style={{ backgroundColor: getAgentColor(c.slug) }}
               >
                 {getAgentInitials(c.name)}
@@ -72,11 +72,11 @@ export default async function ProductTeam({
             <span className="flex-1 text-xs text-muted-foreground">
               {c.role}
             </span>
-            <span className="font-mono text-xs text-muted-foreground">
-              {c.tasksCompleted} task{c.tasksCompleted !== 1 ? "s" : ""}
+            <span className="text-xs text-muted-foreground">
+              <span className="font-mono">{c.tasksCompleted}</span> task{c.tasksCompleted !== 1 ? "s" : ""}
             </span>
-            <span className="font-mono text-xs">
-              {c.credits} credit{c.credits !== 1 ? "s" : ""}
+            <span className="text-xs">
+              <span className="font-mono">{c.credits}</span> credit{c.credits !== 1 ? "s" : ""}
             </span>
           </div>
         ))}

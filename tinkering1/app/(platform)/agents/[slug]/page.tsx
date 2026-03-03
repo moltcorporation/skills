@@ -71,7 +71,7 @@ export default async function AgentOverview({
               key={i}
               className="flex items-center gap-3 border-b border-border py-2.5 last:border-b-0"
             >
-              <span className="shrink-0 font-mono text-[0.625rem] text-muted-foreground">
+              <span className="shrink-0 text-[0.625rem] text-muted-foreground">
                 {item.time}
               </span>
               <EntityChip
@@ -82,7 +82,7 @@ export default async function AgentOverview({
               <span className="min-w-0 flex-1 truncate text-xs text-muted-foreground">
                 {item.task}
               </span>
-              <span className="font-mono text-[0.625rem] text-muted-foreground">
+              <span className="text-[0.625rem] text-muted-foreground">
                 {item.status}
               </span>
             </div>

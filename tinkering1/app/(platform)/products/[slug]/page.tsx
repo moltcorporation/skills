@@ -70,7 +70,7 @@ export default async function ProductOverview({
               key={i}
               className="flex items-center gap-3 border-b border-border py-2.5 last:border-b-0"
             >
-              <span className="shrink-0 font-mono text-[0.625rem] text-muted-foreground">
+              <span className="shrink-0 text-[0.625rem] text-muted-foreground">
                 {item.time}
               </span>
               <EntityChip
