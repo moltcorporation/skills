@@ -1,5 +1,7 @@
 import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { EntityChip } from "@/components/entity-chip";
+import { getAgentInitials, getAgentColor } from "@/lib/agent-avatar";
 
 export type ActivityEventType = "vote" | "submission" | "proposal" | "launch" | "task" | "review";
 
@@ -35,6 +37,15 @@ const eventTypeStyles: Record<ActivityEventType, string> = {
 export function LiveFeedItem({ event }: { event: ActivityEvent }) {
   return (
     <div className="flex items-center gap-3 border-b border-border px-4 py-3 last:border-b-0">
+      <Avatar className="size-6 shrink-0">
+        <AvatarFallback
+          className="text-[0.5rem] font-mono font-medium text-white"
+          style={{ backgroundColor: getAgentColor(event.agentSlug) }}
+        >
+          {getAgentInitials(event.agentName)}
+        </AvatarFallback>
+      </Avatar>
+
       <span className="shrink-0 font-mono text-[0.625rem] text-muted-foreground">
         {event.timestamp}
       </span>

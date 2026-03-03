@@ -1,7 +1,10 @@
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Progress } from "@/components/ui/progress";
 import { EntityChip } from "@/components/entity-chip";
+import { getAgentInitials, getAgentColor } from "@/lib/agent-avatar";
 
 export interface ProductCardData {
   slug: string;
@@ -13,6 +16,7 @@ export interface ProductCardData {
   agentCount: number;
   credits: number;
   proposedBy: { name: string; slug: string };
+  contributors?: { name: string; slug: string }[];
 }
 
 const statusStyles: Record<string, string> = {
@@ -46,7 +50,7 @@ export function ProductCard({ product }: { product: ProductCardData }) {
             {product.description}
           </p>
 
-          {/* Progress bar */}
+          {/* Progress */}
           <div className="space-y-1.5">
             <div className="flex items-baseline justify-between">
               <span className="text-[0.625rem] text-muted-foreground">
@@ -56,12 +60,7 @@ export function ProductCard({ product }: { product: ProductCardData }) {
                 {product.tasksCompleted} / {product.tasksTotal} tasks
               </span>
             </div>
-            <div className="h-1 w-full bg-muted">
-              <div
-                className="h-full bg-foreground transition-all"
-                style={{ width: `${progress}%` }}
-              />
-            </div>
+            <Progress value={progress} className="h-1" />
           </div>
 
           <div className="flex items-center justify-between text-[0.625rem] text-muted-foreground">
@@ -71,14 +70,38 @@ export function ProductCard({ product }: { product: ProductCardData }) {
             <span className="font-mono">{product.credits} credits</span>
           </div>
 
-          <div className="flex items-center gap-1.5">
-            <span className="text-[0.625rem] text-muted-foreground">by</span>
-            <EntityChip
-              type="agent"
-              name={product.proposedBy.name}
-              href={`/agents/${product.proposedBy.slug}`}
-              linked={false}
-            />
+          {/* Contributors avatar group + proposed by */}
+          <div className="flex items-center justify-between">
+            {product.contributors && product.contributors.length > 0 ? (
+              <div className="flex -space-x-1.5">
+                {product.contributors.slice(0, 4).map((c) => (
+                  <Avatar key={c.slug} className="size-5 border border-background">
+                    <AvatarFallback
+                      className="text-[0.4rem] font-mono font-medium text-white"
+                      style={{ backgroundColor: getAgentColor(c.slug) }}
+                    >
+                      {getAgentInitials(c.name)}
+                    </AvatarFallback>
+                  </Avatar>
+                ))}
+                {product.contributors.length > 4 && (
+                  <div className="flex size-5 items-center justify-center rounded-full border border-background bg-muted text-[0.4rem] font-mono">
+                    +{product.contributors.length - 4}
+                  </div>
+                )}
+              </div>
+            ) : (
+              <span />
+            )}
+            <div className="flex items-center gap-1.5">
+              <span className="text-[0.625rem] text-muted-foreground">by</span>
+              <EntityChip
+                type="agent"
+                name={product.proposedBy.name}
+                href={`/agents/${product.proposedBy.slug}`}
+                linked={false}
+              />
+            </div>
           </div>
         </CardContent>
       </Card>

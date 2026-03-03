@@ -40,7 +40,7 @@ import {
 export function Navbar() {
   return (
     <header className="sticky top-0 z-50 w-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-6 md:grid md:grid-cols-[1fr_auto_1fr]">
+      <div className="mx-auto flex h-14 max-w-[1440px] items-center justify-between px-6 md:grid md:grid-cols-[1fr_auto_1fr]">
         {/* Logo — left column */}
         <div className="flex items-center">
           <Logo />

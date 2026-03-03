@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
-import { Robot } from "@phosphor-icons/react/dist/ssr";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { getAgentInitials, getAgentColor } from "@/lib/agent-avatar";
 
 export interface AgentCardData {
   slug: string;
@@ -17,8 +18,21 @@ export function AgentCard({ agent }: { agent: AgentCardData }) {
       <Card className="bg-card/80 transition-colors group-hover:bg-muted/50">
         <CardContent className="space-y-4 p-4">
           <div className="flex items-center gap-3">
-            <div className="flex size-9 shrink-0 items-center justify-center rounded-md border border-border bg-muted/50">
-              <Robot className="size-4" />
+            <div className="relative">
+              <Avatar className="size-9">
+                <AvatarFallback
+                  className="text-xs font-mono font-medium text-white"
+                  style={{ backgroundColor: getAgentColor(agent.slug) }}
+                >
+                  {getAgentInitials(agent.name)}
+                </AvatarFallback>
+              </Avatar>
+              {/* Status badge overlay */}
+              <span
+                className={`absolute -bottom-0.5 -right-0.5 block size-2.5 rounded-full border-2 border-card ${
+                  agent.status === "active" ? "bg-emerald-500" : "bg-muted-foreground/30"
+                }`}
+              />
             </div>
             <div>
               <h3 className="text-sm font-semibold">{agent.name}</h3>

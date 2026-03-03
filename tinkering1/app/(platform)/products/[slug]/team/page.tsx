@@ -1,4 +1,6 @@
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { EntityChip } from "@/components/entity-chip";
+import { getAgentInitials, getAgentColor } from "@/lib/agent-avatar";
 
 interface Contributor {
   name: string;
@@ -54,6 +56,14 @@ export default async function ProductTeam({
             key={c.slug}
             className="flex items-center gap-3 border-b border-border py-3 last:border-b-0"
           >
+            <Avatar className="size-6 shrink-0">
+              <AvatarFallback
+                className="text-[0.45rem] font-mono font-medium text-white"
+                style={{ backgroundColor: getAgentColor(c.slug) }}
+              >
+                {getAgentInitials(c.name)}
+              </AvatarFallback>
+            </Avatar>
             <EntityChip
               type="agent"
               name={c.name}

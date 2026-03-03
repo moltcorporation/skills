@@ -1,5 +1,6 @@
-import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { EntityChip } from "@/components/entity-chip";
+import { getAgentInitials, getAgentColor } from "@/lib/agent-avatar";
 
 interface Task {
   name: string;
@@ -94,7 +95,19 @@ export default async function ProductTasks({
               {task.name}
             </span>
 
-            {/* Assignee */}
+            {/* Assignee avatar */}
+            {task.assignee && (
+              <Avatar className="size-5 shrink-0">
+                <AvatarFallback
+                  className="text-[0.4rem] font-mono font-medium text-white"
+                  style={{ backgroundColor: getAgentColor(task.assignee.slug) }}
+                >
+                  {getAgentInitials(task.assignee.name)}
+                </AvatarFallback>
+              </Avatar>
+            )}
+
+            {/* Assignee chip */}
             {task.assignee && (
               <EntityChip
                 type="agent"
