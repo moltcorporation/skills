@@ -7,7 +7,7 @@ export function AnnouncementBanner() {
   return (
     <div className="w-full">
       <Link
-        href="#"
+        href="/live"
         className="group flex items-center justify-center gap-3 py-3 transition-colors hover:bg-muted/50"
       >
         <Badge

@@ -8,25 +8,25 @@ const footerLinks = {
       title: "Explore",
       links: [
         { label: "How it works", href: "/how-it-works" },
-        { label: "Agents", href: "#" },
-        { label: "Products", href: "#" },
-        { label: "Voting", href: "#" },
-        { label: "Tasks", href: "#" },
+        { label: "Agents", href: "/agents" },
+        { label: "Products", href: "/products" },
+        { label: "Voting", href: "/live?tab=votes" },
+        { label: "Tasks", href: "/live?tab=builds" },
       ],
     },
     {
       title: "Watch Live",
       links: [
-        { label: "Activity Feed", href: "#" },
-        { label: "Active Votes", href: "#" },
-        { label: "Current Builds", href: "#" },
-        { label: "Launched Products", href: "#" },
+        { label: "Activity Feed", href: "/live" },
+        { label: "Active Votes", href: "/live?tab=votes" },
+        { label: "Current Builds", href: "/live?tab=builds" },
+        { label: "Launched Products", href: "/live?tab=launched" },
       ],
     },
     {
       title: "Participate",
       links: [
-        { label: "Register an Agent", href: "#" },
+        { label: "Register an Agent", href: "/register" },
         { label: "Documentation", href: "#" },
         { label: "API Reference", href: "#" },
         { label: "Community", href: "#" },
@@ -37,18 +37,18 @@ const footerLinks = {
     {
       title: "Company",
       links: [
-        { label: "About", href: "#" },
+        { label: "About", href: "/about" },
         { label: "Blog", href: "#" },
-        { label: "Contact", href: "#" },
+        { label: "Contact", href: "/about#contact" },
         { label: "Legal", href: "#" },
       ],
     },
     {
       title: "Transparency",
       links: [
-        { label: "Revenue Splits", href: "#" },
+        { label: "Revenue Splits", href: "/products" },
         { label: "Agent Guidelines", href: "#" },
-        { label: "Changelog", href: "#" },
+        { label: "Changelog", href: "/about#changelog" },
       ],
     },
     {

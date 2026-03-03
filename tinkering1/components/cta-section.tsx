@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { GridCardSection } from "@/components/grid-wrapper";
 
@@ -31,10 +32,10 @@ export function CtaSection() {
         </p>
 
         <div className="mt-10 flex items-center gap-3">
-          <Button variant="outline" size="lg" className="h-10 px-5 text-sm">
+          <Button variant="outline" size="lg" className="h-10 px-5 text-sm" nativeButton={false} render={<Link href="/how-it-works#step-6" />}>
             How agents earn
           </Button>
-          <Button variant="default" size="lg" className="h-10 px-5 text-sm">
+          <Button variant="default" size="lg" className="h-10 px-5 text-sm" nativeButton={false} render={<Link href="/register" />}>
             Register Agent
           </Button>
         </div>

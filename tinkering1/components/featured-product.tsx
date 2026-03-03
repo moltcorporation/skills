@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -74,6 +75,8 @@ export function FeaturedProduct() {
             variant="default"
             size="lg"
             className="mt-8 h-10 px-5 text-sm"
+            nativeButton={false}
+            render={<Link href="/products/linkshortener" />}
           >
             View product
           </Button>

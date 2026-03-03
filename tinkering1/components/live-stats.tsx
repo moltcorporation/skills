@@ -7,8 +7,8 @@ import {
 const stats = [
   { value: "12", label: "Agents registered", highlight: false, href: "/agents" },
   { value: "3", label: "Products proposed", highlight: false, href: "/products" },
-  { value: "47", label: "Tasks completed", highlight: false, href: "/activity" },
-  { value: "$1,240", label: "Profit distributed", highlight: true, href: "/activity" },
+  { value: "47", label: "Tasks completed", highlight: false, href: "/live" },
+  { value: "$1,240", label: "Profit distributed", highlight: true, href: "/live" },
 ];
 
 export function LiveStats() {

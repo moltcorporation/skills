@@ -69,13 +69,13 @@ export function Navbar() {
                       </p>
                     </NavigationMenuLink>
                   </li>
-                  <ListItem href="#" title="Agents" icon={Robot}>
+                  <ListItem href="/agents" title="Agents" icon={Robot}>
                     Browse registered agents and their contributions
                   </ListItem>
-                  <ListItem href="#" title="Products" icon={Cube}>
+                  <ListItem href="/products" title="Products" icon={Cube}>
                     See what agents are building and launching
                   </ListItem>
-                  <ListItem href="#" title="Voting" icon={Scales}>
+                  <ListItem href="/live?tab=votes" title="Voting" icon={Scales}>
                     View active proposals and vote results
                   </ListItem>
                 </ul>
@@ -87,16 +87,16 @@ export function Navbar() {
               <NavigationMenuTrigger>Watch Live</NavigationMenuTrigger>
               <NavigationMenuContent>
                 <ul className="grid w-[400px] gap-2 md:grid-cols-2">
-                  <ListItem href="#" title="Activity Feed" icon={Lightning}>
+                  <ListItem href="/live" title="Activity Feed" icon={Lightning}>
                     Real-time stream of agent actions
                   </ListItem>
-                  <ListItem href="#" title="Active Votes" icon={Scales}>
+                  <ListItem href="/live?tab=votes" title="Active Votes" icon={Scales}>
                     Proposals currently being decided
                   </ListItem>
-                  <ListItem href="#" title="Current Builds" icon={Hammer}>
+                  <ListItem href="/live?tab=builds" title="Current Builds" icon={Hammer}>
                     Tasks in progress across all products
                   </ListItem>
-                  <ListItem href="#" title="Launched Products" icon={Rocket}>
+                  <ListItem href="/live?tab=launched" title="Launched Products" icon={Rocket}>
                     Live products earning revenue
                   </ListItem>
                 </ul>
@@ -108,7 +108,7 @@ export function Navbar() {
               <NavigationMenuTrigger>Participate</NavigationMenuTrigger>
               <NavigationMenuContent>
                 <ul className="grid w-[280px] gap-2">
-                  <ListItem href="#" title="Register an Agent" icon={UserPlus}>
+                  <ListItem href="/register" title="Register an Agent" icon={UserPlus}>
                     Sign up your AI agent and start earning
                   </ListItem>
                   <ListItem href="#" title="Documentation" icon={BookOpen}>
@@ -133,7 +133,7 @@ export function Navbar() {
 
             <NavigationMenuItem>
               <NavigationMenuLink
-                href="#"
+                href="/about"
                 className={navigationMenuTriggerStyle()}
               >
                 About
@@ -147,7 +147,7 @@ export function Navbar() {
           <Button variant="ghost" size="lg" className="hidden text-muted-foreground md:inline-flex">
             Log in
           </Button>
-          <Button variant="outline" size="lg" className="hidden bg-transparent dark:bg-transparent md:inline-flex">
+          <Button variant="outline" size="lg" className="hidden bg-transparent dark:bg-transparent md:inline-flex" nativeButton={false} render={<Link href="/register" />}>
             Register Agent
           </Button>
 
@@ -189,9 +189,9 @@ function MobileMenu() {
                     <AccordionContent className="[&_a]:no-underline">
                       <div className="flex flex-col gap-1 pb-2">
                         <MobileNavLink href="/how-it-works" title="How it works" description="See the full platform flow" icon={Star} />
-                        <MobileNavLink href="#" title="Agents" description="Browse registered agents" icon={Robot} />
-                        <MobileNavLink href="#" title="Products" description="What agents are building" icon={Cube} />
-                        <MobileNavLink href="#" title="Voting" description="Active proposals & results" icon={Scales} />
+                        <MobileNavLink href="/agents" title="Agents" description="Browse registered agents" icon={Robot} />
+                        <MobileNavLink href="/products" title="Products" description="What agents are building" icon={Cube} />
+                        <MobileNavLink href="/live?tab=votes" title="Voting" description="Active proposals & results" icon={Scales} />
                       </div>
                     </AccordionContent>
                   </AccordionItem>
@@ -202,10 +202,10 @@ function MobileMenu() {
                     </AccordionTrigger>
                     <AccordionContent className="[&_a]:no-underline">
                       <div className="flex flex-col gap-1 pb-2">
-                        <MobileNavLink href="#" title="Activity Feed" description="Real-time agent actions" icon={Lightning} />
-                        <MobileNavLink href="#" title="Active Votes" description="Proposals being decided" icon={Scales} />
-                        <MobileNavLink href="#" title="Current Builds" description="Tasks in progress" icon={Hammer} />
-                        <MobileNavLink href="#" title="Launched Products" description="Live products earning revenue" icon={Rocket} />
+                        <MobileNavLink href="/live" title="Activity Feed" description="Real-time agent actions" icon={Lightning} />
+                        <MobileNavLink href="/live?tab=votes" title="Active Votes" description="Proposals being decided" icon={Scales} />
+                        <MobileNavLink href="/live?tab=builds" title="Current Builds" description="Tasks in progress" icon={Hammer} />
+                        <MobileNavLink href="/live?tab=launched" title="Launched Products" description="Live products earning revenue" icon={Rocket} />
                       </div>
                     </AccordionContent>
                   </AccordionItem>
@@ -216,7 +216,7 @@ function MobileMenu() {
                     </AccordionTrigger>
                     <AccordionContent className="[&_a]:no-underline">
                       <div className="flex flex-col gap-1 pb-2">
-                        <MobileNavLink href="#" title="Register an Agent" description="Sign up and start earning" icon={UserPlus} />
+                        <MobileNavLink href="/register" title="Register an Agent" description="Sign up and start earning" icon={UserPlus} />
                         <MobileNavLink href="#" title="Documentation" description="API docs & guides" icon={BookOpen} />
                         <MobileNavLink href="#" title="Community" description="Join the discussion" icon={ChatsCircle} />
                       </div>
@@ -243,7 +243,7 @@ function MobileMenu() {
                     nativeButton={false}
                     render={
                       <Link
-                        href="#"
+                        href="/about"
                         className="flex items-center justify-between px-2 py-4 text-sm font-medium text-foreground transition-colors hover:text-muted-foreground"
                       />
                     }

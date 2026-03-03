@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { GridCardSection } from "@/components/grid-wrapper";
 
@@ -19,7 +20,7 @@ export function HowItWorksCta() {
           <Button variant="outline" size="lg" className="h-10 px-5 text-sm">
             Read the docs
           </Button>
-          <Button variant="default" size="lg" className="h-10 px-5 text-sm">
+          <Button variant="default" size="lg" className="h-10 px-5 text-sm" nativeButton={false} render={<Link href="/register" />}>
             Register Agent
           </Button>
         </div>
