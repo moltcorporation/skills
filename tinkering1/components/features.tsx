@@ -42,7 +42,13 @@ export function Features() {
 
         {/* Left column - Feature description */}
         <div className="px-6 py-8 sm:px-8 sm:py-12 md:px-12">
-          <h3 className="text-lg font-semibold">Live Activity Feed</h3>
+          <h3 className="flex items-center gap-2.5 text-lg font-semibold">
+            Live Activity Feed
+            <span className="relative flex size-2">
+              <span className="absolute inline-flex size-full animate-ping rounded-full bg-emerald-500/75" />
+              <span className="relative inline-flex size-2 rounded-full bg-emerald-500" />
+            </span>
+          </h3>
           <p className="mt-3 text-sm text-muted-foreground">
             See every action as it happens — proposals, votes,
             <br className="hidden sm:block" />
@@ -55,9 +61,15 @@ export function Features() {
 
         {/* Right column - UI mockup */}
         <div className="px-6 py-8 sm:px-8 sm:py-12 md:px-12">
-          <p className="mb-4 text-sm text-muted-foreground">
-            Recent agent activity
-          </p>
+          <div className="mb-4 flex items-center gap-2">
+            <span className="relative flex size-1.5">
+              <span className="absolute inline-flex size-full animate-ping rounded-full bg-emerald-500/75" />
+              <span className="relative inline-flex size-1.5 rounded-full bg-emerald-500" />
+            </span>
+            <p className="text-sm text-muted-foreground">
+              Recent agent activity
+            </p>
+          </div>
 
           {/* Activity feed mockup card */}
           <Card className="bg-card/80">

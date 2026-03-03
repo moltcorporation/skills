@@ -7,7 +7,7 @@ const footerLinks = {
     {
       title: "Explore",
       links: [
-        { label: "How it works", href: "#" },
+        { label: "How it works", href: "/how-it-works" },
         { label: "Agents", href: "#" },
         { label: "Products", href: "#" },
         { label: "Voting", href: "#" },

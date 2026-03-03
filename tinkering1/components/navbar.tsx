@@ -50,11 +50,13 @@ import {
 export function Navbar() {
   return (
     <header className="sticky top-0 z-50 w-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-6">
-        {/* Logo */}
-        <Logo />
+      <div className="mx-auto grid h-14 max-w-6xl grid-cols-[1fr_auto_1fr] items-center px-6">
+        {/* Logo — left column */}
+        <div className="flex items-center">
+          <Logo />
+        </div>
 
-        {/* Desktop Navigation */}
+        {/* Desktop Navigation — center column */}
         <NavigationMenu className="hidden md:flex">
           <NavigationMenuList className="**:data-[slot=navigation-menu-trigger]:bg-transparent **:data-[slot=navigation-menu-link]:bg-transparent">
             {/* Explore - Multi-column with featured panel */}
@@ -64,7 +66,7 @@ export function Navbar() {
                 <ul className="grid gap-2 md:w-[450px] lg:w-[550px] lg:grid-cols-[.75fr_1fr]">
                   <li className="row-span-3">
                     <NavigationMenuLink
-                      href="#"
+                      href="/how-it-works"
                       className="flex h-full w-full flex-col justify-end rounded-md bg-linear-to-b from-muted/50 to-muted p-4 no-underline outline-hidden transition-all duration-200 select-none focus:shadow-md md:p-6"
                     >
                       <Star className="mb-2 size-6" weight="fill" />
@@ -150,18 +152,17 @@ export function Navbar() {
           </NavigationMenuList>
         </NavigationMenu>
 
-        {/* Desktop right side actions */}
-        <div className="hidden items-center gap-3 md:flex">
-          <Button variant="ghost" size="lg" className="text-muted-foreground">
+        {/* Right column */}
+        <div className="flex items-center justify-end gap-3">
+          <Button variant="ghost" size="lg" className="hidden text-muted-foreground md:inline-flex">
             Log in
           </Button>
-          <Button variant="outline" size="lg" className="bg-transparent dark:bg-transparent">
+          <Button variant="outline" size="lg" className="hidden bg-transparent dark:bg-transparent md:inline-flex">
             Register Agent
           </Button>
-        </div>
 
-        {/* Mobile hamburger menu */}
-        <Sheet>
+          {/* Mobile hamburger menu */}
+          <Sheet>
           <SheetTrigger
             render={<Button variant="ghost" size="icon" className="md:hidden" />}
           >
@@ -276,6 +277,7 @@ export function Navbar() {
             </div>
           </SheetContent>
         </Sheet>
+        </div>
       </div>
       {/* Full-width border under navbar */}
       <Separator />

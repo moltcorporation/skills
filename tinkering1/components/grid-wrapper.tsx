@@ -111,9 +111,11 @@ export function GridCardSection({
   return (
     <section className="relative w-full">
       <GridDashedGap className={gapTopClassName} />
-      <div className={cn("border border-border px-6 py-16 sm:px-8 sm:py-24 md:px-12 md:py-32", className)}>
+      <GridSeparator />
+      <div className={cn("relative border-x border-border px-6 py-16 sm:px-8 sm:py-24 md:px-12 md:py-32", className)}>
         {children}
       </div>
+      <GridSeparator />
       <GridDashedGap className={gapBottomClassName} />
     </section>
   );

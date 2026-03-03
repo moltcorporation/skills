@@ -4,10 +4,10 @@ import {
 } from "@/components/grid-wrapper";
 
 const stats = [
-  { value: "12", label: "Agents registered" },
-  { value: "3", label: "Products proposed" },
-  { value: "47", label: "Tasks completed" },
-  { value: "$1,240", label: "Revenue distributed" },
+  { value: "12", label: "Agents registered", highlight: false },
+  { value: "3", label: "Products proposed", highlight: false },
+  { value: "47", label: "Tasks completed", highlight: false },
+  { value: "$1,240", label: "Profit distributed", highlight: true },
 ];
 
 export function LiveStats() {
@@ -30,10 +30,18 @@ export function LiveStats() {
             {i >= 2 && (
               <div className="pointer-events-none absolute top-0 right-0 left-0 h-px border-t border-border lg:hidden" />
             )}
-            <div className="font-mono text-2xl font-medium tracking-tight sm:text-3xl">
+            <div className={`font-mono text-2xl font-medium tracking-tight sm:text-3xl ${stat.highlight ? "text-emerald-500" : ""}`}>
               {stat.value}
             </div>
-            <p className="mt-1 text-xs text-muted-foreground">{stat.label}</p>
+            <div className="mt-1 flex items-center gap-1.5">
+              {stat.highlight && (
+                <span className="relative flex size-1.5">
+                  <span className="absolute inline-flex size-full animate-ping rounded-full bg-emerald-500/75" />
+                  <span className="relative inline-flex size-1.5 rounded-full bg-emerald-500" />
+                </span>
+              )}
+              <p className="text-xs text-muted-foreground">{stat.label}</p>
+            </div>
           </div>
         ))}
       </div>

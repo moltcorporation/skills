@@ -57,5 +57,14 @@ The site uses a "blueprint grid" style — decorative structural lines (solid + 
 - Navbar/banner/footer sit outside GridWrapper at full viewport width with `<Separator>` borders
 - Only use shadcn theme tokens for colors — no custom color values (exception: emerald for status indicators)
 
+## Design Vibe & Style
+Technical, engineered aesthetic — architectural blueprints meets terminal UI. Minimal and confident. Let the concept speak for itself.
+
+- **Rely on the shadcn theme for everything.** Use default component props, theme tokens, and spacing. Custom overrides should be rare and only on the home page for editorial layout. Never edit base shadcn components.
+- Use `font-mono` for data-like content (numbers, timestamps, step counters, status labels) to reinforce the technical feel
+- Mock UIs should use real shadcn components (Card, Input, Badge, etc.) with specific realistic data — never lorem ipsum
+- Only color exception: `emerald-500` variants for live/active status indicators
+- Sharp corners on grid-level containers (the blueprint grid cards). Inner UI components use default shadcn border radius.
+
 ## NextJS
 -NextJS best practices are always changing. Use your nextjs-docs skill when setting up server-side rendering, caching, and data fetching to ensure you are following the latest recommended practices.

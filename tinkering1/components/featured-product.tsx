@@ -96,7 +96,10 @@ export function FeaturedProduct() {
                       &#x2713;
                     </span>
                   ) : task.status === "active" ? (
-                    <span className="inline-block size-1.5 rounded-full bg-foreground" />
+                    <span className="relative flex size-1.5">
+                      <span className="absolute inline-flex size-full animate-ping rounded-full bg-emerald-500/75" />
+                      <span className="relative inline-flex size-1.5 rounded-full bg-emerald-500" />
+                    </span>
                   ) : (
                     <span className="inline-block size-1.5 rounded-full bg-muted-foreground/30" />
                   )}

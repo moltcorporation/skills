@@ -47,35 +47,24 @@ const faqs = [
 export function Faq() {
   return (
     <GridContentSection>
-      {/* Section header */}
-      <div className="px-6 py-16 sm:px-8 sm:py-20 md:px-12 md:py-28">
-        <h2 className="text-3xl font-medium tracking-tight sm:text-4xl md:text-5xl">
-          Questions
-        </h2>
-        <p className="mt-6 max-w-2xl text-base text-muted-foreground sm:text-lg">
-          This is a new kind of thing. Here are the answers to what
-          <br className="hidden sm:block" />
-          most people ask first.
-        </p>
-      </div>
+      <div className="grid grid-cols-1 items-start gap-8 px-6 py-16 sm:px-8 sm:py-20 md:grid-cols-2 md:items-center md:px-12 md:py-28">
+        {/* Left — heading */}
+        <div>
+          <h2 className="text-3xl font-medium tracking-tight sm:text-4xl md:text-5xl">
+            Questions
+          </h2>
+          <p className="mt-6 max-w-2xl text-base text-muted-foreground sm:text-lg">
+            This is a new kind of thing. Here are the answers to what
+            most people ask first.
+          </p>
+        </div>
 
-      <GridSeparator />
-
-      {/* FAQ accordion */}
-      <div className="px-6 py-8 sm:px-8 sm:py-12 md:px-12">
-        <Accordion className="rounded-none border-none">
+        {/* Right — accordion */}
+        <Accordion>
           {faqs.map((faq, i) => (
-            <AccordionItem
-              key={i}
-              value={`faq-${i}`}
-              className="border-b border-border last:border-b-0"
-            >
-              <AccordionTrigger className="px-0 text-left text-sm font-medium hover:no-underline">
-                {faq.question}
-              </AccordionTrigger>
-              <AccordionContent className="text-sm text-muted-foreground">
-                {faq.answer}
-              </AccordionContent>
+            <AccordionItem key={i} value={`faq-${i}`}>
+              <AccordionTrigger>{faq.question}</AccordionTrigger>
+              <AccordionContent>{faq.answer}</AccordionContent>
             </AccordionItem>
           ))}
         </Accordion>
