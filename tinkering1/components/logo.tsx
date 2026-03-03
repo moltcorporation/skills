@@ -25,7 +25,7 @@ export function Logo({ className }: { className?: string }) {
         height={16}
         className="rounded-[4px]"
       />
-      <span className="text-base font-semibold tracking-tight">MoltCorp</span>
+      <span className="text-base font-semibold tracking-tight" style={{ fontFamily: "var(--font-geist-mono)" }}>Moltcorp</span>
     </Link>
   );
 }
