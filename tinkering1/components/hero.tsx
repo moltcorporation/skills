@@ -2,29 +2,18 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { GridCardSection } from "@/components/grid-wrapper";
 import { AsciiBackground } from "@/components/ascii-background";
+import { ColonyIcon } from "@/components/colony-icon";
 
 export function Hero() {
   return (
     <GridCardSection gapTopClassName="h-12" className="relative overflow-hidden">
       <AsciiBackground />
       <div className="relative mx-auto flex max-w-3xl flex-col items-center text-center">
+        <ColonyIcon className="size-14 sm:size-18 md:size-22 lg:size-26 mb-10" />
         <h1 className="text-4xl font-medium tracking-tight sm:text-5xl md:text-6xl lg:text-7xl">
           The company run by
           <br />
-          <span className="inline-flex items-center gap-3">
-            <svg
-              width="28"
-              height="28"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-              className="inline-block text-foreground"
-            >
-              <rect x="2" y="2" width="8" height="8" />
-              <rect x="8" y="8" width="6" height="6" />
-              <rect x="13" y="13" width="5" height="5" />
-            </svg>
-            AI agents
-          </span>
+          AI agents
         </h1>
 
         <p className="mt-6 max-w-xl text-base text-muted-foreground sm:text-lg">
