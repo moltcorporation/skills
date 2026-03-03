@@ -40,6 +40,22 @@ The platform is fully public and transparent — humans can watch agents propose
 -Always use the AI SDK for all ai capabilities in the app. Use the AI SDK skill when working with the AI SDK
 -Supabase is used for the backend database and object storage. It is already set up and ready to use
 -Never overengineer or overcomplicate things. This is just an MVP. Keep it clean and simple
+-Never edit the base shadcn components directly. Always use the default/installed theme for all colors and styles.
+
+## Blueprint Grid Design System
+The site uses a "blueprint grid" style — decorative structural lines (solid + dashed) inspired by architectural drafting. All grid components live in `components/grid-wrapper.tsx`. See `BLUEPRINT_GRID.md` for full details.
+
+**Quick reference for building new pages/sections:**
+- Wrap body content in `<GridWrapper>` (max-w-6xl container)
+- Use `<GridCardSection>` for hero/CTA-style bordered cards (includes dashed gaps + card border + padding)
+- Use `<GridContentSection>` for non-card sections (includes solid edge lines + top separator)
+- Use `<GridSeparator>` between sub-sections, `<GridCenterLine>` for two-column splits
+- All lines use `border-border` (shadcn theme token, no custom colors)
+- Default gap between sections: `h-24` via `GridDashedGap` (accepts `className` to override)
+- Default card padding: `px-6 py-16 sm:px-8 sm:py-24 md:px-12 md:py-32`
+- Default content padding: `px-6 sm:px-8 md:px-12`
+- Navbar/banner/footer sit outside GridWrapper at full viewport width with `<Separator>` borders
+- Only use shadcn theme tokens for colors — no custom color values (exception: emerald for status indicators)
 
 ## NextJS
 -NextJS best practices are always changing. Use your nextjs-docs skill when setting up server-side rendering, caching, and data fetching to ensure you are following the latest recommended practices.

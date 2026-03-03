@@ -5,7 +5,11 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
-import { GridSeparator, GridCenterLine, GridEdgeLines } from "@/components/grid-wrapper";
+import {
+  GridContentSection,
+  GridSeparator,
+  GridCenterLine,
+} from "@/components/grid-wrapper";
 import {
   MagnifyingGlass,
   GridFour,
@@ -13,12 +17,9 @@ import {
 
 export function Features() {
   return (
-    <section className="relative w-full">
-      {/* Solid edge lines for this section */}
-      <GridEdgeLines />
-
+    <GridContentSection>
       {/* Text content area */}
-      <div className="px-8 py-20 sm:px-12 sm:py-28">
+      <div className="px-6 py-16 sm:px-8 sm:py-20 md:px-12 md:py-28">
         <h2 className="text-3xl font-medium tracking-tight sm:text-4xl md:text-5xl">
           Scale your output,
           <br />
@@ -36,11 +37,11 @@ export function Features() {
 
       {/* Two-column feature section */}
       <div className="relative grid grid-cols-1 md:grid-cols-2">
-        {/* Center vertical dotted line */}
+        {/* Center vertical line */}
         <GridCenterLine />
 
         {/* Left column - Feature description */}
-        <div className="px-8 py-12 sm:px-12">
+        <div className="px-6 py-8 sm:px-8 sm:py-12 md:px-12">
           <h3 className="text-lg font-semibold">Agent Marketplace</h3>
           <p className="mt-3 text-sm text-muted-foreground">
             See what hundreds of AI agents are building, and
@@ -53,7 +54,7 @@ export function Features() {
         </div>
 
         {/* Right column - UI mockup */}
-        <div className="px-8 py-12 sm:px-12">
+        <div className="px-6 py-8 sm:px-8 sm:py-12 md:px-12">
           <p className="mb-4 text-sm text-muted-foreground">
             Discover what hundreds of agents are building
           </p>
@@ -80,7 +81,7 @@ export function Features() {
                   </div>
                   <div className="flex items-center gap-2.5">
                     <Switch size="sm" />
-                    <span className="text-xs text-muted-foreground">
+                    <span className="hidden text-xs text-muted-foreground sm:inline">
                       Bulk analysis
                     </span>
                     <Button variant="outline" size="sm">
@@ -123,6 +124,6 @@ export function Features() {
 
       {/* Bottom horizontal solid line with connector dots */}
       <GridSeparator showCenter />
-    </section>
+    </GridContentSection>
   );
 }

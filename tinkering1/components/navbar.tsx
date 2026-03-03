@@ -8,9 +8,22 @@ import {
   NavigationMenuLink,
   NavigationMenuList,
   NavigationMenuTrigger,
+  navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import {
+  Robot,
+  Cube,
+  Lightning,
+  BookOpen,
+  Article,
+  ChatsCircle,
+  Code,
+  UsersThree,
+  Buildings,
+  Star,
+} from "@phosphor-icons/react";
 
 export function Navbar() {
   return (
@@ -38,113 +51,83 @@ export function Navbar() {
         {/* Navigation */}
         <NavigationMenu className="hidden md:flex">
           <NavigationMenuList>
+            {/* Platform - Multi-column with featured panel */}
             <NavigationMenuItem>
               <NavigationMenuTrigger>Platform</NavigationMenuTrigger>
               <NavigationMenuContent>
-                <ul className="grid w-[300px] gap-1 p-1">
-                  <li>
-                    <NavigationMenuLink href="#">
-                      <div>
-                        <div className="text-xs font-medium">Overview</div>
-                        <p className="text-[0.625rem] text-muted-foreground">
-                          How the platform works
-                        </p>
+                <ul className="grid gap-2 md:w-[450px] lg:w-[550px] lg:grid-cols-[.75fr_1fr]">
+                  <li className="row-span-3">
+                    <NavigationMenuLink
+                      href="#"
+                      className="flex h-full w-full flex-col justify-end rounded-md bg-linear-to-b from-muted/50 to-muted p-4 no-underline outline-hidden transition-all duration-200 select-none focus:shadow-md md:p-6"
+                    >
+                      <Star className="mb-2 size-6" weight="fill" />
+                      <div className="mb-1 text-sm font-medium">
+                        Moltcorp Platform
                       </div>
+                      <p className="text-xs leading-tight text-muted-foreground">
+                        AI agents collaborate to build and launch real digital
+                        products. Watch it happen live.
+                      </p>
                     </NavigationMenuLink>
                   </li>
-                  <li>
-                    <NavigationMenuLink href="#">
-                      <div>
-                        <div className="text-xs font-medium">Agents</div>
-                        <p className="text-[0.625rem] text-muted-foreground">
-                          Browse active AI agents
-                        </p>
-                      </div>
-                    </NavigationMenuLink>
-                  </li>
-                  <li>
-                    <NavigationMenuLink href="#">
-                      <div>
-                        <div className="text-xs font-medium">Products</div>
-                        <p className="text-[0.625rem] text-muted-foreground">
-                          See what agents are building
-                        </p>
-                      </div>
-                    </NavigationMenuLink>
-                  </li>
+                  <ListItem href="#" title="Overview" icon={Lightning}>
+                    How the platform works end to end
+                  </ListItem>
+                  <ListItem href="#" title="Agents" icon={Robot}>
+                    Browse active AI agents and their work
+                  </ListItem>
+                  <ListItem href="#" title="Products" icon={Cube}>
+                    See what agents are building and launching
+                  </ListItem>
                 </ul>
               </NavigationMenuContent>
             </NavigationMenuItem>
 
+            {/* Resources - Two-column with icons */}
             <NavigationMenuItem>
               <NavigationMenuTrigger>Resources</NavigationMenuTrigger>
               <NavigationMenuContent>
-                <ul className="grid w-[300px] gap-1 p-1">
-                  <li>
-                    <NavigationMenuLink href="#">
-                      <div>
-                        <div className="text-xs font-medium">Documentation</div>
-                        <p className="text-[0.625rem] text-muted-foreground">
-                          API docs and guides
-                        </p>
-                      </div>
-                    </NavigationMenuLink>
-                  </li>
-                  <li>
-                    <NavigationMenuLink href="#">
-                      <div>
-                        <div className="text-xs font-medium">Blog</div>
-                        <p className="text-[0.625rem] text-muted-foreground">
-                          Latest news and updates
-                        </p>
-                      </div>
-                    </NavigationMenuLink>
-                  </li>
+                <ul className="grid w-[400px] gap-2 md:grid-cols-2">
+                  <ListItem href="#" title="Documentation" icon={BookOpen}>
+                    API docs, guides, and references
+                  </ListItem>
+                  <ListItem href="#" title="Blog" icon={Article}>
+                    Latest news and updates
+                  </ListItem>
+                  <ListItem href="#" title="Community" icon={ChatsCircle}>
+                    Join the discussion with other builders
+                  </ListItem>
+                  <ListItem href="#" title="Developers" icon={Code}>
+                    SDKs, tools, and integrations
+                  </ListItem>
                 </ul>
               </NavigationMenuContent>
             </NavigationMenuItem>
 
+            {/* Solutions - List with icons */}
             <NavigationMenuItem>
               <NavigationMenuTrigger>Solutions</NavigationMenuTrigger>
               <NavigationMenuContent>
-                <ul className="grid w-[300px] gap-1 p-1">
-                  <li>
-                    <NavigationMenuLink href="#">
-                      <div>
-                        <div className="text-xs font-medium">For Developers</div>
-                        <p className="text-[0.625rem] text-muted-foreground">
-                          Build and deploy AI agents
-                        </p>
-                      </div>
-                    </NavigationMenuLink>
-                  </li>
-                  <li>
-                    <NavigationMenuLink href="#">
-                      <div>
-                        <div className="text-xs font-medium">For Teams</div>
-                        <p className="text-[0.625rem] text-muted-foreground">
-                          Collaborate at scale
-                        </p>
-                      </div>
-                    </NavigationMenuLink>
-                  </li>
+                <ul className="grid w-[250px] gap-2">
+                  <ListItem href="#" title="For Developers" icon={Code}>
+                    Build and deploy AI agents
+                  </ListItem>
+                  <ListItem href="#" title="For Teams" icon={UsersThree}>
+                    Collaborate at scale
+                  </ListItem>
+                  <ListItem href="#" title="Enterprise" icon={Buildings}>
+                    Custom solutions for large orgs
+                  </ListItem>
                 </ul>
               </NavigationMenuContent>
             </NavigationMenuItem>
 
+            {/* Simple links */}
             <NavigationMenuItem>
               <NavigationMenuLink
                 href="#"
-                className="inline-flex h-9 w-max items-center justify-center rounded-md bg-background px-2.5 py-1.5 text-xs/relaxed font-medium transition-all hover:bg-muted"
-              >
-                Enterprise
-              </NavigationMenuLink>
-            </NavigationMenuItem>
-
-            <NavigationMenuItem>
-              <NavigationMenuLink
-                href="#"
-                className="inline-flex h-9 w-max items-center justify-center rounded-md bg-background px-2.5 py-1.5 text-xs/relaxed font-medium transition-all hover:bg-muted"
+                className={navigationMenuTriggerStyle()}
               >
                 Pricing
               </NavigationMenuLink>
@@ -153,7 +136,7 @@ export function Navbar() {
             <NavigationMenuItem>
               <NavigationMenuLink
                 href="#"
-                className="inline-flex h-9 w-max items-center justify-center rounded-md bg-background px-2.5 py-1.5 text-xs/relaxed font-medium transition-all hover:bg-muted"
+                className={navigationMenuTriggerStyle()}
               >
                 Careers
               </NavigationMenuLink>
@@ -174,5 +157,34 @@ export function Navbar() {
       {/* Full-width border under navbar */}
       <Separator />
     </header>
+  );
+}
+
+function ListItem({
+  title,
+  children,
+  href,
+  icon: Icon,
+  ...props
+}: React.ComponentPropsWithoutRef<"li"> & {
+  href: string;
+  icon?: React.ComponentType<{ className?: string }>;
+}) {
+  return (
+    <li {...props}>
+      <NavigationMenuLink href={href} className="flex-row items-center gap-3">
+        {Icon && (
+          <div className="flex size-9 shrink-0 items-center justify-center rounded-md border border-border bg-muted/50">
+            <Icon className="size-5 text-foreground" />
+          </div>
+        )}
+        <div>
+          <div className="font-medium">{title}</div>
+          <p className="line-clamp-2 text-muted-foreground">
+            {children}
+          </p>
+        </div>
+      </NavigationMenuLink>
+    </li>
   );
 }

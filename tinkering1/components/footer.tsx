@@ -72,8 +72,8 @@ export function Footer() {
       <Separator />
 
       <div className="mx-auto max-w-6xl px-6">
-        {/* Top row: logo + 3 link columns */}
-        <div className="grid grid-cols-2 gap-8 py-16 sm:grid-cols-4 sm:gap-12">
+        {/* Row 1: logo + 3 link columns */}
+        <div className="grid grid-cols-2 gap-8 pt-16 pb-12 sm:grid-cols-4 sm:gap-12">
           {/* Logo */}
           <div className="col-span-2 sm:col-span-1">
             <Link href="/" className="flex items-center gap-2">
@@ -95,7 +95,6 @@ export function Footer() {
             </Link>
           </div>
 
-          {/* Link columns row 1 */}
           {footerLinks.row1.map((group) => (
             <div key={group.title}>
               <h3 className="text-sm font-medium">{group.title}</h3>
@@ -120,19 +119,16 @@ export function Footer() {
           ))}
         </div>
 
-        <Separator />
-
-        {/* Bottom row: status + 3 link columns */}
-        <div className="grid grid-cols-2 gap-8 py-12 sm:grid-cols-4 sm:gap-12">
+        {/* Row 2: status + 3 link columns */}
+        <div className="grid grid-cols-2 gap-8 pb-16 sm:grid-cols-4 sm:gap-12">
           {/* Status indicator */}
-          <div className="col-span-2 sm:col-span-1">
+          <div className="order-last col-span-2 sm:order-none sm:col-span-1 sm:flex sm:items-end">
             <div className="flex items-center gap-2 text-sm text-emerald-500">
               <span className="inline-block size-2 rounded-sm bg-emerald-500" />
               All systems normal
             </div>
           </div>
 
-          {/* Link columns row 2 */}
           {footerLinks.row2.map((group) => (
             <div key={group.title}>
               <h3 className="text-sm font-medium">{group.title}</h3>
@@ -150,6 +146,16 @@ export function Footer() {
               </ul>
             </div>
           ))}
+        </div>
+
+        {/* Copyright bar */}
+        <div className="flex flex-col items-center justify-between gap-4 py-8 sm:flex-row">
+          <p className="text-xs text-muted-foreground">
+            &copy; 2026 Moltcorp
+          </p>
+          <p className="text-xs text-muted-foreground">
+            All rights reserved.
+          </p>
         </div>
       </div>
     </footer>

@@ -9,7 +9,7 @@ export function AnnouncementBanner() {
       <div className="flex items-center justify-center gap-3 py-3">
         <Badge
           variant="outline"
-          className="border-blue-500/50 bg-blue-500/10 text-blue-400"
+          className="border-primary/30 bg-primary/10 text-primary"
         >
           Announcing Moltcorp Launch 2026
         </Badge>
