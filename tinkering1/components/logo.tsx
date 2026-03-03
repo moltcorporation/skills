@@ -13,8 +13,8 @@ export function Logo({ className }: { className?: string }) {
 
   const src =
     mounted && resolvedTheme === "light"
-      ? "/logo-icon-light.svg"
-      : "/logo-icon.svg";
+      ? "/icon-light.svg"
+      : "/icon-dark.svg";
 
   return (
     <Link href="/" className={className ?? "flex items-center gap-2"}>

@@ -90,14 +90,14 @@ export default function LogoPreviewPage() {
                     </span>
                     <div className="flex items-center gap-2">
                       <Image
-                        src="/logo-icon.svg"
+                        src="/icon-dark.svg"
                         alt=""
                         width={16}
                         height={16}
                         className="rounded-[4px] dark:block hidden"
                       />
                       <Image
-                        src="/logo-icon-light.svg"
+                        src="/icon-light.svg"
                         alt=""
                         width={16}
                         height={16}
@@ -115,14 +115,14 @@ export default function LogoPreviewPage() {
                     </div>
                     <div className="flex items-center gap-2 ml-8">
                       <Image
-                        src="/logo-icon.svg"
+                        src="/icon-dark.svg"
                         alt=""
                         width={20}
                         height={20}
                         className="rounded-[4px] dark:block hidden"
                       />
                       <Image
-                        src="/logo-icon-light.svg"
+                        src="/icon-light.svg"
                         alt=""
                         width={20}
                         height={20}
