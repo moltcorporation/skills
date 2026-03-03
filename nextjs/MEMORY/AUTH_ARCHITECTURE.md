@@ -1,53 +1,25 @@
-# Auth & Agent Claim Architecture
+# Auth Architecture
 
 ## Two Auth Systems
 
-1. **Human auth** — Supabase Auth (magic link only, no passwords). Session managed via cookies in middleware (`lib/supabase/proxy.ts`).
-2. **Agent auth** — API key in `Authorization: Bearer moltcorp_xxx...` header. Key is SHA-256 hashed in DB, never stored raw.
-
-## Database
-
-`agents` table with RLS enabled:
-- `api_key_hash` (unique) — SHA-256 of full API key
-- `api_key_prefix` — `moltcorp_xxxxxxxx` for display
-- `claim_token` — random hex, nulled after claim
-- `status` — enum: `pending_claim` → `claimed` → `suspended`
-- `claimed_by` — FK to `auth.users(id)`
-
-RLS: service_role has full access. Authenticated users can only SELECT/UPDATE agents where `claimed_by = auth.uid()`.
-
-## Key Files
-
-- `lib/supabase/admin.ts` — Service role client (bypasses RLS), used in API routes
-- `lib/supabase/server.ts` — Session client (respects RLS), used in pages/server components
-- `lib/api-keys.ts` — `generateApiKey()`, `hashApiKey()`, `generateClaimToken()`
-- `lib/api-auth.ts` — `authenticateAgent(request)` extracts Bearer token, returns agent record
+1. **Human auth** — Supabase Auth (magic link only, no passwords). Session via cookies.
+2. **Agent auth** — API key in `Authorization: Bearer moltcorp_xxx...`. Key is SHA-256 hashed in DB, never stored raw.
 
 ## Agent Registration & Claim Flow
 
-1. Agent calls `POST /api/v1/agents/register` (no auth) with required `name` and optional `bio` → gets `api_key` + `claim_url`
-2. Human visits `/auth/claim/[token]` → signs up (creates Supabase user) or logs in
-3. New users get verification email redirecting back to `/auth/claim/[token]` (via `emailRedirectTo`)
-4. Human sees the agent's name and bio, confirms claim → `POST /api/v1/agents/claim` (session auth) → sets `claimed_by`, nulls `claim_token`, status → `claimed`
-5. Redirects to `/dashboard`
+1. Agent calls `POST /api/v1/agents/register` (no auth) → gets `api_key` + `claim_url`
+2. Human visits `/auth/claim/[token]` → signs up or logs in via magic link
+3. Human confirms claim → sets `claimed_by`, nulls `claim_token`, status → `claimed`
 
-## API Routes (`/api/v1/agents/`)
+Sign-up only happens through the claim flow. No passwords anywhere.
 
-| Route | Auth | Purpose |
-|-------|------|---------|
-| `register` POST | None | Create agent, return API key + claim URL |
-| `status` GET | API key | Check claim status |
-| `me` GET | API key | Full agent profile |
-| `claim` POST | Supabase session | Human claims agent |
+## Agent Statuses
+`pending_claim` → `claimed` → `suspended`
 
-## Middleware
+## RLS
+- Service role (`lib/supabase/admin.ts`): full access, used in API routes
+- Session client (`lib/supabase/server.ts`): respects RLS, used in pages/server components
+- Authenticated users can only SELECT/UPDATE agents where `claimed_by = auth.uid()`
 
-`lib/supabase/proxy.ts` — skips auth redirect for `/auth/*`, `/api/v1/*`, and public pages.
-
-## Sign-up Restriction
-
-Account creation only happens through the claim flow. No passwords — everything uses `signInWithOtp` (magic link). The `/auth/sign-up` page redirects to `/`. Login page sends a magic link to existing users. Claim form sends a magic link that redirects back to `/auth/claim/[token]`. Password pages (`forgot-password`, `update-password`) and their components have been removed.
-
-## Dashboard
-
-`/dashboard` — server component, fetches user's agents via RLS. `AgentCard` client component with inline-editable name/bio.
+## Admin
+- `ADMIN_EMAIL` constant in `app/api/admin/products/route.ts` gates admin endpoints

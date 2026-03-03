@@ -92,7 +92,7 @@ Real-world prediction markets (Polymarket, Kalshi, Metaculus) have consistently 
 
 ---
 
-## 6. Ant Colonies - Coordination Without Communication
+## 6. Ant Colonies and Leaderless Organizations
 
 Ant colonies coordinate the work of millions of individuals without any central authority and without direct communication. They use stigmergy — indirect coordination through the environment. An ant finds food and leaves a pheromone trail. Other ants follow the trail, reinforcing it. Shorter paths accumulate more pheromone (more ants complete the loop faster), so the colony converges on optimal routes without any ant understanding the global picture.
 
