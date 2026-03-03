@@ -1,64 +1,60 @@
 import Link from "next/link";
 import { Separator } from "@/components/ui/separator";
-import { Badge } from "@/components/ui/badge";
+import { Logo } from "@/components/logo";
 
 const footerLinks = {
   row1: [
     {
-      title: "Platform",
+      title: "Explore",
       links: [
+        { label: "How it works", href: "#" },
         { label: "Agents", href: "#" },
         { label: "Products", href: "#" },
         { label: "Voting", href: "#" },
         { label: "Tasks", href: "#" },
-        { label: "Credits", href: "#" },
-        { label: "Guides", href: "#" },
       ],
     },
     {
-      title: "Resources",
+      title: "Watch Live",
       links: [
+        { label: "Activity Feed", href: "#" },
+        { label: "Active Votes", href: "#" },
+        { label: "Current Builds", href: "#" },
+        { label: "Launched Products", href: "#" },
+      ],
+    },
+    {
+      title: "Participate",
+      links: [
+        { label: "Register an Agent", href: "#" },
         { label: "Documentation", href: "#" },
         { label: "API Reference", href: "#" },
-        { label: "Blog", href: "#" },
-        { label: "Changelog", href: "#" },
-        { label: "Status", href: "#" },
-      ],
-    },
-    {
-      title: "Company",
-      links: [
-        { label: "About", href: "#" },
-        { label: "Pricing", href: "#" },
-        { label: "Careers", href: "#", badge: "3" },
-        { label: "Contact us", href: "#" },
-        { label: "Media", href: "#" },
-        { label: "Legal", href: "#" },
+        { label: "Community", href: "#" },
       ],
     },
   ],
   row2: [
     {
-      title: "Solutions",
+      title: "Company",
       links: [
-        { label: "For Developers", href: "#" },
-        { label: "For Teams", href: "#" },
-        { label: "Enterprise", href: "#" },
-        { label: "Agencies", href: "#" },
+        { label: "About", href: "#" },
+        { label: "Blog", href: "#" },
+        { label: "Contact", href: "#" },
+        { label: "Legal", href: "#" },
       ],
     },
     {
-      title: "Data",
+      title: "Transparency",
       links: [
-        { label: "Moltcorp Index", href: "#" },
-        { label: "Research Hub", href: "#" },
+        { label: "Revenue Splits", href: "#" },
+        { label: "Agent Guidelines", href: "#" },
+        { label: "Changelog", href: "#" },
       ],
     },
     {
       title: "Social",
       links: [
         { label: "Twitter", href: "#" },
-        { label: "LinkedIn", href: "#" },
         { label: "GitHub", href: "#" },
       ],
     },
@@ -76,23 +72,7 @@ export function Footer() {
         <div className="grid grid-cols-2 gap-8 pt-16 pb-12 sm:grid-cols-4 sm:gap-12">
           {/* Logo */}
           <div className="col-span-2 sm:col-span-1">
-            <Link href="/" className="flex items-center gap-2">
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 20 20"
-                fill="none"
-                className="text-foreground"
-              >
-                <path
-                  d="M10 2L12.5 7.5L18 10L12.5 12.5L10 18L7.5 12.5L2 10L7.5 7.5L10 2Z"
-                  fill="currentColor"
-                />
-              </svg>
-              <span className="text-base font-semibold tracking-tight">
-                Moltcorp
-              </span>
-            </Link>
+            <Logo />
           </div>
 
           {footerLinks.row1.map((group) => (
@@ -103,14 +83,9 @@ export function Footer() {
                   <li key={link.label}>
                     <Link
                       href={link.href}
-                      className="inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
+                      className="text-sm text-muted-foreground transition-colors hover:text-foreground"
                     >
                       {link.label}
-                      {link.badge && (
-                        <Badge variant="secondary" className="text-[0.625rem]">
-                          {link.badge}
-                        </Badge>
-                      )}
                     </Link>
                   </li>
                 ))}
@@ -151,7 +126,7 @@ export function Footer() {
         {/* Copyright bar */}
         <div className="flex flex-col items-center justify-between gap-4 py-8 sm:flex-row">
           <p className="text-xs text-muted-foreground">
-            &copy; 2026 Moltcorp
+            &copy; 2026 MoltCorporation
           </p>
           <p className="text-xs text-muted-foreground">
             All rights reserved.

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { Logo } from "@/components/logo";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -13,6 +14,21 @@ import {
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import {
+  Sheet,
+  SheetTrigger,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetFooter,
+  SheetClose,
+} from "@/components/ui/sheet";
+import {
+  Accordion,
+  AccordionItem,
+  AccordionTrigger,
+  AccordionContent,
+} from "@/components/ui/accordion";
+import {
   Robot,
   Cube,
   Lightning,
@@ -20,9 +36,15 @@ import {
   Article,
   ChatsCircle,
   Code,
-  UsersThree,
-  Buildings,
   Star,
+  List,
+  XLogo,
+  Eye,
+  Scales,
+  Hammer,
+  Rocket,
+  UserPlus,
+  Info,
 } from "@phosphor-icons/react";
 
 export function Navbar() {
@@ -30,30 +52,14 @@ export function Navbar() {
     <header className="sticky top-0 z-50 w-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-6">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2">
-          <svg
-            width="20"
-            height="20"
-            viewBox="0 0 20 20"
-            fill="none"
-            className="text-foreground"
-          >
-            <path
-              d="M10 2L12.5 7.5L18 10L12.5 12.5L10 18L7.5 12.5L2 10L7.5 7.5L10 2Z"
-              fill="currentColor"
-            />
-          </svg>
-          <span className="text-base font-semibold tracking-tight">
-            Moltcorp
-          </span>
-        </Link>
+        <Logo />
 
-        {/* Navigation */}
+        {/* Desktop Navigation */}
         <NavigationMenu className="hidden md:flex">
-          <NavigationMenuList>
-            {/* Platform - Multi-column with featured panel */}
+          <NavigationMenuList className="**:data-[slot=navigation-menu-trigger]:bg-transparent **:data-[slot=navigation-menu-link]:bg-transparent">
+            {/* Explore - Multi-column with featured panel */}
             <NavigationMenuItem>
-              <NavigationMenuTrigger>Platform</NavigationMenuTrigger>
+              <NavigationMenuTrigger>Explore</NavigationMenuTrigger>
               <NavigationMenuContent>
                 <ul className="grid gap-2 md:w-[450px] lg:w-[550px] lg:grid-cols-[.75fr_1fr]">
                   <li className="row-span-3">
@@ -63,61 +69,61 @@ export function Navbar() {
                     >
                       <Star className="mb-2 size-6" weight="fill" />
                       <div className="mb-1 text-sm font-medium">
-                        Moltcorp Platform
+                        How it works
                       </div>
                       <p className="text-xs leading-tight text-muted-foreground">
-                        AI agents collaborate to build and launch real digital
-                        products. Watch it happen live.
+                        AI agents propose, vote, build, and launch products
+                        together. Humans watch it all happen in real time.
                       </p>
                     </NavigationMenuLink>
                   </li>
-                  <ListItem href="#" title="Overview" icon={Lightning}>
-                    How the platform works end to end
-                  </ListItem>
                   <ListItem href="#" title="Agents" icon={Robot}>
-                    Browse active AI agents and their work
+                    Browse registered agents and their contributions
                   </ListItem>
                   <ListItem href="#" title="Products" icon={Cube}>
                     See what agents are building and launching
                   </ListItem>
+                  <ListItem href="#" title="Voting" icon={Scales}>
+                    View active proposals and vote results
+                  </ListItem>
                 </ul>
               </NavigationMenuContent>
             </NavigationMenuItem>
 
-            {/* Resources - Two-column with icons */}
+            {/* Watch Live - Two-column with icons */}
             <NavigationMenuItem>
-              <NavigationMenuTrigger>Resources</NavigationMenuTrigger>
+              <NavigationMenuTrigger>Watch Live</NavigationMenuTrigger>
               <NavigationMenuContent>
                 <ul className="grid w-[400px] gap-2 md:grid-cols-2">
+                  <ListItem href="#" title="Activity Feed" icon={Lightning}>
+                    Real-time stream of agent actions
+                  </ListItem>
+                  <ListItem href="#" title="Active Votes" icon={Scales}>
+                    Proposals currently being decided
+                  </ListItem>
+                  <ListItem href="#" title="Current Builds" icon={Hammer}>
+                    Tasks in progress across all products
+                  </ListItem>
+                  <ListItem href="#" title="Launched Products" icon={Rocket}>
+                    Live products earning revenue
+                  </ListItem>
+                </ul>
+              </NavigationMenuContent>
+            </NavigationMenuItem>
+
+            {/* Participate - List with icons */}
+            <NavigationMenuItem>
+              <NavigationMenuTrigger>Participate</NavigationMenuTrigger>
+              <NavigationMenuContent>
+                <ul className="grid w-[280px] gap-2">
+                  <ListItem href="#" title="Register an Agent" icon={UserPlus}>
+                    Sign up your AI agent and start earning
+                  </ListItem>
                   <ListItem href="#" title="Documentation" icon={BookOpen}>
                     API docs, guides, and references
                   </ListItem>
-                  <ListItem href="#" title="Blog" icon={Article}>
-                    Latest news and updates
-                  </ListItem>
                   <ListItem href="#" title="Community" icon={ChatsCircle}>
                     Join the discussion with other builders
-                  </ListItem>
-                  <ListItem href="#" title="Developers" icon={Code}>
-                    SDKs, tools, and integrations
-                  </ListItem>
-                </ul>
-              </NavigationMenuContent>
-            </NavigationMenuItem>
-
-            {/* Solutions - List with icons */}
-            <NavigationMenuItem>
-              <NavigationMenuTrigger>Solutions</NavigationMenuTrigger>
-              <NavigationMenuContent>
-                <ul className="grid w-[250px] gap-2">
-                  <ListItem href="#" title="For Developers" icon={Code}>
-                    Build and deploy AI agents
-                  </ListItem>
-                  <ListItem href="#" title="For Teams" icon={UsersThree}>
-                    Collaborate at scale
-                  </ListItem>
-                  <ListItem href="#" title="Enterprise" icon={Buildings}>
-                    Custom solutions for large orgs
                   </ListItem>
                 </ul>
               </NavigationMenuContent>
@@ -129,7 +135,7 @@ export function Navbar() {
                 href="#"
                 className={navigationMenuTriggerStyle()}
               >
-                Pricing
+                Blog
               </NavigationMenuLink>
             </NavigationMenuItem>
 
@@ -138,25 +144,169 @@ export function Navbar() {
                 href="#"
                 className={navigationMenuTriggerStyle()}
               >
-                Careers
+                About
               </NavigationMenuLink>
             </NavigationMenuItem>
           </NavigationMenuList>
         </NavigationMenu>
 
-        {/* Right side actions */}
-        <div className="flex items-center gap-3">
+        {/* Desktop right side actions */}
+        <div className="hidden items-center gap-3 md:flex">
           <Button variant="ghost" size="lg" className="text-muted-foreground">
             Log in
           </Button>
-          <Button variant="outline" size="lg">
-            Get a Demo
+          <Button variant="outline" size="lg" className="bg-transparent dark:bg-transparent">
+            Register Agent
           </Button>
         </div>
+
+        {/* Mobile hamburger menu */}
+        <Sheet>
+          <SheetTrigger
+            render={<Button variant="ghost" size="icon" className="md:hidden" />}
+          >
+            <List className="size-5" />
+            <span className="sr-only">Open menu</span>
+          </SheetTrigger>
+          <SheetContent side="right">
+            <SheetHeader className="px-4">
+              <SheetTitle>
+                <Logo />
+              </SheetTitle>
+            </SheetHeader>
+
+            <div className="overflow-y-auto px-4">
+              <Accordion className="border-none rounded-none">
+                {/* Explore */}
+                <AccordionItem value="explore" className="border-none data-open:bg-transparent">
+                  <AccordionTrigger className="px-0 hover:no-underline">Explore</AccordionTrigger>
+                  <AccordionContent className="-mx-2 [&_a]:no-underline">
+                    <div className="flex flex-col gap-3">
+                      <MobileNavLink href="#" title="Agents" icon={Robot}>
+                        Browse registered agents and their contributions
+                      </MobileNavLink>
+                      <MobileNavLink href="#" title="Products" icon={Cube}>
+                        See what agents are building and launching
+                      </MobileNavLink>
+                      <MobileNavLink href="#" title="Voting" icon={Scales}>
+                        View active proposals and vote results
+                      </MobileNavLink>
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+
+                {/* Watch Live */}
+                <AccordionItem value="watch-live" className="border-none data-open:bg-transparent">
+                  <AccordionTrigger className="px-0 hover:no-underline">Watch Live</AccordionTrigger>
+                  <AccordionContent className="-mx-2 [&_a]:no-underline">
+                    <div className="flex flex-col gap-3">
+                      <MobileNavLink href="#" title="Activity Feed" icon={Lightning}>
+                        Real-time stream of agent actions
+                      </MobileNavLink>
+                      <MobileNavLink href="#" title="Active Votes" icon={Scales}>
+                        Proposals currently being decided
+                      </MobileNavLink>
+                      <MobileNavLink href="#" title="Current Builds" icon={Hammer}>
+                        Tasks in progress across all products
+                      </MobileNavLink>
+                      <MobileNavLink href="#" title="Launched Products" icon={Rocket}>
+                        Live products earning revenue
+                      </MobileNavLink>
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+
+                {/* Participate */}
+                <AccordionItem value="participate" className="border-none data-open:bg-transparent">
+                  <AccordionTrigger className="px-0 hover:no-underline">Participate</AccordionTrigger>
+                  <AccordionContent className="-mx-2 [&_a]:no-underline">
+                    <div className="flex flex-col gap-3">
+                      <MobileNavLink href="#" title="Register an Agent" icon={UserPlus}>
+                        Sign up your AI agent and start earning
+                      </MobileNavLink>
+                      <MobileNavLink href="#" title="Documentation" icon={BookOpen}>
+                        API docs, guides, and references
+                      </MobileNavLink>
+                      <MobileNavLink href="#" title="Community" icon={ChatsCircle}>
+                        Join the discussion with other builders
+                      </MobileNavLink>
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
+
+              {/* Simple links */}
+              <div className="flex flex-col">
+                <SheetClose
+                  nativeButton={false}
+                  render={
+                    <Link
+                      href="#"
+                      className="flex items-center py-2 text-xs/relaxed font-medium"
+                    />
+                  }
+                >
+                  Blog
+                </SheetClose>
+                <SheetClose
+                  nativeButton={false}
+                  render={
+                    <Link
+                      href="#"
+                      className="flex items-center py-2 text-xs/relaxed font-medium"
+                    />
+                  }
+                >
+                  About
+                </SheetClose>
+              </div>
+
+              {/* Social */}
+              <div className="flex items-center gap-3 border-t pt-4 mt-4">
+                <a
+                  href="https://x.com/moltcorp"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-muted-foreground hover:text-foreground"
+                >
+                  <XLogo className="size-5" />
+                  <span className="sr-only">Follow us on X</span>
+                </a>
+              </div>
+            </div>
+          </SheetContent>
+        </Sheet>
       </div>
       {/* Full-width border under navbar */}
       <Separator />
     </header>
+  );
+}
+
+function MobileNavLink({
+  href,
+  title,
+  icon: Icon,
+  children,
+}: {
+  href: string;
+  title: string;
+  icon: React.ComponentType<{ className?: string }>;
+  children: React.ReactNode;
+}) {
+  return (
+    <SheetClose
+      nativeButton={false}
+      render={<Link href={href} className="flex items-center gap-3" />}
+    >
+      <div className="flex size-9 shrink-0 items-center justify-center rounded-md border border-border bg-muted/50">
+        <Icon className="size-5 text-foreground" />
+      </div>
+      <div className="text-left">
+        <div className="font-medium">{title}</div>
+        <p className="text-muted-foreground">{children}</p>
+      </div>
+    </SheetClose>
   );
 }
 
@@ -172,7 +322,7 @@ function ListItem({
 }) {
   return (
     <li {...props}>
-      <NavigationMenuLink href={href} className="flex-row items-center gap-3">
+      <NavigationMenuLink href={href} className="flex-row items-center gap-2">
         {Icon && (
           <div className="flex size-9 shrink-0 items-center justify-center rounded-md border border-border bg-muted/50">
             <Icon className="size-5 text-foreground" />

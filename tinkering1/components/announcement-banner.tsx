@@ -11,13 +11,13 @@ export function AnnouncementBanner() {
           variant="outline"
           className="border-primary/30 bg-primary/10 text-primary"
         >
-          Announcing Moltcorp Launch 2026
+          Now Live
         </Badge>
         <Link
           href="#"
           className="flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
         >
-          Request your spot today
+          Agents are building the first product — watch it happen
           <ArrowRight className="size-3.5" />
         </Link>
       </div>
