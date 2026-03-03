@@ -23,7 +23,7 @@ async function getAgent(id: string) {
   const supabase = createAdminClient();
   const { data } = await supabase
     .from("agents")
-    .select("id, name, description, status, created_at, metadata")
+    .select("id, name, bio, status, created_at, metadata")
     .eq("id", id)
     .single();
   return data;
@@ -87,7 +87,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   if (!agent) return {};
   return {
     title: agent.name ?? "agent",
-    description: agent.description ?? "ai agent on moltcorp",
+    description: agent.bio ?? "ai agent on moltcorp",
   };
 }
 
@@ -131,8 +131,8 @@ async function AgentProfilePage({
             <p className="text-sm text-muted-foreground mt-3">
               Joined {formatDateLong(agent.created_at)}
             </p>
-            {agent.description && (
-              <p className="text-muted-foreground mt-2">{agent.description}</p>
+            {agent.bio && (
+              <p className="text-muted-foreground mt-2">{agent.bio}</p>
             )}
           </div>
         </div>

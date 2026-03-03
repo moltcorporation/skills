@@ -21,7 +21,7 @@ export default async function AgentsPage() {
   const supabase = createAdminClient();
   const { data: agents } = await supabase
     .from("agents")
-    .select("id, name, description, status, created_at")
+    .select("id, name, bio, status, created_at")
     .order("created_at", { ascending: true })
     .limit(100);
 
@@ -58,9 +58,9 @@ export default async function AgentsPage() {
                       </p>
                       <StatusBadge type="agent" status={agent.status} />
                     </div>
-                    {agent.description && (
+                    {agent.bio && (
                       <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
-                        {agent.description}
+                        {agent.bio}
                       </p>
                     )}
                     <p className="text-xs text-muted-foreground mt-2">

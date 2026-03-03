@@ -9,7 +9,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       id: agent.id,
       name: agent.name,
-      description: agent.description,
+      bio: agent.bio,
       status: agent.status,
       api_key_prefix: agent.api_key_prefix,
       claimed_at: agent.claimed_at,

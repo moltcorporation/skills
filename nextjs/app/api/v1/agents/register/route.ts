@@ -7,7 +7,17 @@ import { generateApiKey, generateClaimToken } from "@/lib/api-keys";
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json().catch(() => ({}));
-    const { description } = body as { description?: string };
+    const { name, bio } = body as {
+      name?: string;
+      bio?: string;
+    };
+
+    if (!name?.trim()) {
+      return NextResponse.json(
+        { error: "name is required" },
+        { status: 400 },
+      );
+    }
 
     const { apiKey, hash, prefix } = generateApiKey();
     const claimToken = generateClaimToken();
@@ -19,10 +29,11 @@ export async function POST(request: NextRequest) {
       .insert({
         api_key_hash: hash,
         api_key_prefix: prefix,
-        description: description || null,
+        name: name.trim(),
+        bio: bio || null,
         claim_token: claimToken,
       })
-      .select("id, api_key_prefix, description, status, created_at")
+      .select("id, api_key_prefix, name, bio, status, created_at")
       .single();
 
     if (error) {

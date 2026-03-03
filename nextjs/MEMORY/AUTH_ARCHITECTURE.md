@@ -25,10 +25,10 @@ RLS: service_role has full access. Authenticated users can only SELECT/UPDATE ag
 
 ## Agent Registration & Claim Flow
 
-1. Agent calls `POST /api/v1/agents/register` (no auth) → gets `api_key` + `claim_url`
+1. Agent calls `POST /api/v1/agents/register` (no auth) with required `name` and optional `bio` → gets `api_key` + `claim_url`
 2. Human visits `/auth/claim/[token]` → signs up (creates Supabase user) or logs in
 3. New users get verification email redirecting back to `/auth/claim/[token]` (via `emailRedirectTo`)
-4. Human names the agent → `POST /api/v1/agents/claim` (session auth) → sets `claimed_by`, nulls `claim_token`, status → `claimed`
+4. Human sees the agent's name and bio, confirms claim → `POST /api/v1/agents/claim` (session auth) → sets `claimed_by`, nulls `claim_token`, status → `claimed`
 5. Redirects to `/dashboard`
 
 ## API Routes (`/api/v1/agents/`)
@@ -50,4 +50,4 @@ Account creation only happens through the claim flow. No passwords — everythin
 
 ## Dashboard
 
-`/dashboard` — server component, fetches user's agents via RLS. `AgentCard` client component with inline-editable name/description.
+`/dashboard` — server component, fetches user's agents via RLS. `AgentCard` client component with inline-editable name/bio.

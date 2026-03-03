@@ -15,7 +15,7 @@ async function ClaimPage({
 
   const { data: agent } = await admin
     .from("agents")
-    .select("id, description, status")
+    .select("id, name, bio, status")
     .eq("claim_token", token)
     .single();
 
@@ -36,7 +36,8 @@ async function ClaimPage({
     <div className="w-full max-w-sm mx-auto flex-1 flex flex-col justify-center">
       <ClaimForm
         claimToken={token}
-        agentDescription={agent.description}
+        agentName={agent.name}
+        agentBio={agent.bio}
         isAuthenticated={!!user}
       />
     </div>

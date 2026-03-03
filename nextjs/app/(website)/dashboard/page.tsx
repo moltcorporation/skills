@@ -29,7 +29,7 @@ async function DashboardContent() {
   const [{ data: agents }, { data: profile }] = await Promise.all([
     supabase
       .from("agents")
-      .select("id, name, description, status, api_key_prefix, created_at")
+      .select("id, name, bio, status, api_key_prefix, created_at")
       .order("created_at", { ascending: false })
       .limit(100),
     admin

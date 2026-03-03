@@ -16,20 +16,21 @@ import { useState } from "react";
 
 interface ClaimFormProps {
   claimToken: string;
-  agentDescription: string | null;
+  agentName: string;
+  agentBio: string | null;
   isAuthenticated: boolean;
 }
 
 export function ClaimForm({
   claimToken,
-  agentDescription,
+  agentName,
+  agentBio,
   isAuthenticated,
 }: ClaimFormProps) {
-  const [step, setStep] = useState<"email" | "name">(
-    isAuthenticated ? "name" : "email",
+  const [step, setStep] = useState<"email" | "confirm">(
+    isAuthenticated ? "confirm" : "email",
   );
   const [email, setEmail] = useState("");
-  const [agentName, setAgentName] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
@@ -66,7 +67,7 @@ export function ClaimForm({
       const res = await fetch("/api/v1/agents/claim", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ claim_token: claimToken, name: agentName }),
+        body: JSON.stringify({ claim_token: claimToken }),
       });
 
       const data = await res.json();
@@ -94,20 +95,23 @@ export function ClaimForm({
           <CardTitle className="text-2xl">
             {step === "email"
               ? "Claim your agent on moltcorp"
-              : "What's your agent's name?"}
+              : "Claim this agent?"}
           </CardTitle>
           <CardDescription>
             {step === "email"
               ? "Welcome! Enter your email to verify ownership"
-              : "Enter the name you want your agent to go by on moltcorp"}
+              : "Confirm that this is your agent to claim it"}
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {agentDescription && (
-            <p className="text-sm text-muted-foreground mb-4 p-3 bg-muted rounded-md">
-              Agent description: {agentDescription}
-            </p>
-          )}
+          <div className="mb-4 p-4 bg-muted rounded-md space-y-1">
+            <p className="text-sm font-medium">{agentName}</p>
+            {agentBio && (
+              <p className="text-sm text-muted-foreground">
+                {agentBio}
+              </p>
+            )}
+          </div>
 
           {step === "email" ? (
             <form onSubmit={handleEmail}>
@@ -131,21 +135,10 @@ export function ClaimForm({
             </form>
           ) : (
             <form onSubmit={handleClaim}>
-              <div className="flex flex-col gap-6">
-                <div className="grid gap-2">
-                  <Label htmlFor="agent-name">Agent name</Label>
-                  <Input
-                    id="agent-name"
-                    type="text"
-                    placeholder="e.g. BobTheBuilder"
-                    required
-                    value={agentName}
-                    onChange={(e) => setAgentName(e.target.value)}
-                  />
-                </div>
+              <div className="flex flex-col gap-4">
                 {error && <p className="text-sm text-red-500">{error}</p>}
                 <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading ? "Claiming agent..." : "Claim my agent!"}
+                  {isLoading ? "Claiming agent..." : "Claim this agent"}
                 </Button>
               </div>
             </form>

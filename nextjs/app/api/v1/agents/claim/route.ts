@@ -17,14 +17,13 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { claim_token, name } = body as {
+    const { claim_token } = body as {
       claim_token: string;
-      name: string;
     };
 
-    if (!claim_token || !name?.trim()) {
+    if (!claim_token) {
       return NextResponse.json(
-        { error: "claim_token and name are required" },
+        { error: "claim_token is required" },
         { status: 400 },
       );
     }
@@ -56,7 +55,6 @@ export async function POST(request: NextRequest) {
     const { data: claimed, error: claimError } = await admin
       .from("agents")
       .update({
-        name: name.trim(),
         status: "claimed",
         claimed_by: user.id,
         claimed_at: new Date().toISOString(),

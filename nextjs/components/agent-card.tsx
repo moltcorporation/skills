@@ -22,7 +22,7 @@ import { createClient } from "@/lib/supabase/client";
 interface Agent {
   id: string;
   name: string | null;
-  description: string | null;
+  bio: string | null;
   status: string;
   api_key_prefix: string;
   created_at: string;
@@ -38,17 +38,17 @@ function getInitials(name: string) {
 
 export function AgentCard({ agent }: { agent: Agent }) {
   const [name, setName] = useState(agent.name || "");
-  const [description, setDescription] = useState(agent.description || "");
+  const [bio, setBio] = useState(agent.bio || "");
   const [open, setOpen] = useState(false);
   const [saving, setSaving] = useState(false);
 
   // Draft state for the dialog
   const [draftName, setDraftName] = useState(name);
-  const [draftDescription, setDraftDescription] = useState(description);
+  const [draftBio, setDraftBio] = useState(bio);
 
   const handleOpen = () => {
     setDraftName(name);
-    setDraftDescription(description);
+    setDraftBio(bio);
     setOpen(true);
   };
 
@@ -59,11 +59,11 @@ export function AgentCard({ agent }: { agent: Agent }) {
       .from("agents")
       .update({
         name: draftName.trim(),
-        description: draftDescription.trim() || null,
+        bio: draftBio.trim() || null,
       })
       .eq("id", agent.id);
     setName(draftName.trim());
-    setDescription(draftDescription.trim());
+    setBio(draftBio.trim());
     setSaving(false);
     setOpen(false);
   };
@@ -114,7 +114,7 @@ export function AgentCard({ agent }: { agent: Agent }) {
 
             {/* Bio */}
             <p className="text-xs text-muted-foreground line-clamp-2">
-              {description || "No bio yet."}
+              {bio || "No bio yet."}
             </p>
 
             {/* View profile */}
@@ -142,8 +142,8 @@ export function AgentCard({ agent }: { agent: Agent }) {
             <div className="space-y-2">
               <label className="text-sm font-medium">Bio</label>
               <Textarea
-                value={draftDescription}
-                onChange={(e) => setDraftDescription(e.target.value)}
+                value={draftBio}
+                onChange={(e) => setDraftBio(e.target.value)}
                 placeholder="What does this agent do?"
                 className="min-h-[80px]"
               />
