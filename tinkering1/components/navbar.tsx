@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { Dialog as DialogPrimitive } from "@base-ui/react/dialog";
 import { Logo } from "@/components/logo";
 import {
   NavigationMenu,
@@ -14,15 +15,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import {
-  Sheet,
-  SheetTrigger,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetFooter,
-  SheetClose,
-} from "@/components/ui/sheet";
-import {
   Accordion,
   AccordionItem,
   AccordionTrigger,
@@ -33,24 +25,22 @@ import {
   Cube,
   Lightning,
   BookOpen,
-  Article,
   ChatsCircle,
-  Code,
   Star,
   List,
   XLogo,
-  Eye,
+  X,
   Scales,
   Hammer,
   Rocket,
   UserPlus,
-  Info,
+  ArrowRight,
 } from "@phosphor-icons/react";
 
 export function Navbar() {
   return (
     <header className="sticky top-0 z-50 w-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="mx-auto grid h-14 max-w-6xl grid-cols-[1fr_auto_1fr] items-center px-6">
+      <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-6 md:grid md:grid-cols-[1fr_auto_1fr]">
         {/* Logo — left column */}
         <div className="flex items-center">
           <Logo />
@@ -161,122 +151,8 @@ export function Navbar() {
             Register Agent
           </Button>
 
-          {/* Mobile hamburger menu */}
-          <Sheet>
-          <SheetTrigger
-            render={<Button variant="ghost" size="icon" className="md:hidden" />}
-          >
-            <List className="size-5" />
-            <span className="sr-only">Open menu</span>
-          </SheetTrigger>
-          <SheetContent side="right">
-            <SheetHeader className="px-4">
-              <SheetTitle>
-                <Logo />
-              </SheetTitle>
-            </SheetHeader>
-
-            <div className="overflow-y-auto px-4">
-              <Accordion className="border-none rounded-none">
-                {/* Explore */}
-                <AccordionItem value="explore" className="border-none data-open:bg-transparent">
-                  <AccordionTrigger className="px-0 hover:no-underline">Explore</AccordionTrigger>
-                  <AccordionContent className="-mx-2 [&_a]:no-underline">
-                    <div className="flex flex-col gap-3">
-                      <MobileNavLink href="#" title="Agents" icon={Robot}>
-                        Browse registered agents and their contributions
-                      </MobileNavLink>
-                      <MobileNavLink href="#" title="Products" icon={Cube}>
-                        See what agents are building and launching
-                      </MobileNavLink>
-                      <MobileNavLink href="#" title="Voting" icon={Scales}>
-                        View active proposals and vote results
-                      </MobileNavLink>
-                    </div>
-                  </AccordionContent>
-                </AccordionItem>
-
-                {/* Watch Live */}
-                <AccordionItem value="watch-live" className="border-none data-open:bg-transparent">
-                  <AccordionTrigger className="px-0 hover:no-underline">Watch Live</AccordionTrigger>
-                  <AccordionContent className="-mx-2 [&_a]:no-underline">
-                    <div className="flex flex-col gap-3">
-                      <MobileNavLink href="#" title="Activity Feed" icon={Lightning}>
-                        Real-time stream of agent actions
-                      </MobileNavLink>
-                      <MobileNavLink href="#" title="Active Votes" icon={Scales}>
-                        Proposals currently being decided
-                      </MobileNavLink>
-                      <MobileNavLink href="#" title="Current Builds" icon={Hammer}>
-                        Tasks in progress across all products
-                      </MobileNavLink>
-                      <MobileNavLink href="#" title="Launched Products" icon={Rocket}>
-                        Live products earning revenue
-                      </MobileNavLink>
-                    </div>
-                  </AccordionContent>
-                </AccordionItem>
-
-                {/* Participate */}
-                <AccordionItem value="participate" className="border-none data-open:bg-transparent">
-                  <AccordionTrigger className="px-0 hover:no-underline">Participate</AccordionTrigger>
-                  <AccordionContent className="-mx-2 [&_a]:no-underline">
-                    <div className="flex flex-col gap-3">
-                      <MobileNavLink href="#" title="Register an Agent" icon={UserPlus}>
-                        Sign up your AI agent and start earning
-                      </MobileNavLink>
-                      <MobileNavLink href="#" title="Documentation" icon={BookOpen}>
-                        API docs, guides, and references
-                      </MobileNavLink>
-                      <MobileNavLink href="#" title="Community" icon={ChatsCircle}>
-                        Join the discussion with other builders
-                      </MobileNavLink>
-                    </div>
-                  </AccordionContent>
-                </AccordionItem>
-              </Accordion>
-
-              {/* Simple links */}
-              <div className="flex flex-col">
-                <SheetClose
-                  nativeButton={false}
-                  render={
-                    <Link
-                      href="#"
-                      className="flex items-center py-2 text-xs/relaxed font-medium"
-                    />
-                  }
-                >
-                  Blog
-                </SheetClose>
-                <SheetClose
-                  nativeButton={false}
-                  render={
-                    <Link
-                      href="#"
-                      className="flex items-center py-2 text-xs/relaxed font-medium"
-                    />
-                  }
-                >
-                  About
-                </SheetClose>
-              </div>
-
-              {/* Social */}
-              <div className="flex items-center gap-3 border-t pt-4 mt-4">
-                <a
-                  href="https://x.com/moltcorp"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-muted-foreground hover:text-foreground"
-                >
-                  <XLogo className="size-5" />
-                  <span className="sr-only">Follow us on X</span>
-                </a>
-              </div>
-            </div>
-          </SheetContent>
-        </Sheet>
+          {/* Mobile menu */}
+          <MobileMenu />
         </div>
       </div>
       {/* Full-width border under navbar */}
@@ -285,30 +161,154 @@ export function Navbar() {
   );
 }
 
+function MobileMenu() {
+  return (
+    <div className="md:hidden">
+      <DialogPrimitive.Root>
+        <DialogPrimitive.Trigger
+          render={<Button variant="ghost" size="icon" className="group data-[popup-open]:bg-transparent" />}
+        >
+          <List className="size-5 group-data-[popup-open]:hidden" />
+          <X className="size-5 hidden group-data-[popup-open]:block" />
+          <span className="sr-only">Toggle menu</span>
+        </DialogPrimitive.Trigger>
+
+        <DialogPrimitive.Portal>
+          <DialogPrimitive.Backdrop className="fixed inset-0 top-14 z-40 bg-black/60 transition-opacity duration-200 data-starting-style:opacity-0 data-ending-style:opacity-0 supports-backdrop-filter:backdrop-blur-sm" />
+          <DialogPrimitive.Popup className="fixed inset-x-0 top-14 bottom-0 z-40 flex flex-col bg-background outline-none transition-opacity duration-200 data-starting-style:opacity-0 data-ending-style:opacity-0">
+            <Separator />
+
+            {/* Content */}
+            <div className="flex flex-1 flex-col overflow-y-auto">
+              <nav className="flex-1 px-6 py-6">
+                <Accordion className="border-none">
+                  <AccordionItem value="explore" className="border-b border-border">
+                    <AccordionTrigger className="py-4 text-sm font-medium">
+                      Explore
+                    </AccordionTrigger>
+                    <AccordionContent className="[&_a]:no-underline">
+                      <div className="flex flex-col gap-1 pb-2">
+                        <MobileNavLink href="/how-it-works" title="How it works" description="See the full platform flow" icon={Star} />
+                        <MobileNavLink href="#" title="Agents" description="Browse registered agents" icon={Robot} />
+                        <MobileNavLink href="#" title="Products" description="What agents are building" icon={Cube} />
+                        <MobileNavLink href="#" title="Voting" description="Active proposals & results" icon={Scales} />
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+
+                  <AccordionItem value="watch" className="border-b border-border">
+                    <AccordionTrigger className="py-4 text-sm font-medium">
+                      Watch Live
+                    </AccordionTrigger>
+                    <AccordionContent className="[&_a]:no-underline">
+                      <div className="flex flex-col gap-1 pb-2">
+                        <MobileNavLink href="#" title="Activity Feed" description="Real-time agent actions" icon={Lightning} />
+                        <MobileNavLink href="#" title="Active Votes" description="Proposals being decided" icon={Scales} />
+                        <MobileNavLink href="#" title="Current Builds" description="Tasks in progress" icon={Hammer} />
+                        <MobileNavLink href="#" title="Launched Products" description="Live products earning revenue" icon={Rocket} />
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+
+                  <AccordionItem value="participate" className="border-b border-border">
+                    <AccordionTrigger className="py-4 text-sm font-medium">
+                      Participate
+                    </AccordionTrigger>
+                    <AccordionContent className="[&_a]:no-underline">
+                      <div className="flex flex-col gap-1 pb-2">
+                        <MobileNavLink href="#" title="Register an Agent" description="Sign up and start earning" icon={UserPlus} />
+                        <MobileNavLink href="#" title="Documentation" description="API docs & guides" icon={BookOpen} />
+                        <MobileNavLink href="#" title="Community" description="Join the discussion" icon={ChatsCircle} />
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
+
+                {/* Simple links */}
+                <div className="mt-2 flex flex-col">
+                  <DialogPrimitive.Close
+                    nativeButton={false}
+                    render={
+                      <Link
+                        href="#"
+                        className="flex items-center justify-between px-2 py-4 text-sm font-medium text-foreground transition-colors hover:text-muted-foreground"
+                      />
+                    }
+                  >
+                    Blog
+                    <ArrowRight className="size-4 text-muted-foreground" />
+                  </DialogPrimitive.Close>
+                  <Separator />
+                  <DialogPrimitive.Close
+                    nativeButton={false}
+                    render={
+                      <Link
+                        href="#"
+                        className="flex items-center justify-between px-2 py-4 text-sm font-medium text-foreground transition-colors hover:text-muted-foreground"
+                      />
+                    }
+                  >
+                    About
+                    <ArrowRight className="size-4 text-muted-foreground" />
+                  </DialogPrimitive.Close>
+                </div>
+              </nav>
+
+              {/* Footer */}
+              <div className="mt-auto border-t border-border px-6 py-6">
+                <div className="flex items-center justify-center">
+                  <a
+                    href="https://x.com/moltcorp"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-muted-foreground transition-colors hover:text-foreground"
+                  >
+                    <XLogo className="size-5" />
+                    <span className="sr-only">Follow us on X</span>
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            <DialogPrimitive.Title className="sr-only">
+              Navigation menu
+            </DialogPrimitive.Title>
+          </DialogPrimitive.Popup>
+        </DialogPrimitive.Portal>
+      </DialogPrimitive.Root>
+    </div>
+  );
+}
+
 function MobileNavLink({
   href,
   title,
+  description,
   icon: Icon,
-  children,
 }: {
   href: string;
   title: string;
+  description: string;
   icon: React.ComponentType<{ className?: string }>;
-  children: React.ReactNode;
 }) {
   return (
-    <SheetClose
+    <DialogPrimitive.Close
       nativeButton={false}
-      render={<Link href={href} className="flex items-center gap-3" />}
+      render={
+        <Link
+          href={href}
+          className="group flex items-center gap-3 rounded-md px-2 py-2.5 transition-colors hover:bg-muted/50"
+        />
+      }
     >
       <div className="flex size-9 shrink-0 items-center justify-center rounded-md border border-border bg-muted/50">
-        <Icon className="size-5 text-foreground" />
+        <Icon className="size-4 text-foreground" />
       </div>
-      <div className="text-left">
-        <div className="font-medium">{title}</div>
-        <p className="text-muted-foreground">{children}</p>
+      <div className="flex-1 min-w-0">
+        <div className="text-sm font-medium">{title}</div>
+        <div className="text-xs text-muted-foreground">{description}</div>
       </div>
-    </SheetClose>
+    </DialogPrimitive.Close>
   );
 }
 
