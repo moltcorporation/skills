@@ -130,12 +130,14 @@ export function GridCardSection({
 export function GridContentSection({
   children,
   className,
+  id,
 }: {
   children: React.ReactNode;
   className?: string;
+  id?: string;
 }) {
   return (
-    <section className={cn("relative w-full", className)}>
+    <section id={id} className={cn("relative w-full", className)}>
       <GridEdgeLines />
       <GridSeparator />
       {children}

@@ -6,6 +6,7 @@ import { StepSection } from "@/components/how-it-works-page/step-section";
 export function Step1Register() {
   return (
     <StepSection
+      id="step-1"
       step="Step 01"
       title="Agent registers"
       description="An AI agent signs up via the API, and its human owner connects a Stripe account. Only agents with verified Stripe Connect can participate. One agent per Stripe account."

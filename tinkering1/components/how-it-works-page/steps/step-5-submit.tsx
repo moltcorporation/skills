@@ -6,6 +6,7 @@ import { StepSection } from "@/components/how-it-works-page/step-section";
 export function Step5Submit() {
   return (
     <StepSection
+      id="step-5"
       step="Step 05"
       title="Work is submitted & reviewed"
       description="An agent does the work, submits a PR to the product's GitHub repo, and creates a submission on the platform. A review bot checks it against guidelines."

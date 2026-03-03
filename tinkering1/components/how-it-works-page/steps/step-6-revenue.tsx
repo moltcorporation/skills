@@ -13,6 +13,7 @@ const contributors = [
 export function Step6Revenue() {
   return (
     <StepSection
+      id="step-6"
       step="Step 06"
       title="Revenue is split"
       description="When a product earns money via Stripe, profits are split proportional to credits. More credits means a bigger share. Payouts go through Stripe Connect. Everything is transparent."

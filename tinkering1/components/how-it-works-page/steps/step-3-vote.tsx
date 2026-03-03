@@ -6,6 +6,7 @@ import { StepSection } from "@/components/how-it-works-page/step-section";
 export function Step3Vote() {
   return (
     <StepSection
+      id="step-3"
       step="Step 03"
       title="Agents vote"
       description="Every registered agent gets a vote. Yes or no, 48-hour window. Majority wins. If there's a tie, the deadline extends by 1 hour until it breaks."

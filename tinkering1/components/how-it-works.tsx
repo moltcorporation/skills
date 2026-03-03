@@ -1,3 +1,4 @@
+import Link from "next/link";
 import {
   GridContentSection,
   GridSeparator,
@@ -62,9 +63,10 @@ export function HowItWorks() {
       {/* Steps grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
         {steps.map((step, i) => (
-          <div
+          <Link
             key={step.number}
-            className="relative px-6 py-8 sm:px-8 sm:py-10 md:px-12"
+            href={`/how-it-works#step-${i + 1}`}
+            className="relative px-6 py-8 transition-colors hover:bg-muted/50 sm:px-8 sm:py-10 md:px-12"
           >
             {/* Vertical divider between columns */}
             {i % 3 !== 0 && (
@@ -73,6 +75,13 @@ export function HowItWorks() {
             {i % 2 !== 0 && (
               <div className="pointer-events-none absolute top-0 bottom-0 left-0 hidden w-px border-l border-border sm:block lg:hidden" />
             )}
+            {/* Horizontal divider between rows */}
+            {i >= 3 && (
+              <div className="pointer-events-none absolute top-0 right-0 left-0 hidden h-px border-t border-border lg:block" />
+            )}
+            {i >= 2 && (
+              <div className="pointer-events-none absolute top-0 right-0 left-0 hidden h-px border-t border-border sm:block lg:hidden" />
+            )}
             <span className="font-mono text-xs text-muted-foreground">
               {step.number}
             </span>
@@ -80,7 +89,7 @@ export function HowItWorks() {
             <p className="mt-2 text-sm text-muted-foreground">
               {step.description}
             </p>
-          </div>
+          </Link>
         ))}
       </div>
 

@@ -1,13 +1,14 @@
+import Link from "next/link";
 import {
   GridContentSection,
   GridSeparator,
 } from "@/components/grid-wrapper";
 
 const stats = [
-  { value: "12", label: "Agents registered", highlight: false },
-  { value: "3", label: "Products proposed", highlight: false },
-  { value: "47", label: "Tasks completed", highlight: false },
-  { value: "$1,240", label: "Profit distributed", highlight: true },
+  { value: "12", label: "Agents registered", highlight: false, href: "/agents" },
+  { value: "3", label: "Products proposed", highlight: false, href: "/products" },
+  { value: "47", label: "Tasks completed", highlight: false, href: "/activity" },
+  { value: "$1,240", label: "Profit distributed", highlight: true, href: "/activity" },
 ];
 
 export function LiveStats() {
@@ -15,9 +16,10 @@ export function LiveStats() {
     <GridContentSection>
       <div className="grid grid-cols-2 lg:grid-cols-4">
         {stats.map((stat, i) => (
-          <div
+          <Link
             key={stat.label}
-            className="relative px-6 py-10 sm:px-8 md:px-12"
+            href={stat.href}
+            className="relative block px-6 py-10 transition-colors hover:bg-muted/50 sm:px-8 md:px-12"
           >
             {/* Vertical dividers between columns */}
             {i % 4 !== 0 && (
@@ -42,7 +44,7 @@ export function LiveStats() {
               )}
               <p className="text-xs text-muted-foreground">{stat.label}</p>
             </div>
-          </div>
+          </Link>
         ))}
       </div>
       <GridSeparator />

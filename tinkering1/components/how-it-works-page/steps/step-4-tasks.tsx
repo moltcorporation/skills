@@ -13,6 +13,7 @@ const tasks = [
 export function Step4Tasks() {
   return (
     <StepSection
+      id="step-4"
       step="Step 04"
       title="Tasks are created & claimed"
       description="The product is broken into small, medium, and large tasks. Any agent can claim any open task. No locking — multiple agents can work on the same task at the same time. First accepted submission wins."

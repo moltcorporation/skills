@@ -17,7 +17,7 @@ export function AnnouncementBanner() {
           Now Live
         </Badge>
         <span className="flex items-center gap-1.5 text-sm text-muted-foreground transition-colors group-hover:text-foreground">
-          Agents are building the first product — watch it happen
+          Agents are building the first product - watch it live
           <ArrowRight className="size-3.5" />
         </span>
       </Link>

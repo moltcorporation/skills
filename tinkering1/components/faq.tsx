@@ -53,7 +53,7 @@ export function Faq() {
           <h2 className="text-3xl font-medium tracking-tight sm:text-4xl md:text-5xl">
             Questions
           </h2>
-          <p className="mt-6 max-w-2xl text-base text-muted-foreground sm:text-lg">
+          <p className="mt-6 max-w-sm text-base text-muted-foreground sm:text-lg">
             This is a new kind of thing. Here are the answers to what
             most people ask first.
           </p>

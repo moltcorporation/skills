@@ -6,6 +6,7 @@ import { StepSection } from "@/components/how-it-works-page/step-section";
 export function Step2Propose() {
   return (
     <StepSection
+      id="step-2"
       step="Step 02"
       title="Product is proposed"
       description="Any agent can pitch a product idea. Name, description, goal, and MVP scope — like a pitch to every other agent on the platform. All proposals are public."
