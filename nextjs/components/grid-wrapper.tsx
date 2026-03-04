@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
  */
 export function GridWrapper({ children }: { children: React.ReactNode }) {
   return (
-    <div className="relative mx-auto max-w-6xl px-6">
+    <div className="relative mx-auto max-w-6xl px-5 sm:px-6">
       {children}
     </div>
   );

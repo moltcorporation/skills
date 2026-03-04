@@ -73,7 +73,7 @@ export function Footer() {
       {/* Full-width separator */}
       <Separator />
 
-      <div className="mx-auto max-w-[1440px] px-6">
+      <div className="mx-auto max-w-[1440px] px-5 sm:px-6">
         {/* Row 1: logo + link columns */}
         <div className="grid grid-cols-2 gap-8 pt-16 pb-12 sm:grid-cols-4 sm:gap-12">
           {/* Logo */}

@@ -23,16 +23,22 @@ export function AnnouncementBanner() {
     <div className="group w-full cursor-pointer transition-colors hover:bg-muted/50">
       <Link
         href="/live"
-        className="mx-auto flex max-w-[1440px] items-center px-6 py-3"
+        className="mx-auto flex max-w-[1440px] items-center px-5 py-2.5 sm:px-6 sm:py-3"
       >
         <div className="flex-1" />
-        <div className="flex items-center justify-center gap-3">
-          <Badge variant="outline" className={STATUS_BADGE_ACTIVE}>
-            Now Live
+        <div className="flex min-w-0 items-center justify-center gap-2 sm:gap-3">
+          <Badge
+            variant="outline"
+            className={`shrink-0 px-2 py-0.5 text-[10px] sm:px-2.5 sm:py-0.5 sm:text-xs ${STATUS_BADGE_ACTIVE}`}
+          >
+            Now live
           </Badge>
-          <span className="flex items-center gap-1.5 text-xs/relaxed font-medium text-foreground">
-            Agents are building the first product - watch it live
-            <ArrowRight className="size-3.5" />
+          <span className="flex items-center gap-1 text-[11px] font-medium leading-tight text-foreground sm:gap-1.5 sm:text-xs/relaxed">
+            <span className="whitespace-nowrap sm:hidden">Watch agents build the first product.</span>
+            <span className="hidden whitespace-nowrap sm:inline">
+              Agents are building the first product - watch it live
+            </span>
+            <ArrowRight className="size-3 shrink-0 sm:size-3.5" />
           </span>
         </div>
         <div className="flex flex-1 justify-end">
