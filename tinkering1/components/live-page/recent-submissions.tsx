@@ -1,3 +1,4 @@
+import * as React from "react";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
@@ -9,6 +10,7 @@ import {
   ItemDescription,
   ItemActions,
   ItemGroup,
+  ItemSeparator,
 } from "@/components/ui/item";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { ArrowSquareOut } from "@phosphor-icons/react/dist/ssr";
@@ -89,52 +91,55 @@ const statusBadgeBase: Record<string, "outline" | "destructive"> = {
 export function RecentSubmissions() {
   return (
     <Card size="sm">
-      <ItemGroup>
-        {recentSubmissions.map((sub) => (
-          <Item key={sub.id} size="sm">
-            <ItemMedia>
-              <Avatar className="size-5">
-                <AvatarFallback
-                  className="text-[0.4rem] font-medium text-white"
-                  style={{ backgroundColor: getAgentColor(sub.agentSlug) }}
+      <ItemGroup className="gap-0">
+        {recentSubmissions.map((sub, i) => (
+          <React.Fragment key={sub.id}>
+            <Item size="sm">
+              <ItemMedia>
+                <Avatar className="size-5">
+                  <AvatarFallback
+                    className="text-[0.4rem] font-medium text-white"
+                    style={{ backgroundColor: getAgentColor(sub.agentSlug) }}
+                  >
+                    {getAgentInitials(sub.agentName)}
+                  </AvatarFallback>
+                </Avatar>
+              </ItemMedia>
+              <ItemContent>
+                <ItemTitle>
+                  <Link
+                    href={`/agents/${sub.agentSlug}`}
+                    className="hover:underline"
+                  >
+                    {sub.agentName}
+                  </Link>
+                </ItemTitle>
+                <ItemDescription>
+                  {sub.taskTitle} · {sub.productName} ·{" "}
+                  <span className="font-mono">{sub.time}</span>
+                </ItemDescription>
+              </ItemContent>
+              <ItemActions>
+                <Badge
+                  variant={statusBadgeBase[sub.status]}
+                  className={statusBadgeVariant[sub.status]}
                 >
-                  {getAgentInitials(sub.agentName)}
-                </AvatarFallback>
-              </Avatar>
-            </ItemMedia>
-            <ItemContent>
-              <ItemTitle>
-                <Link
-                  href={`/agents/${sub.agentSlug}`}
-                  className="hover:underline"
-                >
-                  {sub.agentName}
-                </Link>
-              </ItemTitle>
-              <ItemDescription>
-                {sub.taskTitle} · {sub.productName} ·{" "}
-                <span className="font-mono">{sub.time}</span>
-              </ItemDescription>
-            </ItemContent>
-            <ItemActions>
-              <Badge
-                variant={statusBadgeBase[sub.status]}
-                className={statusBadgeVariant[sub.status]}
-              >
-                {sub.status}
-              </Badge>
-              {sub.prUrl && (
-                <a
-                  href={sub.prUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-muted-foreground hover:text-foreground"
-                >
-                  <ArrowSquareOut className="size-3" />
-                </a>
-              )}
-            </ItemActions>
-          </Item>
+                  {sub.status}
+                </Badge>
+                {sub.prUrl && (
+                  <a
+                    href={sub.prUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-muted-foreground hover:text-foreground"
+                  >
+                    <ArrowSquareOut className="size-3" />
+                  </a>
+                )}
+              </ItemActions>
+            </Item>
+            {i !== recentSubmissions.length - 1 && <ItemSeparator className="my-0" />}
+          </React.Fragment>
         ))}
       </ItemGroup>
     </Card>

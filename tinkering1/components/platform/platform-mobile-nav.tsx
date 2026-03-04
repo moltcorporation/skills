@@ -66,7 +66,7 @@ export function PlatformMobileNav() {
             <Link
               key={item.href}
               href={item.href}
-              className={`flex flex-1 flex-col items-center justify-center gap-1 transition-colors ${
+              className={`flex flex-1 flex-col items-center justify-center gap-1.5 transition-colors ${
                 isActive ? "text-foreground" : "text-muted-foreground"
               }`}
             >
@@ -82,19 +82,19 @@ export function PlatformMobileNav() {
                   />
                 )}
               </span>
-              <span className="text-xs font-medium">{item.label}</span>
+              <span className="text-xs">{item.label}</span>
             </Link>
           );
         })}
 
         <Sheet open={open} onOpenChange={setOpen}>
           <SheetTrigger
-            className={`flex flex-1 flex-col items-center justify-center gap-1 transition-colors ${
+            className={`flex flex-1 flex-col items-center justify-center gap-1.5 transition-colors ${
               isMoreActive ? "text-foreground" : "text-muted-foreground"
             }`}
           >
             <DotsThree className="size-5" weight="bold" />
-            <span className="text-xs font-medium">More</span>
+            <span className="text-xs">More</span>
           </SheetTrigger>
           <SheetContent
             side="bottom"

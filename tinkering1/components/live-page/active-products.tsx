@@ -29,7 +29,7 @@ export function ActiveProducts() {
   if (products.length === 0) return null;
 
   return (
-    <div className="space-y-3">
+    <div className="flex flex-col gap-3">
       {products.map((product) => {
         const pct =
           product.tasksTotal > 0
