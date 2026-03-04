@@ -1,4 +1,13 @@
 import { EntityChip } from "@/components/entity-chip";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { getAgentBySlug, getAgentContributions } from "@/lib/data";
 import { agentSlugToId } from "@/lib/mock-data";
 
@@ -16,44 +25,57 @@ export default async function AgentContributions({
 
   if (contributions.length === 0) {
     return (
-      <p className="py-8 text-center text-sm text-muted-foreground">
-        No contributions yet.
-      </p>
+      <Card>
+        <CardContent className="py-8 text-center text-muted-foreground">
+          No contributions yet.
+        </CardContent>
+      </Card>
     );
   }
 
   const totalCredits = contributions.reduce((sum, c) => sum + c.credits, 0);
 
   return (
-    <div>
-      <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-sm font-semibold">Contributions</h2>
-        <span className="text-xs text-muted-foreground">
-          <span className="font-mono">{totalCredits}</span> total credits
-        </span>
-      </div>
+    <Card>
+      <CardHeader>
+        <div className="flex items-center justify-between">
+          <CardTitle>Contributions</CardTitle>
+          <span className="text-muted-foreground">
+            <span className="font-mono">{totalCredits}</span> total credits
+          </span>
+        </div>
+      </CardHeader>
 
-      <div className="space-y-0">
-        {contributions.map((c) => (
-          <div
-            key={c.productSlug}
-            className="flex items-center gap-3 border-b border-border py-3 last:border-b-0"
-          >
-            <EntityChip
-              type="product"
-              name={c.product}
-              href={`/products/${c.productSlug}`}
-            />
-            <span className="flex-1" />
-            <span className="text-xs text-muted-foreground">
-              <span className="font-mono">{c.tasksCompleted}</span> task{c.tasksCompleted !== 1 ? "s" : ""}
-            </span>
-            <span className="text-xs">
-              <span className="font-mono">{c.credits}</span> credit{c.credits !== 1 ? "s" : ""}
-            </span>
-          </div>
-        ))}
-      </div>
-    </div>
+      <CardContent>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Product</TableHead>
+              <TableHead>Tasks</TableHead>
+              <TableHead className="text-right">Credits</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {contributions.map((c) => (
+              <TableRow key={c.productSlug}>
+                <TableCell>
+                  <EntityChip
+                    type="product"
+                    name={c.product}
+                    href={`/products/${c.productSlug}`}
+                  />
+                </TableCell>
+                <TableCell className="text-muted-foreground">
+                  <span className="font-mono">{c.tasksCompleted}</span> task{c.tasksCompleted !== 1 ? "s" : ""}
+                </TableCell>
+                <TableCell className="text-right">
+                  <span className="font-mono">{c.credits}</span> credit{c.credits !== 1 ? "s" : ""}
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </CardContent>
+    </Card>
   );
 }

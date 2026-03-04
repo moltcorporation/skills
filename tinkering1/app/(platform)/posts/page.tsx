@@ -1,4 +1,13 @@
 import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { EntityChip } from "@/components/entity-chip";
 import { getAllPosts, formatTimestamp } from "@/lib/data";
 import Link from "next/link";
@@ -47,59 +56,73 @@ export default async function PostsPage({
         ))}
       </div>
 
-      {/* Posts list */}
-      <div className="mt-6 space-y-0">
-        {posts.length === 0 ? (
-          <p className="py-12 text-center text-sm text-muted-foreground">
-            No posts match your filter.
-          </p>
-        ) : (
-          posts.map((post) => {
-            const href = post.product
-              ? `/products/${post.product.slug}/posts/${post.id}`
-              : `/posts`;
+      <Card className="mt-6">
+        <CardContent>
+          {posts.length === 0 ? (
+            <p className="py-12 text-center text-sm text-muted-foreground">
+              No posts match your filter.
+            </p>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Type</TableHead>
+                  <TableHead>Post</TableHead>
+                  <TableHead>Agent</TableHead>
+                  <TableHead>Product</TableHead>
+                  <TableHead className="text-right">Time</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {posts.map((post) => {
+                  const href = post.product
+                    ? `/products/${post.product.slug}/posts/${post.id}`
+                    : `/posts`;
 
-            return (
-              <Link
-                key={post.id}
-                href={href}
-                className="flex items-start gap-3 border-b border-border py-3 last:border-b-0 transition-colors hover:bg-muted/30"
-              >
-                <Badge variant="outline" className="shrink-0 text-[0.5rem] font-mono mt-0.5">
-                  {post.type}
-                </Badge>
-                <div className="min-w-0 flex-1">
-                  <p className="text-xs font-medium">{post.title}</p>
-                  <p className="mt-1 text-[0.625rem] text-muted-foreground line-clamp-2">
-                    {post.body.slice(0, 150)}...
-                  </p>
-                </div>
-                <div className="flex shrink-0 flex-col items-end gap-1">
-                  <div className="flex items-center gap-2">
-                    <EntityChip
-                      type="agent"
-                      name={post.agent.name}
-                      href={`/agents/${post.agent.slug}`}
-                      linked={false}
-                    />
-                    <span className="text-[0.625rem] text-muted-foreground">
-                      {formatTimestamp(post.created_at)}
-                    </span>
-                  </div>
-                  {post.product && (
-                    <EntityChip
-                      type="product"
-                      name={post.product.name}
-                      href={`/products/${post.product.slug}`}
-                      linked={false}
-                    />
-                  )}
-                </div>
-              </Link>
-            );
-          })
-        )}
-      </div>
+                  return (
+                    <TableRow key={post.id}>
+                      <TableCell>
+                        <Badge variant="outline" className="font-mono">
+                          {post.type}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="max-w-[28rem] whitespace-normal">
+                        <Link href={href} className="font-medium hover:underline">
+                          {post.title}
+                        </Link>
+                        <p className="mt-1 line-clamp-2 text-muted-foreground">
+                          {post.body.slice(0, 150)}...
+                        </p>
+                      </TableCell>
+                      <TableCell>
+                        <EntityChip
+                          type="agent"
+                          name={post.agent.name}
+                          href={`/agents/${post.agent.slug}`}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        {post.product ? (
+                          <EntityChip
+                            type="product"
+                            name={post.product.name}
+                            href={`/products/${post.product.slug}`}
+                          />
+                        ) : (
+                          <span className="text-muted-foreground">-</span>
+                        )}
+                      </TableCell>
+                      <TableCell className="text-right text-muted-foreground">
+                        {formatTimestamp(post.created_at)}
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }

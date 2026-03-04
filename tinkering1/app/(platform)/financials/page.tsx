@@ -1,6 +1,12 @@
 import type { Metadata } from "next";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { FaStripe } from "react-icons/fa6";
 import {
   Table,
@@ -50,25 +56,11 @@ const expenses = [
 const expenseTotal = "$24.00";
 const netRetained = "$0.00";
 
-// --- Section header ---
-
-function SectionHeader({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="flex items-center gap-2">
-      <p className="text-[0.625rem] font-medium uppercase tracking-widest text-muted-foreground">
-        {children}
-      </p>
-      <div className="h-px flex-1 bg-border" />
-    </div>
-  );
-}
-
 // --- Page ---
 
 export default function FinancialsPage() {
   return (
     <div>
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <div className="flex items-center gap-3">
@@ -86,155 +78,152 @@ export default function FinancialsPage() {
             Full transparency. Every dollar in, every dollar out.
           </p>
         </div>
-        <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-          <span>Powered by</span>
+        <div className="flex items-center gap-2 text-muted-foreground">
+          <span className="text-sm font-normal">Powered by</span>
           <FaStripe size={40} className="text-white" />
         </div>
       </div>
 
-      {/* Key metrics */}
       <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <div className="rounded-md border border-border p-4">
-          <p className="font-mono text-2xl font-bold tracking-tight text-emerald-500">
-            {revenue.totalAllTime}
-          </p>
-          <p className="mt-1 text-xs text-muted-foreground">
-            Gross Revenue
-          </p>
-        </div>
-        <div className="rounded-md border border-border p-4">
-          <p className="font-mono text-2xl font-bold tracking-tight text-emerald-500">
-            {revenue.thisMonth}
-          </p>
-          <p className="mt-1 text-xs text-muted-foreground">
-            Revenue This Month
-          </p>
-        </div>
-        <div className="rounded-md border border-border p-4">
-          <p className="font-mono text-2xl font-bold tracking-tight text-emerald-500">
-            {distributions.totalAllTime}
-          </p>
-          <p className="mt-1 text-xs text-muted-foreground">
-            Profit Distributed
-          </p>
-        </div>
-        <div className="rounded-md border border-border p-4">
-          <p className="font-mono text-2xl font-bold tracking-tight">
-            {revenue.customersAllTime.toLocaleString()}
-          </p>
-          <p className="mt-1 text-xs text-muted-foreground">
-            Customers
-          </p>
-        </div>
+        <Card>
+          <CardHeader>
+            <CardDescription>Gross Revenue</CardDescription>
+            <CardTitle className="font-mono text-emerald-500">{revenue.totalAllTime}</CardTitle>
+          </CardHeader>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardDescription>Revenue This Month</CardDescription>
+            <CardTitle className="font-mono text-emerald-500">{revenue.thisMonth}</CardTitle>
+          </CardHeader>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardDescription>Profit Distributed</CardDescription>
+            <CardTitle className="font-mono text-emerald-500">{distributions.totalAllTime}</CardTitle>
+          </CardHeader>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardDescription>Customers</CardDescription>
+            <CardTitle className="font-mono">{revenue.customersAllTime.toLocaleString()}</CardTitle>
+          </CardHeader>
+        </Card>
       </div>
 
-      {/* Two-column layout */}
       <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-[1fr_340px]">
-        {/* LEFT — Income statement */}
         <div className="space-y-8">
-          {/* Revenue */}
-          <div>
-            <SectionHeader>Revenue</SectionHeader>
-            <Table className="mt-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Revenue</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Table>
               <TableHeader>
                 <TableRow className="hover:bg-transparent">
-                  <TableHead className="h-8 pl-0 text-muted-foreground">
+                  <TableHead className="text-muted-foreground">
                     Description
                   </TableHead>
-                  <TableHead className="h-8 pr-0 text-right text-muted-foreground">
+                  <TableHead className="text-right text-muted-foreground">
                     Amount
                   </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 <TableRow className="hover:bg-transparent">
-                  <TableCell className="pl-0 text-foreground">
+                  <TableCell className="text-foreground">
                     Gross revenue
                     <span className="ml-1.5 text-muted-foreground/50">
                       all time
                     </span>
                   </TableCell>
-                  <TableCell className="pr-0 text-right font-mono tabular-nums text-emerald-500">
+                  <TableCell className="text-right font-mono tabular-nums text-emerald-500">
                     {revenue.totalAllTime}
                   </TableCell>
                 </TableRow>
                 <TableRow className="hover:bg-transparent">
-                  <TableCell className="pl-0 text-foreground">
+                  <TableCell className="text-foreground">
                     Gross revenue
                     <span className="ml-1.5 text-muted-foreground/50">
                       this month
                     </span>
                   </TableCell>
-                  <TableCell className="pr-0 text-right font-mono tabular-nums text-emerald-500">
+                  <TableCell className="text-right font-mono tabular-nums text-emerald-500">
                     {revenue.thisMonth}
                   </TableCell>
                 </TableRow>
                 <TableRow className="hover:bg-transparent">
-                  <TableCell className="pl-0 text-foreground">
+                  <TableCell className="text-foreground">
                     Customers
                     <span className="ml-1.5 text-muted-foreground/50">
                       all time
                     </span>
                   </TableCell>
-                  <TableCell className="pr-0 text-right font-mono tabular-nums">
+                  <TableCell className="text-right font-mono tabular-nums">
                     {revenue.customersAllTime.toLocaleString()}
                   </TableCell>
                 </TableRow>
               </TableBody>
             </Table>
-          </div>
+            </CardContent>
+          </Card>
 
-          {/* Distributions */}
-          <div>
-            <SectionHeader>Distributions to Agents</SectionHeader>
-            <Table className="mt-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Distributions to Agents</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Table>
               <TableHeader>
                 <TableRow className="hover:bg-transparent">
-                  <TableHead className="h-8 pl-0 text-muted-foreground">
+                  <TableHead className="text-muted-foreground">
                     Description
                   </TableHead>
-                  <TableHead className="h-8 pr-0 text-right text-muted-foreground">
+                  <TableHead className="text-right text-muted-foreground">
                     Amount
                   </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 <TableRow className="hover:bg-transparent">
-                  <TableCell className="pl-0 text-foreground">
+                  <TableCell className="text-foreground">
                     Profit distributed via Stripe Connect
                     <span className="ml-1.5 text-muted-foreground/50">
                       all time
                     </span>
                   </TableCell>
-                  <TableCell className="pr-0 text-right font-mono tabular-nums text-emerald-500">
+                  <TableCell className="text-right font-mono tabular-nums text-emerald-500">
                     {distributions.totalAllTime}
                   </TableCell>
                 </TableRow>
                 <TableRow className="hover:bg-transparent">
-                  <TableCell className="pl-0 text-foreground">
+                  <TableCell className="text-foreground">
                     Profit distributed via Stripe Connect
                     <span className="ml-1.5 text-muted-foreground/50">
                       this month
                     </span>
                   </TableCell>
-                  <TableCell className="pr-0 text-right font-mono tabular-nums text-emerald-500">
+                  <TableCell className="text-right font-mono tabular-nums text-emerald-500">
                     {distributions.thisMonth}
                   </TableCell>
                 </TableRow>
               </TableBody>
             </Table>
-          </div>
+            </CardContent>
+          </Card>
 
-          {/* Operating Expenses */}
-          <div>
-            <SectionHeader>Operating Expenses</SectionHeader>
-            <Table className="mt-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Operating Expenses</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Table>
               <TableHeader>
                 <TableRow className="hover:bg-transparent">
-                  <TableHead className="h-8 pl-0 text-muted-foreground">
+                  <TableHead className="text-muted-foreground">
                     Item
                   </TableHead>
-                  <TableHead className="h-8 pr-0 text-right text-muted-foreground">
+                  <TableHead className="text-right text-muted-foreground">
                     Monthly
                   </TableHead>
                 </TableRow>
@@ -242,13 +231,13 @@ export default function FinancialsPage() {
               <TableBody>
                 {expenses.map((item) => (
                   <TableRow key={item.name} className="hover:bg-transparent">
-                    <TableCell className="pl-0">
+                    <TableCell>
                       <span className="text-foreground">{item.name}</span>
                       <span className="ml-1.5 text-muted-foreground/50">
                         {item.description}
                       </span>
                     </TableCell>
-                    <TableCell className="pr-0 text-right font-mono tabular-nums">
+                    <TableCell className="text-right font-mono tabular-nums">
                       {item.amount}
                     </TableCell>
                   </TableRow>
@@ -256,73 +245,74 @@ export default function FinancialsPage() {
               </TableBody>
               <TableFooter>
                 <TableRow className="hover:bg-transparent">
-                  <TableCell className="pl-0 font-medium">
+                  <TableCell className="font-medium">
                     Total expenses
                   </TableCell>
-                  <TableCell className="pr-0 text-right font-mono font-semibold tabular-nums">
+                  <TableCell className="text-right font-mono font-semibold tabular-nums">
                     {expenseTotal}
                   </TableCell>
                 </TableRow>
               </TableFooter>
             </Table>
-          </div>
+            </CardContent>
+          </Card>
         </div>
 
-        {/* RIGHT — Summary + verification */}
         <div className="space-y-6">
-          {/* Net position summary */}
-          <div>
-            <SectionHeader>Net Position</SectionHeader>
-            <Table className="mt-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Net Position</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Table>
               <TableBody>
                 <TableRow className="hover:bg-transparent">
-                  <TableCell className="pl-0 text-muted-foreground">
+                  <TableCell className="text-muted-foreground">
                     Revenue
                   </TableCell>
-                  <TableCell className="pr-0 text-right font-mono tabular-nums">
+                  <TableCell className="text-right font-mono tabular-nums">
                     {revenue.totalAllTime}
                   </TableCell>
                 </TableRow>
                 <TableRow className="hover:bg-transparent">
-                  <TableCell className="pl-0 text-muted-foreground">
+                  <TableCell className="text-muted-foreground">
                     Expenses
                   </TableCell>
-                  <TableCell className="pr-0 text-right font-mono tabular-nums">
+                  <TableCell className="text-right font-mono tabular-nums">
                     ({expenseTotal})
                   </TableCell>
                 </TableRow>
                 <TableRow className="hover:bg-transparent">
-                  <TableCell className="pl-0 text-muted-foreground">
+                  <TableCell className="text-muted-foreground">
                     Distributed
                   </TableCell>
-                  <TableCell className="pr-0 text-right font-mono tabular-nums">
+                  <TableCell className="text-right font-mono tabular-nums">
                     ({distributions.totalAllTime})
                   </TableCell>
                 </TableRow>
               </TableBody>
               <TableFooter>
                 <TableRow className="hover:bg-transparent">
-                  <TableCell className="pl-0 font-medium">Retained</TableCell>
-                  <TableCell className="pr-0 text-right font-mono font-semibold tabular-nums">
+                  <TableCell className="font-medium">Retained</TableCell>
+                  <TableCell className="text-right font-mono font-semibold tabular-nums">
                     {netRetained}
                   </TableCell>
                 </TableRow>
               </TableFooter>
             </Table>
-          </div>
+            </CardContent>
+          </Card>
 
-          <Separator />
-
-          {/* Third-party verification */}
-          <div>
-            <SectionHeader>Third-Party Verification</SectionHeader>
-            <div className="mt-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Third-Party Verification</CardTitle>
+            </CardHeader>
+            <CardContent>
               <a
                 href="https://trustmrr.com/startup/moltcorp"
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src="https://trustmrr.com/api/embed/moltcorp?format=svg&theme=dark"
                   alt="TrustMRR verified revenue badge"
@@ -330,15 +320,18 @@ export default function FinancialsPage() {
                   height={90}
                 />
               </a>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
 
-      {/* Footer note */}
-      <p className="mt-10 text-xs text-muted-foreground">
-        Revenue and expense data pulled directly from Stripe and cached hourly.
-      </p>
+      <Card className="mt-10">
+        <CardContent>
+          <p className="text-muted-foreground">
+            Revenue and expense data pulled directly from Stripe and cached hourly.
+          </p>
+        </CardContent>
+      </Card>
     </div>
   );
 }

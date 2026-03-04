@@ -1,5 +1,6 @@
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
 import { EntityChip } from "@/components/entity-chip";
 import { getProductBySlug, getVotesForProduct } from "@/lib/data";
 
@@ -16,24 +17,24 @@ export default async function ProductVotes({
 
   if (votes.length === 0) {
     return (
-      <p className="py-8 text-center text-sm text-muted-foreground">
-        No votes yet.
-      </p>
+      <Card>
+        <CardContent className="py-8 text-center text-muted-foreground">
+          No votes yet.
+        </CardContent>
+      </Card>
     );
   }
 
   return (
     <div className="space-y-4">
-      <h2 className="text-sm font-semibold">Votes</h2>
-
       {votes.map((vote) => {
         const totalVotes = vote.options.reduce((sum, o) => sum + o.count, 0);
 
         return (
           <Card key={vote.id} className="bg-card/80">
-            <CardContent className="space-y-4 p-4">
+            <CardHeader>
               <div className="flex items-center justify-between">
-                <p className="text-sm font-medium">{vote.question}</p>
+                <CardTitle>{vote.question}</CardTitle>
                 <Badge
                   variant="outline"
                   className={
@@ -45,29 +46,28 @@ export default async function ProductVotes({
                   {vote.status === "open" ? "Open" : "Closed"}
                 </Badge>
               </div>
-
-              <div className="flex items-center gap-3">
-                <p className="text-[0.625rem] text-muted-foreground">
+              <CardDescription className="flex items-center gap-3">
+                <span>
                   Deadline: {new Date(vote.deadline).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
-                </p>
-                <span className="text-[0.625rem] text-muted-foreground">
-                  Created by
                 </span>
+                <span>Created by</span>
                 <EntityChip
                   type="agent"
                   name={vote.creator.name}
                   href={`/agents/${vote.creator.slug}`}
                 />
-              </div>
+              </CardDescription>
+            </CardHeader>
 
+            <CardContent className="space-y-4">
               {vote.outcome && (
-                <p className="text-xs font-medium">
+                <p className="font-medium">
                   Outcome: <span className="font-mono">{vote.outcome}</span>
                 </p>
               )}
 
               {vote.target && (
-                <div className="flex items-center gap-1.5 text-[0.625rem] text-muted-foreground">
+                <div className="flex items-center gap-1.5 text-muted-foreground">
                   <span>Regarding:</span>
                   <EntityChip
                     type={vote.target.type === "product" ? "product" : "post"}
@@ -77,30 +77,23 @@ export default async function ProductVotes({
                 </div>
               )}
 
-              {/* Vote bars */}
               <div className="space-y-2">
                 {vote.options.map((option) => {
                   const pct = totalVotes > 0 ? (option.count / totalVotes) * 100 : 0;
                   return (
                     <div key={option.label} className="space-y-1">
-                      <div className="flex items-baseline justify-between text-xs">
+                      <div className="flex items-baseline justify-between">
                         <span>{option.label}</span>
                         <span className="text-muted-foreground">
                           <span className="font-mono">{option.count}</span> (<span className="font-mono">{Math.round(pct)}</span>%)
                         </span>
                       </div>
-                      <div className="h-1.5 w-full bg-muted">
-                        <div
-                          className="h-full bg-foreground"
-                          style={{ width: `${pct}%` }}
-                        />
-                      </div>
+                      <Progress value={pct} className="h-1.5" />
                     </div>
                   );
                 })}
               </div>
 
-              {/* Voters with choices */}
               <div className="flex flex-wrap gap-1.5">
                 {vote.voters.map((v) => (
                   <div key={v.agent.slug} className="flex items-center gap-1">
@@ -109,7 +102,7 @@ export default async function ProductVotes({
                       name={v.agent.name}
                       href={`/agents/${v.agent.slug}`}
                     />
-                    <span className="text-[0.5rem] text-muted-foreground font-mono">
+                    <span className="text-muted-foreground font-mono">
                       {v.choice}
                     </span>
                   </div>

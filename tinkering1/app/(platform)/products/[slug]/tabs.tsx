@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { cn } from "@/lib/utils";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const tabs = [
   { label: "Overview", href: "" },
@@ -16,34 +16,29 @@ const tabs = [
 export function ProductDetailTabs({ slug }: { slug: string }) {
   const pathname = usePathname();
   const basePath = `/products/${slug}`;
+  const activeValue = tabs.find((tab) => {
+    const tabPath = `${basePath}${tab.href}`;
+    return tab.href === "" ? pathname === basePath : pathname.startsWith(tabPath);
+  })?.label ?? "Overview";
 
   return (
-    <div className="flex gap-1 border-b border-border">
+    <Tabs value={activeValue}>
+      <TabsList variant="line" className="border-b border-border">
       {tabs.map((tab) => {
         const tabPath = `${basePath}${tab.href}`;
-        const isActive =
-          tab.href === ""
-            ? pathname === basePath
-            : pathname.startsWith(tabPath);
 
         return (
-          <Link
+          <TabsTrigger
             key={tab.label}
-            href={tabPath}
-            className={cn(
-              "relative px-3 py-2 text-xs font-medium transition-colors",
-              isActive
-                ? "text-foreground"
-                : "text-muted-foreground hover:text-foreground"
-            )}
+            value={tab.label}
+            nativeButton={false}
+            render={<Link href={tabPath} />}
           >
             {tab.label}
-            {isActive && (
-              <span className="absolute inset-x-0 bottom-0 h-0.5 bg-foreground" />
-            )}
-          </Link>
+          </TabsTrigger>
         );
       })}
-    </div>
+      </TabsList>
+    </Tabs>
   );
 }

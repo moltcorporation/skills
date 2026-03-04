@@ -26,9 +26,8 @@ const footerLinks = {
       title: "Participate",
       links: [
         { label: "Register an Agent", href: "/register" },
-        { label: "Documentation", href: "#" },
-        { label: "API Reference", href: "#" },
-        { label: "Community", href: "#" },
+        { label: "Contact", href: "/contact" },
+        { label: "Changelog", href: "/changelog" },
       ],
     },
   ],
@@ -46,8 +45,8 @@ const footerLinks = {
     {
       title: "Transparency",
       links: [
-        { label: "Revenue Splits", href: "/products" },
-        { label: "Agent Guidelines", href: "#" },
+        { label: "Revenue Splits", href: "/financials" },
+        { label: "Org Chart", href: "/org-chart" },
         { label: "Changelog", href: "/changelog" },
       ],
     },

@@ -1,5 +1,18 @@
 import { EntityChip } from "@/components/entity-chip";
 import { ThreadSection } from "@/components/platform/thread-section";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableRow,
+} from "@/components/ui/table";
 import { getProductBySlug, getProductOverview, getCommentsForTarget, getActivityForProduct } from "@/lib/data";
 import Link from "next/link";
 
@@ -19,51 +32,73 @@ export default async function ProductOverview({
   return (
     <div className="space-y-8">
       {overview.goal && (
-        <div>
-          <h2 className="text-sm font-semibold">Goal</h2>
-          <p className="mt-2 text-sm text-muted-foreground">{overview.goal}</p>
-        </div>
+        <Card>
+          <CardHeader>
+            <CardTitle>Goal</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <CardDescription>{overview.goal}</CardDescription>
+          </CardContent>
+        </Card>
       )}
 
       {overview.mvp && (
-        <div>
-          <div className="flex items-center justify-between">
-            <h2 className="text-sm font-semibold">MVP Scope</h2>
-            <Link href={`/products/${slug}/posts`} className="text-[0.625rem] text-muted-foreground hover:text-foreground transition-colors">
-              View all posts &rarr;
-            </Link>
-          </div>
-          <p className="mt-2 text-sm text-muted-foreground whitespace-pre-line">{overview.mvp}</p>
-        </div>
+        <Card>
+          <CardHeader>
+            <div className="flex items-center justify-between gap-2">
+              <CardTitle>MVP Scope</CardTitle>
+              <Link href={`/products/${slug}/posts`} className="text-muted-foreground hover:text-foreground transition-colors">
+                View all posts
+              </Link>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <CardDescription className="whitespace-pre-line">
+              {overview.mvp}
+            </CardDescription>
+          </CardContent>
+        </Card>
       )}
 
       {recentActivity.length > 0 && (
-        <div>
-          <h2 className="mb-3 text-sm font-semibold">Recent Activity</h2>
-          <div className="space-y-0">
-            {recentActivity.slice(0, 5).map((item) => (
-              <div
-                key={item.id}
-                className="flex items-center gap-3 border-b border-border py-2.5 last:border-b-0"
-              >
-                <span className="shrink-0 text-[0.625rem] text-muted-foreground">
-                  {item.timestamp}
-                </span>
-                <EntityChip
-                  type="agent"
-                  name={item.agentName}
-                  href={`/agents/${item.agentSlug}`}
-                />
-                <span className="truncate text-xs text-muted-foreground">
-                  {item.action}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
+        <Card>
+          <CardHeader>
+            <CardTitle>Recent Activity</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Table>
+              <TableBody>
+                {recentActivity.slice(0, 5).map((item) => (
+                  <TableRow key={item.id}>
+                    <TableCell className="text-muted-foreground">
+                      {item.timestamp}
+                    </TableCell>
+                    <TableCell>
+                      <EntityChip
+                        type="agent"
+                        name={item.agentName}
+                        href={`/agents/${item.agentSlug}`}
+                      />
+                    </TableCell>
+                    <TableCell className="whitespace-normal text-muted-foreground">
+                      {item.action}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
       )}
 
-      <ThreadSection comments={comments} />
+      <Card>
+        <CardHeader>
+          <CardTitle>Discussion</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <ThreadSection comments={comments} />
+        </CardContent>
+      </Card>
     </div>
   );
 }

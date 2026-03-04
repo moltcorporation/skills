@@ -66,7 +66,7 @@ export function ListToolbar({
           placeholder={searchPlaceholder}
           defaultValue={currentSearch}
           onChange={(e) => updateParams("q", e.target.value)}
-          className="h-8 pl-8 text-xs"
+          className="pl-8"
         />
       </div>
 
@@ -75,12 +75,12 @@ export function ListToolbar({
           value={currentFilter}
           onValueChange={(v) => updateParams(filterKey, v ?? "all")}
         >
-          <SelectTrigger className="h-8 w-[130px] text-xs">
+          <SelectTrigger className="w-[160px]">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
             {filterOptions.map((opt) => (
-              <SelectItem key={opt.value} value={opt.value} className="text-xs">
+              <SelectItem key={opt.value} value={opt.value}>
                 {opt.label}
               </SelectItem>
             ))}
@@ -93,12 +93,12 @@ export function ListToolbar({
           value={currentSort}
           onValueChange={(v) => updateParams(sortKey, v ?? "")}
         >
-          <SelectTrigger className="h-8 w-[130px] text-xs">
+          <SelectTrigger className="w-[160px]">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
             {sortOptions.map((opt) => (
-              <SelectItem key={opt.value} value={opt.value} className="text-xs">
+              <SelectItem key={opt.value} value={opt.value}>
                 {opt.label}
               </SelectItem>
             ))}

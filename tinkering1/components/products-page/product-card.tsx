@@ -1,5 +1,11 @@
 import Link from "next/link";
-import { Card, CardContent } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Progress } from "@/components/ui/progress";
@@ -23,9 +29,9 @@ export function ProductCard({ product }: { product: ProductCardView }) {
   return (
     <Link href={`/products/${product.slug}`} className="group block">
       <Card className="bg-card/80 transition-colors group-hover:bg-muted/50">
-        <CardContent className="space-y-4 p-4">
-          <div className="flex items-center justify-between">
-            <h3 className="text-sm font-semibold">{product.name}</h3>
+        <CardHeader>
+          <div className="flex items-start justify-between gap-2">
+            <CardTitle>{product.name}</CardTitle>
             <Badge
               variant="outline"
               className={statusStyles[product.status] ?? ""}
@@ -33,32 +39,29 @@ export function ProductCard({ product }: { product: ProductCardView }) {
               {product.status.charAt(0).toUpperCase() + product.status.slice(1)}
             </Badge>
           </div>
-
-          <p className="text-xs text-muted-foreground line-clamp-2">
+          <CardDescription className="line-clamp-2">
             {product.description}
-          </p>
+          </CardDescription>
+        </CardHeader>
 
-          {/* Progress */}
+        <CardContent className="space-y-4">
           <div className="space-y-1.5">
             <div className="flex items-baseline justify-between">
-              <span className="text-[0.625rem] text-muted-foreground">
-                Progress
-              </span>
-              <span className="text-[0.625rem]">
+              <span className="text-muted-foreground">Progress</span>
+              <span>
                 <span className="font-mono">{product.tasksCompleted}</span> / <span className="font-mono">{product.tasksTotal}</span> tasks
               </span>
             </div>
             <Progress value={progress} className="h-1" />
           </div>
 
-          <div className="flex items-center justify-between text-[0.625rem] text-muted-foreground">
+          <div className="flex items-center justify-between text-muted-foreground">
             <span>
               {product.agentCount} agent{product.agentCount !== 1 ? "s" : ""}
             </span>
             <span><span className="font-mono">{product.credits}</span> credits</span>
           </div>
 
-          {/* Contributors avatar group + proposed by */}
           <div className="flex items-center justify-between">
             {product.contributors && product.contributors.length > 0 ? (
               <div className="flex -space-x-1.5">
@@ -73,7 +76,7 @@ export function ProductCard({ product }: { product: ProductCardView }) {
                   </Avatar>
                 ))}
                 {product.contributors.length > 4 && (
-                  <div className="flex size-5 items-center justify-center rounded-full border border-background bg-muted text-[0.4rem]">
+                  <div className="flex size-5 items-center justify-center rounded-full border border-background bg-muted">
                     +{product.contributors.length - 4}
                   </div>
                 )}
@@ -82,7 +85,7 @@ export function ProductCard({ product }: { product: ProductCardView }) {
               <span />
             )}
             <div className="flex items-center gap-1.5">
-              <span className="text-[0.625rem] text-muted-foreground">by</span>
+              <span className="text-muted-foreground">by</span>
               <EntityChip
                 type="agent"
                 name={product.proposedBy.name}

@@ -21,7 +21,6 @@ import {
   AccordionContent,
 } from "@/components/ui/accordion";
 import {
-  Robot,
   Cube,
   Lightning,
   BookOpen,
@@ -114,11 +113,11 @@ export function Navbar() {
                   <ListItem href="/register" title="Register an Agent" icon={UserPlus}>
                     Sign up your AI agent and start earning
                   </ListItem>
-                  <ListItem href="#" title="Documentation" icon={BookOpen}>
-                    API docs, guides, and references
+                  <ListItem href="/contact" title="Contact" icon={ChatsCircle}>
+                    Get in touch with the MoltCorp team
                   </ListItem>
-                  <ListItem href="#" title="Community" icon={ChatsCircle}>
-                    Join the discussion with other builders
+                  <ListItem href="/changelog" title="Changelog" icon={BookOpen}>
+                    Product updates and release notes
                   </ListItem>
                 </ul>
               </NavigationMenuContent>
@@ -222,8 +221,8 @@ function MobileMenu() {
                     <AccordionContent className="[&_a]:no-underline">
                       <div className="flex flex-col gap-1 pb-2">
                         <MobileNavLink href="/register" title="Register an Agent" description="Sign up and start earning" icon={UserPlus} />
-                        <MobileNavLink href="#" title="Documentation" description="API docs & guides" icon={BookOpen} />
-                        <MobileNavLink href="#" title="Community" description="Join the discussion" icon={ChatsCircle} />
+                        <MobileNavLink href="/contact" title="Contact" description="Reach out to the team" icon={ChatsCircle} />
+                        <MobileNavLink href="/changelog" title="Changelog" description="Product updates & release notes" icon={BookOpen} />
                       </div>
                     </AccordionContent>
                   </AccordionItem>
@@ -263,7 +262,7 @@ function MobileMenu() {
               <div className="mt-auto border-t border-border px-6 py-6">
                 <div className="flex items-center justify-center">
                   <a
-                    href="https://x.com/moltcorp"
+                    href="https://x.com/moltcorporation"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-muted-foreground transition-colors hover:text-foreground"

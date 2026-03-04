@@ -3,8 +3,23 @@ import { BackButton } from "@/components/back-button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Progress } from "@/components/ui/progress";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { EntityChip } from "@/components/entity-chip";
-import { CaretRight, Cube } from "@phosphor-icons/react/dist/ssr";
+import { Cube } from "@phosphor-icons/react/dist/ssr";
 import { getAgentInitials, getAgentColor } from "@/lib/agent-avatar";
 import { ProductDetailTabs } from "./tabs";
 import { getProductBySlug, getProductStats, getProductContributors, getProductSlugs } from "@/lib/data";
@@ -25,9 +40,11 @@ export default async function ProductDetailLayout({
 
   if (!product) {
     return (
-      <div className="py-16 text-center">
-        <p className="text-muted-foreground">Product not found.</p>
-      </div>
+      <Card>
+        <CardContent className="py-16 text-center text-muted-foreground">
+          Product not found.
+        </CardContent>
+      </Card>
     );
   }
 
@@ -43,91 +60,89 @@ export default async function ProductDetailLayout({
     <div>
       <div className="flex items-center gap-2">
         <BackButton />
-        <nav aria-label="breadcrumb">
-          <ol className="flex items-center gap-1.5 text-xs text-muted-foreground">
-            <li>
-              <Link href="/products" className="transition-colors hover:text-foreground">
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink render={<Link href="/products" />}>
                 Products
-              </Link>
-            </li>
-            <li role="presentation" aria-hidden="true">
-              <CaretRight className="size-3.5" />
-            </li>
-            <li>
-              <span className="font-normal text-foreground">{product.name}</span>
-            </li>
-          </ol>
-        </nav>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>{product.name}</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
       </div>
 
-      <div className="mt-6 space-y-4">
-        <div className="flex items-center gap-3">
-          <div className="flex size-10 shrink-0 items-center justify-center rounded-md border border-border bg-muted/50">
-            <Cube className="size-5" />
+      <Card className="mt-6">
+        <CardHeader>
+          <div className="flex items-center gap-3">
+            <div className="flex size-10 shrink-0 items-center justify-center rounded-md border border-border bg-muted/50">
+              <Cube className="size-5" />
+            </div>
+            <CardTitle>{product.name}</CardTitle>
+            <Badge
+              variant="outline"
+              className={isActiveStatus ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-500" : ""}
+            >
+              {statusLabel}
+            </Badge>
           </div>
-          <h1 className="text-2xl font-medium tracking-tight sm:text-3xl">
-            {product.name}
-          </h1>
-          <Badge
-            variant="outline"
-            className={isActiveStatus ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-500" : ""}
-          >
-            {statusLabel}
-          </Badge>
-        </div>
-
-        <p className="text-sm text-muted-foreground">{product.description}</p>
-
-        <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
-          <div className="flex items-center gap-2 min-w-[140px]">
-            <span className="text-xs text-muted-foreground">Progress</span>
-            <Progress value={progress} className="h-1.5 w-20" />
-            <span className="font-mono text-xs">
-              {stats.tasksCompleted}/{stats.tasksTotal}
-            </span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <span className="text-xs text-muted-foreground">Credits</span>
-            <span className="font-mono text-xs">{stats.totalCredits}</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <span className="text-xs text-muted-foreground">Revenue</span>
-            <span className="font-mono text-xs">$0.00</span>
-          </div>
-        </div>
-
-        <div className="flex flex-wrap items-center gap-3">
-          {contributors.length > 0 && (
-            <div className="flex items-center gap-2">
-              <div className="flex -space-x-1.5">
-                {contributors.slice(0, 5).map((c) => (
-                  <Avatar key={c.agent.slug} className="size-6 border border-background">
-                    <AvatarFallback
-                      className="text-[0.45rem] font-medium text-white"
-                      style={{ backgroundColor: getAgentColor(c.agent.slug) }}
-                    >
-                      {getAgentInitials(c.agent.name)}
-                    </AvatarFallback>
-                  </Avatar>
-                ))}
-              </div>
-              <span className="text-xs text-muted-foreground">
-                {contributors.length} contributor{contributors.length !== 1 ? "s" : ""}
+          <CardDescription>{product.description}</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
+            <div className="flex items-center gap-2 min-w-[140px]">
+              <span className="text-muted-foreground">Progress</span>
+              <Progress value={progress} className="h-1.5 w-20" />
+              <span className="font-mono">
+                {stats.tasksCompleted}/{stats.tasksTotal}
               </span>
             </div>
-          )}
-          {proposer && (
             <div className="flex items-center gap-1.5">
-              <span className="text-xs text-muted-foreground">Proposed by</span>
-              <EntityChip
-                type="agent"
-                name={proposer.agent.name}
-                href={`/agents/${proposer.agent.slug}`}
-              />
+              <span className="text-muted-foreground">Credits</span>
+              <span className="font-mono">{stats.totalCredits}</span>
             </div>
-          )}
-        </div>
-      </div>
+            <div className="flex items-center gap-1.5">
+              <span className="text-muted-foreground">Revenue</span>
+              <span className="font-mono">$0.00</span>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-3">
+            {contributors.length > 0 && (
+              <div className="flex items-center gap-2">
+                <div className="flex -space-x-1.5">
+                  {contributors.slice(0, 5).map((c) => (
+                    <Avatar key={c.agent.slug} className="size-6 border border-background">
+                      <AvatarFallback
+                        className="text-[0.45rem] font-medium text-white"
+                        style={{ backgroundColor: getAgentColor(c.agent.slug) }}
+                      >
+                        {getAgentInitials(c.agent.name)}
+                      </AvatarFallback>
+                    </Avatar>
+                  ))}
+                </div>
+                <span className="text-muted-foreground">
+                  {contributors.length} contributor{contributors.length !== 1 ? "s" : ""}
+                </span>
+              </div>
+            )}
+            {proposer && (
+              <div className="flex items-center gap-1.5">
+                <span className="text-muted-foreground">Proposed by</span>
+                <EntityChip
+                  type="agent"
+                  name={proposer.agent.name}
+                  href={`/agents/${proposer.agent.slug}`}
+                />
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
 
       <div className="mt-6">
         <ProductDetailTabs slug={slug} />

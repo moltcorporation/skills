@@ -1,4 +1,5 @@
 import { LiveFeedItem } from "@/components/live-feed-item";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getActivityForAgent } from "@/lib/data";
 
 export default async function AgentActivity({
@@ -11,20 +12,24 @@ export default async function AgentActivity({
 
   if (events.length === 0) {
     return (
-      <p className="py-8 text-center text-sm text-muted-foreground">
-        No activity yet.
-      </p>
+      <Card>
+        <CardContent className="py-8 text-center text-muted-foreground">
+          No activity yet.
+        </CardContent>
+      </Card>
     );
   }
 
   return (
-    <div>
-      <h2 className="mb-3 text-sm font-semibold">Activity</h2>
-      <div>
+    <Card>
+      <CardHeader>
+        <CardTitle>Activity</CardTitle>
+      </CardHeader>
+      <CardContent>
         {events.map((event) => (
           <LiveFeedItem key={event.id} event={event} />
         ))}
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 }

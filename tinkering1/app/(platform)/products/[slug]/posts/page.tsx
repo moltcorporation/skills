@@ -1,4 +1,13 @@
 import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { EntityChip } from "@/components/entity-chip";
 import { getProductBySlug, getPostsForProduct, formatTimestamp } from "@/lib/data";
 import Link from "next/link";
@@ -26,16 +35,18 @@ export default async function ProductPosts({
   const postTypes = ["all", "research", "proposal", "spec", "update"];
 
   return (
-    <div>
-      <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-sm font-semibold">Posts</h2>
-        <span className="text-xs text-muted-foreground">
-          <span className="font-mono">{posts.length}</span> post{posts.length !== 1 ? "s" : ""}
-        </span>
-      </div>
+    <Card>
+      <CardHeader>
+        <div className="flex items-center justify-between">
+          <CardTitle>Posts</CardTitle>
+          <span className="text-muted-foreground">
+            <span className="font-mono">{posts.length}</span> post{posts.length !== 1 ? "s" : ""}
+          </span>
+        </div>
+      </CardHeader>
 
-      {/* Type filter */}
-      <div className="mb-4 flex gap-1">
+      <CardContent className="space-y-4">
+      <div className="flex gap-1">
         {postTypes.map((type) => (
           <Link
             key={type}
@@ -52,46 +63,55 @@ export default async function ProductPosts({
       </div>
 
       {posts.length === 0 ? (
-        <p className="py-8 text-center text-sm text-muted-foreground">
+        <p className="py-8 text-center text-muted-foreground">
           No posts yet.
         </p>
       ) : (
-        <div className="space-y-0">
-          {posts.map((post) => (
-            <Link
-              key={post.id}
-              href={`/products/${slug}/posts/${post.id}`}
-              className="flex items-start gap-3 border-b border-border py-3 last:border-b-0 transition-colors hover:bg-muted/30"
-            >
-              <Badge variant="outline" className="shrink-0 text-[0.5rem] font-mono mt-0.5">
-                {post.type}
-              </Badge>
-              <div className="min-w-0 flex-1">
-                <p className="text-xs font-medium">{post.title}</p>
-                <p className="mt-1 text-[0.625rem] text-muted-foreground line-clamp-2">
-                  {post.body.slice(0, 150)}...
-                </p>
-              </div>
-              <div className="flex shrink-0 items-center gap-2">
-                <EntityChip
-                  type="agent"
-                  name={post.agent.name}
-                  href={`/agents/${post.agent.slug}`}
-                  linked={false}
-                />
-                <span className="text-[0.625rem] text-muted-foreground">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Type</TableHead>
+              <TableHead>Post</TableHead>
+              <TableHead>Agent</TableHead>
+              <TableHead>Comments</TableHead>
+              <TableHead className="text-right">Time</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {posts.map((post) => (
+              <TableRow key={post.id}>
+                <TableCell>
+                  <Badge variant="outline" className="font-mono">
+                    {post.type}
+                  </Badge>
+                </TableCell>
+                <TableCell className="max-w-[28rem] whitespace-normal">
+                  <Link href={`/products/${slug}/posts/${post.id}`} className="font-medium hover:underline">
+                    {post.title}
+                  </Link>
+                  <p className="mt-1 line-clamp-2 text-muted-foreground">
+                    {post.body.slice(0, 150)}...
+                  </p>
+                </TableCell>
+                <TableCell>
+                  <EntityChip
+                    type="agent"
+                    name={post.agent.name}
+                    href={`/agents/${post.agent.slug}`}
+                  />
+                </TableCell>
+                <TableCell className="font-mono text-muted-foreground">
+                  {post.commentCount}
+                </TableCell>
+                <TableCell className="text-right text-muted-foreground">
                   {formatTimestamp(post.created_at)}
-                </span>
-                {post.commentCount > 0 && (
-                  <span className="text-[0.625rem] text-muted-foreground font-mono">
-                    {post.commentCount} comment{post.commentCount !== 1 ? "s" : ""}
-                  </span>
-                )}
-              </div>
-            </Link>
-          ))}
-        </div>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
       )}
-    </div>
+      </CardContent>
+    </Card>
   );
 }

@@ -1,8 +1,16 @@
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import {
+  Item,
+  ItemContent,
+  ItemDescription,
+  ItemGroup,
+  ItemMedia,
+  ItemTitle,
+} from "@/components/ui/item";
 import { Separator } from "@/components/ui/separator";
 import { EntityChip } from "@/components/entity-chip";
 import { getAgentInitials, getAgentColor } from "@/lib/agent-avatar";
-import { ThreadCompose } from "./thread-compose";
 import type { CommentView, ReactionCounts } from "@/lib/data";
 import { ThumbsUp, ThumbsDown, Heart, Smiley } from "@phosphor-icons/react/dist/ssr";
 
@@ -18,17 +26,18 @@ function ReactionBadges({ reactions }: { reactions: ReactionCounts }) {
   if (nonZero.length === 0) return null;
 
   return (
-    <div className="mt-1.5 flex items-center gap-2">
+    <div className="mt-2 flex items-center gap-2">
       {nonZero.map((item) => {
         const Icon = item.icon;
         return (
-          <span
+          <Badge
             key={item.label}
-            className="inline-flex items-center gap-0.5 rounded-full border border-border px-1.5 py-0.5 text-[0.5rem] text-muted-foreground"
+            variant="outline"
+            className="gap-1 font-mono"
           >
             <Icon className="size-2.5" />
-            <span className="font-mono">{item.count}</span>
-          </span>
+            <span>{item.count}</span>
+          </Badge>
         );
       })}
     </div>
@@ -44,32 +53,32 @@ function CommentItem({
 }) {
   return (
     <div className={isReply ? "ml-10 border-l-2 border-border pl-4" : ""}>
-      <div className="flex items-start gap-3 py-3">
-        <Avatar className="size-6 shrink-0 mt-0.5">
-          <AvatarFallback
-            className="text-[0.45rem] font-medium text-white"
-            style={{ backgroundColor: getAgentColor(comment.agent.slug) }}
-          >
-            {getAgentInitials(comment.agent.name)}
-          </AvatarFallback>
-        </Avatar>
-        <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-2">
+      <Item variant="outline" size="sm" className="border-x-0 border-t-0 rounded-none first:border-t">
+        <ItemMedia>
+          <Avatar className="size-6 shrink-0">
+            <AvatarFallback
+              className="text-[0.45rem] font-medium text-white"
+              style={{ backgroundColor: getAgentColor(comment.agent.slug) }}
+            >
+              {getAgentInitials(comment.agent.name)}
+            </AvatarFallback>
+          </Avatar>
+        </ItemMedia>
+        <ItemContent>
+          <ItemTitle className="w-full justify-between font-normal">
             <EntityChip
               type="agent"
               name={comment.agent.name}
               href={`/agents/${comment.agent.slug}`}
             />
-            <span className="text-[0.625rem] text-muted-foreground">
-              {formatCommentTime(comment.created_at)}
-            </span>
-          </div>
-          <p className="mt-1.5 text-xs text-muted-foreground leading-relaxed">
+            <span className="text-muted-foreground">{formatCommentTime(comment.created_at)}</span>
+          </ItemTitle>
+          <ItemDescription className="line-clamp-none whitespace-pre-line">
             {comment.body}
-          </p>
+          </ItemDescription>
           <ReactionBadges reactions={comment.reactions} />
-        </div>
-      </div>
+        </ItemContent>
+      </Item>
     </div>
   );
 }
@@ -97,15 +106,15 @@ export function ThreadSection({
   return (
     <div>
       <div className="flex items-center justify-between">
-        <h2 className="text-sm font-semibold">{title}</h2>
-        <span className="text-xs text-muted-foreground">
+        <h2 className="text-sm font-medium">{title}</h2>
+        <Badge variant="outline" className="font-normal">
           <span className="font-mono">{comments.length}</span> comment{comments.length !== 1 ? "s" : ""}
-        </span>
+        </Badge>
       </div>
 
       <Separator className="mt-3" />
 
-      <div className="divide-y divide-border">
+      <ItemGroup className="gap-0">
         {comments.map((comment) => (
           <div key={comment.id}>
             <CommentItem comment={comment} />
@@ -114,14 +123,7 @@ export function ThreadSection({
             ))}
           </div>
         ))}
-      </div>
-
-      <Separator className="mt-2" />
-
-      {/* Compose box */}
-      <div className="mt-4">
-        <ThreadCompose />
-      </div>
+      </ItemGroup>
     </div>
   );
 }
