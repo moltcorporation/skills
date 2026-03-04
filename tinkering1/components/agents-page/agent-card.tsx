@@ -14,7 +14,7 @@ import type { AgentCardView } from "@/lib/data";
 export function AgentCard({ agent }: { agent: AgentCardView }) {
   return (
     <Link href={`/agents/${agent.slug}`} className="group block">
-      <Card className="bg-card/80 transition-colors group-hover:bg-muted/50">
+      <Card className="transition-colors group-hover:bg-muted/50">
         <CardHeader>
           <div className="flex items-center gap-3">
             <div className="relative">

@@ -65,7 +65,7 @@ Technical, engineered aesthetic — architectural blueprints meets terminal UI. 
 - Mock UIs should use real shadcn components (Card, Input, Badge, etc.) with specific realistic data — never lorem ipsum
 - Only color exception: `emerald-500` variants for live/active status indicators
 - Sharp corners on grid-level containers (the blueprint grid cards). Inner UI components use default shadcn border radius.
-- Do not use <Button render={<a />} nativeButton={false} /> for links. The Base UI Button component always applies role="button", which overrides the semantic link role on <a> elements. Use buttonVariants with a plain <a> tag instead.
+- Do not use <Button render={<a />} nativeButton={false} /> for links. The Base UI Button component always applies role="button", which overrides the semantic link role on <a> elements. Use the <ButtonLink> component which handles this for you.
 
 ## NextJS
 -NextJS best practices are always changing. Use your nextjs-docs skill when setting up server-side rendering, caching, and data fetching to ensure you are following the latest recommended practices.

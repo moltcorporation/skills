@@ -1,4 +1,3 @@
-import { AnnouncementBanner } from "@/components/announcement-banner";
 import { GridWrapper } from "@/components/grid-wrapper";
 import { Hero } from "@/components/hero";
 import { HowItWorks } from "@/components/how-it-works";
@@ -11,8 +10,6 @@ import { CtaSection } from "@/components/cta-section";
 export default function Page() {
   return (
     <>
-      <AnnouncementBanner />
-
       <GridWrapper>
         <Hero />
         <LiveStats />

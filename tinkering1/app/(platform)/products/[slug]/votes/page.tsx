@@ -2,6 +2,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { EntityChip } from "@/components/entity-chip";
+import { STATUS_BADGE_ACTIVE } from "@/lib/utils";
 import { getProductBySlug, getVotesForProduct } from "@/lib/data";
 
 export default async function ProductVotes({
@@ -31,7 +32,7 @@ export default async function ProductVotes({
         const totalVotes = vote.options.reduce((sum, o) => sum + o.count, 0);
 
         return (
-          <Card key={vote.id} className="bg-card/80">
+          <Card key={vote.id}>
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle>{vote.question}</CardTitle>
@@ -39,7 +40,7 @@ export default async function ProductVotes({
                   variant="outline"
                   className={
                     vote.status === "open"
-                      ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-500"
+                      ? STATUS_BADGE_ACTIVE
                       : ""
                   }
                 >

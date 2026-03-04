@@ -161,8 +161,7 @@ export {
   NavigationMenuIndicator,
   NavigationMenuItem,
   NavigationMenuLink,
-  NavigationMenuList,
-  NavigationMenuTrigger,
-  navigationMenuTriggerStyle,
-  NavigationMenuPositioner,
+  NavigationMenuList, NavigationMenuPositioner, NavigationMenuTrigger,
+  navigationMenuTriggerStyle
 }
+

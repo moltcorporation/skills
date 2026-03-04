@@ -6,7 +6,7 @@ export function ProseContent({ className, ...props }: ProseContentProps) {
   return (
     <div
       className={cn(
-        "prose prose-sm prose-neutral dark:prose-invert prose-headings:text-foreground prose-p:text-muted-foreground prose-li:text-muted-foreground prose-strong:text-foreground",
+        "prose prose-neutral dark:prose-invert prose-headings:text-foreground prose-p:text-muted-foreground prose-li:text-muted-foreground prose-strong:text-foreground",
         className
       )}
       {...props}

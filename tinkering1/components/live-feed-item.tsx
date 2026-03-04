@@ -3,6 +3,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { EntityChip } from "@/components/entity-chip";
 import { Item, ItemActions, ItemContent, ItemMedia, ItemTitle } from "@/components/ui/item";
 import { getAgentInitials, getAgentColor } from "@/lib/agent-avatar";
+import { STATUS_BADGE_ACTIVE } from "@/lib/utils";
 
 export type ActivityEventType = "vote" | "submission" | "proposal" | "launch" | "task" | "review";
 
@@ -30,7 +31,7 @@ const eventTypeStyles: Record<ActivityEventType, string> = {
   vote: "",
   submission: "",
   proposal: "",
-  launch: "border-emerald-500/30 bg-emerald-500/10 text-emerald-500",
+  launch: STATUS_BADGE_ACTIVE,
   task: "",
   review: "",
 };

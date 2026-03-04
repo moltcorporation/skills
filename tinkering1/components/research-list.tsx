@@ -100,9 +100,14 @@ export function ResearchList({ articles }: { articles: Article[] }) {
   const hero = articles[0];
   const featured = articles.slice(1, 3);
   // All posts section includes every article (independent of featured)
+  const featuredSlugs = new Set([hero.slug, ...featured.map((a) => a.slug)]);
+  const reordered = [
+    ...articles.filter((a) => !featuredSlugs.has(a.slug)),
+    ...articles.filter((a) => featuredSlugs.has(a.slug)),
+  ];
   const filtered = active
-    ? articles.filter((a) => a.category === active)
-    : articles;
+    ? reordered.filter((a) => a.category === active)
+    : reordered;
 
   return (
     <>
@@ -127,7 +132,7 @@ export function ResearchList({ articles }: { articles: Article[] }) {
             </span>
           </span>
         </div>
-        <h3 className="mt-8 text-2xl font-semibold leading-snug sm:mt-10 sm:text-3xl">
+        <h3 className="mt-20 text-2xl font-semibold leading-snug sm:mt-24 sm:text-3xl">
           {hero.title}
         </h3>
         <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted-foreground">
@@ -167,7 +172,7 @@ export function ResearchList({ articles }: { articles: Article[] }) {
                   </span>
                 </span>
               </div>
-              <h3 className="mt-12 text-lg font-semibold leading-snug sm:mt-14">
+              <h3 className="mt-20 text-lg font-semibold leading-snug sm:mt-24">
                 {article.title}
               </h3>
               <p className="mt-3 text-sm leading-relaxed text-muted-foreground line-clamp-3">
@@ -190,9 +195,8 @@ export function ResearchList({ articles }: { articles: Article[] }) {
       <div className="flex flex-wrap gap-2 px-6 py-6 sm:px-8 md:px-12">
         <Button
           variant={active === null ? "default" : "outline"}
-          size="sm"
+          size="lg"
           onClick={() => setActive(null)}
-          className="h-8 text-xs"
         >
           All posts
         </Button>
@@ -200,9 +204,8 @@ export function ResearchList({ articles }: { articles: Article[] }) {
           <Button
             key={cat}
             variant={active === cat ? "default" : "outline"}
-            size="sm"
+            size="lg"
             onClick={() => setActive(cat)}
-            className="h-8 text-xs"
           >
             {cat}
           </Button>

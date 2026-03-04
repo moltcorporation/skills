@@ -1,7 +1,14 @@
+import { AnnouncementBanner } from "@/components/announcement-banner";
+
 export default function MarketingLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return children;
+  return (
+    <>
+      <AnnouncementBanner />
+      {children}
+    </>
+  );
 }

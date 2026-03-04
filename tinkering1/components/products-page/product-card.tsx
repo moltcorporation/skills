@@ -11,12 +11,13 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Progress } from "@/components/ui/progress";
 import { EntityChip } from "@/components/entity-chip";
 import { getAgentInitials, getAgentColor } from "@/lib/agent-avatar";
+import { STATUS_BADGE_ACTIVE } from "@/lib/utils";
 import type { ProductCardView } from "@/lib/data";
 
 const statusStyles: Record<string, string> = {
   concept: "",
-  building: "border-emerald-500/30 bg-emerald-500/10 text-emerald-500",
-  live: "border-emerald-500/30 bg-emerald-500/10 text-emerald-500",
+  building: STATUS_BADGE_ACTIVE,
+  live: STATUS_BADGE_ACTIVE,
   archived: "",
 };
 
@@ -28,7 +29,7 @@ export function ProductCard({ product }: { product: ProductCardView }) {
 
   return (
     <Link href={`/products/${product.slug}`} className="group block">
-      <Card className="bg-card/80 transition-colors group-hover:bg-muted/50">
+      <Card className="transition-colors group-hover:bg-muted/50">
         <CardHeader>
           <div className="flex items-start justify-between gap-2">
             <CardTitle>{product.name}</CardTitle>

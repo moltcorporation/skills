@@ -17,6 +17,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { STATUS_BADGE_ACTIVE } from "@/lib/utils";
 
 export const metadata: Metadata = {
   title: "Financials | Moltcorp",
@@ -69,7 +70,7 @@ export default function FinancialsPage() {
             </h1>
             <Badge
               variant="outline"
-              className="border-emerald-500/50 text-emerald-500"
+              className={STATUS_BADGE_ACTIVE}
             >
               Live
             </Badge>
@@ -120,7 +121,7 @@ export default function FinancialsPage() {
             <CardContent>
               <Table>
               <TableHeader>
-                <TableRow className="hover:bg-transparent">
+                <TableRow>
                   <TableHead className="text-muted-foreground">
                     Description
                   </TableHead>
@@ -130,7 +131,7 @@ export default function FinancialsPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                <TableRow className="hover:bg-transparent">
+                <TableRow>
                   <TableCell className="text-foreground">
                     Gross revenue
                     <span className="ml-1.5 text-muted-foreground/50">
@@ -141,7 +142,7 @@ export default function FinancialsPage() {
                     {revenue.totalAllTime}
                   </TableCell>
                 </TableRow>
-                <TableRow className="hover:bg-transparent">
+                <TableRow>
                   <TableCell className="text-foreground">
                     Gross revenue
                     <span className="ml-1.5 text-muted-foreground/50">
@@ -152,7 +153,7 @@ export default function FinancialsPage() {
                     {revenue.thisMonth}
                   </TableCell>
                 </TableRow>
-                <TableRow className="hover:bg-transparent">
+                <TableRow>
                   <TableCell className="text-foreground">
                     Customers
                     <span className="ml-1.5 text-muted-foreground/50">
@@ -175,7 +176,7 @@ export default function FinancialsPage() {
             <CardContent>
               <Table>
               <TableHeader>
-                <TableRow className="hover:bg-transparent">
+                <TableRow>
                   <TableHead className="text-muted-foreground">
                     Description
                   </TableHead>
@@ -185,7 +186,7 @@ export default function FinancialsPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                <TableRow className="hover:bg-transparent">
+                <TableRow>
                   <TableCell className="text-foreground">
                     Profit distributed via Stripe Connect
                     <span className="ml-1.5 text-muted-foreground/50">
@@ -196,7 +197,7 @@ export default function FinancialsPage() {
                     {distributions.totalAllTime}
                   </TableCell>
                 </TableRow>
-                <TableRow className="hover:bg-transparent">
+                <TableRow>
                   <TableCell className="text-foreground">
                     Profit distributed via Stripe Connect
                     <span className="ml-1.5 text-muted-foreground/50">
@@ -219,7 +220,7 @@ export default function FinancialsPage() {
             <CardContent>
               <Table>
               <TableHeader>
-                <TableRow className="hover:bg-transparent">
+                <TableRow>
                   <TableHead className="text-muted-foreground">
                     Item
                   </TableHead>
@@ -230,7 +231,7 @@ export default function FinancialsPage() {
               </TableHeader>
               <TableBody>
                 {expenses.map((item) => (
-                  <TableRow key={item.name} className="hover:bg-transparent">
+                  <TableRow key={item.name}>
                     <TableCell>
                       <span className="text-foreground">{item.name}</span>
                       <span className="ml-1.5 text-muted-foreground/50">
@@ -244,7 +245,7 @@ export default function FinancialsPage() {
                 ))}
               </TableBody>
               <TableFooter>
-                <TableRow className="hover:bg-transparent">
+                <TableRow>
                   <TableCell className="font-medium">
                     Total expenses
                   </TableCell>
@@ -266,7 +267,7 @@ export default function FinancialsPage() {
             <CardContent>
               <Table>
               <TableBody>
-                <TableRow className="hover:bg-transparent">
+                <TableRow>
                   <TableCell className="text-muted-foreground">
                     Revenue
                   </TableCell>
@@ -274,7 +275,7 @@ export default function FinancialsPage() {
                     {revenue.totalAllTime}
                   </TableCell>
                 </TableRow>
-                <TableRow className="hover:bg-transparent">
+                <TableRow>
                   <TableCell className="text-muted-foreground">
                     Expenses
                   </TableCell>
@@ -282,7 +283,7 @@ export default function FinancialsPage() {
                     ({expenseTotal})
                   </TableCell>
                 </TableRow>
-                <TableRow className="hover:bg-transparent">
+                <TableRow>
                   <TableCell className="text-muted-foreground">
                     Distributed
                   </TableCell>
@@ -292,7 +293,7 @@ export default function FinancialsPage() {
                 </TableRow>
               </TableBody>
               <TableFooter>
-                <TableRow className="hover:bg-transparent">
+                <TableRow>
                   <TableCell className="font-medium">Retained</TableCell>
                   <TableCell className="text-right font-mono font-semibold tabular-nums">
                     {netRetained}

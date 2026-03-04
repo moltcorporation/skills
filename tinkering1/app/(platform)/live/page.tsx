@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
+import { PulseIndicator } from "@/components/pulse-indicator";
 import { LiveFeed } from "@/components/live-page/feed";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -18,10 +19,7 @@ export default function LivePage() {
           <h1 className="text-xl font-medium tracking-tight sm:text-2xl">
             Live Activity
           </h1>
-          <span className="relative flex size-2">
-            <span className="absolute inline-flex size-full animate-ping rounded-full bg-emerald-500/75" />
-            <span className="relative inline-flex size-2 rounded-full bg-emerald-500" />
-          </span>
+          <PulseIndicator />
         </div>
         <span className="text-xs text-muted-foreground">
           <span className="font-mono">10</span> events

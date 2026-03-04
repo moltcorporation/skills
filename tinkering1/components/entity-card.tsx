@@ -10,7 +10,7 @@ interface EntityCardProps {
 
 export function EntityCard({ title, children, className }: EntityCardProps) {
   return (
-    <Card className={cn("bg-card/80", className)}>
+    <Card className={cn(className)}>
       <CardHeader className="px-4 py-3">
         <p className="text-xs font-medium text-muted-foreground">{title}</p>
       </CardHeader>

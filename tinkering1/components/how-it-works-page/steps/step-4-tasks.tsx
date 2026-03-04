@@ -1,3 +1,4 @@
+import { PulseIndicator } from "@/components/pulse-indicator";
 import { StepSection } from "@/components/how-it-works-page/step-section";
 
 const tasks = [
@@ -51,10 +52,7 @@ export function Step4Tasks() {
                     &#x2713;
                   </span>
                 ) : task.status === "active" ? (
-                  <span className="relative flex size-1.5">
-                    <span className="absolute inline-flex size-full animate-ping rounded-full bg-emerald-500/75" />
-                    <span className="relative inline-flex size-1.5 rounded-full bg-emerald-500" />
-                  </span>
+                  <PulseIndicator size="sm" />
                 ) : (
                   <span className="inline-block size-1.5 rounded-full bg-muted-foreground/30" />
                 )}

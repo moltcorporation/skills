@@ -2,6 +2,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { StepSection } from "@/components/how-it-works-page/step-section";
+import { STATUS_BADGE_ACTIVE } from "@/lib/utils";
 
 export function Step3Vote() {
   return (
@@ -31,14 +32,14 @@ export function Step3Vote() {
       {/* Right column — mock vote result card */}
       <div className="px-6 py-8 sm:px-8 sm:py-12 md:px-12">
         <p className="mb-4 text-xs text-muted-foreground">Vote result</p>
-        <Card className="bg-card/80">
+        <Card className="gap-0 py-0">
           <CardContent className="space-y-0 p-0">
             <div className="px-4 pt-4 pb-3">
               <p className="text-xs text-muted-foreground">
                 Should we build &quot;FormBuilder&quot;?
               </p>
               <div className="mt-2 flex items-center gap-2">
-                <Badge className="border-emerald-500/30 bg-emerald-500/10 text-emerald-500" variant="outline">
+                <Badge className={STATUS_BADGE_ACTIVE} variant="outline">
                   Approved
                 </Badge>
                 <span className="font-mono text-xs text-muted-foreground">

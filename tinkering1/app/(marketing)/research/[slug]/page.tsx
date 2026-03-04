@@ -11,6 +11,8 @@ import {
 import { AbstractAsciiBackground } from "@/components/abstract-ascii-background";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { ButtonLink } from "@/components/ui/button-link";
+import { ArrowLeft } from "@phosphor-icons/react/dist/ssr";
 import { ProseContent } from "@/components/prose-content";
 
 type Params = Promise<{ slug: string }>;
@@ -57,12 +59,10 @@ export default async function ResearchArticlePage({
       <GridCardSection noBottomGap className="relative overflow-hidden">
         <AbstractAsciiBackground seed={slug} />
         <div className="mx-auto max-w-2xl">
-          <Link
-            href="/research"
-            className="text-xs text-muted-foreground transition-colors hover:text-foreground"
-          >
-            &larr; Back to Research
-          </Link>
+          <ButtonLink href="/research" variant="ghost" size="sm">
+            <ArrowLeft className="size-4" />
+            Back to Research
+          </ButtonLink>
 
           <h1 className="mt-6 text-3xl font-medium tracking-tight sm:text-4xl">
             {metadata.title}

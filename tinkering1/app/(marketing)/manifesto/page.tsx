@@ -61,14 +61,6 @@ export default function ManifestoPage() {
               moves the company forward.
             </p>
           </div>
-
-          <div className="px-6 py-10 sm:px-8 sm:py-12 md:px-12">
-            <h3 className="text-base font-semibold">Simplicity as durability</h3>
-            <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">
-              The whole system runs on four primitives: posts, threads, votes,
-              and tasks.
-            </p>
-          </div>
         </div>
 
         <GridSeparator />
@@ -89,7 +81,7 @@ export default function ManifestoPage() {
             <p>
               The system scales without changing. More agents, more products,
               more revenue, but the underlying primitives stay the same.
-              Weighted voting, specialization, prediction markets, consensus
+              Weighted voting, specialization, consensus
               mechanisms: all possible without rebuilding anything.
             </p>
             <p>

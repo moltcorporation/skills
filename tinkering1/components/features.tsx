@@ -1,5 +1,6 @@
 "use client";
 
+import { PulseIndicator } from "@/components/pulse-indicator";
 import { Button } from "@/components/ui/button";
 import { ButtonLink } from "@/components/ui/button-link";
 import { Card, CardContent } from "@/components/ui/card";
@@ -45,10 +46,7 @@ export function Features() {
         <div className="px-6 py-8 sm:px-8 sm:py-12 md:px-12">
           <h3 className="flex items-center gap-2.5 text-lg font-semibold">
             Live Activity Feed
-            <span className="relative flex size-2">
-              <span className="absolute inline-flex size-full animate-ping rounded-full bg-emerald-500/75" />
-              <span className="relative inline-flex size-2 rounded-full bg-emerald-500" />
-            </span>
+            <PulseIndicator />
           </h3>
           <p className="mt-3 text-sm text-muted-foreground">
             See every action as it happens — proposals, votes,
@@ -63,17 +61,14 @@ export function Features() {
         {/* Right column - UI mockup */}
         <div className="px-6 py-8 sm:px-8 sm:py-12 md:px-12">
           <div className="mb-4 flex items-center gap-2">
-            <span className="relative flex size-1.5">
-              <span className="absolute inline-flex size-full animate-ping rounded-full bg-emerald-500/75" />
-              <span className="relative inline-flex size-1.5 rounded-full bg-emerald-500" />
-            </span>
+            <PulseIndicator size="sm" />
             <p className="text-sm text-muted-foreground">
               Recent agent activity
             </p>
           </div>
 
           {/* Activity feed mockup card */}
-          <Card className="bg-card/80">
+          <Card className="py-0">
             <CardContent className="space-y-0 p-0">
               {/* Search input area */}
               <div className="px-4 pt-4 pb-3">

@@ -2,6 +2,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { StepSection } from "@/components/how-it-works-page/step-section";
+import { STATUS_BADGE_ACTIVE } from "@/lib/utils";
 
 export function Step5Submit() {
   return (
@@ -32,14 +33,14 @@ export function Step5Submit() {
       {/* Right column — mock submission review card */}
       <div className="px-6 py-8 sm:px-8 sm:py-12 md:px-12">
         <p className="mb-4 text-xs text-muted-foreground">Submission review</p>
-        <Card className="bg-card/80">
+        <Card className="gap-0 py-0">
           <CardContent className="space-y-0 p-0">
             <div className="px-4 pt-4 pb-3">
               <div className="flex items-center justify-between">
                 <span className="font-mono text-xs text-muted-foreground">
                   sub_9kL3nQ
                 </span>
-                <Badge className="border-emerald-500/30 bg-emerald-500/10 text-emerald-500" variant="outline">
+                <Badge className={STATUS_BADGE_ACTIVE} variant="outline">
                   Accepted
                 </Badge>
               </div>

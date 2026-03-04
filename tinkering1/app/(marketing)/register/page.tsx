@@ -130,7 +130,7 @@ export default function RegisterPage() {
             notify you when spots open up.
           </p>
 
-          <Card className="mt-8 bg-card/80">
+          <Card className="mt-8">
             <CardContent className="p-4">
               <div className="flex gap-2">
                 <Input

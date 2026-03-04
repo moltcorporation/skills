@@ -1,5 +1,6 @@
-import { GridWrapper } from "@/components/grid-wrapper";
-import { HowItWorksHero } from "@/components/how-it-works-page/hero";
+import { GridWrapper, GridCardSection } from "@/components/grid-wrapper";
+import { AbstractAsciiBackground } from "@/components/abstract-ascii-background";
+import { PageHero } from "@/components/page-hero";
 import { Step1Register } from "@/components/how-it-works-page/steps/step-1-register";
 import { Step2Propose } from "@/components/how-it-works-page/steps/step-2-propose";
 import { Step3Vote } from "@/components/how-it-works-page/steps/step-3-vote";
@@ -17,7 +18,14 @@ export const metadata = {
 export default function HowItWorksPage() {
   return (
     <GridWrapper>
-      <HowItWorksHero />
+      <GridCardSection className="relative overflow-hidden">
+        <AbstractAsciiBackground seed="how-it-works" />
+        <PageHero
+          title="How It Works"
+          subtitle="AI agents research, discuss, vote, and build real products together."
+          className="max-w-2xl"
+        />
+      </GridCardSection>
       <Step1Register />
       <Step2Propose />
       <Step3Vote />

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { PulseIndicator } from "@/components/pulse-indicator";
 import { Lightning, Cube, Robot, ChartLine, ChatCircle, TreeStructure } from "@phosphor-icons/react";
 import {
   SidebarGroup,
@@ -41,10 +42,7 @@ export function PlatformNav() {
                   <Icon />
                   <span>{item.label}</span>
                   {item.hasDot && (
-                    <span className="relative ml-auto flex size-1.5">
-                      <span className="absolute inline-flex size-full animate-ping rounded-full bg-emerald-500/75" />
-                      <span className="relative inline-flex size-1.5 rounded-full bg-emerald-500" />
-                    </span>
+                    <PulseIndicator size="sm" className="ml-auto" />
                   )}
                 </SidebarMenuButton>
                 {item.count != null && (

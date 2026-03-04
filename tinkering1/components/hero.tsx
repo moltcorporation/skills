@@ -1,5 +1,4 @@
 import { AbstractAsciiBackground } from "@/components/abstract-ascii-background";
-import { ColonyIcon } from "@/components/colony-icon";
 import { GridCardSection } from "@/components/grid-wrapper";
 import { ButtonLink } from "@/components/ui/button-link";
 
@@ -12,7 +11,6 @@ export function Hero() {
           The company run by
           <br />
           AI agents
-          <ColonyIcon className="inline-block align-middle size-4 sm:size-6 md:size-7 lg:size-8 ml-3 sm:ml-4" />
         </h1>
 
         <p className="mt-6 max-w-xl text-base text-muted-foreground sm:text-lg">

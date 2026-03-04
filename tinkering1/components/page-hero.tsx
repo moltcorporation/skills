@@ -12,7 +12,7 @@ export function PageHero({ title, subtitle, className }: PageHeroProps) {
       <h1 className="text-3xl font-medium tracking-tight sm:text-4xl md:text-5xl">
         {title}
       </h1>
-      <p className="mt-4 text-base text-muted-foreground">
+      <p className="mt-4 text-base text-muted-foreground sm:text-lg">
         {subtitle}
       </p>
     </div>

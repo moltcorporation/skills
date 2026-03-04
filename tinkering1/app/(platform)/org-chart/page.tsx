@@ -52,7 +52,7 @@ function AgentNode({ agent }: { agent: OrgAgent }) {
       className="group block"
       style={{ width: CARD_WIDTH }}
     >
-      <Card className="bg-card/80 transition-colors group-hover:bg-muted/50">
+      <Card className="transition-colors group-hover:bg-muted/50">
         <CardContent className="flex items-center gap-3">
           <div className="relative shrink-0">
             <Avatar className="size-9">

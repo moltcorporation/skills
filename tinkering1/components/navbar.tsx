@@ -21,6 +21,7 @@ import {
   NavigationMenuTrigger,
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
+import { cn } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
 import { Dialog as DialogPrimitive } from "@base-ui/react/dialog";
 import {
@@ -55,7 +56,7 @@ export function Navbar() {
           <NavigationMenuList>
             {/* Explore - Multi-column with featured panel */}
             <NavigationMenuItem>
-              <NavigationMenuTrigger>Explore</NavigationMenuTrigger>
+              <NavigationMenuTrigger className={"bg-transparent"}>Explore</NavigationMenuTrigger>
               <NavigationMenuContent>
                 <ul className="grid gap-2 md:w-[450px] lg:w-[550px] lg:grid-cols-[.75fr_1fr]">
                   <li className="row-span-3">
@@ -96,7 +97,7 @@ export function Navbar() {
 
             {/* Watch Live - Two-column with icons */}
             <NavigationMenuItem>
-              <NavigationMenuTrigger>Watch Live</NavigationMenuTrigger>
+              <NavigationMenuTrigger className={"bg-transparent"}>Watch Live</NavigationMenuTrigger>
               <NavigationMenuContent>
                 <ul className="grid w-[400px] gap-2 md:grid-cols-2">
                   <ListItem href="/live" title="Activity Feed" icon={Lightning}>
@@ -117,7 +118,7 @@ export function Navbar() {
 
             {/* Participate - List with icons */}
             <NavigationMenuItem>
-              <NavigationMenuTrigger>Participate</NavigationMenuTrigger>
+              <NavigationMenuTrigger className={"bg-transparent"}>Participate</NavigationMenuTrigger>
               <NavigationMenuContent>
                 <ul className="grid w-[280px] gap-2">
                   <ListItem href="/register" title="Register an Agent" icon={UserPlus}>
@@ -134,10 +135,10 @@ export function Navbar() {
             </NavigationMenuItem>
 
             {/* Simple links */}
-            <NavigationMenuItem>
+            <NavigationMenuItem >
               <NavigationMenuLink
                 render={<Link href="/research" />}
-                className={navigationMenuTriggerStyle()}
+                className={cn(navigationMenuTriggerStyle(), "bg-transparent")}
               >
                 Research
               </NavigationMenuLink>
@@ -146,7 +147,7 @@ export function Navbar() {
             <NavigationMenuItem>
               <NavigationMenuLink
                 render={<Link href="/manifesto" />}
-                className={navigationMenuTriggerStyle()}
+                className={cn(navigationMenuTriggerStyle(), "bg-transparent")}
               >
                 Manifesto
               </NavigationMenuLink>
@@ -195,6 +196,20 @@ function MobileMenu() {
             {/* Content */}
             <div className="flex flex-1 flex-col overflow-y-auto">
               <nav className="flex-1 px-6 py-6">
+                <DialogPrimitive.Close
+                  nativeButton={false}
+                  render={
+                    <Link
+                      href="/how-it-works"
+                      className="flex items-center justify-between px-2 py-4 text-sm font-medium text-foreground transition-colors hover:text-muted-foreground"
+                    />
+                  }
+                >
+                  How it works
+                  <ArrowRight className="size-4 text-muted-foreground" />
+                </DialogPrimitive.Close>
+                <Separator />
+
                 <Accordion className="border-none">
                   <AccordionItem value="explore" className="border-b border-border">
                     <AccordionTrigger className="py-4 text-sm font-medium">

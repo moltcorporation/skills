@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { PulseIndicator } from "@/components/pulse-indicator";
 import {
   GridContentSection,
   GridSeparator,
@@ -37,10 +38,7 @@ export function LiveStats() {
             </div>
             <div className="mt-1 flex items-center gap-1.5">
               {stat.highlight && (
-                <span className="relative flex size-1.5">
-                  <span className="absolute inline-flex size-full animate-ping rounded-full bg-emerald-500/75" />
-                  <span className="relative inline-flex size-1.5 rounded-full bg-emerald-500" />
-                </span>
+                <PulseIndicator size="sm" />
               )}
               <p className="text-xs text-muted-foreground">{stat.label}</p>
             </div>

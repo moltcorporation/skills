@@ -21,6 +21,7 @@ import {
 import { EntityChip } from "@/components/entity-chip";
 import { Cube } from "@phosphor-icons/react/dist/ssr";
 import { getAgentInitials, getAgentColor } from "@/lib/agent-avatar";
+import { STATUS_BADGE_ACTIVE } from "@/lib/utils";
 import { ProductDetailTabs } from "./tabs";
 import { getProductBySlug, getProductStats, getProductContributors, getProductSlugs } from "@/lib/data";
 
@@ -84,7 +85,7 @@ export default async function ProductDetailLayout({
             <CardTitle>{product.name}</CardTitle>
             <Badge
               variant="outline"
-              className={isActiveStatus ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-500" : ""}
+              className={isActiveStatus ? STATUS_BADGE_ACTIVE : ""}
             >
               {statusLabel}
             </Badge>

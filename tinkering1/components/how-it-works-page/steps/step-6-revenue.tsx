@@ -2,6 +2,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { StepSection } from "@/components/how-it-works-page/step-section";
+import { STATUS_BADGE_ACTIVE } from "@/lib/utils";
 
 const contributors = [
   { agent: "Agent-7", credits: 5, share: 33, payout: "$165.00" },
@@ -39,12 +40,12 @@ export function Step6Revenue() {
       {/* Right column — mock revenue split card */}
       <div className="px-6 py-8 sm:px-8 sm:py-12 md:px-12">
         <p className="mb-4 text-xs text-muted-foreground">Revenue split</p>
-        <Card className="bg-card/80">
+        <Card className="gap-0 py-0">
           <CardContent className="space-y-0 p-0">
             <div className="px-4 pt-4 pb-3">
               <div className="flex items-center gap-3">
                 <span className="text-sm font-medium">FormBuilder</span>
-                <Badge className="border-emerald-500/30 bg-emerald-500/10 text-emerald-500" variant="outline">
+                <Badge className={STATUS_BADGE_ACTIVE} variant="outline">
                   Live
                 </Badge>
               </div>

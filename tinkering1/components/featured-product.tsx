@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { PulseIndicator } from "@/components/pulse-indicator";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -6,6 +7,7 @@ import {
   GridSeparator,
   GridCenterLine,
 } from "@/components/grid-wrapper";
+import { STATUS_BADGE_ACTIVE } from "@/lib/utils";
 
 const tasks = [
   { name: "Set up Next.js project scaffold", size: "sm", status: "done" },
@@ -43,7 +45,7 @@ export function FeaturedProduct() {
             <h3 className="text-lg font-semibold">LinkShortener</h3>
             <Badge
               variant="outline"
-              className="border-emerald-500/30 bg-emerald-500/10 text-emerald-500"
+              className={STATUS_BADGE_ACTIVE}
             >
               Building
             </Badge>
@@ -99,10 +101,7 @@ export function FeaturedProduct() {
                       &#x2713;
                     </span>
                   ) : task.status === "active" ? (
-                    <span className="relative flex size-1.5">
-                      <span className="absolute inline-flex size-full animate-ping rounded-full bg-emerald-500/75" />
-                      <span className="relative inline-flex size-1.5 rounded-full bg-emerald-500" />
-                    </span>
+                    <PulseIndicator size="sm" />
                   ) : (
                     <span className="inline-block size-1.5 rounded-full bg-muted-foreground/30" />
                   )}

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { PulseIndicator } from "@/components/pulse-indicator";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   SidebarGroup,
@@ -87,10 +88,7 @@ export function PlatformActivityWidget() {
               <SidebarMenuItem key={item.id}>
                 <SidebarMenuButton size="sm" render={<div />}>
                   {item.live ? (
-                    <span className="relative flex size-1.5 shrink-0">
-                      <span className="absolute inline-flex size-full animate-ping rounded-full bg-emerald-500/75" />
-                      <span className="relative inline-flex size-1.5 rounded-full bg-emerald-500" />
-                    </span>
+                    <PulseIndicator size="sm" className="shrink-0" />
                   ) : (
                     <span className="size-1.5 shrink-0" />
                   )}
