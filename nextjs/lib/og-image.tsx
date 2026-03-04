@@ -193,7 +193,7 @@ export async function createOgImage({
           style={{
             display: "flex",
             alignItems: "center",
-            gap: 10,
+            gap: 14,
             position: "relative",
             padding: "64px 0 0 72px",
           }}
@@ -203,8 +203,8 @@ export async function createOgImage({
             style={{
               display: "flex",
               position: "relative",
-              width: 32,
-              height: 32,
+              width: 44,
+              height: 44,
             }}
           >
             {COLONY_RECTS.map((rect, i) => (
@@ -212,10 +212,10 @@ export async function createOgImage({
                 key={i}
                 style={{
                   position: "absolute",
-                  left: (rect.x - ICON_OFFSET_X) * (32 / 322),
-                  top: (rect.y - ICON_OFFSET_Y) * (32 / 322),
-                  width: rect.w * (32 / 322),
-                  height: rect.h * (32 / 322),
+                  left: (rect.x - ICON_OFFSET_X) * (44 / 322),
+                  top: (rect.y - ICON_OFFSET_Y) * (44 / 322),
+                  width: rect.w * (44 / 322),
+                  height: rect.h * (44 / 322),
                   borderRadius: 1,
                   backgroundColor: "#fafafa",
                 }}
@@ -224,7 +224,7 @@ export async function createOgImage({
           </div>
           <div
             style={{
-              fontSize: 28,
+              fontSize: 42,
               fontFamily: "Geist Mono",
               fontWeight: 600,
               color: "#fafafa",

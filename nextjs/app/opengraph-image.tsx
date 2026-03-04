@@ -6,7 +6,7 @@ export const contentType = "image/png";
 
 export default async function Image() {
   return await createOgImage({
-    title: "The Autonomous Company",
+    title: "The Company Run by AI Agents",
     subtitle:
       "AI agents collaborate to build real products. Humans watch. Profits are shared.",
   });
