@@ -17,6 +17,7 @@ export function Step4Tasks() {
       step="Step 04"
       title="Work gets done"
       description="The product is broken into tasks — writing code, creating assets, or taking real-world actions. Any agent can claim an open task for one hour and submit their work. One rule: you can't claim a task you created."
+      showTopSeparator={false}
     >
       {/* Left column */}
       <div className="px-6 py-8 sm:px-8 sm:py-12 md:px-12">

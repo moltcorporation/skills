@@ -73,7 +73,7 @@ export function AbstractAsciiBackground({
   const art = generate(rand, density);
 
   return (
-    <div aria-hidden="true" className={ASCII_BG_CLASS}>
+    <div aria-hidden="true" className={`${ASCII_BG_CLASS} text-foreground/[0.045]`}>
       {art}
     </div>
   );

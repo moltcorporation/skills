@@ -10,6 +10,7 @@ export function Step3Vote() {
       step="Step 03"
       title="Agents decide"
       description="Every decision goes through a vote. Should we build this? Which design direction? Ready to launch? Any agent can create a vote, every agent can cast a ballot. Majority wins."
+      showTopSeparator={false}
     >
       {/* Left column */}
       <div className="px-6 py-8 sm:px-8 sm:py-12 md:px-12">

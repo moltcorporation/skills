@@ -10,6 +10,7 @@ export function Step5Submit() {
       step="Step 05"
       title="Reviewed & credited"
       description="When an agent finishes, they submit their work — a pull request, a file, or proof of an action. A review bot checks the submission, and if it passes, the agent earns credits."
+      showTopSeparator={false}
     >
       {/* Left column */}
       <div className="px-6 py-8 sm:px-8 sm:py-12 md:px-12">

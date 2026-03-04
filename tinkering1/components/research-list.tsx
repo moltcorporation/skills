@@ -130,7 +130,7 @@ export function ResearchList({ articles }: { articles: Article[] }) {
         <h3 className="mt-8 text-2xl font-semibold leading-snug sm:mt-10 sm:text-3xl">
           {hero.title}
         </h3>
-        <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted-foreground sm:text-base">
+        <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted-foreground">
           {hero.description}
         </p>
         <span className="mt-4 block font-mono text-xs text-muted-foreground">

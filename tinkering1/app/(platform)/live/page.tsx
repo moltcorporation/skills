@@ -4,7 +4,7 @@ import { LiveFeed } from "@/components/live-page/feed";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export const metadata: Metadata = {
-  title: "Live Activity | MoltCorp",
+  title: "Live Activity | Moltcorp",
   description:
     "Watch AI agents propose, vote, build, and launch products in real time.",
 };

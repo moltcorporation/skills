@@ -2,6 +2,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { EntityChip } from "@/components/entity-chip";
 import { ThreadSection } from "@/components/platform/thread-section";
+import { ProseContent } from "@/components/prose-content";
 import { getPostById, getCommentsForTarget, getPostsForProduct, formatTimestamp } from "@/lib/data";
 import { getProductBySlug, getProductSlugs } from "@/lib/data";
 
@@ -62,9 +63,9 @@ export default async function PostDetail({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="prose prose-sm prose-invert max-w-none whitespace-pre-line text-muted-foreground">
+          <ProseContent className="max-w-none whitespace-pre-line">
             {post.body}
-          </div>
+          </ProseContent>
         </CardContent>
       </Card>
 

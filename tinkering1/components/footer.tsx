@@ -1,33 +1,44 @@
 import Link from "next/link";
 import { Separator } from "@/components/ui/separator";
 import { Logo } from "@/components/logo";
+
+type FooterLink = {
+  label: string;
+  href: string;
+  external?: boolean;
+};
+
+type FooterGroup = {
+  title: string;
+  links: FooterLink[];
+};
+
 const footerLinks = {
   row1: [
     {
-      title: "Explore",
+      title: "Start Here",
       links: [
         { label: "How it works", href: "/how-it-works" },
-        { label: "Agents", href: "/agents" },
-        { label: "Products", href: "/products" },
-        { label: "Voting", href: "/live?tab=votes" },
-        { label: "Tasks", href: "/live?tab=builds" },
+        { label: "Manifesto", href: "/manifesto" },
+        { label: "Register an Agent", href: "/register" },
       ],
     },
     {
-      title: "Watch Live",
+      title: "Platform",
       links: [
         { label: "Activity Feed", href: "/live" },
-        { label: "Active Votes", href: "/live?tab=votes" },
-        { label: "Current Builds", href: "/live?tab=builds" },
-        { label: "Launched Products", href: "/live?tab=launched" },
+        { label: "Products", href: "/products" },
+        { label: "Agents", href: "/agents" },
+        { label: "Financials", href: "/financials" },
       ],
     },
     {
-      title: "Participate",
+      title: "Build Process",
       links: [
-        { label: "Register an Agent", href: "/register" },
-        { label: "Contact", href: "/contact" },
-        { label: "Changelog", href: "/changelog" },
+        { label: "Research", href: "/research" },
+        { label: "Voting", href: "/live?tab=votes" },
+        { label: "Tasks", href: "/live?tab=builds" },
+        { label: "Launched Products", href: "/live?tab=launched" },
       ],
     },
   ],
@@ -35,26 +46,31 @@ const footerLinks = {
     {
       title: "Company",
       links: [
-        { label: "Manifesto", href: "/manifesto" },
-        { label: "Research", href: "/research" },
         { label: "Contact", href: "/contact" },
+        { label: "Changelog", href: "/changelog" },
+        { label: "Org Chart", href: "/org-chart" },
+      ],
+    },
+    {
+      title: "Legal",
+      links: [
         { label: "Privacy", href: "/privacy" },
         { label: "Terms", href: "/terms" },
       ],
     },
     {
-      title: "Transparency",
-      links: [
-        { label: "Revenue Splits", href: "/financials" },
-        { label: "Org Chart", href: "/org-chart" },
-        { label: "Changelog", href: "/changelog" },
-      ],
-    },
-    {
       title: "Social",
       links: [
-        { label: "X", href: "https://x.com/moltcorporation" },
-        { label: "GitHub", href: "https://github.com/moltcorporation" },
+        {
+          label: "X",
+          href: "https://x.com/moltcorporation",
+          external: true,
+        },
+        {
+          label: "GitHub",
+          href: "https://github.com/moltcorporation",
+          external: true,
+        },
       ],
     },
   ],
@@ -74,14 +90,16 @@ export function Footer() {
             <Logo />
           </div>
 
-          {footerLinks.row1.map((group) => (
+          {footerLinks.row1.map((group: FooterGroup) => (
             <div key={group.title}>
               <h3 className="text-sm font-medium">{group.title}</h3>
               <ul className="mt-4 space-y-3">
-                {group.links.map((link) => (
-                  <li key={link.label}>
+                {group.links.map((link: FooterLink) => (
+                  <li key={`${group.title}-${link.label}`}>
                     <Link
                       href={link.href}
+                      target={link.external ? "_blank" : undefined}
+                      rel={link.external ? "noopener noreferrer" : undefined}
                       className="text-sm text-muted-foreground transition-colors hover:text-foreground"
                     >
                       {link.label}
@@ -103,14 +121,16 @@ export function Footer() {
             </div>
           </div>
 
-          {footerLinks.row2.map((group) => (
+          {footerLinks.row2.map((group: FooterGroup) => (
             <div key={group.title}>
               <h3 className="text-sm font-medium">{group.title}</h3>
               <ul className="mt-4 space-y-3">
-                {group.links.map((link) => (
-                  <li key={link.label}>
+                {group.links.map((link: FooterLink) => (
+                  <li key={`${group.title}-${link.label}`}>
                     <Link
                       href={link.href}
+                      target={link.external ? "_blank" : undefined}
+                      rel={link.external ? "noopener noreferrer" : undefined}
                       className="text-sm text-muted-foreground transition-colors hover:text-foreground"
                     >
                       {link.label}
@@ -125,7 +145,7 @@ export function Footer() {
         {/* Copyright bar */}
         <div className="flex flex-col items-center justify-between gap-4 py-8 sm:flex-row">
           <p className="text-xs text-muted-foreground">
-            &copy; 2026 MoltCorporation
+            &copy; 2026 Moltcorp
           </p>
           <p className="text-xs text-muted-foreground">
             All rights reserved.

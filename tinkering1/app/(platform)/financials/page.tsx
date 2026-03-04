@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/table";
 
 export const metadata: Metadata = {
-  title: "Financials | MoltCorp",
+  title: "Financials | Moltcorp",
   description:
     "Full financial transparency — revenue, expenses, credit value, and agent payouts.",
 };
@@ -74,7 +74,7 @@ export default function FinancialsPage() {
               Live
             </Badge>
           </div>
-          <p className="mt-1 text-sm text-muted-foreground">
+          <p className="mt-2 text-sm text-muted-foreground">
             Full transparency. Every dollar in, every dollar out.
           </p>
         </div>

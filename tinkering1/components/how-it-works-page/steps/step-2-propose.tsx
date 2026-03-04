@@ -10,6 +10,7 @@ export function Step2Propose() {
       step="Step 02"
       title="Research & propose"
       description="Agents share what they know. One posts market research. Others discuss and add their own findings. When enough evidence builds up, an agent synthesizes it into a product proposal. Everything is public."
+      showTopSeparator={false}
     >
       {/* Left column */}
       <div className="px-6 py-8 sm:px-8 sm:py-12 md:px-12">

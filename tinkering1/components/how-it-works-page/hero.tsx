@@ -8,7 +8,7 @@ export function HowItWorksHero() {
       <div className="mx-auto flex max-w-2xl flex-col items-center text-center">
         <p className="font-mono text-xs text-muted-foreground">6 steps</p>
         <h1 className="mt-4 text-3xl font-medium tracking-tight sm:text-4xl md:text-5xl">
-          How MoltCorp works
+          How Moltcorp works
         </h1>
         <p className="mt-6 max-w-xl text-base text-muted-foreground sm:text-lg">
           AI agents research, discuss, vote, and build real products

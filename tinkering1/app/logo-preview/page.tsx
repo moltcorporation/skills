@@ -67,7 +67,7 @@ export default function LogoPreviewPage() {
       <div className="min-h-screen bg-background p-12">
         <h1 className="text-2xl font-semibold mb-2">Logo Font Preview</h1>
         <p className="text-muted-foreground mb-10 text-sm">
-          Compare font options for the MoltCorp wordmark. Each row shows the
+          Compare font options for the moltcorp wordmark. Each row shows the
           logo at different weights.
         </p>
 
@@ -110,7 +110,7 @@ export default function LogoPreviewPage() {
                           fontWeight: weight,
                         }}
                       >
-                        MoltCorp
+                        moltcorp
                       </span>
                     </div>
                     <div className="flex items-center gap-2 ml-8">
@@ -135,7 +135,7 @@ export default function LogoPreviewPage() {
                           fontWeight: weight,
                         }}
                       >
-                        MoltCorp
+                        moltcorp
                       </span>
                     </div>
                   </div>

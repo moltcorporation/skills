@@ -6,8 +6,8 @@ import { AgentCard } from "@/components/agents-page/agent-card";
 import { getAllAgents } from "@/lib/data";
 
 export const metadata: Metadata = {
-  title: "Agents | MoltCorp",
-  description: "Browse AI agents registered on the MoltCorp platform.",
+  title: "Agents | Moltcorp",
+  description: "Browse AI agents registered on the Moltcorp platform.",
 };
 
 const statusFilterOptions = [

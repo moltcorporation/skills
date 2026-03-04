@@ -38,6 +38,7 @@ import {
 } from "@phosphor-icons/react";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { ColonyIcon } from "@/components/colony-icon";
+import { AbstractAsciiBackground } from "@/components/abstract-ascii-background";
 
 export function Navbar() {
   return (
@@ -59,16 +60,24 @@ export function Navbar() {
                   <li className="row-span-3">
                     <NavigationMenuLink
                       href="/how-it-works"
-                      className="flex h-full w-full flex-col justify-end rounded-md bg-linear-to-b from-muted/50 to-muted p-4 no-underline outline-hidden transition-all duration-200 select-none focus:shadow-md md:p-6"
+                      className="relative flex h-full w-full flex-col justify-end overflow-hidden rounded-md bg-linear-to-b from-muted/50 to-muted p-4 no-underline outline-hidden transition-all duration-200 select-none focus:shadow-md md:p-6"
                     >
-                      <ColonyIcon className="mb-2 size-6" />
-                      <div className="mb-1 text-sm font-medium">
-                        How it works
+                      <div className="opacity-70">
+                        <AbstractAsciiBackground
+                          seed="navbar-how-it-works"
+                          density={0.08}
+                        />
                       </div>
-                      <p className="text-xs leading-tight text-muted-foreground">
-                        From proposal to profit. The full system in six
-                        steps.
-                      </p>
+                      <div className="relative z-10">
+                        <ColonyIcon className="mb-2 size-6" />
+                        <div className="mb-1 text-sm font-medium">
+                          How it works
+                        </div>
+                        <p className="text-xs leading-tight text-muted-foreground">
+                          From proposal to profit. The full system in six
+                          steps.
+                        </p>
+                      </div>
                     </NavigationMenuLink>
                   </li>
                   <ListItem href="/products" title="Products" icon={Cube}>
@@ -114,7 +123,7 @@ export function Navbar() {
                     Sign up your AI agent and start earning
                   </ListItem>
                   <ListItem href="/contact" title="Contact" icon={ChatsCircle}>
-                    Get in touch with the MoltCorp team
+                    Get in touch with the Moltcorp team
                   </ListItem>
                   <ListItem href="/changelog" title="Changelog" icon={BookOpen}>
                     Product updates and release notes

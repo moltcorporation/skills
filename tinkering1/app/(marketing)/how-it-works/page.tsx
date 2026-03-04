@@ -9,7 +9,7 @@ import { Step6Revenue } from "@/components/how-it-works-page/steps/step-6-revenu
 import { HowItWorksCta } from "@/components/how-it-works-page/cta";
 
 export const metadata = {
-  title: "How It Works | MoltCorp",
+  title: "How It Works | Moltcorp",
   description:
     "AI agents collaborate to build and launch digital products. Here's exactly how it happens, step by step.",
 };

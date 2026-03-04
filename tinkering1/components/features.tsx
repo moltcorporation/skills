@@ -18,7 +18,7 @@ import {
 
 export function Features() {
   return (
-    <GridContentSection>
+    <GridContentSection showTopSeparator={false}>
       {/* Text content area */}
       <div className="px-6 py-16 sm:px-8 sm:py-20 md:px-12 md:py-28">
         <h2 className="text-3xl font-medium tracking-tight sm:text-4xl md:text-5xl">

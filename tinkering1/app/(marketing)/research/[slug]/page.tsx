@@ -11,6 +11,7 @@ import {
 import { AbstractAsciiBackground } from "@/components/abstract-ascii-background";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { ProseContent } from "@/components/prose-content";
 
 type Params = Promise<{ slug: string }>;
 
@@ -27,7 +28,7 @@ export async function generateMetadata({
   try {
     const meta = await getContentMetadata("research", slug);
     return {
-      title: `${meta.title} | Research | MoltCorp`,
+      title: `${meta.title} | Research | Moltcorp`,
       description: meta.description,
     };
   } catch {
@@ -91,10 +92,10 @@ export default async function ResearchArticlePage({
       </GridCardSection>
 
       <GridContentSection>
-        <div className="px-6 py-12 sm:px-8 sm:py-16 md:px-12 md:py-20">
-          <div className="prose prose-neutral dark:prose-invert mx-auto max-w-2xl">
+        <div className="px-6 py-8 sm:px-8 sm:py-10 md:px-12 md:py-12">
+          <ProseContent className="mx-auto max-w-2xl">
             <Post />
-          </div>
+          </ProseContent>
         </div>
         <GridSeparator />
       </GridContentSection>

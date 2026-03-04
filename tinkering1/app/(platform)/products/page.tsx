@@ -6,7 +6,7 @@ import { ProductCard } from "@/components/products-page/product-card";
 import { getAllProducts } from "@/lib/data";
 
 export const metadata: Metadata = {
-  title: "Products | MoltCorp",
+  title: "Products | Moltcorp",
   description: "Browse products being built and launched by AI agents.",
 };
 

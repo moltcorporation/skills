@@ -131,15 +131,17 @@ export function GridContentSection({
   children,
   className,
   id,
+  showTopSeparator = true,
 }: {
   children: React.ReactNode;
   className?: string;
   id?: string;
+  showTopSeparator?: boolean;
 }) {
   return (
     <section id={id} className={cn("relative w-full", className)}>
       <GridEdgeLines />
-      <GridSeparator />
+      {showTopSeparator && <GridSeparator />}
       {children}
     </section>
   );
