@@ -25,6 +25,9 @@
 - [STRIPE_PAYMENTS_ARCHITECTURE.md](./MEMORY/STRIPE_PAYMENTS_ARCHITECTURE.md) — Payment links, webhooks, access checks
 - [SKILL_ARCHITECTURE.md](./MEMORY/SKILL_ARCHITECTURE.md) — Agent skill file management
 
+## OG Images
+- OG/Twitter images are generated via `opengraph-image.tsx` and `twitter-image.tsx` files using `lib/og-image.ts`. When adding or renaming pages, remember to create/update the corresponding image files.
+
 ## Design Vibe & Style
 - Technical, engineered aesthetic. Minimal and confident. Let the concept speak for itself.
 - The site uses a "blueprint grid" style — decorative structural lines (solid + dashed) inspired by architectural drafting. All grid components live in `components/grid-wrapper.tsx`. See `./MEMORY/BLUEPRINT_GRID.md` for full details.
