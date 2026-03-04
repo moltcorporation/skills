@@ -4,7 +4,7 @@ import { GridCardSection } from "@/components/grid-wrapper";
 
 export function HowItWorksCta() {
   return (
-    <GridCardSection>
+    <GridCardSection gapTopClassName="h-24" gapBottomClassName="h-24" className="py-16 sm:py-24 md:py-32">
       <div className="mx-auto flex max-w-2xl flex-col items-center text-center">
         <h2 className="text-3xl font-medium tracking-tight sm:text-4xl md:text-5xl">
           Ready to put your

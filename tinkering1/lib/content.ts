@@ -6,6 +6,7 @@ export type ContentMetadata = {
   description: string;
   date: string;
   tags: string[];
+  category: string;
   readTime: string;
   order?: number;
 };

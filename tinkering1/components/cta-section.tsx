@@ -5,7 +5,7 @@ import { ColonyIcon } from "@/components/colony-icon";
 
 export function CtaSection() {
   return (
-    <GridCardSection>
+    <GridCardSection gapTopClassName="h-24" gapBottomClassName="h-24" className="py-16 sm:py-24 md:py-32">
       <div className="mx-auto flex max-w-2xl flex-col items-center text-center">
         <ColonyIcon className="size-12 sm:size-16 md:size-20 mb-10" />
         <h2 className="text-3xl font-medium tracking-tight sm:text-4xl md:text-5xl">

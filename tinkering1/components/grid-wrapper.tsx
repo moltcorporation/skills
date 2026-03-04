@@ -41,11 +41,11 @@ export function GridDashedEdgeLines() {
 
 /**
  * Standard dashed connector gap between sections.
- * Default h-24 height with dashed edge lines. Pass className to override height.
+ * Default h-12 height with dashed edge lines. Pass className to override height.
  */
 export function GridDashedGap({ className }: { className?: string } = {}) {
   return (
-    <div className={cn("relative h-24", className)}>
+    <div className={cn("relative h-12", className)}>
       <GridDashedEdgeLines />
     </div>
   );
@@ -69,13 +69,6 @@ export function GridSeparator({ showCenter = false }: { showCenter?: boolean }) 
 }
 
 /**
- * A dashed horizontal line (no connector dots).
- */
-export function GridDashedLine() {
-  return <div className="h-px w-full border-t border-dashed border-border" />;
-}
-
-/**
  * A solid vertical center divider for two-column layouts.
  * Place inside a relative parent that spans the columns.
  */
@@ -93,30 +86,39 @@ export function GridCenterLine() {
  * A bordered card section with dashed connector gaps above and below.
  * Used for hero, CTA, and any full-width card within the grid.
  *
- * - `gapTopClassName` overrides the top gap height (default h-24)
- * - `gapBottomClassName` overrides the bottom gap height (default h-24)
- * - `className` is applied to the card's inner content wrapper
+ * Defaults are tuned for standard content pages (h-12 gaps, moderate padding).
+ * Override with `gapTopClassName` / `gapBottomClassName` / `className` for
+ * editorial or landing-page layouts that need more breathing room.
+ *
+ * - `noBottomGap` — skip the bottom separator + dashed gap entirely
+ *   (useful when the next section provides its own separator)
  */
 export function GridCardSection({
   children,
   className,
   gapTopClassName,
   gapBottomClassName,
+  noBottomGap = false,
 }: {
   children: React.ReactNode;
   className?: string;
   gapTopClassName?: string;
   gapBottomClassName?: string;
+  noBottomGap?: boolean;
 }) {
   return (
     <section className="relative w-full">
       <GridDashedGap className={gapTopClassName} />
       <GridSeparator />
-      <div className={cn("relative border-x border-border px-6 py-16 sm:px-8 sm:py-24 md:px-12 md:py-32", className)}>
+      <div className={cn("relative border-x border-border px-6 py-12 sm:px-8 sm:py-16 md:px-12 md:py-20", className)}>
         {children}
       </div>
-      <GridSeparator />
-      <GridDashedGap className={gapBottomClassName} />
+      {!noBottomGap && (
+        <>
+          <GridSeparator />
+          <GridDashedGap className={gapBottomClassName} />
+        </>
+      )}
     </section>
   );
 }
@@ -124,8 +126,6 @@ export function GridCardSection({
 /**
  * A content section with solid edge lines and a top separator.
  * Used for features, text blocks, and any non-card grid section.
- *
- * - Children are rendered inside standard padding (px-8 sm:px-12).
  */
 export function GridContentSection({
   children,

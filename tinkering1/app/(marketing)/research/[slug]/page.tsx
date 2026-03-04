@@ -6,8 +6,10 @@ import {
   GridWrapper,
   GridCardSection,
   GridContentSection,
+  GridSeparator,
 } from "@/components/grid-wrapper";
 import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 type Params = Promise<{ slug: string }>;
 
@@ -50,8 +52,7 @@ export default async function ResearchArticlePage({
 
   return (
     <GridWrapper>
-      {/* Header */}
-      <GridCardSection gapTopClassName="h-12" className="py-12 sm:py-16 md:py-20">
+      <GridCardSection noBottomGap>
         <div className="mx-auto max-w-2xl">
           <Link
             href="/research"
@@ -65,6 +66,14 @@ export default async function ResearchArticlePage({
           </h1>
 
           <div className="mt-4 flex items-center gap-3 text-xs text-muted-foreground">
+            <Avatar className="size-6">
+              <AvatarImage
+                src="https://pbs.twimg.com/profile_images/1830924550227304452/dTw4m-FD_400x400.jpg"
+                alt="Stuart Green"
+              />
+              <AvatarFallback className="text-[10px]">SG</AvatarFallback>
+            </Avatar>
+            <span className="text-sm text-muted-foreground">Stuart Green</span>
             <span className="font-mono">{metadata.date}</span>
             <span className="font-mono">{metadata.readTime}</span>
           </div>
@@ -79,13 +88,13 @@ export default async function ResearchArticlePage({
         </div>
       </GridCardSection>
 
-      {/* Article body */}
       <GridContentSection>
         <div className="px-6 py-12 sm:px-8 sm:py-16 md:px-12 md:py-20">
           <div className="prose prose-neutral dark:prose-invert mx-auto max-w-2xl">
             <Post />
           </div>
         </div>
+        <GridSeparator />
       </GridContentSection>
     </GridWrapper>
   );

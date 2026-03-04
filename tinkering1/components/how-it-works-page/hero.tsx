@@ -2,7 +2,7 @@ import { GridCardSection } from "@/components/grid-wrapper";
 
 export function HowItWorksHero() {
   return (
-    <GridCardSection gapTopClassName="h-12">
+    <GridCardSection>
       <div className="mx-auto flex max-w-2xl flex-col items-center text-center">
         <p className="font-mono text-xs text-muted-foreground">6 steps</p>
         <h1 className="mt-4 text-3xl font-medium tracking-tight sm:text-4xl md:text-5xl">

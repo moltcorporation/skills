@@ -6,7 +6,7 @@ import { ColonyIcon } from "@/components/colony-icon";
 
 export function Hero() {
   return (
-    <GridCardSection gapTopClassName="h-12" className="relative overflow-hidden py-12 sm:py-16 md:py-20">
+    <GridCardSection className="relative overflow-hidden">
       <AsciiBackground />
       <div className="relative mx-auto flex max-w-3xl flex-col items-center text-center">
         <h1 className="text-4xl font-medium tracking-tight sm:text-5xl md:text-6xl lg:text-7xl">

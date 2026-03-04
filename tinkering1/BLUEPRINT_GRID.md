@@ -1,13 +1,11 @@
 # Blueprint Grid Design System
 
 ## What is it?
-A "blueprint grid" (also called "structural grid" or "wireframe grid") layout pattern. Decorative lines — solid and dashed — create a visual scaffolding that connects sections and gives the page an engineered, technical feel. Common in modern SaaS/tech landing pages (Profound, Linear, Vercel).
+A "blueprint grid" layout pattern. Decorative lines — solid and dashed — create a visual scaffolding that connects sections and gives the page an engineered, technical feel.
 
 ## Solid vs Dashed — the rule
 - **Solid lines** = structure. Borders of cards, section dividers, outer edge rails, column dividers, full-width separators (navbar, banner, footer).
 - **Dashed lines** = connection/transition. Short segments that bridge between structural elements — e.g. the vertical gap between a full-width border and a card below.
-
-Think of it as: solid lines define boundaries, dashed lines are the "stitching" that connects them.
 
 ## Page layout hierarchy
 ```
@@ -24,8 +22,21 @@ Full viewport width
 ## Section composables (prefer these)
 | Component | Use for | What it provides |
 |-----------|---------|------------------|
-| `GridCardSection` | Hero, CTA, any full-width card | Dashed gaps (top + bottom) + solid bordered card with `px-8 sm:px-12 py-24 sm:py-32` padding. Override gap height via `gapTopClassName` / `gapBottomClassName`. Override card padding via `className`. |
-| `GridContentSection` | Features, text blocks, any non-card section | Solid edge lines + top separator. Content goes as children — add your own `px-8 sm:px-12` padding to inner divs. |
+| `GridCardSection` | Hero, CTA, any full-width card | Dashed gaps (top + bottom) + solid bordered card. Default gap: `h-12`. Default padding: `px-6 py-12 sm:px-8 sm:py-16 md:px-12 md:py-20`. |
+| `GridContentSection` | Features, text blocks, any non-card section | Solid edge lines + top separator. Content goes as children — add your own padding to inner divs. |
+
+### GridCardSection props
+| Prop | Default | Purpose |
+|------|---------|---------|
+| `className` | — | Override card padding (e.g. add `relative overflow-hidden`, or use larger `py-16 sm:py-24 md:py-32` for CTA sections) |
+| `gapTopClassName` | `h-12` | Override top dashed gap height |
+| `gapBottomClassName` | `h-12` | Override bottom dashed gap height |
+| `noBottomGap` | `false` | Skip bottom separator + gap entirely (when the next section provides its own) |
+
+**Convention:** Most pages use bare `<GridCardSection>` with no props. Only override for:
+- **CTA/landing sections** that need more breathing room: `gapTopClassName="h-24" gapBottomClassName="h-24" className="py-16 sm:py-24 md:py-32"`
+- **Flush joins** where card flows directly into content: `noBottomGap`
+- **Special layout needs** like `className="relative overflow-hidden"` for backgrounds
 
 ## Low-level primitives (in `components/grid-wrapper.tsx`)
 | Component | What it does |
@@ -33,15 +44,15 @@ Full viewport width
 | `GridWrapper` | `max-w-6xl px-6` container. Sections go inside. No lines. |
 | `GridEdgeLines` | Solid vertical lines on left+right edges. Place in a `relative` parent. |
 | `GridDashedEdgeLines` | Dashed vertical lines on left+right. For connector gaps. |
-| `GridDashedGap` | Standard connector gap — `h-24` default with dashed edge lines. Accepts `className` to override height. |
+| `GridDashedGap` | Standard connector gap — `h-12` default with dashed edge lines. Accepts `className` to override height. |
 | `GridSeparator` | Horizontal solid line + connector dots at edges. `showCenter` adds a center dot. |
-| `GridDashedLine` | Horizontal dashed line, no dots. |
 | `GridCenterLine` | Solid vertical center divider for two-column layouts. |
 
 ## Spacing standards
-- **Dashed connector gap:** `h-24` (96px) default via `GridDashedGap`. Single source of truth for vertical rhythm.
-- **Card internal padding:** `px-8 sm:px-12 py-24 sm:py-32` (built into `GridCardSection`).
-- **Section content padding:** `px-8 sm:px-12` on inner content divs within `GridContentSection`.
+- **Dashed connector gap:** `h-12` (48px) default via `GridDashedGap`.
+- **Card internal padding:** `px-6 py-12 sm:px-8 sm:py-16 md:px-12 md:py-20` (built into `GridCardSection`).
+- **Section content padding:** `px-6 sm:px-8 md:px-12` on inner content divs within `GridContentSection`.
+- **Section header padding:** `px-6 py-16 sm:px-8 sm:py-20 md:px-12 md:py-28` for header blocks inside `GridContentSection`.
 
 ## Key details
 - All card borders use sharp corners (no `rounded-*`) to match the grid aesthetic

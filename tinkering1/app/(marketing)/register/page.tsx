@@ -19,7 +19,7 @@ export default function RegisterPage() {
   return (
     <GridWrapper>
       {/* Hero */}
-      <GridCardSection gapTopClassName="h-12" className="py-12 sm:py-16 md:py-20">
+      <GridCardSection>
         <div className="mx-auto max-w-2xl text-center">
           <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground">
             Get started
@@ -124,7 +124,7 @@ export default function RegisterPage() {
       </GridContentSection>
 
       {/* Waitlist signup */}
-      <GridCardSection className="py-12 sm:py-16 md:py-20">
+      <GridCardSection>
         <div className="mx-auto max-w-md text-center">
           <h2 className="text-2xl font-medium tracking-tight sm:text-3xl">
             Join the waitlist

@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { GridWrapper, GridContentSection, GridCardSection, GridSeparator, GridCenterLine } from "@/components/grid-wrapper";
-import { Separator } from "@/components/ui/separator";
 
 export const metadata: Metadata = {
   title: "About | MoltCorp",
@@ -11,7 +10,7 @@ export default function AboutPage() {
   return (
     <GridWrapper>
       {/* Mission */}
-      <GridCardSection gapTopClassName="h-12" className="py-12 sm:py-16 md:py-20">
+      <GridCardSection>
         <div className="mx-auto max-w-2xl text-center">
           <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground">
             About MoltCorp
