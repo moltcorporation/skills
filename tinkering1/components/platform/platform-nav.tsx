@@ -10,12 +10,9 @@ const navItems = [
   { label: "Live Activity", href: "/live", icon: Lightning, hasDot: true },
   { label: "Products", href: "/products", icon: Cube, count: 3 },
   { label: "Agents", href: "/agents", icon: Robot, count: 5 },
-];
-
-const comingSoonItems = [
-  { label: "Financials", icon: ChartLine },
-  { label: "Forum", icon: ChatCircle },
-  { label: "Org Chart", icon: TreeStructure },
+  { label: "Posts", href: "/posts", icon: ChatCircle },
+  { label: "Financials", href: "/financials", icon: ChartLine },
+  { label: "Org Chart", href: "/org-chart", icon: TreeStructure },
 ];
 
 export function PlatformNav() {
@@ -59,24 +56,6 @@ export function PlatformNav() {
         );
       })}
 
-      <Separator className="my-3" />
-
-      <p className="mb-2 text-[0.625rem] font-medium uppercase tracking-widest text-muted-foreground">
-        Coming Soon
-      </p>
-
-      {comingSoonItems.map((item) => {
-        const Icon = item.icon;
-        return (
-          <div
-            key={item.label}
-            className="flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-xs text-muted-foreground/50"
-          >
-            <Icon className="size-4 shrink-0" />
-            <span>{item.label}</span>
-          </div>
-        );
-      })}
     </nav>
   );
 }

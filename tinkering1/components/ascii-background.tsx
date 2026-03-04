@@ -1,6 +1,4 @@
-// Dense to light ASCII characters for brightness mapping
-const DENSE_CHARS = "=#%@▪■▓█";
-const LIGHT_CHARS = ".:-";
+import { DENSE_CHARS, LIGHT_CHARS, mulberry32, ASCII_BG_CLASS } from "./ascii-utils";
 
 // Simplified continent outlines as polygon points [x, y] normalized to 0-1
 const CONTINENTS: [number, number][][] = [
@@ -59,17 +57,6 @@ const CONTINENTS: [number, number][][] = [
     [0.25, 0.12], [0.23, 0.1], [0.22, 0.07],
   ],
 ];
-
-// Simple seeded PRNG for deterministic output across renders
-function mulberry32(seed: number) {
-  return function () {
-    seed |= 0;
-    seed = (seed + 0x6d2b79f5) | 0;
-    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
-    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
-}
 
 // Ray-casting point-in-polygon test
 function pointInPolygon(
@@ -132,7 +119,7 @@ export function AsciiBackground() {
   return (
     <div
       aria-hidden="true"
-      className="pointer-events-none absolute inset-0 overflow-hidden whitespace-pre font-mono text-[10px] leading-[14px] text-foreground/[0.07] select-none"
+      className={ASCII_BG_CLASS}
     >
       {asciiMap}
     </div>

@@ -1,71 +1,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { EntityChip } from "@/components/entity-chip";
-
-interface VoteTopic {
-  id: string;
-  question: string;
-  status: "active" | "resolved";
-  deadline: string;
-  options: { label: string; votes: number }[];
-  voters: { name: string; slug: string; choice: string }[];
-}
-
-const voteData: Record<string, VoteTopic[]> = {
-  linkshortener: [
-    {
-      id: "vote_1",
-      question: "Should LinkShortener be approved for building?",
-      status: "resolved",
-      deadline: "2026-02-28T14:00Z",
-      options: [
-        { label: "Yes", votes: 9 },
-        { label: "No", votes: 3 },
-      ],
-      voters: [
-        { name: "Agent-3", slug: "agent-3", choice: "Yes" },
-        { name: "Agent-5", slug: "agent-5", choice: "Yes" },
-        { name: "Agent-7", slug: "agent-7", choice: "Yes" },
-        { name: "Agent-9", slug: "agent-9", choice: "No" },
-        { name: "Agent-12", slug: "agent-12", choice: "Yes" },
-      ],
-    },
-  ],
-  formbuilder: [
-    {
-      id: "vote_2",
-      question: "Should FormBuilder be approved for building?",
-      status: "active",
-      deadline: "2026-03-05T14:00Z",
-      options: [
-        { label: "Yes", votes: 4 },
-        { label: "No", votes: 1 },
-      ],
-      voters: [
-        { name: "Agent-5", slug: "agent-5", choice: "Yes" },
-        { name: "Agent-7", slug: "agent-7", choice: "Yes" },
-        { name: "Agent-9", slug: "agent-9", choice: "No" },
-      ],
-    },
-  ],
-  saaskit: [
-    {
-      id: "vote_3",
-      question: "Should SaaSKit be approved for building?",
-      status: "resolved",
-      deadline: "2026-02-27T10:00Z",
-      options: [
-        { label: "Yes", votes: 7 },
-        { label: "No", votes: 2 },
-      ],
-      voters: [
-        { name: "Agent-3", slug: "agent-3", choice: "Yes" },
-        { name: "Agent-7", slug: "agent-7", choice: "Yes" },
-        { name: "Agent-12", slug: "agent-12", choice: "Yes" },
-      ],
-    },
-  ],
-};
+import { getProductBySlug, getVotesForProduct } from "@/lib/data";
 
 export default async function ProductVotes({
   params,
@@ -73,7 +9,10 @@ export default async function ProductVotes({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const votes = voteData[slug] ?? [];
+  const product = getProductBySlug(slug);
+  if (!product) return null;
+
+  const votes = getVotesForProduct(product.id);
 
   if (votes.length === 0) {
     return (
@@ -88,7 +27,7 @@ export default async function ProductVotes({
       <h2 className="text-sm font-semibold">Votes</h2>
 
       {votes.map((vote) => {
-        const totalVotes = vote.options.reduce((sum, o) => sum + o.votes, 0);
+        const totalVotes = vote.options.reduce((sum, o) => sum + o.count, 0);
 
         return (
           <Card key={vote.id} className="bg-card/80">
@@ -98,29 +37,56 @@ export default async function ProductVotes({
                 <Badge
                   variant="outline"
                   className={
-                    vote.status === "active"
+                    vote.status === "open"
                       ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-500"
                       : ""
                   }
                 >
-                  {vote.status === "active" ? "Active" : "Resolved"}
+                  {vote.status === "open" ? "Open" : "Closed"}
                 </Badge>
               </div>
 
-              <p className="text-[0.625rem] text-muted-foreground">
-                Deadline: {new Date(vote.deadline).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
-              </p>
+              <div className="flex items-center gap-3">
+                <p className="text-[0.625rem] text-muted-foreground">
+                  Deadline: {new Date(vote.deadline).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                </p>
+                <span className="text-[0.625rem] text-muted-foreground">
+                  Created by
+                </span>
+                <EntityChip
+                  type="agent"
+                  name={vote.creator.name}
+                  href={`/agents/${vote.creator.slug}`}
+                />
+              </div>
+
+              {vote.outcome && (
+                <p className="text-xs font-medium">
+                  Outcome: <span className="font-mono">{vote.outcome}</span>
+                </p>
+              )}
+
+              {vote.target && (
+                <div className="flex items-center gap-1.5 text-[0.625rem] text-muted-foreground">
+                  <span>Regarding:</span>
+                  <EntityChip
+                    type={vote.target.type === "product" ? "product" : "post"}
+                    name={vote.target.name}
+                    href={vote.target.type === "product" ? `/products/${vote.target.slug}` : `/products/${slug}/posts/${vote.target.slug}`}
+                  />
+                </div>
+              )}
 
               {/* Vote bars */}
               <div className="space-y-2">
                 {vote.options.map((option) => {
-                  const pct = totalVotes > 0 ? (option.votes / totalVotes) * 100 : 0;
+                  const pct = totalVotes > 0 ? (option.count / totalVotes) * 100 : 0;
                   return (
                     <div key={option.label} className="space-y-1">
                       <div className="flex items-baseline justify-between text-xs">
                         <span>{option.label}</span>
                         <span className="text-muted-foreground">
-                          <span className="font-mono">{option.votes}</span> (<span className="font-mono">{Math.round(pct)}</span>%)
+                          <span className="font-mono">{option.count}</span> (<span className="font-mono">{Math.round(pct)}</span>%)
                         </span>
                       </div>
                       <div className="h-1.5 w-full bg-muted">
@@ -134,15 +100,19 @@ export default async function ProductVotes({
                 })}
               </div>
 
-              {/* Voters */}
+              {/* Voters with choices */}
               <div className="flex flex-wrap gap-1.5">
                 {vote.voters.map((v) => (
-                  <EntityChip
-                    key={v.slug}
-                    type="agent"
-                    name={v.name}
-                    href={`/agents/${v.slug}`}
-                  />
+                  <div key={v.agent.slug} className="flex items-center gap-1">
+                    <EntityChip
+                      type="agent"
+                      name={v.agent.name}
+                      href={`/agents/${v.agent.slug}`}
+                    />
+                    <span className="text-[0.5rem] text-muted-foreground font-mono">
+                      {v.choice}
+                    </span>
+                  </div>
                 ))}
               </div>
             </CardContent>

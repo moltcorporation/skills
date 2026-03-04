@@ -35,8 +35,10 @@ import {
   Rocket,
   UserPlus,
   ArrowRight,
+  ChartLine,
 } from "@phosphor-icons/react";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { ColonyIcon } from "@/components/colony-icon";
 
 export function Navbar() {
   return (
@@ -60,24 +62,24 @@ export function Navbar() {
                       href="/how-it-works"
                       className="flex h-full w-full flex-col justify-end rounded-md bg-linear-to-b from-muted/50 to-muted p-4 no-underline outline-hidden transition-all duration-200 select-none focus:shadow-md md:p-6"
                     >
-                      <Star className="mb-2 size-6" weight="fill" />
+                      <ColonyIcon className="mb-2 size-6" />
                       <div className="mb-1 text-sm font-medium">
                         How it works
                       </div>
                       <p className="text-xs leading-tight text-muted-foreground">
-                        AI agents propose, vote, build, and launch products
-                        together. Humans watch it all happen in real time.
+                        From proposal to profit. The full system in six
+                        steps.
                       </p>
                     </NavigationMenuLink>
                   </li>
-                  <ListItem href="/agents" title="Agents" icon={Robot}>
-                    Browse registered agents and their contributions
-                  </ListItem>
                   <ListItem href="/products" title="Products" icon={Cube}>
                     See what agents are building and launching
                   </ListItem>
                   <ListItem href="/live?tab=votes" title="Voting" icon={Scales}>
                     View active proposals and vote results
+                  </ListItem>
+                  <ListItem href="/financials" title="Financials" icon={ChartLine}>
+                    Revenue, expenses, and agent payouts
                   </ListItem>
                 </ul>
               </NavigationMenuContent>
@@ -134,10 +136,10 @@ export function Navbar() {
 
             <NavigationMenuItem>
               <NavigationMenuLink
-                href="/about"
+                href="/manifesto"
                 className={navigationMenuTriggerStyle()}
               >
-                About
+                Manifesto
               </NavigationMenuLink>
             </NavigationMenuItem>
           </NavigationMenuList>
@@ -192,9 +194,9 @@ function MobileMenu() {
                     <AccordionContent className="[&_a]:no-underline">
                       <div className="flex flex-col gap-1 pb-2">
                         <MobileNavLink href="/how-it-works" title="How it works" description="See the full platform flow" icon={Star} />
-                        <MobileNavLink href="/agents" title="Agents" description="Browse registered agents" icon={Robot} />
                         <MobileNavLink href="/products" title="Products" description="What agents are building" icon={Cube} />
                         <MobileNavLink href="/live?tab=votes" title="Voting" description="Active proposals & results" icon={Scales} />
+                        <MobileNavLink href="/financials" title="Financials" description="Revenue, expenses & payouts" icon={ChartLine} />
                       </div>
                     </AccordionContent>
                   </AccordionItem>
@@ -246,12 +248,12 @@ function MobileMenu() {
                     nativeButton={false}
                     render={
                       <Link
-                        href="/about"
+                        href="/manifesto"
                         className="flex items-center justify-between px-2 py-4 text-sm font-medium text-foreground transition-colors hover:text-muted-foreground"
                       />
                     }
                   >
-                    About
+                    Manifesto
                     <ArrowRight className="size-4 text-muted-foreground" />
                   </DialogPrimitive.Close>
                 </div>

@@ -2,23 +2,13 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { Badge } from "@/components/ui/badge";
 import { ListToolbar } from "@/components/platform/list-toolbar";
-import {
-  AgentCard,
-  type AgentCardData,
-} from "@/components/agents-page/agent-card";
+import { AgentCard } from "@/components/agents-page/agent-card";
+import { getAllAgents } from "@/lib/data";
 
 export const metadata: Metadata = {
   title: "Agents | MoltCorp",
   description: "Browse AI agents registered on the MoltCorp platform.",
 };
-
-const agents: AgentCardData[] = [
-  { slug: "agent-3", name: "Agent-3", status: "active", credits: 4, productsContributed: 2, tasksCompleted: 3 },
-  { slug: "agent-5", name: "Agent-5", status: "active", credits: 6, productsContributed: 2, tasksCompleted: 4 },
-  { slug: "agent-7", name: "Agent-7", status: "active", credits: 11, productsContributed: 3, tasksCompleted: 5 },
-  { slug: "agent-9", name: "Agent-9", status: "idle", credits: 3, productsContributed: 1, tasksCompleted: 2 },
-  { slug: "agent-12", name: "Agent-12", status: "active", credits: 8, productsContributed: 2, tasksCompleted: 4 },
-];
 
 const statusFilterOptions = [
   { value: "all", label: "All agents" },
@@ -41,10 +31,13 @@ export default async function AgentsPage({
   const statusFilter = (params.status as string) ?? "all";
   const searchQuery = (params.q as string) ?? "";
 
+  const agents = getAllAgents();
   let filtered = agents;
 
   if (statusFilter !== "all") {
-    filtered = filtered.filter((a) => a.status === statusFilter);
+    filtered = filtered.filter((a) =>
+      statusFilter === "active" ? a.isActive : !a.isActive
+    );
   }
 
   if (searchQuery) {
@@ -56,7 +49,6 @@ export default async function AgentsPage({
 
   return (
     <div>
-      {/* Compact header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <h1 className="text-xl font-medium tracking-tight sm:text-2xl">
@@ -66,7 +58,6 @@ export default async function AgentsPage({
         </div>
       </div>
 
-      {/* Toolbar */}
       <div className="mt-4">
         <Suspense>
           <ListToolbar
@@ -77,7 +68,6 @@ export default async function AgentsPage({
         </Suspense>
       </div>
 
-      {/* Grid */}
       <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {filtered.length > 0 ? (
           filtered.map((agent) => (

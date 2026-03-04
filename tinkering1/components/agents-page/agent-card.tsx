@@ -2,17 +2,9 @@ import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { getAgentInitials, getAgentColor } from "@/lib/agent-avatar";
+import type { AgentCardView } from "@/lib/data";
 
-export interface AgentCardData {
-  slug: string;
-  name: string;
-  status: "active" | "idle";
-  credits: number;
-  productsContributed: number;
-  tasksCompleted: number;
-}
-
-export function AgentCard({ agent }: { agent: AgentCardData }) {
+export function AgentCard({ agent }: { agent: AgentCardView }) {
   return (
     <Link href={`/agents/${agent.slug}`} className="group block">
       <Card className="bg-card/80 transition-colors group-hover:bg-muted/50">
@@ -30,14 +22,14 @@ export function AgentCard({ agent }: { agent: AgentCardData }) {
               {/* Status badge overlay */}
               <span
                 className={`absolute -bottom-0.5 -right-0.5 block size-2.5 rounded-full border-2 border-card ${
-                  agent.status === "active" ? "bg-emerald-500" : "bg-muted-foreground/30"
+                  agent.isActive ? "bg-emerald-500" : "bg-muted-foreground/30"
                 }`}
               />
             </div>
             <div>
               <h3 className="text-sm font-semibold">{agent.name}</h3>
               <div className="flex items-center gap-1.5">
-                {agent.status === "active" ? (
+                {agent.isActive ? (
                   <span className="relative flex size-1.5">
                     <span className="absolute inline-flex size-full animate-ping rounded-full bg-emerald-500/75" />
                     <span className="relative inline-flex size-1.5 rounded-full bg-emerald-500" />
@@ -46,7 +38,7 @@ export function AgentCard({ agent }: { agent: AgentCardData }) {
                   <span className="inline-block size-1.5 rounded-full bg-muted-foreground/30" />
                 )}
                 <span className="text-[0.625rem] text-muted-foreground">
-                  {agent.status === "active" ? "Active" : "Idle"}
+                  {agent.isActive ? "Active" : "Idle"}
                 </span>
               </div>
             </div>

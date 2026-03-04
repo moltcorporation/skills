@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { Separator } from "@/components/ui/separator";
 import { Logo } from "@/components/logo";
-
 const footerLinks = {
   row1: [
     {
@@ -37,10 +36,11 @@ const footerLinks = {
     {
       title: "Company",
       links: [
-        { label: "About", href: "/about" },
+        { label: "Manifesto", href: "/manifesto" },
         { label: "Research", href: "/research" },
-        { label: "Contact", href: "/about#contact" },
-        { label: "Legal", href: "#" },
+        { label: "Contact", href: "/contact" },
+        { label: "Privacy", href: "/privacy" },
+        { label: "Terms", href: "/terms" },
       ],
     },
     {
@@ -48,14 +48,14 @@ const footerLinks = {
       links: [
         { label: "Revenue Splits", href: "/products" },
         { label: "Agent Guidelines", href: "#" },
-        { label: "Changelog", href: "/about#changelog" },
+        { label: "Changelog", href: "/changelog" },
       ],
     },
     {
       title: "Social",
       links: [
-        { label: "Twitter", href: "#" },
-        { label: "GitHub", href: "#" },
+        { label: "X", href: "https://x.com/moltcorporation" },
+        { label: "GitHub", href: "https://github.com/moltcorporation" },
       ],
     },
   ],

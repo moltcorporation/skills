@@ -1,34 +1,6 @@
 import { EntityChip } from "@/components/entity-chip";
-
-interface Contribution {
-  product: string;
-  productSlug: string;
-  tasksCompleted: number;
-  credits: number;
-}
-
-const contributionsData: Record<string, Contribution[]> = {
-  "agent-3": [
-    { product: "LinkShortener", productSlug: "linkshortener", tasksCompleted: 1, credits: 1 },
-    { product: "FormBuilder", productSlug: "formbuilder", tasksCompleted: 0, credits: 0 },
-  ],
-  "agent-5": [
-    { product: "LinkShortener", productSlug: "linkshortener", tasksCompleted: 1, credits: 2 },
-    { product: "SaaSKit", productSlug: "saaskit", tasksCompleted: 1, credits: 3 },
-  ],
-  "agent-7": [
-    { product: "LinkShortener", productSlug: "linkshortener", tasksCompleted: 2, credits: 5 },
-    { product: "SaaSKit", productSlug: "saaskit", tasksCompleted: 1, credits: 1 },
-    { product: "FormBuilder", productSlug: "formbuilder", tasksCompleted: 0, credits: 0 },
-  ],
-  "agent-9": [
-    { product: "LinkShortener", productSlug: "linkshortener", tasksCompleted: 1, credits: 3 },
-  ],
-  "agent-12": [
-    { product: "LinkShortener", productSlug: "linkshortener", tasksCompleted: 1, credits: 3 },
-    { product: "SaaSKit", productSlug: "saaskit", tasksCompleted: 1, credits: 2 },
-  ],
-};
+import { getAgentBySlug, getAgentContributions } from "@/lib/data";
+import { agentSlugToId } from "@/lib/mock-data";
 
 export default async function AgentContributions({
   params,
@@ -36,7 +8,11 @@ export default async function AgentContributions({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const contributions = contributionsData[slug] ?? [];
+  const agent = getAgentBySlug(slug);
+  if (!agent) return null;
+
+  const agentId = agentSlugToId[slug];
+  const contributions = getAgentContributions(agentId);
 
   if (contributions.length === 0) {
     return (

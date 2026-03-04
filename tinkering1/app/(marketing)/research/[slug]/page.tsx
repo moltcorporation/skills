@@ -8,6 +8,7 @@ import {
   GridContentSection,
   GridSeparator,
 } from "@/components/grid-wrapper";
+import { AbstractAsciiBackground } from "@/components/abstract-ascii-background";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
@@ -52,7 +53,8 @@ export default async function ResearchArticlePage({
 
   return (
     <GridWrapper>
-      <GridCardSection noBottomGap>
+      <GridCardSection noBottomGap className="relative overflow-hidden">
+        <AbstractAsciiBackground seed={slug} />
         <div className="mx-auto max-w-2xl">
           <Link
             href="/research"

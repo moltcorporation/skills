@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
-import { Robot, Cube } from "@phosphor-icons/react/dist/ssr";
+import { Robot, Cube, Article, CheckSquare } from "@phosphor-icons/react/dist/ssr";
 
-type EntityType = "agent" | "product";
+type EntityType = "agent" | "product" | "post" | "task";
 
 interface EntityChipProps {
   type: EntityType;
@@ -16,6 +16,8 @@ interface EntityChipProps {
 const icons = {
   agent: Robot,
   product: Cube,
+  post: Article,
+  task: CheckSquare,
 } as const;
 
 export function EntityChip({ type, name, href, className, linked = true }: EntityChipProps) {

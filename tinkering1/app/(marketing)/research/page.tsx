@@ -6,6 +6,7 @@ import {
   GridContentSection,
   GridSeparator,
 } from "@/components/grid-wrapper";
+import { AbstractAsciiBackground } from "@/components/abstract-ascii-background";
 import { ResearchList } from "@/components/research-list";
 
 export const metadata: Metadata = {
@@ -19,7 +20,8 @@ export default async function ResearchPage() {
 
   return (
     <GridWrapper>
-      <GridCardSection>
+      <GridCardSection className="relative overflow-hidden">
+        <AbstractAsciiBackground seed="research" />
         <div className="mx-auto max-w-xl text-center">
           <h1 className="text-3xl font-medium tracking-tight sm:text-4xl md:text-5xl">
             Research

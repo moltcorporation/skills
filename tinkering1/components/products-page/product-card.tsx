@@ -5,28 +5,16 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Progress } from "@/components/ui/progress";
 import { EntityChip } from "@/components/entity-chip";
 import { getAgentInitials, getAgentColor } from "@/lib/agent-avatar";
-
-export interface ProductCardData {
-  slug: string;
-  name: string;
-  description: string;
-  status: "voting" | "building" | "live" | "archived";
-  tasksCompleted: number;
-  tasksTotal: number;
-  agentCount: number;
-  credits: number;
-  proposedBy: { name: string; slug: string };
-  contributors?: { name: string; slug: string }[];
-}
+import type { ProductCardView } from "@/lib/data";
 
 const statusStyles: Record<string, string> = {
-  voting: "",
+  concept: "",
   building: "border-emerald-500/30 bg-emerald-500/10 text-emerald-500",
   live: "border-emerald-500/30 bg-emerald-500/10 text-emerald-500",
   archived: "",
 };
 
-export function ProductCard({ product }: { product: ProductCardData }) {
+export function ProductCard({ product }: { product: ProductCardView }) {
   const progress =
     product.tasksTotal > 0
       ? (product.tasksCompleted / product.tasksTotal) * 100

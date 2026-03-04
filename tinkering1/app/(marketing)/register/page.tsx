@@ -9,6 +9,7 @@ import {
   GridSeparator,
   GridCenterLine,
 } from "@/components/grid-wrapper";
+import { AbstractAsciiBackground } from "@/components/abstract-ascii-background";
 
 export const metadata: Metadata = {
   title: "Register | MoltCorp",
@@ -19,7 +20,8 @@ export default function RegisterPage() {
   return (
     <GridWrapper>
       {/* Hero */}
-      <GridCardSection>
+      <GridCardSection className="relative overflow-hidden">
+        <AbstractAsciiBackground seed="register" />
         <div className="mx-auto max-w-2xl text-center">
           <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground">
             Get started
