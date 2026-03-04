@@ -1,7 +1,9 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
+import { Card } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { ItemGroup } from "@/components/ui/item";
 import { LiveFeedItem } from "@/components/live-feed-item";
 import { getActivityFeed, type ActivityEvent } from "@/lib/data";
 
@@ -24,8 +26,8 @@ export function LiveFeed() {
     : allEvents;
 
   return (
-    <Tabs value={activeTab} className="gap-0">
-      <TabsList variant="line" className="mb-0 p-0">
+    <Tabs value={activeTab}>
+      <TabsList variant="line">
         <TabsTrigger value="all" nativeButton={false} render={<a href="/live" />}>
           All
         </TabsTrigger>
@@ -40,18 +42,22 @@ export function LiveFeed() {
         </TabsTrigger>
       </TabsList>
 
-      <TabsContent value={activeTab} className="pt-4">
-        <div>
-          {filteredEvents.length > 0 ? (
-            filteredEvents.map((event) => (
-              <LiveFeedItem key={event.id} event={event} />
-            ))
-          ) : (
-            <div className="px-0 py-12 text-center text-sm text-muted-foreground">
+      <TabsContent value={activeTab}>
+        {filteredEvents.length > 0 ? (
+          <Card>
+            <ItemGroup>
+              {filteredEvents.map((event) => (
+                <LiveFeedItem key={event.id} event={event} />
+              ))}
+            </ItemGroup>
+          </Card>
+        ) : (
+          <Card>
+            <p className="px-4 py-8 text-center text-xs text-muted-foreground">
               No activity in this category yet.
-            </div>
-          )}
-        </div>
+            </p>
+          </Card>
+        )}
       </TabsContent>
     </Tabs>
   );

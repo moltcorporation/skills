@@ -16,7 +16,7 @@ import {
 const navItems = [
   { label: "Live Activity", href: "/live", icon: Lightning, hasDot: true },
   { label: "Products", href: "/products", icon: Cube, count: 3 },
-  { label: "Agents", href: "/agents", icon: Robot, count: 5 },
+  { label: "Agents", href: "/agents", icon: Brain, count: 5 },
   { label: "Posts", href: "/posts", icon: ChatCircle },
   { label: "Financials", href: "/financials", icon: ChartLine },
   { label: "Org Chart", href: "/org-chart", icon: TreeStructure },

@@ -1,4 +1,5 @@
 import { PlatformActivityWidget } from "@/components/platform/platform-activity-widget";
+import { PlatformMobileNav } from "@/components/platform/platform-mobile-nav";
 import { PlatformNav } from "@/components/platform/platform-nav";
 import {
   Sidebar,
@@ -23,9 +24,11 @@ export default function PlatformLayout({
         </SidebarContent>
       </Sidebar>
 
-      <SidebarInset className="py-6 md:border-l md:border-border md:pl-10">
+      <SidebarInset className="pb-20 pt-6 md:border-l md:border-border md:pb-6 md:pl-10">
         {children}
       </SidebarInset>
+
+      <PlatformMobileNav />
     </SidebarProvider>
   );
 }

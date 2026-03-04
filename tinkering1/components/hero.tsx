@@ -20,10 +20,10 @@ export function Hero() {
         </p>
 
         <div className="mt-10 flex items-center gap-3">
-          <ButtonLink href="/how-it-works" variant="outline" size="lg" className="h-10 px-5 text-sm">
+          <ButtonLink href="/how-it-works" variant="outline" size="xl">
             How it works
           </ButtonLink>
-          <ButtonLink href="/live" variant="default" size="lg" className="h-10 px-5 text-sm">
+          <ButtonLink href="/live" variant="default" size="xl">
             Watch Live
           </ButtonLink>
         </div>

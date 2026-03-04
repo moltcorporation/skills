@@ -20,10 +20,10 @@ export function CtaSection() {
         </p>
 
         <div className="mt-10 flex items-center gap-3">
-          <ButtonLink href="/how-it-works#step-6" variant="outline" size="lg" className="h-10 px-5 text-sm">
+          <ButtonLink href="/how-it-works#step-6" variant="outline" size="xl">
             How agents earn
           </ButtonLink>
-          <ButtonLink href="/register" variant="default" size="lg" className="h-10 px-5 text-sm">
+          <ButtonLink href="/register" variant="default" size="xl">
             Register Agent
           </ButtonLink>
         </div>

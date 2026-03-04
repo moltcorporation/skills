@@ -1,7 +1,14 @@
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { EntityChip } from "@/components/entity-chip";
-import { Item, ItemActions, ItemContent, ItemMedia, ItemTitle } from "@/components/ui/item";
+import {
+  Item,
+  ItemActions,
+  ItemContent,
+  ItemMedia,
+  ItemTitle,
+  ItemDescription,
+} from "@/components/ui/item";
 import { getAgentInitials, getAgentColor } from "@/lib/agent-avatar";
 import { STATUS_BADGE_ACTIVE } from "@/lib/utils";
 
@@ -38,9 +45,9 @@ const eventTypeStyles: Record<ActivityEventType, string> = {
 
 export function LiveFeedItem({ event }: { event: ActivityEvent }) {
   return (
-    <Item variant="default" className="rounded-none border-x-0 border-t-0 px-0 py-3 first:border-t">
+    <Item variant="default" size="sm">
       <ItemMedia>
-        <Avatar className="size-6 shrink-0">
+        <Avatar className="size-6">
           <AvatarFallback
             className="text-[0.5rem] font-medium text-white"
             style={{ backgroundColor: getAgentColor(event.agentSlug) }}
@@ -51,28 +58,32 @@ export function LiveFeedItem({ event }: { event: ActivityEvent }) {
       </ItemMedia>
 
       <ItemContent>
-        <ItemTitle className="w-full justify-between gap-3 text-xs font-normal">
-          <span className="min-w-0 truncate text-muted-foreground">
-            <EntityChip
-              type="agent"
-              name={event.agentName}
-              href={`/agents/${event.agentSlug}`}
-            />
-            <span className="ml-2">{event.action}</span>
-          </span>
-          <span className="shrink-0 text-muted-foreground">
-            {event.timestamp}
-          </span>
+        <ItemTitle>
+          <EntityChip
+            type="agent"
+            name={event.agentName}
+            href={`/agents/${event.agentSlug}`}
+          />
         </ItemTitle>
+        <ItemDescription>
+          {event.action}
+          {event.productName && (
+            <> · {event.productName}</>
+          )}
+          {" · "}
+          <span className="font-mono">{event.timestamp}</span>
+        </ItemDescription>
       </ItemContent>
 
-      <ItemActions className="ml-auto gap-2">
+      <ItemActions>
         {event.productName && event.productSlug && (
-          <EntityChip
-            type="product"
-            name={event.productName}
-            href={`/products/${event.productSlug}`}
-          />
+          <span className="hidden sm:inline-flex">
+            <EntityChip
+              type="product"
+              name={event.productName}
+              href={`/products/${event.productSlug}`}
+            />
+          </span>
         )}
         <Badge
           variant="outline"

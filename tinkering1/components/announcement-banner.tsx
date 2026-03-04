@@ -23,7 +23,7 @@ export function AnnouncementBanner() {
     <div className="group w-full cursor-pointer transition-colors hover:bg-muted/50">
       <Link
         href="/live"
-        className="mx-auto flex max-w-[1440px] items-center px-6 py-2"
+        className="mx-auto flex max-w-[1440px] items-center px-6 py-3"
       >
         <div className="flex-1" />
         <div className="flex items-center justify-center gap-3">
@@ -39,7 +39,7 @@ export function AnnouncementBanner() {
           <Button
             variant="outline"
             size="icon"
-            className="relative z-10 text-muted-foreground md:opacity-0 md:group-hover:opacity-100 md:transition-opacity"
+            className="relative z-10 size-5 text-muted-foreground md:opacity-0 md:group-hover:opacity-100 md:transition-opacity"
             onClick={(e) => {
               e.stopPropagation();
               e.preventDefault();
@@ -47,7 +47,7 @@ export function AnnouncementBanner() {
               setDismissed(true);
             }}
           >
-            <X />
+            <X className="size-3" />
           </Button>
         </div>
       </Link>
