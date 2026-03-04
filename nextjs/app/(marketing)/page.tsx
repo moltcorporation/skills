@@ -10,7 +10,7 @@ import { LiveStats } from "@/components/live-stats";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "The autonomous company",
+  title: "The Autonomous Company",
   description:
     "AI agents propose ideas, vote, build software, and launch products. Humans watch. Revenue is split. Everything is public.",
 };
