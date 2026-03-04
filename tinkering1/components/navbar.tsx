@@ -1,8 +1,17 @@
 "use client";
 
-import Link from "next/link";
-import { Dialog as DialogPrimitive } from "@base-ui/react/dialog";
+import { AbstractAsciiBackground } from "@/components/abstract-ascii-background";
+import { ColonyIcon } from "@/components/colony-icon";
 import { Logo } from "@/components/logo";
+import { ThemeToggle } from "@/components/theme-toggle";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { Button } from "@/components/ui/button";
+import { ButtonLink } from "@/components/ui/button-link";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -12,33 +21,25 @@ import {
   NavigationMenuTrigger,
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
-import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { Dialog as DialogPrimitive } from "@base-ui/react/dialog";
 import {
-  Accordion,
-  AccordionItem,
-  AccordionTrigger,
-  AccordionContent,
-} from "@/components/ui/accordion";
-import {
-  Cube,
-  Lightning,
-  BookOpen,
-  ChatsCircle,
-  Star,
-  List,
-  XLogo,
-  X,
-  Scales,
-  Hammer,
-  Rocket,
-  UserPlus,
   ArrowRight,
+  BookOpen,
   ChartLine,
+  ChatsCircle,
+  Cube,
+  Hammer,
+  Lightning,
+  List,
+  Rocket,
+  Scales,
+  Star,
+  UserPlus,
+  X,
+  XLogo,
 } from "@phosphor-icons/react";
-import { ThemeToggle } from "@/components/theme-toggle";
-import { ColonyIcon } from "@/components/colony-icon";
-import { AbstractAsciiBackground } from "@/components/abstract-ascii-background";
+import Link from "next/link";
 
 export function Navbar() {
   return (
@@ -51,7 +52,7 @@ export function Navbar() {
 
         {/* Desktop Navigation — center column */}
         <NavigationMenu className="hidden md:flex">
-          <NavigationMenuList className="**:data-[slot=navigation-menu-trigger]:bg-transparent **:data-[slot=navigation-menu-link]:bg-transparent">
+          <NavigationMenuList>
             {/* Explore - Multi-column with featured panel */}
             <NavigationMenuItem>
               <NavigationMenuTrigger>Explore</NavigationMenuTrigger>
@@ -135,7 +136,7 @@ export function Navbar() {
             {/* Simple links */}
             <NavigationMenuItem>
               <NavigationMenuLink
-                href="/research"
+                render={<Link href="/research" />}
                 className={navigationMenuTriggerStyle()}
               >
                 Research
@@ -144,7 +145,7 @@ export function Navbar() {
 
             <NavigationMenuItem>
               <NavigationMenuLink
-                href="/manifesto"
+                render={<Link href="/manifesto" />}
                 className={navigationMenuTriggerStyle()}
               >
                 Manifesto
@@ -155,12 +156,12 @@ export function Navbar() {
 
         {/* Right column */}
         <div className="flex items-center justify-end gap-3">
-          <Button variant="ghost" size="lg" className="hidden text-muted-foreground md:inline-flex">
+          <ButtonLink href="/login" variant="ghost" size="lg" className="hidden md:inline-flex">
             Log in
-          </Button>
-          <Button variant="outline" size="lg" className="hidden bg-transparent dark:bg-transparent md:inline-flex" nativeButton={false} render={<Link href="/register" />}>
+          </ButtonLink>
+          <ButtonLink href="/register" variant="outline" size="lg" className="hidden md:inline-flex">
             Register Agent
-          </Button>
+          </ButtonLink>
 
           <ThemeToggle />
 

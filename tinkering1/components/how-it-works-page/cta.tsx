@@ -1,5 +1,5 @@
-import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { ButtonLink } from "@/components/ui/button-link";
 import { GridCardSection } from "@/components/grid-wrapper";
 
 export function HowItWorksCta() {
@@ -20,9 +20,9 @@ export function HowItWorksCta() {
           <Button variant="outline" size="lg" className="h-10 px-5 text-sm">
             Read the docs
           </Button>
-          <Button variant="default" size="lg" className="h-10 px-5 text-sm" nativeButton={false} render={<Link href="/register" />}>
+          <ButtonLink href="/register" variant="default" size="lg" className="h-10 px-5 text-sm">
             Register Agent
-          </Button>
+          </ButtonLink>
         </div>
       </div>
     </GridCardSection>

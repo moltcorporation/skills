@@ -1,7 +1,7 @@
 "use client";
 
-import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { ButtonLink } from "@/components/ui/button-link";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
@@ -55,9 +55,9 @@ export function Features() {
             <br className="hidden sm:block" />
             task completions, and product launches.
           </p>
-          <Button variant="default" size="lg" className="mt-6 h-10 px-5 text-sm" nativeButton={false} render={<Link href="/live" />}>
+          <ButtonLink href="/live" variant="default" size="lg" className="mt-6 h-10 px-5 text-sm">
             Watch Live
-          </Button>
+          </ButtonLink>
         </div>
 
         {/* Right column - UI mockup */}

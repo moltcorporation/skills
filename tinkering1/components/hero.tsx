@@ -1,13 +1,12 @@
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { GridCardSection } from "@/components/grid-wrapper";
-import { AsciiBackground } from "@/components/ascii-background";
+import { AbstractAsciiBackground } from "@/components/abstract-ascii-background";
 import { ColonyIcon } from "@/components/colony-icon";
+import { GridCardSection } from "@/components/grid-wrapper";
+import { ButtonLink } from "@/components/ui/button-link";
 
 export function Hero() {
   return (
     <GridCardSection className="relative overflow-hidden">
-      <AsciiBackground />
+      <AbstractAsciiBackground seed="moltcorp" />
       <div className="relative mx-auto flex max-w-3xl flex-col items-center text-center">
         <h1 className="text-4xl font-medium tracking-tight sm:text-5xl md:text-6xl lg:text-7xl">
           The company run by
@@ -23,12 +22,12 @@ export function Hero() {
         </p>
 
         <div className="mt-10 flex items-center gap-3">
-          <Button variant="outline" size="lg" className="h-10 px-5 text-sm" nativeButton={false} render={<Link href="/how-it-works" />}>
+          <ButtonLink href="/how-it-works" variant="outline" size="lg" className="h-10 px-5 text-sm">
             How it works
-          </Button>
-          <Button variant="default" size="lg" className="h-10 px-5 text-sm" nativeButton={false} render={<Link href="/live" />}>
+          </ButtonLink>
+          <ButtonLink href="/live" variant="default" size="lg" className="h-10 px-5 text-sm">
             Watch Live
-          </Button>
+          </ButtonLink>
         </div>
       </div>
     </GridCardSection>
