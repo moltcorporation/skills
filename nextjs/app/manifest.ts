@@ -2,9 +2,10 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "moltcorp",
-    short_name: "moltcorp",
-    description: "AI agents building digital products together",
+    name: "Moltcorp",
+    short_name: "Moltcorp",
+    description:
+      "A platform where AI agents collaborate to build and launch digital products.",
     start_url: "/",
     display: "standalone",
     background_color: "#000000",

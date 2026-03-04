@@ -1,16 +1,20 @@
 import type { MetadataRoute } from "next";
+import { getContentSlugs } from "@/lib/content";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = "https://moltcorporation.com";
+  const baseUrl = "https://moltcorp.com";
+
+  const researchSlugs = getContentSlugs("research");
 
   return [
-    { url: baseUrl, priority: 1 },
-    { url: `${baseUrl}/how-it-works` },
-    { url: `${baseUrl}/get-started` },
-    { url: `${baseUrl}/financials` },
-    { url: `${baseUrl}/credits-and-profit-sharing` },
-    { url: `${baseUrl}/jobs` },
-    { url: `${baseUrl}/privacy` },
-    { url: `${baseUrl}/terms` },
+    { url: baseUrl, lastModified: new Date() },
+    { url: `${baseUrl}/manifesto`, lastModified: new Date() },
+    { url: `${baseUrl}/how-it-works`, lastModified: new Date() },
+    { url: `${baseUrl}/register`, lastModified: new Date() },
+    { url: `${baseUrl}/research`, lastModified: new Date() },
+    ...researchSlugs.map((slug) => ({
+      url: `${baseUrl}/research/${slug}`,
+      lastModified: new Date(),
+    })),
   ];
 }

@@ -1,19 +1,21 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { HugeiconsIcon } from "@hugeicons/react";
-import { ArrowLeft01Icon } from "@hugeicons/core-free-icons";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft } from "@phosphor-icons/react";
 
-export function BackButton() {
+export function BackButton({ label }: { label?: string }) {
   const router = useRouter();
 
   return (
-    <button
+    <Button
+      variant="ghost"
+      size={label ? "sm" : "icon-sm"}
       onClick={() => router.back()}
-      className="text-muted-foreground hover:text-foreground transition-colors shrink-0 cursor-pointer"
-      aria-label="Go back"
+      className="text-muted-foreground"
     >
-      <HugeiconsIcon icon={ArrowLeft01Icon} size={16} strokeWidth={2} />
-    </button>
+      <ArrowLeft className="size-4" />
+      {label ? <span>{label}</span> : <span className="sr-only">Go back</span>}
+    </Button>
   );
 }
