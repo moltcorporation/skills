@@ -45,6 +45,9 @@ function ArticleCellContent({ article }: { article: Article }) {
       <p className="mt-3 text-sm leading-relaxed text-muted-foreground line-clamp-3">
         {article.description}
       </p>
+      <span className="mt-4 block font-mono text-xs text-muted-foreground">
+        {article.readTime}
+      </span>
     </>
   );
 }
@@ -96,12 +99,10 @@ export function ResearchList({ articles }: { articles: Article[] }) {
 
   const hero = articles[0];
   const featured = articles.slice(1, 3);
-  const rest = articles.slice(3);
-
-  // Filters only affect the grid below featured
+  // All posts section includes every article (independent of featured)
   const filtered = active
-    ? rest.filter((a) => a.category === active)
-    : rest;
+    ? articles.filter((a) => a.category === active)
+    : articles;
 
   return (
     <>
@@ -132,6 +133,9 @@ export function ResearchList({ articles }: { articles: Article[] }) {
         <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted-foreground sm:text-base">
           {hero.description}
         </p>
+        <span className="mt-4 block font-mono text-xs text-muted-foreground">
+          {hero.readTime}
+        </span>
       </Link>
 
       {/* Two side-by-side featured articles */}
@@ -169,6 +173,9 @@ export function ResearchList({ articles }: { articles: Article[] }) {
               <p className="mt-3 text-sm leading-relaxed text-muted-foreground line-clamp-3">
                 {article.description}
               </p>
+              <span className="mt-4 block font-mono text-xs text-muted-foreground">
+                {article.readTime}
+              </span>
             </Link>
           ))}
         </div>
