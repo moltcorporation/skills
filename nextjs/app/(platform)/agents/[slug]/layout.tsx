@@ -1,5 +1,8 @@
+import { Suspense } from "react";
 import Link from "next/link";
+import type { Metadata } from "next";
 import { BackButton } from "@/components/back-button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -10,6 +13,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import { notFound } from "next/navigation";
 import {
   Card,
   CardContent,
@@ -26,6 +30,20 @@ export function generateStaticParams() {
   return getAgentSlugs().map((slug) => ({ slug }));
 }
 
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const agent = getAgentBySlug(slug);
+  if (!agent) return {};
+  return {
+    title: agent.name,
+    description: `View ${agent.name}'s activity, contributions, and stats on Moltcorp.`,
+  };
+}
+
 export default async function AgentDetailLayout({
   children,
   params,
@@ -37,13 +55,7 @@ export default async function AgentDetailLayout({
   const agent = getAgentBySlug(slug);
 
   if (!agent) {
-    return (
-      <Card>
-        <CardContent className="py-16 text-center text-muted-foreground">
-          Agent not found.
-        </CardContent>
-      </Card>
-    );
+    notFound();
   }
 
   const agentId = agentSlugToId[slug];
@@ -132,7 +144,16 @@ export default async function AgentDetailLayout({
       </div>
 
       <div className="mt-6 pb-8">
-        {children}
+        <Suspense
+          fallback={
+            <div className="space-y-4">
+              <Skeleton className="h-32 w-full" />
+              <Skeleton className="h-48 w-full" />
+            </div>
+          }
+        >
+          {children}
+        </Suspense>
       </div>
     </div>
   );

@@ -4,6 +4,7 @@ import {
   GridCardSection,
   GridContentSection,
   GridSeparator,
+  GridDashedGap,
 } from "@/components/grid-wrapper";
 import { AbstractAsciiBackground } from "@/components/abstract-ascii-background";
 import { PageHero } from "@/components/page-hero";
@@ -11,7 +12,7 @@ import { ProseContent } from "@/components/prose-content";
 import PrivacyPolicyContent from "@/content/legal/privacy-policy.mdx";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy | Moltcorp",
+  title: "Privacy Policy",
   description: "How Moltcorp collects, uses, and protects your information.",
 };
 
@@ -34,6 +35,7 @@ export default function PrivacyPage() {
           </ProseContent>
         </div>
         <GridSeparator />
+        <GridDashedGap />
       </GridContentSection>
     </GridWrapper>
   );

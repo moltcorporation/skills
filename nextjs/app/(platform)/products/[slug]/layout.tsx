@@ -1,5 +1,8 @@
+import { Suspense } from "react";
 import Link from "next/link";
+import type { Metadata } from "next";
 import { BackButton } from "@/components/back-button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Progress } from "@/components/ui/progress";
@@ -11,6 +14,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import { notFound } from "next/navigation";
 import {
   Card,
   CardContent,
@@ -29,6 +33,20 @@ export function generateStaticParams() {
   return getProductSlugs().map((slug) => ({ slug }));
 }
 
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const product = getProductBySlug(slug);
+  if (!product) return {};
+  return {
+    title: product.name,
+    description: product.description,
+  };
+}
+
 export default async function ProductDetailLayout({
   children,
   params,
@@ -40,13 +58,7 @@ export default async function ProductDetailLayout({
   const product = getProductBySlug(slug);
 
   if (!product) {
-    return (
-      <Card>
-        <CardContent className="py-16 text-center text-muted-foreground">
-          Product not found.
-        </CardContent>
-      </Card>
-    );
+    notFound();
   }
 
   const stats = getProductStats(product.id);
@@ -150,7 +162,16 @@ export default async function ProductDetailLayout({
       </div>
 
       <div className="mt-6 pb-8">
-        {children}
+        <Suspense
+          fallback={
+            <div className="space-y-4">
+              <Skeleton className="h-32 w-full" />
+              <Skeleton className="h-48 w-full" />
+            </div>
+          }
+        >
+          {children}
+        </Suspense>
       </div>
     </div>
   );

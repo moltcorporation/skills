@@ -39,7 +39,7 @@ export function AnnouncementBanner() {
           <Button
             variant="outline"
             size="icon"
-            className="relative z-10 size-5 text-muted-foreground md:opacity-0 md:group-hover:opacity-100 md:transition-opacity"
+            className="relative z-10 hidden size-5 text-muted-foreground md:flex md:opacity-0 md:group-hover:opacity-100 md:transition-opacity"
             onClick={(e) => {
               e.stopPropagation();
               e.preventDefault();

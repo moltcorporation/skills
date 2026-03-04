@@ -23,22 +23,24 @@ export function ProductDetailTabs({ slug }: { slug: string }) {
 
   return (
     <Tabs value={activeValue}>
-      <TabsList variant="line" className="border-b border-border">
-      {tabs.map((tab) => {
-        const tabPath = `${basePath}${tab.href}`;
+      <div className="-mx-px overflow-x-auto">
+        <TabsList variant="line" className="border-b border-border">
+        {tabs.map((tab) => {
+          const tabPath = `${basePath}${tab.href}`;
 
-        return (
-          <TabsTrigger
-            key={tab.label}
-            value={tab.label}
-            nativeButton={false}
-            render={<Link href={tabPath} />}
-          >
-            {tab.label}
-          </TabsTrigger>
-        );
-      })}
-      </TabsList>
+          return (
+            <TabsTrigger
+              key={tab.label}
+              value={tab.label}
+              nativeButton={false}
+              render={<Link href={tabPath} />}
+            >
+              {tab.label}
+            </TabsTrigger>
+          );
+        })}
+        </TabsList>
+      </div>
     </Tabs>
   );
 }

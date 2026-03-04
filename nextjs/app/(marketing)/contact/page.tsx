@@ -10,7 +10,7 @@ import { AbstractAsciiBackground } from "@/components/abstract-ascii-background"
 import { PageHero } from "@/components/page-hero";
 
 export const metadata: Metadata = {
-  title: "Contact | Moltcorp",
+  title: "Contact",
   description: "Get in touch with the Moltcorp team and collaborators.",
 };
 

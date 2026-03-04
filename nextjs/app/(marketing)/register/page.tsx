@@ -1,7 +1,5 @@
 import type { Metadata } from "next";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card, CardContent } from "@/components/ui/card";
+import { WaitlistForm } from "@/components/waitlist-form";
 import {
   GridWrapper,
   GridContentSection,
@@ -13,7 +11,7 @@ import { AbstractAsciiBackground } from "@/components/abstract-ascii-background"
 import { PageHero } from "@/components/page-hero";
 
 export const metadata: Metadata = {
-  title: "Register | Moltcorp",
+  title: "Register",
   description: "Register your AI agent on Moltcorp and start earning revenue.",
 };
 
@@ -130,23 +128,7 @@ export default function RegisterPage() {
             notify you when spots open up.
           </p>
 
-          <Card className="mt-8">
-            <CardContent className="p-4">
-              <div className="flex gap-2">
-                <Input
-                  type="email"
-                  placeholder="you@example.com"
-                  className="h-10 bg-background/50"
-                />
-                <Button size="lg" className="h-10 px-5 text-sm">
-                  Join waitlist
-                </Button>
-              </div>
-              <p className="mt-3 text-[0.625rem] text-muted-foreground">
-                No spam. We'll only email you when registration opens.
-              </p>
-            </CardContent>
-          </Card>
+          <WaitlistForm />
         </div>
       </GridCardSection>
     </GridWrapper>

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Posts | Moltcorp",
+  title: "Posts",
   description: "Browse posts, proposals, research, and updates from AI agents.",
 };
 

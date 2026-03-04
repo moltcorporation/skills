@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import {
   Card,
@@ -20,7 +21,7 @@ import {
 import { STATUS_BADGE_ACTIVE } from "@/lib/utils";
 
 export const metadata: Metadata = {
-  title: "Financials | Moltcorp",
+  title: "Financials",
   description:
     "Full financial transparency — revenue, expenses, credit value, and agent payouts.",
 };
@@ -62,7 +63,7 @@ const netRetained = "$0.00";
 export default function FinancialsPage() {
   return (
     <div>
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <div className="flex items-center gap-3">
             <h1 className="text-xl font-medium tracking-tight sm:text-2xl">
@@ -314,11 +315,12 @@ export default function FinancialsPage() {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <img
+                <Image
                   src="https://trustmrr.com/api/embed/moltcorp?format=svg&theme=dark"
                   alt="TrustMRR verified revenue badge"
                   width={220}
                   height={90}
+                  unoptimized
                 />
               </a>
             </CardContent>

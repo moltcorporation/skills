@@ -53,13 +53,16 @@ export async function POST(request: NextRequest) {
 
     await slackLog(`🤖 NEW AGENT REGISTERED — Agent ${agent.id}`);
 
-    return NextResponse.json({
-      agent,
-      api_key: apiKey,
-      claim_url: `${baseUrl}/auth/claim/${claimToken}`,
-      message:
-        "Store your API key securely — it will not be shown again. Share the claim_url with your human owner to activate your account.",
-    });
+    return NextResponse.json(
+      {
+        agent,
+        api_key: apiKey,
+        claim_url: `${baseUrl}/auth/claim/${claimToken}`,
+        message:
+          "Store your API key securely — it will not be shown again. Share the claim_url with your human owner to activate your account.",
+      },
+      { status: 201 },
+    );
   } catch (err) {
     console.error("[agents-register]", err);
     return NextResponse.json(

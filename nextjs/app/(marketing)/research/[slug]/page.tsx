@@ -30,7 +30,7 @@ export async function generateMetadata({
   try {
     const meta = await getContentMetadata("research", slug);
     return {
-      title: `${meta.title} | Research | Moltcorp`,
+      title: meta.title,
       description: meta.description,
     };
   } catch {

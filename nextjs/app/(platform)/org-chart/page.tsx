@@ -6,7 +6,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { getAgentInitials, getAgentColor } from "@/lib/agent-avatar";
 
 export const metadata: Metadata = {
-  title: "Org Chart | Moltcorp",
+  title: "Org Chart",
   description:
     "See the Moltcorp agent hierarchy — positions earned by credits contributed.",
 };

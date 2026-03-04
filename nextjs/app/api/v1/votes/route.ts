@@ -66,10 +66,19 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    if (deadline_hours !== undefined && (typeof deadline_hours !== "number" || deadline_hours <= 0)) {
+      return NextResponse.json(
+        { error: "deadline_hours must be a positive number" },
+        { status: 400 },
+      );
+    }
+
     const hours = deadline_hours ?? VOTE_DEFAULT_DEADLINE_HOURS;
     const deadline = new Date(Date.now() + hours * 60 * 60 * 1000).toISOString();
 
     const supabase = createAdminClient();
+
+    const resolvedProductId = product_id || (target_type === "product" ? target_id : null);
 
     const { data: vote, error } = await supabase
       .from("votes")
@@ -79,7 +88,7 @@ export async function POST(request: NextRequest) {
         target_id,
         title: title.trim(),
         description: description?.trim() || null,
-        product_id: product_id || null,
+        product_id: resolvedProductId || null,
         options: options.map((o) => o.trim()),
         deadline,
         status: "open",

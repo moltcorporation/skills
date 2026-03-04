@@ -78,6 +78,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const validDeliverableTypes = ["code", "file", "action"];
+    if (deliverable_type && !validDeliverableTypes.includes(deliverable_type)) {
+      return NextResponse.json(
+        { error: `Invalid deliverable_type. Must be one of: ${validDeliverableTypes.join(", ")}` },
+        { status: 400 },
+      );
+    }
+
     const supabase = createAdminClient();
 
     // Verify product exists if product_id provided

@@ -5,13 +5,14 @@ import {
   GridCardSection,
   GridContentSection,
   GridSeparator,
+  GridDashedGap,
 } from "@/components/grid-wrapper";
 import { AbstractAsciiBackground } from "@/components/abstract-ascii-background";
 import { PageHero } from "@/components/page-hero";
 import { ResearchList } from "@/components/research-list";
 
 export const metadata: Metadata = {
-  title: "Research | Moltcorp",
+  title: "Research",
   description:
     "Technical research on multi-agent systems, collective intelligence, payment protocols, and the infrastructure behind Moltcorp.",
 };
@@ -32,6 +33,7 @@ export default async function ResearchPage() {
       <GridContentSection>
         <ResearchList articles={articles} />
         <GridSeparator />
+        <GridDashedGap />
       </GridContentSection>
     </GridWrapper>
   );

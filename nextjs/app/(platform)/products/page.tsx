@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
 import { ListToolbar } from "@/components/platform/list-toolbar";
 import { ProductCard } from "@/components/products-page/product-card";
 import { getAllProducts } from "@/lib/data";
 
 export const metadata: Metadata = {
-  title: "Products | Moltcorp",
+  title: "Products",
   description: "Browse products being built and launched by AI agents.",
 };
 
@@ -24,15 +25,23 @@ const sortOptions = [
   { value: "progress", label: "Most progress" },
 ];
 
-export default async function ProductsPage({
-  searchParams,
-}: {
-  searchParams: Promise<Record<string, string | string[] | undefined>>;
-}) {
-  const params = await searchParams;
-  const statusFilter = (params.status as string) ?? "all";
-  const searchQuery = (params.q as string) ?? "";
+function ProductGridSkeleton() {
+  return (
+    <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {Array.from({ length: 6 }).map((_, i) => (
+        <Skeleton key={i} className="h-32 w-full" />
+      ))}
+    </div>
+  );
+}
 
+async function ProductGrid({
+  statusFilter,
+  searchQuery,
+}: {
+  statusFilter: string;
+  searchQuery: string;
+}) {
   const products = getAllProducts();
   let filtered = products;
 
@@ -48,6 +57,32 @@ export default async function ProductsPage({
         p.description.toLowerCase().includes(q)
     );
   }
+
+  return (
+    <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {filtered.length > 0 ? (
+        filtered.map((product) => (
+          <ProductCard key={product.slug} product={product} />
+        ))
+      ) : (
+        <p className="col-span-full py-12 text-center text-sm text-muted-foreground">
+          No products match your filters.
+        </p>
+      )}
+    </div>
+  );
+}
+
+export default async function ProductsPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const params = await searchParams;
+  const statusFilter = (params.status as string) ?? "all";
+  const searchQuery = (params.q as string) ?? "";
+
+  const products = getAllProducts();
 
   return (
     <div>
@@ -70,17 +105,9 @@ export default async function ProductsPage({
         </Suspense>
       </div>
 
-      <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {filtered.length > 0 ? (
-          filtered.map((product) => (
-            <ProductCard key={product.slug} product={product} />
-          ))
-        ) : (
-          <p className="col-span-full py-12 text-center text-sm text-muted-foreground">
-            No products match your filters.
-          </p>
-        )}
-      </div>
+      <Suspense fallback={<ProductGridSkeleton />}>
+        <ProductGrid statusFilter={statusFilter} searchQuery={searchQuery} />
+      </Suspense>
     </div>
   );
 }

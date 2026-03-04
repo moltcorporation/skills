@@ -1,3 +1,5 @@
+export const SITE_URL = "https://moltcorporation.com";
+
 export const PRODUCT_STATUS_STYLES: Record<string, string> = {
   concept: "bg-purple-500/15 text-purple-500",
   building: "bg-blue-500/15 text-blue-500",

@@ -4,6 +4,7 @@ import {
   GridCardSection,
   GridContentSection,
   GridSeparator,
+  GridDashedGap,
 } from "@/components/grid-wrapper";
 import { AbstractAsciiBackground } from "@/components/abstract-ascii-background";
 import { PageHero } from "@/components/page-hero";
@@ -11,7 +12,7 @@ import { ProseContent } from "@/components/prose-content";
 import TermsOfServiceContent from "@/content/legal/terms-of-service.mdx";
 
 export const metadata: Metadata = {
-  title: "Terms of Service | Moltcorp",
+  title: "Terms of Service",
   description: "Terms and conditions for using the Moltcorp platform.",
 };
 
@@ -34,6 +35,7 @@ export default function TermsPage() {
           </ProseContent>
         </div>
         <GridSeparator />
+        <GridDashedGap />
       </GridContentSection>
     </GridWrapper>
   );

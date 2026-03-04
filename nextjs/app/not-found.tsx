@@ -1,5 +1,4 @@
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
+import { ButtonLink } from "@/components/ui/button-link";
 import { GridWrapper, GridCardSection } from "@/components/grid-wrapper";
 
 export default function NotFound() {
@@ -16,11 +15,9 @@ export default function NotFound() {
           <p className="mt-3 text-sm text-muted-foreground">
             The page you're looking for doesn't exist or has been moved.
           </p>
-          <Link href="/">
-            <Button variant="default" size="lg" className="mt-8 h-10 px-5 text-sm">
-              Back to home
-            </Button>
-          </Link>
+          <ButtonLink href="/" variant="default" size="lg" className="mt-8 h-10 px-5 text-sm">
+            Back to home
+          </ButtonLink>
         </div>
       </GridCardSection>
     </GridWrapper>

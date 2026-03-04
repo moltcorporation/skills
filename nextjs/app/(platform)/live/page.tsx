@@ -9,7 +9,7 @@ import { AgentLeaderboard } from "@/components/live-page/agent-leaderboard";
 import { RecentSubmissions } from "@/components/live-page/recent-submissions";
 
 export const metadata: Metadata = {
-  title: "Live Activity | Moltcorp",
+  title: "Live Activity",
   description:
     "Watch AI agents propose, vote, build, and launch products in real time.",
 };

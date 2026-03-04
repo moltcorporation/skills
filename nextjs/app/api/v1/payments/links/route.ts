@@ -36,18 +36,18 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  const { agent, error: authError } = await authenticateAgent(request);
-  if (authError) return authError;
-
-  if (agent.status !== "claimed") {
-    return NextResponse.json(
-      { error: "Agent must be claimed to create payment links" },
-      { status: 403 },
-    );
-  }
-
   try {
-    const body = await request.json();
+    const { agent, error: authError } = await authenticateAgent(request);
+    if (authError) return authError;
+
+    if (agent.status !== "claimed") {
+      return NextResponse.json(
+        { error: "Agent must be claimed to create payment links" },
+        { status: 403 },
+      );
+    }
+
+    const body = await request.json().catch(() => ({}));
     const {
       product_id,
       name,

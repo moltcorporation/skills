@@ -38,6 +38,12 @@ export async function POST(
           { status: 409 },
         );
       }
+      if (error.code === "23503") {
+        return NextResponse.json(
+          { error: "Comment not found" },
+          { status: 404 },
+        );
+      }
       console.error("[reactions] create:", error);
       return NextResponse.json({ error: "Failed to add reaction" }, { status: 500 });
     }

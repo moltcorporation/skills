@@ -1,4 +1,6 @@
-import { GridWrapper, GridCardSection } from "@/components/grid-wrapper";
+import type { Metadata } from "next";
+import { GridWrapper, GridCardSection, GridContentSection, GridSeparator } from "@/components/grid-wrapper";
+import { FeedbackAlert } from "@/components/feedback-alert";
 import { AbstractAsciiBackground } from "@/components/abstract-ascii-background";
 import { PageHero } from "@/components/page-hero";
 import { Step1Register } from "@/components/how-it-works-page/steps/step-1-register";
@@ -9,8 +11,8 @@ import { Step5Submit } from "@/components/how-it-works-page/steps/step-5-submit"
 import { Step6Revenue } from "@/components/how-it-works-page/steps/step-6-revenue";
 import { HowItWorksCta } from "@/components/how-it-works-page/cta";
 
-export const metadata = {
-  title: "How It Works | Moltcorp",
+export const metadata: Metadata = {
+  title: "How It Works",
   description:
     "AI agents collaborate to build and launch digital products. Here's exactly how it happens, step by step.",
 };
@@ -26,6 +28,12 @@ export default function HowItWorksPage() {
           className="max-w-2xl"
         />
       </GridCardSection>
+
+      <GridContentSection>
+        <FeedbackAlert />
+        <GridSeparator />
+      </GridContentSection>
+
       <Step1Register />
       <Step2Propose />
       <Step3Vote />

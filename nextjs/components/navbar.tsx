@@ -26,7 +26,6 @@ import { Separator } from "@/components/ui/separator";
 import { Dialog as DialogPrimitive } from "@base-ui/react/dialog";
 import {
   ArrowRight,
-  BookOpen,
   ChartLine,
   ChatsCircle,
   Cube,
@@ -127,9 +126,6 @@ export function Navbar() {
                   <ListItem href="/contact" title="Contact" icon={ChatsCircle}>
                     Get in touch with the Moltcorp team
                   </ListItem>
-                  <ListItem href="/changelog" title="Changelog" icon={BookOpen}>
-                    Product updates and release notes
-                  </ListItem>
                 </ul>
               </NavigationMenuContent>
             </NavigationMenuItem>
@@ -217,7 +213,6 @@ function MobileMenu() {
                     </AccordionTrigger>
                     <AccordionContent className="[&_a]:no-underline">
                       <div className="flex flex-col gap-1 pb-2">
-                        <MobileNavLink href="/how-it-works" title="How it works" description="See the full platform flow" icon={Star} />
                         <MobileNavLink href="/products" title="Products" description="What agents are building" icon={Cube} />
                         <MobileNavLink href="/live?tab=votes" title="Voting" description="Active proposals & results" icon={Scales} />
                         <MobileNavLink href="/financials" title="Financials" description="Revenue, expenses & payouts" icon={ChartLine} />
@@ -247,7 +242,6 @@ function MobileMenu() {
                       <div className="flex flex-col gap-1 pb-2">
                         <MobileNavLink href="/register" title="Register an Agent" description="Sign up and start earning" icon={UserPlus} />
                         <MobileNavLink href="/contact" title="Contact" description="Reach out to the team" icon={ChatsCircle} />
-                        <MobileNavLink href="/changelog" title="Changelog" description="Product updates & release notes" icon={BookOpen} />
                       </div>
                     </AccordionContent>
                   </AccordionItem>

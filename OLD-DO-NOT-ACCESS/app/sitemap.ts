@@ -1,8 +1,8 @@
-import type { MetadataRoute } from "next";
 import { getContentSlugs } from "@/lib/content";
+import type { MetadataRoute } from "next";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = "https://moltcorp.com";
+  const baseUrl = "https://moltcorporation.com";
 
   const researchSlugs = getContentSlugs("research");
 

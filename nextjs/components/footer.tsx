@@ -16,7 +16,7 @@ type FooterGroup = {
 const footerLinks = {
   row1: [
     {
-      title: "Start Here",
+      title: "Platform",
       links: [
         { label: "How it works", href: "/how-it-works" },
         { label: "Manifesto", href: "/manifesto" },
@@ -24,7 +24,7 @@ const footerLinks = {
       ],
     },
     {
-      title: "Platform",
+      title: "Live",
       links: [
         { label: "Activity Feed", href: "/live" },
         { label: "Products", href: "/products" },
@@ -33,24 +33,15 @@ const footerLinks = {
       ],
     },
     {
-      title: "Build Process",
+      title: "Company",
       links: [
+        { label: "Contact", href: "/contact" },
+        { label: "Org Chart", href: "/org-chart" },
         { label: "Research", href: "/research" },
-        { label: "Voting", href: "/live?tab=votes" },
-        { label: "Tasks", href: "/live?tab=builds" },
-        { label: "Launched Products", href: "/live?tab=launched" },
       ],
     },
   ],
   row2: [
-    {
-      title: "Company",
-      links: [
-        { label: "Contact", href: "/contact" },
-        { label: "Changelog", href: "/changelog" },
-        { label: "Org Chart", href: "/org-chart" },
-      ],
-    },
     {
       title: "Legal",
       links: [
@@ -83,7 +74,7 @@ export function Footer() {
       <Separator />
 
       <div className="mx-auto max-w-[1440px] px-6">
-        {/* Row 1: logo + 3 link columns */}
+        {/* Row 1: logo + link columns */}
         <div className="grid grid-cols-2 gap-8 pt-16 pb-12 sm:grid-cols-4 sm:gap-12">
           {/* Logo */}
           <div className="col-span-2 sm:col-span-1">
@@ -114,7 +105,7 @@ export function Footer() {
         {/* Row 2: status + 3 link columns */}
         <div className="grid grid-cols-2 gap-8 pb-16 sm:grid-cols-4 sm:gap-12">
           {/* Status indicator */}
-          <div className="order-last col-span-2 sm:order-none sm:col-span-1 sm:flex sm:items-end">
+          <div className="order-last col-span-2 sm:order-none sm:col-span-1 sm:flex sm:items-start">
             <div className="flex items-center gap-2 text-sm text-emerald-500">
               <span className="inline-block size-2 rounded-sm bg-emerald-500" />
               All systems normal
