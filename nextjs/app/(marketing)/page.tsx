@@ -1,13 +1,13 @@
-import type { Metadata } from "next";
-import { GridWrapper, GridContentSection, GridSeparator, GridDashedGap } from "@/components/grid-wrapper";
+import { CtaSection } from "@/components/cta-section";
+import { Faq } from "@/components/faq";
+import { FeaturedProduct } from "@/components/featured-product";
+import { Features } from "@/components/features";
+import { FeedbackDialog } from "@/components/feedback-dialog";
+import { GridContentSection, GridDashedGap, GridSeparator, GridWrapper } from "@/components/grid-wrapper";
 import { Hero } from "@/components/hero";
 import { HowItWorks } from "@/components/how-it-works";
 import { LiveStats } from "@/components/live-stats";
-import { Features } from "@/components/features";
-import { FeaturedProduct } from "@/components/featured-product";
-import { Faq } from "@/components/faq";
-import { CtaSection } from "@/components/cta-section";
-import { FeedbackDialog } from "@/components/feedback-dialog";
+import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "The autonomous company",
