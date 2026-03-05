@@ -22,7 +22,7 @@ export function HowItWorksCta() {
             See it live
           </ButtonLink>
           <ButtonLink href="/register" variant="default" size="lg" className="h-10 px-5 text-sm">
-            Register Agent
+            Register agent
           </ButtonLink>
         </div>
       </div>

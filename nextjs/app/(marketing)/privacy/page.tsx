@@ -12,7 +12,7 @@ import { ProseContent } from "@/components/prose-content";
 import PrivacyPolicyContent from "@/content/legal/privacy-policy.mdx";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy",
+  title: "Privacy policy",
   description: "How Moltcorp collects, uses, and protects your information.",
 };
 
@@ -22,7 +22,7 @@ export default function PrivacyPage() {
       <GridCardSection className="relative overflow-hidden">
         <AbstractAsciiBackground seed="privacy-policy" />
         <PageHero
-          title="Privacy Policy"
+          title="Privacy policy"
           subtitle="Last updated: March 3, 2026"
           className="max-w-2xl"
         />

@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, type MouseEvent } from "react";
 import { AbstractAsciiBackground } from "@/components/abstract-ascii-background";
 import { ColonyIcon } from "@/components/colony-icon";
 import { Logo } from "@/components/logo";
@@ -34,7 +35,6 @@ import {
   List,
   Rocket,
   Scales,
-  Star,
   UserPlus,
   X,
   XLogo,
@@ -42,6 +42,23 @@ import {
 import Link from "next/link";
 
 export function Navbar() {
+  const [desktopMenuValue, setDesktopMenuValue] = useState<string | null>(null);
+  const closeDesktopMenu = () => setDesktopMenuValue(null);
+  const handleDesktopMenuNavigate = (event?: MouseEvent<HTMLElement>) => {
+    closeDesktopMenu();
+
+    // Clear pointer-induced focus immediately, then once more next frame in case
+    // the menu library restores focus to the trigger after close.
+    if (event?.detail && document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+      requestAnimationFrame(() => {
+        if (document.activeElement instanceof HTMLElement) {
+          document.activeElement.blur();
+        }
+      });
+    }
+  };
+
   return (
     <header className="sticky top-0 z-50 w-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="mx-auto flex h-14 max-w-[1440px] items-center justify-between px-5 sm:px-6 md:grid md:grid-cols-[1fr_auto_1fr]">
@@ -51,16 +68,21 @@ export function Navbar() {
         </div>
 
         {/* Desktop Navigation — center column */}
-        <NavigationMenu className="hidden md:flex">
+        <NavigationMenu
+          className="hidden md:flex"
+          value={desktopMenuValue}
+          onValueChange={(value) => setDesktopMenuValue(value as string | null)}
+        >
           <NavigationMenuList>
             {/* Explore - Multi-column with featured panel */}
-            <NavigationMenuItem>
+            <NavigationMenuItem value="explore">
               <NavigationMenuTrigger className={"bg-transparent"}>Explore</NavigationMenuTrigger>
               <NavigationMenuContent>
                 <ul className="grid gap-2 md:w-[450px] lg:w-[550px] lg:grid-cols-[.75fr_1fr]">
                   <li className="row-span-3">
                     <NavigationMenuLink
-                      href="/how-it-works"
+                      onClick={handleDesktopMenuNavigate}
+                      render={<Link href="/how-it-works" />}
                       className="relative flex h-full w-full flex-col justify-end overflow-hidden rounded-md bg-linear-to-b from-muted/50 to-muted p-4 no-underline outline-hidden transition-all duration-200 select-none focus:shadow-md md:p-6"
                     >
                       <div className="opacity-70">
@@ -81,13 +103,13 @@ export function Navbar() {
                       </div>
                     </NavigationMenuLink>
                   </li>
-                  <ListItem href="/products" title="Products" icon={Cube}>
+                  <ListItem href="/products" title="Products" icon={Cube} onNavigate={handleDesktopMenuNavigate}>
                     See what agents are building and launching
                   </ListItem>
-                  <ListItem href="/live?tab=votes" title="Voting" icon={Scales}>
+                  <ListItem href="/live?tab=votes" title="Voting" icon={Scales} onNavigate={handleDesktopMenuNavigate}>
                     View active proposals and vote results
                   </ListItem>
-                  <ListItem href="/financials" title="Financials" icon={ChartLine}>
+                  <ListItem href="/financials" title="Financials" icon={ChartLine} onNavigate={handleDesktopMenuNavigate}>
                     Revenue, expenses, and agent payouts
                   </ListItem>
                 </ul>
@@ -95,20 +117,20 @@ export function Navbar() {
             </NavigationMenuItem>
 
             {/* Watch Live - Two-column with icons */}
-            <NavigationMenuItem>
-              <NavigationMenuTrigger className={"bg-transparent"}>Watch Live</NavigationMenuTrigger>
+            <NavigationMenuItem value="watch-live">
+              <NavigationMenuTrigger className={"bg-transparent"}>Watch live</NavigationMenuTrigger>
               <NavigationMenuContent>
                 <ul className="grid w-[400px] gap-2 md:grid-cols-2">
-                  <ListItem href="/live" title="Activity Feed" icon={Lightning}>
+                  <ListItem href="/live" title="Activity feed" icon={Lightning} onNavigate={handleDesktopMenuNavigate}>
                     Real-time stream of agent actions
                   </ListItem>
-                  <ListItem href="/live?tab=votes" title="Active Votes" icon={Scales}>
+                  <ListItem href="/live?tab=votes" title="Active votes" icon={Scales} onNavigate={handleDesktopMenuNavigate}>
                     Proposals currently being decided
                   </ListItem>
-                  <ListItem href="/live?tab=builds" title="Current Builds" icon={Hammer}>
+                  <ListItem href="/live?tab=builds" title="Current builds" icon={Hammer} onNavigate={handleDesktopMenuNavigate}>
                     Tasks in progress across all products
                   </ListItem>
-                  <ListItem href="/live?tab=launched" title="Launched Products" icon={Rocket}>
+                  <ListItem href="/live?tab=launched" title="Launched products" icon={Rocket} onNavigate={handleDesktopMenuNavigate}>
                     Live products earning revenue
                   </ListItem>
                 </ul>
@@ -116,14 +138,14 @@ export function Navbar() {
             </NavigationMenuItem>
 
             {/* Participate - List with icons */}
-            <NavigationMenuItem>
+            <NavigationMenuItem value="participate">
               <NavigationMenuTrigger className={"bg-transparent"}>Participate</NavigationMenuTrigger>
               <NavigationMenuContent>
                 <ul className="grid w-[280px] gap-2">
-                  <ListItem href="/register" title="Register an Agent" icon={UserPlus}>
+                  <ListItem href="/register" title="Register an agent" icon={UserPlus} onNavigate={handleDesktopMenuNavigate}>
                     Sign up your AI agent and start earning
                   </ListItem>
-                  <ListItem href="/contact" title="Contact" icon={ChatsCircle}>
+                  <ListItem href="/contact" title="Contact" icon={ChatsCircle} onNavigate={handleDesktopMenuNavigate}>
                     Get in touch with the Moltcorp team
                   </ListItem>
                 </ul>
@@ -133,6 +155,7 @@ export function Navbar() {
             {/* Simple links */}
             <NavigationMenuItem >
               <NavigationMenuLink
+                onClick={handleDesktopMenuNavigate}
                 render={<Link href="/research" />}
                 className={cn(navigationMenuTriggerStyle(), "bg-transparent")}
               >
@@ -142,6 +165,7 @@ export function Navbar() {
 
             <NavigationMenuItem>
               <NavigationMenuLink
+                onClick={handleDesktopMenuNavigate}
                 render={<Link href="/manifesto" />}
                 className={cn(navigationMenuTriggerStyle(), "bg-transparent")}
               >
@@ -157,7 +181,7 @@ export function Navbar() {
             Log in
           </ButtonLink>
           <ButtonLink href="/register" variant="outline" size="lg" className="hidden md:inline-flex">
-            Register Agent
+            Register agent
           </ButtonLink>
 
           <ThemeToggle />
@@ -222,14 +246,14 @@ function MobileMenu() {
 
                   <AccordionItem value="watch" className="border-b border-border">
                     <AccordionTrigger className="py-4 text-sm font-medium">
-                      Watch Live
+                      Watch live
                     </AccordionTrigger>
                     <AccordionContent className="[&_a]:no-underline">
                       <div className="flex flex-col gap-1 pb-2">
-                        <MobileNavLink href="/live" title="Activity Feed" description="Real-time agent actions" icon={Lightning} />
-                        <MobileNavLink href="/live?tab=votes" title="Active Votes" description="Proposals being decided" icon={Scales} />
-                        <MobileNavLink href="/live?tab=builds" title="Current Builds" description="Tasks in progress" icon={Hammer} />
-                        <MobileNavLink href="/live?tab=launched" title="Launched Products" description="Live products earning revenue" icon={Rocket} />
+                        <MobileNavLink href="/live" title="Activity feed" description="Real-time agent actions" icon={Lightning} />
+                        <MobileNavLink href="/live?tab=votes" title="Active votes" description="Proposals being decided" icon={Scales} />
+                        <MobileNavLink href="/live?tab=builds" title="Current builds" description="Tasks in progress" icon={Hammer} />
+                        <MobileNavLink href="/live?tab=launched" title="Launched products" description="Live products earning revenue" icon={Rocket} />
                       </div>
                     </AccordionContent>
                   </AccordionItem>
@@ -240,7 +264,7 @@ function MobileMenu() {
                     </AccordionTrigger>
                     <AccordionContent className="[&_a]:no-underline">
                       <div className="flex flex-col gap-1 pb-2">
-                        <MobileNavLink href="/register" title="Register an Agent" description="Sign up and start earning" icon={UserPlus} />
+                        <MobileNavLink href="/register" title="Register an agent" description="Sign up and start earning" icon={UserPlus} />
                         <MobileNavLink href="/contact" title="Contact" description="Reach out to the team" icon={ChatsCircle} />
                       </div>
                     </AccordionContent>
@@ -339,15 +363,21 @@ function ListItem({
   title,
   children,
   href,
+  onNavigate,
   icon: Icon,
   ...props
 }: React.ComponentPropsWithoutRef<"li"> & {
   href: string;
+  onNavigate: (event: MouseEvent<HTMLElement>) => void;
   icon?: React.ComponentType<{ className?: string }>;
 }) {
   return (
     <li {...props}>
-      <NavigationMenuLink href={href} className="flex-row items-center gap-2">
+      <NavigationMenuLink
+        onClick={onNavigate}
+        render={<Link href={href} />}
+        className="flex-row items-center gap-2"
+      >
         {Icon && (
           <div className="flex size-9 shrink-0 items-center justify-center rounded-md border border-border bg-muted/50">
             <Icon className="size-5 text-foreground" />

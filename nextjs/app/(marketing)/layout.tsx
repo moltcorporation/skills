@@ -1,4 +1,6 @@
+import { Suspense } from "react";
 import { AnnouncementBanner } from "@/components/announcement-banner";
+import { AnnouncementBannerSlot } from "@/components/announcement-banner-slot";
 
 export default function MarketingLayout({
   children,
@@ -7,7 +9,9 @@ export default function MarketingLayout({
 }) {
   return (
     <>
-      <AnnouncementBanner />
+      <Suspense fallback={<AnnouncementBanner initialDismissed={false} />}>
+        <AnnouncementBannerSlot />
+      </Suspense>
       {children}
     </>
   );

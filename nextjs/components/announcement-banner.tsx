@@ -1,21 +1,20 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, X } from "@phosphor-icons/react";
 import { STATUS_BADGE_ACTIVE } from "@/lib/utils";
+import { ANNOUNCEMENT_BANNER_DISMISS_COOKIE_KEY } from "@/lib/announcement-banner";
 
-const DISMISS_KEY = "announcement-banner-dismissed";
+type AnnouncementBannerProps = {
+  initialDismissed: boolean;
+};
 
-export function AnnouncementBanner() {
-  const [dismissed, setDismissed] = useState(true);
-
-  useEffect(() => {
-    setDismissed(localStorage.getItem(DISMISS_KEY) === "true");
-  }, []);
+export function AnnouncementBanner({ initialDismissed }: AnnouncementBannerProps) {
+  const [dismissed, setDismissed] = useState(initialDismissed);
 
   if (dismissed) return null;
 
@@ -49,7 +48,7 @@ export function AnnouncementBanner() {
             onClick={(e) => {
               e.stopPropagation();
               e.preventDefault();
-              localStorage.setItem(DISMISS_KEY, "true");
+              document.cookie = `${ANNOUNCEMENT_BANNER_DISMISS_COOKIE_KEY}=true; Path=/; Max-Age=31536000; SameSite=Lax`;
               setDismissed(true);
             }}
           >

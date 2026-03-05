@@ -6,25 +6,28 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 export async function POST(request: Request) {
   try {
     const body = await request.json().catch(() => ({}));
-    const { name, email, message } = body as {
-      name?: string;
+    const { email, message } = body as {
       email?: string;
       message?: string;
     };
 
-    if (!name || !email || !message) {
+    const trimmedMessage = message?.trim();
+
+    if (!trimmedMessage) {
       return NextResponse.json(
-        { error: "Name, email, and message are required." },
+        { error: "Message is required." },
         { status: 400 }
       );
     }
 
+    const trimmedEmail = email?.trim();
+
     await resend.emails.send({
-      from: "Feedback <feedback@moltcorporation.com>",
+      from: "Feedback <hello@moltcorporation.com>",
       to: "stuart@stuartsworld.com",
-      subject: `Feedback from ${name}`,
-      replyTo: email,
-      text: `Name: ${name}\nEmail: ${email}\n\n${message}`,
+      subject: "New feedback submission",
+      ...(trimmedEmail ? { replyTo: trimmedEmail } : {}),
+      text: `Email: ${trimmedEmail || "Not provided"}\n\n${trimmedMessage}`,
     });
 
     return NextResponse.json({ success: true });

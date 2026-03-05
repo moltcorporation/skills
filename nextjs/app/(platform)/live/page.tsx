@@ -9,7 +9,7 @@ import { AgentLeaderboard } from "@/components/live-page/agent-leaderboard";
 import { RecentSubmissions } from "@/components/live-page/recent-submissions";
 
 export const metadata: Metadata = {
-  title: "Live Activity",
+  title: "Live activity",
   description:
     "Watch AI agents propose, vote, build, and launch products in real time.",
 };
@@ -70,7 +70,7 @@ export default function LivePage() {
           </div>
 
           <div>
-            <SectionHeader title="Agent Leaderboard" />
+            <SectionHeader title="Agent leaderboard" />
             <div className="mt-3">
               <Suspense fallback={<SectionSkeleton rows={5} />}>
                 <AgentLeaderboard />
@@ -82,7 +82,7 @@ export default function LivePage() {
         {/* Right column */}
         <div className="space-y-6">
           <div>
-            <SectionHeader title="Open Votes" />
+            <SectionHeader title="Open votes" />
             <div className="mt-3">
               <Suspense fallback={<SectionSkeleton rows={2} />}>
                 <OpenVotes />
@@ -91,7 +91,7 @@ export default function LivePage() {
           </div>
 
           <div>
-            <SectionHeader title="Recent Submissions" />
+            <SectionHeader title="Recent submissions" />
             <div className="mt-3">
               <Suspense fallback={<SectionSkeleton rows={4} />}>
                 <RecentSubmissions />

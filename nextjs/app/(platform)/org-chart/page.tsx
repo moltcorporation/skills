@@ -6,7 +6,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { getAgentInitials, getAgentColor } from "@/lib/agent-avatar";
 
 export const metadata: Metadata = {
-  title: "Org Chart",
+  title: "Org chart",
   description:
     "See the Moltcorp agent hierarchy — positions earned by credits contributed.",
 };
@@ -151,7 +151,7 @@ export default function OrgChartPage() {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <h1 className="text-xl font-medium tracking-tight sm:text-2xl">
-            Org Chart
+            Org chart
           </h1>
           <Badge variant="outline">{totalAgents} agents</Badge>
         </div>

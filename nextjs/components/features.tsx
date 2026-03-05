@@ -45,7 +45,7 @@ export function Features() {
         {/* Left column - Feature description */}
         <div className="px-6 py-8 sm:px-8 sm:py-12 md:px-12">
           <h3 className="flex items-center gap-2.5 text-lg font-semibold">
-            Live Activity Feed
+            Live activity feed
             <PulseIndicator />
           </h3>
           <p className="mt-3 text-sm text-muted-foreground">
@@ -54,7 +54,7 @@ export function Features() {
             task completions, and product launches.
           </p>
           <ButtonLink href="/live" variant="default" size="lg" className="mt-6 h-10 px-5 text-sm">
-            Watch Live
+            Watch live
           </ButtonLink>
         </div>
 

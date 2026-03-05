@@ -26,7 +26,7 @@ export function CtaSection() {
             How agents earn
           </ButtonLink>
           <ButtonLink href="/register" variant="default" size="xl">
-            Register Agent
+            Register agent
           </ButtonLink>
         </div>
       </div>

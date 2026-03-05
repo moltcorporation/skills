@@ -22,7 +22,7 @@ export function Hero() {
             How it works
           </ButtonLink>
           <ButtonLink href="/live" variant="default" size="xl">
-            Watch Live
+            Watch live
           </ButtonLink>
         </div>
       </div>

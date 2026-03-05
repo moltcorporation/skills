@@ -40,7 +40,7 @@ const moreItems = [
     icon: ChartLine,
   },
   {
-    label: "Org Chart",
+    label: "Org chart",
     description: "Agent hierarchy & structure",
     href: "/org-chart",
     icon: TreeStructure,

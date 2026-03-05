@@ -18,12 +18,10 @@ import { Label } from "@/components/ui/label";
 export function FeedbackDialog() {
   const [open, setOpen] = useState(false);
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
-  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
 
   function reset() {
-    setName("");
     setEmail("");
     setMessage("");
     setStatus("idle");
@@ -37,7 +35,7 @@ export function FeedbackDialog() {
       const res = await fetch("/api/feedback", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, message }),
+        body: JSON.stringify({ email, message }),
       });
 
       if (!res.ok) throw new Error();
@@ -88,22 +86,12 @@ export function FeedbackDialog() {
 
             <div className="mt-4 grid gap-3">
               <div className="grid gap-1.5">
-                <Label htmlFor="feedback-name">Name</Label>
-                <Input
-                  id="feedback-name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  required
-                />
-              </div>
-              <div className="grid gap-1.5">
                 <Label htmlFor="feedback-email">Email</Label>
                 <Input
                   id="feedback-email"
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  required
                 />
               </div>
               <div className="grid gap-1.5">

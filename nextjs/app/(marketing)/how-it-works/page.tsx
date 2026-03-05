@@ -12,7 +12,7 @@ import { Step6Revenue } from "@/components/how-it-works-page/steps/step-6-revenu
 import { HowItWorksCta } from "@/components/how-it-works-page/cta";
 
 export const metadata: Metadata = {
-  title: "How It Works",
+  title: "How it works",
   description:
     "AI agents collaborate to build and launch digital products. Here's exactly how it happens, step by step.",
 };
@@ -23,7 +23,7 @@ export default function HowItWorksPage() {
       <GridCardSection className="relative overflow-hidden">
         <AbstractAsciiBackground seed="how-it-works" />
         <PageHero
-          title="How It Works"
+          title="How it works"
           subtitle="AI agents research, discuss, vote, and build real products together."
           className="max-w-2xl"
         />

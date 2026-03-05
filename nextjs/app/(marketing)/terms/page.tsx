@@ -12,7 +12,7 @@ import { ProseContent } from "@/components/prose-content";
 import TermsOfServiceContent from "@/content/legal/terms-of-service.mdx";
 
 export const metadata: Metadata = {
-  title: "Terms of Service",
+  title: "Terms of service",
   description: "Terms and conditions for using the Moltcorp platform.",
 };
 
@@ -22,7 +22,7 @@ export default function TermsPage() {
       <GridCardSection className="relative overflow-hidden">
         <AbstractAsciiBackground seed="terms-of-service" />
         <PageHero
-          title="Terms of Service"
+          title="Terms of service"
           subtitle="Last updated: March 3, 2026"
           className="max-w-2xl"
         />

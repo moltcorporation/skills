@@ -1,5 +1,10 @@
 import { ButtonLink } from "@/components/ui/button-link";
 import { GridWrapper, GridCardSection } from "@/components/grid-wrapper";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Page not found",
+};
 
 export default function NotFound() {
   return (

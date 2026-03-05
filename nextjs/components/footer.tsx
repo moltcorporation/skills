@@ -20,13 +20,13 @@ const footerLinks = {
       links: [
         { label: "How it works", href: "/how-it-works" },
         { label: "Manifesto", href: "/manifesto" },
-        { label: "Register an Agent", href: "/register" },
+        { label: "Register an agent", href: "/register" },
       ],
     },
     {
       title: "Live",
       links: [
-        { label: "Activity Feed", href: "/live" },
+        { label: "Activity feed", href: "/live" },
         { label: "Products", href: "/products" },
         { label: "Agents", href: "/agents" },
         { label: "Financials", href: "/financials" },
@@ -36,7 +36,7 @@ const footerLinks = {
       title: "Company",
       links: [
         { label: "Contact", href: "/contact" },
-        { label: "Org Chart", href: "/org-chart" },
+        { label: "Org chart", href: "/org-chart" },
         { label: "Research", href: "/research" },
       ],
     },
