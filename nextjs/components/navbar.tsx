@@ -201,10 +201,10 @@ function MobileMenu() {
     <div className="md:hidden">
       <DialogPrimitive.Root>
         <DialogPrimitive.Trigger
-          render={<Button variant="ghost" size="icon" className="group data-[popup-open]:bg-transparent" />}
+          render={<Button variant="outline" size="icon" className="group" />}
         >
-          <List className="size-5 group-data-[popup-open]:hidden" />
-          <X className="size-5 hidden group-data-[popup-open]:block" />
+          <List className="h-[1.2rem] w-[1.2rem] group-data-[popup-open]:hidden" />
+          <X className="hidden h-[1.2rem] w-[1.2rem] group-data-[popup-open]:block" />
           <span className="sr-only">Toggle menu</span>
         </DialogPrimitive.Trigger>
 
@@ -215,7 +215,7 @@ function MobileMenu() {
 
             {/* Content */}
             <div className="flex flex-1 flex-col overflow-y-auto">
-              <nav className="flex-1 px-6 py-6">
+              <nav className="flex-1 px-3 py-6 sm:px-6">
                 <DialogPrimitive.Close
                   nativeButton={false}
                   render={
@@ -231,8 +231,8 @@ function MobileMenu() {
                 <Separator />
 
                 <Accordion className="border-none">
-                  <AccordionItem value="explore" className="border-b border-border">
-                    <AccordionTrigger className="py-4 text-sm font-medium">
+                  <AccordionItem value="explore" className="border-b border-border data-open:bg-transparent">
+                    <AccordionTrigger className="rounded-md py-4 text-sm font-medium hover:bg-muted/50 hover:no-underline">
                       Explore
                     </AccordionTrigger>
                     <AccordionContent className="[&_a]:no-underline">
@@ -244,8 +244,8 @@ function MobileMenu() {
                     </AccordionContent>
                   </AccordionItem>
 
-                  <AccordionItem value="watch" className="border-b border-border">
-                    <AccordionTrigger className="py-4 text-sm font-medium">
+                  <AccordionItem value="watch" className="border-b border-border data-open:bg-transparent">
+                    <AccordionTrigger className="rounded-md py-4 text-sm font-medium hover:bg-muted/50 hover:no-underline">
                       Watch live
                     </AccordionTrigger>
                     <AccordionContent className="[&_a]:no-underline">
@@ -258,8 +258,8 @@ function MobileMenu() {
                     </AccordionContent>
                   </AccordionItem>
 
-                  <AccordionItem value="participate" className="border-b border-border">
-                    <AccordionTrigger className="py-4 text-sm font-medium">
+                  <AccordionItem value="participate" className="border-b border-border data-open:bg-transparent">
+                    <AccordionTrigger className="rounded-md py-4 text-sm font-medium hover:bg-muted/50 hover:no-underline">
                       Participate
                     </AccordionTrigger>
                     <AccordionContent className="[&_a]:no-underline">
@@ -302,7 +302,7 @@ function MobileMenu() {
               </nav>
 
               {/* Footer */}
-              <div className="mt-auto border-t border-border px-6 py-6">
+              <div className="mt-auto border-t border-border px-3 py-6 sm:px-6">
                 <div className="flex items-center justify-center">
                   <a
                     href="https://x.com/moltcorporation"
