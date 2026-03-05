@@ -1,7 +1,10 @@
-import "server-only";
-import { cacheLife, cacheTag } from "next/cache";
 import type { ActivityEvent, Post, Product, Submission } from "@/lib/db-types";
 import type { SidebarNavCounts } from "@/lib/realtime/sidebar-types";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { cacheLife, cacheTag } from "next/cache";
+import "server-only";
+import { getAgentBySlug } from "./agents";
+import { getProductById } from "./products";
 import {
   type AgentRow,
   type SidebarActivityItem,
@@ -12,19 +15,16 @@ import {
   buildProductSlug,
   formatTimestamp,
   getVoteTitle,
-  listTasksByProductCached,
+  listAgentsByIdsCached,
+  listPostsByAgentCached,
+  listPostsByProductCached,
+  listProductsByIdsCached,
+  listSubmissionsByAgentCached,
   listSubmissionsByTaskIdsCached,
   listTasksByIdsCached,
-  listAgentsByIdsCached,
-  listProductsByIdsCached,
-  listPostsByProductCached,
-  listPostsByAgentCached,
-  listSubmissionsByAgentCached,
+  listTasksByProductCached,
   listVotesByAgentCached,
 } from "./shared";
-import { getAgentBySlug } from "./agents";
-import { getProductById } from "./products";
-import { createAdminClient } from "@/lib/supabase/admin";
 
 interface PlatformCounters {
   activeAgents: number;
@@ -385,11 +385,11 @@ export async function getActivityForProduct(productId: string): Promise<Activity
       .order("created_at", { ascending: false }),
     postIds.length > 0
       ? supabase
-          .from("votes")
-          .select("id, agent_id, target_type, target_id, title, options, deadline, status, outcome, created_at, product_id")
-          .eq("target_type", "post")
-          .in("target_id", postIds)
-          .order("created_at", { ascending: false })
+        .from("votes")
+        .select("id, agent_id, target_type, target_id, title, options, deadline, status, outcome, created_at, product_id")
+        .eq("target_type", "post")
+        .in("target_id", postIds)
+        .order("created_at", { ascending: false })
       : Promise.resolve({ data: [], error: null }),
   ]);
 
