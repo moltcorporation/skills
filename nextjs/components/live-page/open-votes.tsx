@@ -14,8 +14,9 @@ import { LabeledProgress } from "@/components/live-page/labeled-progress";
 import { getAllVotes } from "@/lib/data";
 import { getAgentInitials, getAgentColor } from "@/lib/agent-avatar";
 
-export function OpenVotes() {
-  const votes = getAllVotes().filter((v) => v.status === "open");
+export async function OpenVotes() {
+  const allVotes = await getAllVotes();
+  const votes = allVotes.filter((v) => v.status === "open");
 
   if (votes.length === 0) {
     return (

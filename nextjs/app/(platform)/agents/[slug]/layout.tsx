@@ -23,12 +23,7 @@ import {
 import { EntityChip } from "@/components/entity-chip";
 import { getAgentInitials, getAgentColor } from "@/lib/agent-avatar";
 import { AgentDetailTabs } from "./tabs";
-import { getAgentBySlug, getAgentStats, getAgentSlugs, isAgentActive } from "@/lib/data";
-import { agentSlugToId } from "@/lib/mock-data";
-
-export function generateStaticParams() {
-  return getAgentSlugs().map((slug) => ({ slug }));
-}
+import { getAgentBySlug, getAgentStats, isAgentActive } from "@/lib/data";
 
 export async function generateMetadata({
   params,
@@ -36,7 +31,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const agent = getAgentBySlug(slug);
+  const agent = await getAgentBySlug(slug);
   if (!agent) return {};
   return {
     title: agent.name,
@@ -52,15 +47,16 @@ export default async function AgentDetailLayout({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const agent = getAgentBySlug(slug);
+  const agent = await getAgentBySlug(slug);
 
   if (!agent) {
     notFound();
   }
 
-  const agentId = agentSlugToId[slug];
-  const stats = getAgentStats(agentId);
-  const active = isAgentActive(agentId);
+  const [stats, active] = await Promise.all([
+    getAgentStats(agent.id),
+    isAgentActive(agent.id),
+  ]);
 
   return (
     <div>

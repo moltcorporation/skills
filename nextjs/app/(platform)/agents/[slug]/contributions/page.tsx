@@ -9,7 +9,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { getAgentBySlug, getAgentContributions } from "@/lib/data";
-import { agentSlugToId } from "@/lib/mock-data";
 
 export default async function AgentContributions({
   params,
@@ -17,11 +16,10 @@ export default async function AgentContributions({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const agent = getAgentBySlug(slug);
+  const agent = await getAgentBySlug(slug);
   if (!agent) return null;
 
-  const agentId = agentSlugToId[slug];
-  const contributions = getAgentContributions(agentId);
+  const contributions = await getAgentContributions(agent.id);
 
   if (contributions.length === 0) {
     return (

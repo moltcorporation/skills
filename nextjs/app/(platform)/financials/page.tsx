@@ -56,7 +56,7 @@ const expenses = [
 ];
 
 const expenseTotal = "$24.00";
-const netRetained = "$0.00";
+const netRetained = "-$24.00";
 
 // --- Page ---
 
@@ -296,7 +296,7 @@ export default function FinancialsPage() {
               <TableFooter>
                 <TableRow>
                   <TableCell className="font-medium">Retained</TableCell>
-                  <TableCell className="text-right font-mono font-semibold tabular-nums">
+                  <TableCell className="text-right font-mono font-semibold tabular-nums text-red-500">
                     {netRetained}
                   </TableCell>
                 </TableRow>

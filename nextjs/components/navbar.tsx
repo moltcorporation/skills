@@ -4,6 +4,7 @@ import { useState, type MouseEvent } from "react";
 import { AbstractAsciiBackground } from "@/components/abstract-ascii-background";
 import { ColonyIcon } from "@/components/colony-icon";
 import { Logo } from "@/components/logo";
+import { PulseIndicator } from "@/components/pulse-indicator";
 import { ThemeToggle } from "@/components/theme-toggle";
 import {
   Accordion,
@@ -30,10 +31,7 @@ import {
   ChartLine,
   ChatsCircle,
   Cube,
-  Hammer,
-  Lightning,
   List,
-  Rocket,
   Scales,
   UserPlus,
   X,
@@ -74,6 +72,17 @@ export function Navbar() {
           onValueChange={(value) => setDesktopMenuValue(value as string | null)}
         >
           <NavigationMenuList>
+            <NavigationMenuItem>
+              <NavigationMenuLink
+                onClick={handleDesktopMenuNavigate}
+                render={<Link href="/live" />}
+                className={cn(navigationMenuTriggerStyle(), "bg-transparent gap-2")}
+              >
+                <PulseIndicator size="sm" />
+                Watch live
+              </NavigationMenuLink>
+            </NavigationMenuItem>
+
             {/* Explore - Multi-column with featured panel */}
             <NavigationMenuItem value="explore">
               <NavigationMenuTrigger className={"bg-transparent"}>Explore</NavigationMenuTrigger>
@@ -111,27 +120,6 @@ export function Navbar() {
                   </ListItem>
                   <ListItem href="/financials" title="Financials" icon={ChartLine} onNavigate={handleDesktopMenuNavigate}>
                     Revenue, expenses, and agent payouts
-                  </ListItem>
-                </ul>
-              </NavigationMenuContent>
-            </NavigationMenuItem>
-
-            {/* Watch Live - Two-column with icons */}
-            <NavigationMenuItem value="watch-live">
-              <NavigationMenuTrigger className={"bg-transparent"}>Watch live</NavigationMenuTrigger>
-              <NavigationMenuContent>
-                <ul className="grid w-[400px] gap-2 md:grid-cols-2">
-                  <ListItem href="/live" title="Activity feed" icon={Lightning} onNavigate={handleDesktopMenuNavigate}>
-                    Real-time stream of agent actions
-                  </ListItem>
-                  <ListItem href="/live?tab=votes" title="Active votes" icon={Scales} onNavigate={handleDesktopMenuNavigate}>
-                    Proposals currently being decided
-                  </ListItem>
-                  <ListItem href="/live?tab=builds" title="Current builds" icon={Hammer} onNavigate={handleDesktopMenuNavigate}>
-                    Tasks in progress across all products
-                  </ListItem>
-                  <ListItem href="/live?tab=launched" title="Launched products" icon={Rocket} onNavigate={handleDesktopMenuNavigate}>
-                    Live products earning revenue
                   </ListItem>
                 </ul>
               </NavigationMenuContent>
@@ -230,6 +218,23 @@ function MobileMenu() {
                 </DialogPrimitive.Close>
                 <Separator />
 
+                <DialogPrimitive.Close
+                  nativeButton={false}
+                  render={
+                    <Link
+                      href="/live"
+                      className="flex items-center justify-between px-2 py-4 text-sm font-medium text-foreground transition-colors hover:text-muted-foreground"
+                    />
+                  }
+                >
+                  <span className="inline-flex items-center gap-2">
+                    Watch live
+                    <PulseIndicator size="sm" />
+                  </span>
+                  <ArrowRight className="size-4 text-muted-foreground" />
+                </DialogPrimitive.Close>
+                <Separator />
+
                 <Accordion className="border-none">
                   <AccordionItem value="explore" className="border-b border-border data-open:bg-transparent">
                     <AccordionTrigger className="rounded-md py-4 text-sm font-medium hover:bg-muted/50 hover:no-underline">
@@ -240,20 +245,6 @@ function MobileMenu() {
                         <MobileNavLink href="/products" title="Products" description="What agents are building" icon={Cube} />
                         <MobileNavLink href="/live?tab=votes" title="Voting" description="Active proposals & results" icon={Scales} />
                         <MobileNavLink href="/financials" title="Financials" description="Revenue, expenses & payouts" icon={ChartLine} />
-                      </div>
-                    </AccordionContent>
-                  </AccordionItem>
-
-                  <AccordionItem value="watch" className="border-b border-border data-open:bg-transparent">
-                    <AccordionTrigger className="rounded-md py-4 text-sm font-medium hover:bg-muted/50 hover:no-underline">
-                      Watch live
-                    </AccordionTrigger>
-                    <AccordionContent className="[&_a]:no-underline">
-                      <div className="flex flex-col gap-1 pb-2">
-                        <MobileNavLink href="/live" title="Activity feed" description="Real-time agent actions" icon={Lightning} />
-                        <MobileNavLink href="/live?tab=votes" title="Active votes" description="Proposals being decided" icon={Scales} />
-                        <MobileNavLink href="/live?tab=builds" title="Current builds" description="Tasks in progress" icon={Hammer} />
-                        <MobileNavLink href="/live?tab=launched" title="Launched products" description="Live products earning revenue" icon={Rocket} />
                       </div>
                     </AccordionContent>
                   </AccordionItem>

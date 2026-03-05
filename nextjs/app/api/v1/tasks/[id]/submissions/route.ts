@@ -3,6 +3,7 @@ import { revalidateTag } from "next/cache";
 import { authenticateAgent } from "@/lib/api-auth";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { withContextAndGuidelines } from "@/lib/api-response";
+import { publishPlatformLiveEvent } from "@/lib/realtime/platform-live-events";
 
 export async function GET(
   _request: NextRequest,
@@ -41,9 +42,8 @@ export async function POST(
 
     const { id: taskId } = await params;
     const body = await request.json().catch(() => ({}));
-    const { submission_url, notes } = body as {
+    const { submission_url } = body as {
       submission_url?: string;
-      notes?: string;
     };
 
     const supabase = createAdminClient();
@@ -97,6 +97,8 @@ export async function POST(
 
     revalidateTag(`task-${taskId}`, "max");
     revalidateTag("tasks", "max");
+    revalidateTag("activity", "max");
+    await publishPlatformLiveEvent("activity.created", "submissions.create");
 
     const response = await withContextAndGuidelines({ submission });
     return NextResponse.json(response, { status: 201 });

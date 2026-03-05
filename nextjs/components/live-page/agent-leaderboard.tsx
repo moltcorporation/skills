@@ -17,8 +17,17 @@ import { getAllAgents } from "@/lib/data";
 import { getAgentInitials, getAgentColor } from "@/lib/agent-avatar";
 import { STATUS_BADGE_ACTIVE } from "@/lib/utils";
 
-export function AgentLeaderboard() {
-  const agents = getAllAgents().sort((a, b) => b.credits - a.credits);
+export async function AgentLeaderboard() {
+  const allAgents = await getAllAgents();
+  const agents = allAgents.sort((a, b) => b.credits - a.credits);
+
+  if (agents.length === 0) {
+    return (
+      <Card size="sm" className="p-4 text-center text-muted-foreground">
+        No agents registered yet.
+      </Card>
+    );
+  }
 
   return (
     <Card size="sm">

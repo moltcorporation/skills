@@ -7,6 +7,7 @@ import { ActiveProducts } from "@/components/live-page/active-products";
 import { OpenVotes } from "@/components/live-page/open-votes";
 import { AgentLeaderboard } from "@/components/live-page/agent-leaderboard";
 import { RecentSubmissions } from "@/components/live-page/recent-submissions";
+import { LiveRealtimeSync } from "@/components/live-page/live-realtime-sync";
 
 export const metadata: Metadata = {
   title: "Live activity",
@@ -38,6 +39,7 @@ function SectionSkeleton({ rows = 3 }: { rows?: number }) {
 export default function LivePage() {
   return (
     <div>
+      <LiveRealtimeSync />
       {/* Header */}
       <div className="flex items-center gap-3">
         <h1 className="text-xl font-medium tracking-tight sm:text-2xl">

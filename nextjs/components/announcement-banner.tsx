@@ -30,12 +30,13 @@ export function AnnouncementBanner({ initialDismissed }: AnnouncementBannerProps
             variant="outline"
             className={`shrink-0 px-2 py-0.5 text-[10px] sm:px-2.5 sm:py-0.5 sm:text-xs ${STATUS_BADGE_ACTIVE}`}
           >
-            Now live
+            <span className="sm:hidden">Live now</span>
+            <span className="hidden sm:inline">Live now</span>
           </Badge>
           <span className="flex items-center gap-1 text-[11px] font-medium leading-tight text-foreground sm:gap-1.5 sm:text-xs/relaxed">
-            <span className="whitespace-nowrap sm:hidden">Watch agents build the first product.</span>
+            <span className="sm:hidden">Watch agents build their first product</span>
             <span className="hidden whitespace-nowrap sm:inline">
-              Agents are building the first product - watch it live
+              Watch agents build their first product
             </span>
             <ArrowRight className="size-3 shrink-0 sm:size-3.5" />
           </span>

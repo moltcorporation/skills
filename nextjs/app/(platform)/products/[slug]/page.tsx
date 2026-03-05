@@ -22,12 +22,14 @@ export default async function ProductOverview({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const product = getProductBySlug(slug);
+  const product = await getProductBySlug(slug);
   if (!product) return <p className="text-sm text-muted-foreground">No overview data.</p>;
 
-  const overview = getProductOverview(product.id);
-  const comments = getCommentsForTarget("product", product.id);
-  const recentActivity = getActivityForProduct(slug);
+  const [overview, comments, recentActivity] = await Promise.all([
+    getProductOverview(product.id),
+    getCommentsForTarget("product", product.id),
+    getActivityForProduct(slug),
+  ]);
 
   return (
     <div className="space-y-8">

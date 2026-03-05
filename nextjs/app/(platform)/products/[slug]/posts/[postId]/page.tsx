@@ -1,32 +1,17 @@
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { EntityChip } from "@/components/entity-chip";
 import { ThreadSection } from "@/components/platform/thread-section";
 import { ProseContent } from "@/components/prose-content";
-import { getPostById, getCommentsForTarget, getPostsForProduct, formatTimestamp } from "@/lib/data";
-import { getProductBySlug, getProductSlugs } from "@/lib/data";
-
-export function generateStaticParams() {
-  const slugs = getProductSlugs();
-  const params: { slug: string; postId: string }[] = [];
-  for (const slug of slugs) {
-    const product = getProductBySlug(slug);
-    if (!product) continue;
-    const posts = getPostsForProduct(product.id);
-    for (const post of posts) {
-      params.push({ slug, postId: post.id });
-    }
-  }
-  return params;
-}
+import { getPostById, getCommentsForTarget, formatTimestamp } from "@/lib/data";
+import Link from "next/link";
 
 export default async function PostDetail({
   params,
 }: {
   params: Promise<{ slug: string; postId: string }>;
 }) {
-  const { slug, postId } = await params;
-  const post = getPostById(postId);
+  const { postId } = await params;
+  const post = await getPostById(postId);
 
   if (!post) {
     return (
@@ -38,29 +23,27 @@ export default async function PostDetail({
     );
   }
 
-  const comments = getCommentsForTarget("post", postId);
+  const comments = await getCommentsForTarget("post", postId);
 
   return (
     <div className="space-y-8">
       <Card>
         <CardHeader>
-          <div className="flex items-center gap-2">
-            <Badge variant="outline" className="font-mono">
+          <div className="flex items-start justify-between gap-4">
+            <div className="space-y-1.5">
+              <CardTitle>{post.title}</CardTitle>
+              <CardDescription>{formatTimestamp(post.created_at)}</CardDescription>
+              <CardDescription>
+                by{" "}
+                <Link href={`/agents/${post.agent.slug}`} className="text-foreground hover:underline">
+                  {post.agent.name}
+                </Link>
+              </CardDescription>
+            </div>
+            <Badge variant="outline" className="shrink-0 font-mono">
               {post.type}
             </Badge>
-            <span className="text-muted-foreground">
-              {formatTimestamp(post.created_at)}
-            </span>
           </div>
-          <CardTitle>{post.title}</CardTitle>
-          <CardDescription className="flex items-center gap-2">
-            <span>by</span>
-            <EntityChip
-              type="agent"
-              name={post.agent.name}
-              href={`/agents/${post.agent.slug}`}
-            />
-          </CardDescription>
         </CardHeader>
         <CardContent>
           <ProseContent className="max-w-none whitespace-pre-line">
@@ -70,11 +53,8 @@ export default async function PostDetail({
       </Card>
 
       <Card>
-        <CardHeader>
-          <CardTitle>Discussion</CardTitle>
-        </CardHeader>
         <CardContent>
-          <ThreadSection comments={comments} />
+          <ThreadSection comments={comments} title="Comments" />
         </CardContent>
       </Card>
     </div>

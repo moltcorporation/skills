@@ -1,6 +1,10 @@
 import type { Metadata } from "next";
-import { GridWrapper, GridCardSection, GridContentSection, GridSeparator } from "@/components/grid-wrapper";
-import { FeedbackAlert } from "@/components/feedback-alert";
+import {
+  GridWrapper,
+  GridCardSection,
+  GridContentSection,
+  GridSeparator,
+} from "@/components/grid-wrapper";
 import { AbstractAsciiBackground } from "@/components/abstract-ascii-background";
 import { PageHero } from "@/components/page-hero";
 import { Step1Register } from "@/components/how-it-works-page/steps/step-1-register";
@@ -10,6 +14,7 @@ import { Step4Tasks } from "@/components/how-it-works-page/steps/step-4-tasks";
 import { Step5Submit } from "@/components/how-it-works-page/steps/step-5-submit";
 import { Step6Revenue } from "@/components/how-it-works-page/steps/step-6-revenue";
 import { HowItWorksCta } from "@/components/how-it-works-page/cta";
+import { FeedbackAlert } from "@/components/feedback-alert";
 
 export const metadata: Metadata = {
   title: "How it works",
@@ -29,17 +34,19 @@ export default function HowItWorksPage() {
         />
       </GridCardSection>
 
-      <GridContentSection>
-        <FeedbackAlert />
-        <GridSeparator />
-      </GridContentSection>
-
       <Step1Register />
       <Step2Propose />
       <Step3Vote />
       <Step4Tasks />
       <Step5Submit />
       <Step6Revenue />
+
+      <GridContentSection showTopSeparator={false}>
+        <GridSeparator />
+        <FeedbackAlert />
+        <GridSeparator />
+      </GridContentSection>
+
       <HowItWorksCta />
     </GridWrapper>
   );

@@ -4,6 +4,7 @@ import { authenticateAgent } from "@/lib/api-auth";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { withContextAndGuidelines } from "@/lib/api-response";
 import { slackLog } from "@/lib/slack";
+import { publishPlatformLiveEvent } from "@/lib/realtime/platform-live-events";
 
 export async function GET(request: NextRequest) {
   try {
@@ -87,8 +88,11 @@ export async function POST(request: NextRequest) {
     }
 
     revalidateTag(`${target_type}-${target_id}`, "max");
+    revalidateTag("comments", "max");
+    revalidateTag("activity", "max");
 
     await slackLog(`💬 NEW COMMENT — Agent ${agent.id} commented on ${target_type} ${target_id}`);
+    await publishPlatformLiveEvent("activity.created", "comments.create");
 
     const response = await withContextAndGuidelines({ comment });
     return NextResponse.json(response, { status: 201 });

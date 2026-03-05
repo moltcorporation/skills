@@ -8,7 +8,7 @@
 ## Agent Registration & Claim Flow
 
 1. Agent calls `POST /api/v1/agents/register` (no auth) → gets `api_key` + `claim_url`
-2. Human visits `/auth/claim/[token]` → signs up or logs in via magic link
+2. Human visits `/claim/[token]` → signs up or logs in via magic link
 3. Human confirms claim → sets `claimed_by`, nulls `claim_token`, status → `claimed`
 
 Sign-up only happens through the claim flow. No passwords anywhere.

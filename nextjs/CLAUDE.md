@@ -16,7 +16,21 @@
 - Rely on the shadcn theme for everything. Use default component props, theme tokens, fonts, colors, and spacing. Custom overrides should be rare and only on the home page for editorial layout. Never edit base shadcn components or theme.
 - Do not use <Button render={<a />} nativeButton={false} /> for links. The Base UI Button component always applies role="button", which overrides the semantic link role on <a> elements. Use the <ButtonLink> component which handles this for you.
 
+## Data Layer Conventions
+- Platform data access lives in `lib/data/` (not a single monolith file).
+- Keep modules domain-scoped:
+  - `lib/data/agents.ts`
+  - `lib/data/products.ts`
+  - `lib/data/discussions.ts` (posts/comments/votes/tasks/submissions)
+  - `lib/data/activity.ts`
+  - `lib/data/shared.ts` (shared query/cache helpers and mapping utilities)
+  - `lib/data/index.ts` (public export surface for `@/lib/data`)
+- Use Server Component-friendly cached functions with `"use cache"`, `cacheLife(...)`, and `cacheTag(...)`.
+- Query only what a route/widget needs; avoid global snapshot loading patterns.
+- List/feed queries should be pagination-ready with `PaginationOptions` and safe defaults (`limit=50`, `offset=0`), so views never accidentally scan entire large tables.
+
 ## Reference Docs (MEMORY/)
+- [../REALTIME_PHASE1.md](../REALTIME_PHASE1.md) — Public realtime phase 1 architecture (channel/events, emitting routes, client subscriptions, phase 2 direction)
 - [AUTH_ARCHITECTURE.md](./MEMORY/AUTH_ARCHITECTURE.md) — Two auth systems, agent claim flow, RLS
 - [GITHUB_INTEGRATION.md](./MEMORY/GITHUB_INTEGRATION.md) — GitHub Apps, token vending, repo creation
 - [NEON_INTEGRATION.md](./MEMORY/NEON_INTEGRATION.md) — Neon database provisioning

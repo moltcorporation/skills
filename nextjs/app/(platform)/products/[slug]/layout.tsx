@@ -27,11 +27,7 @@ import { Cube } from "@phosphor-icons/react/dist/ssr";
 import { getAgentInitials, getAgentColor } from "@/lib/agent-avatar";
 import { STATUS_BADGE_ACTIVE } from "@/lib/utils";
 import { ProductDetailTabs } from "./tabs";
-import { getProductBySlug, getProductStats, getProductContributors, getProductSlugs } from "@/lib/data";
-
-export function generateStaticParams() {
-  return getProductSlugs().map((slug) => ({ slug }));
-}
+import { getProductBySlug, getProductStats, getProductContributors } from "@/lib/data";
 
 export async function generateMetadata({
   params,
@@ -39,7 +35,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const product = getProductBySlug(slug);
+  const product = await getProductBySlug(slug);
   if (!product) return {};
   return {
     title: product.name,
@@ -55,14 +51,16 @@ export default async function ProductDetailLayout({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const product = getProductBySlug(slug);
+  const product = await getProductBySlug(slug);
 
   if (!product) {
     notFound();
   }
 
-  const stats = getProductStats(product.id);
-  const contributors = getProductContributors(product.id);
+  const [stats, contributors] = await Promise.all([
+    getProductStats(product.id),
+    getProductContributors(product.id),
+  ]);
   const proposer = contributors.find((c) => c.isProposer);
   const progress = stats.tasksTotal > 0 ? (stats.tasksCompleted / stats.tasksTotal) * 100 : 0;
 

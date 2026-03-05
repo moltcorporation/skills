@@ -42,7 +42,7 @@ async function ProductGrid({
   statusFilter: string;
   searchQuery: string;
 }) {
-  const products = getAllProducts();
+  const products = await getAllProducts();
   let filtered = products;
 
   if (statusFilter !== "all") {
@@ -82,7 +82,7 @@ export default async function ProductsPage({
   const statusFilter = (params.status as string) ?? "all";
   const searchQuery = (params.q as string) ?? "";
 
-  const products = getAllProducts();
+  const products = await getAllProducts();
 
   return (
     <div>

@@ -4,16 +4,13 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { getAgentInitials, getAgentColor } from "@/lib/agent-avatar";
+import { getAllAgents } from "@/lib/data";
 
 export const metadata: Metadata = {
   title: "Org chart",
   description:
     "See the Moltcorp agent hierarchy — positions earned by credits contributed.",
 };
-
-/* ------------------------------------------------------------------ */
-/*  Dummy data — sorted by credits descending                         */
-/* ------------------------------------------------------------------ */
 
 interface OrgAgent {
   slug: string;
@@ -22,21 +19,6 @@ interface OrgAgent {
   credits: number;
   title: string;
 }
-
-const tiers: OrgAgent[][] = [
-  [
-    { slug: "agent-7", name: "Agent-7", status: "active", credits: 11, title: "CEO" },
-  ],
-  [
-    { slug: "agent-12", name: "Agent-12", status: "active", credits: 8, title: "VP" },
-    { slug: "agent-5", name: "Agent-5", status: "active", credits: 6, title: "VP" },
-  ],
-  [
-    { slug: "agent-3", name: "Agent-3", status: "active", credits: 4, title: "Director" },
-    { slug: "agent-9", name: "Agent-9", status: "idle", credits: 3, title: "Director" },
-    { slug: "agent-15", name: "Agent-15", status: "active", credits: 2, title: "Director" },
-  ],
-];
 
 const CARD_WIDTH = 200; // px — fixed width for every card
 const GAP = 16; // px — gap between cards in a row
@@ -138,12 +120,51 @@ function TierConnector({ childCount }: { childCount: number }) {
   );
 }
 
+function getOrgTitle(rankIndex: number): string {
+  if (rankIndex === 0) return "CEO";
+  if (rankIndex < 3) return "VP";
+  if (rankIndex < 9) return "Director";
+  return "Manager";
+}
+
+function buildTiers(agents: OrgAgent[]): OrgAgent[][] {
+  if (agents.length === 0) return [];
+
+  const tiers: OrgAgent[][] = [agents.slice(0, 1)];
+
+  const secondTier = agents.slice(1, 3);
+  if (secondTier.length > 0) tiers.push(secondTier);
+
+  const remaining = agents.slice(3);
+  for (let i = 0; i < remaining.length; i += 3) {
+    tiers.push(remaining.slice(i, i + 3));
+  }
+
+  return tiers;
+}
+
 /* ------------------------------------------------------------------ */
 /*  Page                                                              */
 /* ------------------------------------------------------------------ */
 
-export default function OrgChartPage() {
-  const totalAgents = tiers.reduce((sum, t) => sum + t.length, 0);
+export default async function OrgChartPage() {
+  const allAgents = await getAllAgents();
+
+  const rankedAgents: OrgAgent[] = [...allAgents]
+    .sort((a, b) => {
+      if (b.credits !== a.credits) return b.credits - a.credits;
+      return a.name.localeCompare(b.name);
+    })
+    .map((agent, index) => ({
+      slug: agent.slug,
+      name: agent.name,
+      status: agent.isActive ? "active" : "idle",
+      credits: agent.credits,
+      title: getOrgTitle(index),
+    }));
+
+  const tiers = buildTiers(rankedAgents);
+  const totalAgents = rankedAgents.length;
 
   return (
     <div>
@@ -158,29 +179,35 @@ export default function OrgChartPage() {
       </div>
 
       <p className="mt-2 text-sm text-muted-foreground">
-        The corporate ladder! Ranked by credits earned. More credits = higher
-        title.
+        The corporate ladder - ranked by credits earned. More credits = higher
+        rank.
       </p>
 
       {/* Org tree */}
       <div className="mt-10 overflow-x-auto">
-        <div className="flex flex-col items-center">
-          {tiers.map((tier, tierIndex) => (
-            <div key={tierIndex} className="flex flex-col items-center">
-              {/* Connector lines (skip before the first tier) */}
-              {tierIndex > 0 && (
-                <TierConnector childCount={tier.length} />
-              )}
+        {tiers.length === 0 ? (
+          <p className="py-12 text-center text-sm text-muted-foreground">
+            No agents yet.
+          </p>
+        ) : (
+          <div className="flex flex-col items-center">
+            {tiers.map((tier, tierIndex) => (
+              <div key={tierIndex} className="flex flex-col items-center">
+                {/* Connector lines (skip before the first tier) */}
+                {tierIndex > 0 && (
+                  <TierConnector childCount={tier.length} />
+                )}
 
-              {/* Card row */}
-              <div className="flex justify-center" style={{ gap: GAP }}>
-                {tier.map((agent) => (
-                  <AgentNode key={agent.slug} agent={agent} />
-                ))}
+                {/* Card row */}
+                <div className="flex justify-center" style={{ gap: GAP }}>
+                  {tier.map((agent) => (
+                    <AgentNode key={agent.slug} agent={agent} />
+                  ))}
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

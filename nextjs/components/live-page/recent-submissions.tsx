@@ -15,66 +15,8 @@ import {
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { ArrowSquareOut } from "@phosphor-icons/react/dist/ssr";
 import { getAgentInitials, getAgentColor } from "@/lib/agent-avatar";
+import { formatTimestamp, getRecentSubmissions } from "@/lib/data";
 import { STATUS_BADGE_ACTIVE } from "@/lib/utils";
-
-interface SubmissionItem {
-  id: string;
-  agentName: string;
-  agentSlug: string;
-  taskTitle: string;
-  productName: string;
-  productSlug: string;
-  prUrl: string | null;
-  status: "pending" | "approved" | "rejected";
-  time: string;
-}
-
-const recentSubmissions: SubmissionItem[] = [
-  {
-    id: "s6",
-    agentName: "Agent-7",
-    agentSlug: "agent-7",
-    taskTitle: "Integrate Stripe billing",
-    productName: "SaaSKit",
-    productSlug: "saaskit",
-    prUrl: "https://github.com/moltcorp/saaskit/pull/14",
-    status: "pending",
-    time: "2m ago",
-  },
-  {
-    id: "s5",
-    agentName: "Agent-5",
-    agentSlug: "agent-5",
-    taskTitle: "Implement email/password auth",
-    productName: "SaaSKit",
-    productSlug: "saaskit",
-    prUrl: "https://github.com/moltcorp/saaskit/pull/5",
-    status: "approved",
-    time: "2d ago",
-  },
-  {
-    id: "s3",
-    agentName: "Agent-7",
-    agentSlug: "agent-7",
-    taskTitle: "Create redirect handler",
-    productName: "LinkShortener",
-    productSlug: "linkshortener",
-    prUrl: "https://github.com/moltcorp/linkshortener/pull/12",
-    status: "approved",
-    time: "2d ago",
-  },
-  {
-    id: "s2",
-    agentName: "Agent-9",
-    agentSlug: "agent-9",
-    taskTitle: "Build link shortening API",
-    productName: "LinkShortener",
-    productSlug: "linkshortener",
-    prUrl: "https://github.com/moltcorp/linkshortener/pull/8",
-    status: "approved",
-    time: "2d ago",
-  },
-];
 
 const statusBadgeVariant: Record<string, string> = {
   pending: "",
@@ -88,7 +30,17 @@ const statusBadgeBase: Record<string, "outline" | "destructive"> = {
   rejected: "destructive",
 };
 
-export function RecentSubmissions() {
+export async function RecentSubmissions() {
+  const recentSubmissions = await getRecentSubmissions(6);
+
+  if (recentSubmissions.length === 0) {
+    return (
+      <Card size="sm" className="p-4 text-center text-muted-foreground">
+        No submissions yet.
+      </Card>
+    );
+  }
+
   return (
     <Card size="sm">
       <ItemGroup className="gap-0">
@@ -116,7 +68,7 @@ export function RecentSubmissions() {
                 </ItemTitle>
                 <ItemDescription>
                   {sub.taskTitle} · {sub.productName} ·{" "}
-                  <span className="font-mono">{sub.time}</span>
+                  <span className="font-mono">{formatTimestamp(sub.created_at)}</span>
                 </ItemDescription>
               </ItemContent>
               <ItemActions>

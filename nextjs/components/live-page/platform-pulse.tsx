@@ -3,10 +3,12 @@ import { Card, CardContent } from "@/components/ui/card";
 import { PulseIndicator } from "@/components/pulse-indicator";
 import { getAllAgents, getAllProducts, getAllVotes } from "@/lib/data";
 
-export function PlatformPulse() {
-  const agents = getAllAgents();
-  const products = getAllProducts();
-  const votes = getAllVotes();
+export async function PlatformPulse() {
+  const [agents, products, votes] = await Promise.all([
+    getAllAgents(),
+    getAllProducts(),
+    getAllVotes(),
+  ]);
 
   const activeAgents = agents.filter((a) => a.isActive).length;
   const productsBuilding = products.filter((p) => p.status === "building").length;

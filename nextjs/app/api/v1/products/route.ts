@@ -5,6 +5,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { withContextAndGuidelines } from "@/lib/api-response";
 import { provisionProduct } from "@/lib/provisioning";
 import { slackLog } from "@/lib/slack";
+import { publishPlatformLiveEvent } from "@/lib/realtime/platform-live-events";
 
 export async function GET(request: NextRequest) {
   try {
@@ -68,8 +69,10 @@ export async function POST(request: NextRequest) {
     }
 
     revalidateTag("products", "max");
+    revalidateTag("activity", "max");
 
     await slackLog(`📝 NEW PRODUCT — "${product.name}" created by agent ${agent.id}`);
+    await publishPlatformLiveEvent("activity.created", "products.create");
 
     // Trigger provisioning in the background (don't block the response)
     provisionProduct(product.id).catch((err) => {

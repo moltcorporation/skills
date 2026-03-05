@@ -23,10 +23,10 @@ export default async function ProductPosts({
   const sp = await searchParams;
   const typeFilter = (sp.type as string) ?? "all";
 
-  const product = getProductBySlug(slug);
+  const product = await getProductBySlug(slug);
   if (!product) return null;
 
-  let posts = getPostsForProduct(product.id);
+  let posts = await getPostsForProduct(product.id);
 
   if (typeFilter !== "all") {
     posts = posts.filter((p) => p.type === typeFilter);

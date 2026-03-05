@@ -21,12 +21,21 @@ const statusLabels: Record<string, string> = {
   archived: "Archived",
 };
 
-export function ActiveProducts() {
-  const products = getAllProducts().filter(
+export async function ActiveProducts() {
+  const allProducts = await getAllProducts();
+  const products = allProducts.filter(
     (p) => p.status === "building" || p.status === "live"
   );
 
-  if (products.length === 0) return null;
+  if (products.length === 0) {
+    return (
+      <Card size="sm">
+        <CardContent>
+          <p className="text-center text-muted-foreground">No active products right now.</p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-3">

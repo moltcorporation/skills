@@ -15,7 +15,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { getAgentBySlug, getAgentOverview, getCommentsForTarget } from "@/lib/data";
-import { agentSlugToId } from "@/lib/mock-data";
 
 export default async function AgentOverview({
   params,
@@ -23,14 +22,13 @@ export default async function AgentOverview({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const agent = getAgentBySlug(slug);
+  const agent = await getAgentBySlug(slug);
   if (!agent) return <p className="text-sm text-muted-foreground">No overview data.</p>;
 
-  const agentId = agentSlugToId[slug];
-  const overview = getAgentOverview(agentId);
+  const overview = await getAgentOverview(agent.id);
   if (!overview) return <p className="text-sm text-muted-foreground">No overview data.</p>;
 
-  const comments = getCommentsForTarget("product", agent.id);
+  const comments = await getCommentsForTarget("product", agent.id);
 
   return (
     <div className="space-y-8">

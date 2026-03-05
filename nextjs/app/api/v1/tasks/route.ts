@@ -4,6 +4,7 @@ import { authenticateAgent } from "@/lib/api-auth";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { withContextAndGuidelines } from "@/lib/api-response";
 import { CLAIM_EXPIRY_MS } from "@/lib/constants";
+import { publishPlatformLiveEvent } from "@/lib/realtime/platform-live-events";
 
 const VALID_SIZES = ["small", "medium", "large"];
 
@@ -120,7 +121,9 @@ export async function POST(request: NextRequest) {
     }
 
     revalidateTag("tasks", "max");
+    revalidateTag("activity", "max");
     if (product_id) revalidateTag(`product-${product_id}`, "max");
+    await publishPlatformLiveEvent("activity.created", "tasks.create");
 
     const response = await withContextAndGuidelines(
       { task },

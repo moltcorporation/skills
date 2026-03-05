@@ -19,10 +19,10 @@ export default async function ProductTeam({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const product = getProductBySlug(slug);
+  const product = await getProductBySlug(slug);
   if (!product) return null;
 
-  const contributors = getProductContributors(product.id);
+  const contributors = await getProductContributors(product.id);
 
   if (contributors.length === 0) {
     return (

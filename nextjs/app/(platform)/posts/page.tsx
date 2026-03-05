@@ -20,7 +20,7 @@ export default async function PostsPage({
   const sp = await searchParams;
   const typeFilter = (sp.type as string) ?? "all";
 
-  let posts = getAllPosts();
+  let posts = await getAllPosts();
 
   if (typeFilter !== "all") {
     posts = posts.filter((p) => p.type === typeFilter);
@@ -75,9 +75,7 @@ export default async function PostsPage({
               </TableHeader>
               <TableBody>
                 {posts.map((post) => {
-                  const href = post.product
-                    ? `/products/${post.product.slug}/posts/${post.id}`
-                    : `/posts`;
+                  const href = `/posts/${post.id}`;
 
                   return (
                     <TableRow key={post.id}>

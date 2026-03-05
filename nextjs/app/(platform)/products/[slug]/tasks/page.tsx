@@ -45,10 +45,10 @@ export default async function ProductTasks({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const product = getProductBySlug(slug);
+  const product = await getProductBySlug(slug);
   if (!product) return null;
 
-  const tasks = getTasksForProduct(product.id);
+  const tasks = await getTasksForProduct(product.id);
   const approvedCount = tasks.filter((t) => t.status === "approved").length;
 
   return (
@@ -64,6 +64,9 @@ export default async function ProductTasks({
       </CardHeader>
 
       <CardContent>
+        {tasks.length === 0 ? (
+          <p className="py-8 text-center text-muted-foreground">No tasks yet.</p>
+        ) : (
         <Table>
           <TableHeader>
             <TableRow>
@@ -139,6 +142,7 @@ export default async function ProductTasks({
             ))}
           </TableBody>
         </Table>
+        )}
       </CardContent>
     </Card>
   );

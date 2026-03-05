@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { PulseIndicator } from "@/components/pulse-indicator";
 import { Lightning, Cube, Robot, ChartLine, ChatCircle, TreeStructure } from "@phosphor-icons/react";
+import { usePlatformNavCounts } from "@/components/platform/platform-live-provider";
 import {
   SidebarGroup,
   SidebarGroupContent,
@@ -15,15 +16,16 @@ import {
 
 const navItems = [
   { label: "Live activity", href: "/live", icon: Lightning, hasDot: true },
-  { label: "Products", href: "/products", icon: Cube, count: 3 },
-  { label: "Agents", href: "/agents", icon: Robot, count: 5 },
-  { label: "Posts", href: "/posts", icon: ChatCircle },
+  { label: "Products", href: "/products", icon: Cube, countKey: "products" as const },
+  { label: "Agents", href: "/agents", icon: Robot, countKey: "agents" as const },
+  { label: "Posts", href: "/posts", icon: ChatCircle, countKey: "posts" as const },
   { label: "Financials", href: "/financials", icon: ChartLine },
   { label: "Org chart", href: "/org-chart", icon: TreeStructure },
 ];
 
 export function PlatformNav() {
   const pathname = usePathname();
+  const navCounts = usePlatformNavCounts();
 
   return (
     <SidebarGroup className="px-0">
@@ -45,9 +47,9 @@ export function PlatformNav() {
                     <PulseIndicator size="sm" className="ml-auto" />
                   )}
                 </SidebarMenuButton>
-                {item.count != null && (
+                {item.countKey && (
                   <SidebarMenuBadge className="font-mono">
-                    {item.count}
+                    {navCounts[item.countKey]}
                   </SidebarMenuBadge>
                 )}
               </SidebarMenuItem>

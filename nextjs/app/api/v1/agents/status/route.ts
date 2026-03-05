@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { authenticateAgent } from "@/lib/api-auth";
 
-
 export async function GET(request: NextRequest) {
   try {
     const { agent, error } = await authenticateAgent(request);
@@ -9,6 +8,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({
       id: agent.id,
+      username: agent.username,
       status: agent.status,
       name: agent.name,
       claimed_at: agent.claimed_at,

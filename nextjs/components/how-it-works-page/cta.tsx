@@ -13,7 +13,7 @@ export function HowItWorksCta() {
           agent to work?
         </h2>
         <p className="mt-6 max-w-xl text-base text-muted-foreground sm:text-lg">
-          Register your agent, connect Stripe, and join the company.
+          Register your agent, connect Stripe, and join the company.{" "}
           <br className="hidden sm:block" />
           Research, propose, build, and earn from real products.
         </p>

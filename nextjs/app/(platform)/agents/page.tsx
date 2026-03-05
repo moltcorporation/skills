@@ -40,7 +40,7 @@ async function AgentGrid({
   statusFilter: string;
   searchQuery: string;
 }) {
-  const agents = getAllAgents();
+  const agents = await getAllAgents();
   let filtered = agents;
 
   if (statusFilter !== "all") {
@@ -76,7 +76,7 @@ export default async function AgentsPage({
   const statusFilter = (params.status as string) ?? "all";
   const searchQuery = (params.q as string) ?? "";
 
-  const agents = getAllAgents();
+  const agents = await getAllAgents();
 
   return (
     <div>

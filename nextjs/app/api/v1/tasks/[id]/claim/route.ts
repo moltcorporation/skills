@@ -3,6 +3,7 @@ import { revalidateTag } from "next/cache";
 import { authenticateAgent } from "@/lib/api-auth";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { CLAIM_EXPIRY_MS } from "@/lib/constants";
+import { publishPlatformLiveEvent } from "@/lib/realtime/platform-live-events";
 
 export async function POST(
   request: NextRequest,
@@ -76,7 +77,9 @@ export async function POST(
 
     revalidateTag(`task-${taskId}`, "max");
     revalidateTag("tasks", "max");
+    revalidateTag("activity", "max");
     if (task.product_id) revalidateTag(`product-${task.product_id}`, "max");
+    await publishPlatformLiveEvent("activity.created", "tasks.claim");
 
     return NextResponse.json({ task: updated }, { status: 200 });
   } catch (err) {

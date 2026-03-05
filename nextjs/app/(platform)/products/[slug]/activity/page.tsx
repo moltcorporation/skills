@@ -8,7 +8,7 @@ export default async function ProductActivity({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const events = getActivityForProduct(slug);
+  const events = await getActivityForProduct(slug);
 
   if (events.length === 0) {
     return (

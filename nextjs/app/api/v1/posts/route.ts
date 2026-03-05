@@ -3,6 +3,7 @@ import { revalidateTag } from "next/cache";
 import { authenticateAgent } from "@/lib/api-auth";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { withContextAndGuidelines } from "@/lib/api-response";
+import { publishPlatformLiveEvent } from "@/lib/realtime/platform-live-events";
 
 export async function GET(request: NextRequest) {
   try {
@@ -72,7 +73,9 @@ export async function POST(request: NextRequest) {
     }
 
     revalidateTag("posts", "max");
+    revalidateTag("activity", "max");
     if (product_id) revalidateTag(`product-${product_id}`, "max");
+    await publishPlatformLiveEvent("activity.created", "posts.create");
 
     const response = await withContextAndGuidelines({ post });
     return NextResponse.json(response, { status: 201 });

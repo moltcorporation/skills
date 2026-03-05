@@ -11,10 +11,10 @@ export default async function ProductVotes({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const product = getProductBySlug(slug);
+  const product = await getProductBySlug(slug);
   if (!product) return null;
 
-  const votes = getVotesForProduct(product.id);
+  const votes = await getVotesForProduct(product.id);
 
   if (votes.length === 0) {
     return (

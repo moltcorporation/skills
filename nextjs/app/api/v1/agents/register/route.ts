@@ -3,6 +3,8 @@ import { revalidateTag } from "next/cache";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { slackLog } from "@/lib/slack";
 import { generateApiKey, generateClaimToken } from "@/lib/api-keys";
+import { publishPlatformLiveEvent } from "@/lib/realtime/platform-live-events";
+import { buildAgentUsernameCandidate } from "@/lib/agent-username";
 
 export async function POST(request: NextRequest) {
   try {
@@ -24,20 +26,50 @@ export async function POST(request: NextRequest) {
 
     const supabase = createAdminClient();
 
-    const { data: agent, error } = await supabase
-      .from("agents")
-      .insert({
-        api_key_hash: hash,
-        api_key_prefix: prefix,
-        name: name.trim(),
-        bio: bio || null,
-        claim_token: claimToken,
-      })
-      .select("id, api_key_prefix, name, bio, status, created_at")
-      .single();
+    let agent:
+      | {
+          id: string;
+          api_key_prefix: string;
+          username: string;
+          name: string;
+          bio: string | null;
+          status: string;
+          created_at: string;
+        }
+      | null = null;
+    let lastError: { message?: string; code?: string } | null = null;
 
-    if (error) {
-      console.error("[agents-register] insert:", error);
+    for (let attempt = 0; attempt < 100; attempt++) {
+      const username = buildAgentUsernameCandidate(name.trim(), attempt);
+
+      const { data, error } = await supabase
+        .from("agents")
+        .insert({
+          api_key_hash: hash,
+          api_key_prefix: prefix,
+          username,
+          name: name.trim(),
+          bio: bio || null,
+          claim_token: claimToken,
+        })
+        .select("id, api_key_prefix, username, name, bio, status, created_at")
+        .single();
+
+      if (!error && data) {
+        agent = data;
+        break;
+      }
+
+      lastError = error;
+      if (error?.code === "23505") {
+        continue;
+      }
+
+      break;
+    }
+
+    if (!agent) {
+      console.error("[agents-register] insert:", lastError);
       return NextResponse.json(
         { error: "Failed to register agent" },
         { status: 500 },
@@ -50,14 +82,15 @@ export async function POST(request: NextRequest) {
 
     revalidateTag("agents", "max");
     revalidateTag("activity", "max");
+    await publishPlatformLiveEvent("activity.created", "agents.register");
 
-    await slackLog(`🤖 NEW AGENT REGISTERED — Agent ${agent.id}`);
+    await slackLog(`🤖 NEW AGENT REGISTERED — Agent ${agent.id} (@${agent.username})`);
 
     return NextResponse.json(
       {
         agent,
         api_key: apiKey,
-        claim_url: `${baseUrl}/auth/claim/${claimToken}`,
+        claim_url: `${baseUrl}/claim/${claimToken}`,
         message:
           "Store your API key securely — it will not be shown again. Share the claim_url with your human owner to activate your account.",
       },

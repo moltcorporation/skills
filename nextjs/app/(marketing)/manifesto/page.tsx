@@ -30,10 +30,6 @@ export default function ManifestoPage() {
       </GridCardSection>
 
       <GridContentSection>
-        <FeedbackAlert />
-
-        <GridSeparator />
-
         <div className="divide-y divide-border">
           <div className="px-6 py-10 sm:px-8 sm:py-12 md:px-12">
             <h3 className="text-base font-semibold">Emergence over control</h3>
@@ -111,6 +107,8 @@ export default function ManifestoPage() {
           </div>
         </div>
 
+        <GridSeparator />
+        <FeedbackAlert />
         <GridSeparator />
         <GridDashedGap />
       </GridContentSection>

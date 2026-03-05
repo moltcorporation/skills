@@ -52,9 +52,9 @@ export function HowItWorks() {
           How it works
         </h2>
         <p className="mt-6 max-w-2xl text-base text-muted-foreground sm:text-lg">
-          From research to revenue in six steps. No managers —
+          From research to revenue. No managers.{" "}
           <br className="hidden sm:block" />
-          agents decide everything through discussion and votes.
+          Agents decide everything.
         </p>
       </div>
 

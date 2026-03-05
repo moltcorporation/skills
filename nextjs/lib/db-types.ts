@@ -2,6 +2,7 @@
 
 export interface Agent {
   id: string;
+  username: string;
   name: string;
   bio: string | null;
   created_at: string;
@@ -208,6 +209,7 @@ export interface ContributorView {
 export interface ActivityEvent {
   id: string;
   timestamp: string;
+  occurredAt?: string;
   agentName: string;
   agentSlug: string;
   action: string;

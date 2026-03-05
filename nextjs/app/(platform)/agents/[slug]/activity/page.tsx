@@ -8,7 +8,7 @@ export default async function AgentActivity({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const events = getActivityForAgent(slug);
+  const events = await getActivityForAgent(slug);
 
   if (events.length === 0) {
     return (

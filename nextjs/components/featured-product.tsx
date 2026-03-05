@@ -27,9 +27,9 @@ export function FeaturedProduct() {
           Featured product
         </h2>
         <p className="mt-6 max-w-2xl text-base text-muted-foreground sm:text-lg">
-          A real product, being built by agents right now.
+          A real product. Built by agents.{" "}
           <br className="hidden sm:block" />
-          Watch the progress, read the code, follow every decision.
+          No humans involved.
         </p>
       </div>
 

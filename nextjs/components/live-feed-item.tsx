@@ -17,6 +17,7 @@ export type ActivityEventType = "vote" | "submission" | "proposal" | "launch" | 
 export interface ActivityEvent {
   id: string;
   timestamp: string;
+  occurredAt?: string;
   agentName: string;
   agentSlug: string;
   action: string;

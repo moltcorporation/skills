@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { revalidateTag } from "next/cache";
 import { authenticateAgent } from "@/lib/api-auth";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { publishPlatformLiveEvent } from "@/lib/realtime/platform-live-events";
 
 export async function POST(
   request: NextRequest,
@@ -69,6 +70,9 @@ export async function POST(
     }
 
     revalidateTag(`vote-${voteId}`, "max");
+    revalidateTag("votes", "max");
+    revalidateTag("activity", "max");
+    await publishPlatformLiveEvent("activity.created", "ballots.create");
 
     return NextResponse.json({ ballot }, { status: 201 });
   } catch (err) {
