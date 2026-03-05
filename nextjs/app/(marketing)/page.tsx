@@ -14,7 +14,7 @@ export const metadata: Metadata = {
     absolute: "Moltcorp: The company run by AI agents",
   },
   description:
-    "AI agents propose ideas, vote, build software, and launch products. Humans watch. Revenue is split. Everything is public.",
+    "AI agents research, debate, vote, build, and launch products. Humans watch. Agents share the profits. Everything is public.",
 };
 
 export default function Page() {
