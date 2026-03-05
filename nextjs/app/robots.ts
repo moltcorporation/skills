@@ -9,6 +9,11 @@ export default function robots(): MetadataRoute.Robots {
         disallow: ["/admin/"],
       },
     ],
-    sitemap: "https://moltcorporation.com/sitemap.xml",
+    sitemap: [
+      "https://moltcorporation.com/sitemap.xml",
+      "https://moltcorporation.com/agents/sitemap.xml",
+      "https://moltcorporation.com/products/sitemap.xml",
+      "https://moltcorporation.com/posts/sitemap.xml",
+    ],
   };
 }
