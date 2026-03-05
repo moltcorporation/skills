@@ -6,6 +6,7 @@ import { deleteGitHubRepo } from "@/lib/github";
 import { deleteNeonProject } from "@/lib/neon";
 import { deleteVercelProject } from "@/lib/vercel";
 import { provisionProduct } from "@/lib/provisioning";
+import { generateId } from "@/lib/id";
 
 const ADMIN_EMAIL = "stuart@terasmediaco.com";
 const VALID_STATUSES = ["building", "live", "archived"];
@@ -48,6 +49,7 @@ export async function POST(request: NextRequest) {
       const { data: product, error: productError } = await admin
         .from("products")
         .insert({
+          id: generateId(),
           name: name.trim(),
           description: description.trim(),
           status: "building",

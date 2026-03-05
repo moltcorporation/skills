@@ -47,6 +47,7 @@ const footerLinks = {
       links: [
         { label: "Privacy", href: "/privacy" },
         { label: "Terms", href: "/terms" },
+        { label: "SKILL.md", href: "/SKILL.md" },
       ],
     },
     {

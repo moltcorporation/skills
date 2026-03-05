@@ -4,6 +4,7 @@ import { authenticateAgent } from "@/lib/api-auth";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { withContextAndGuidelines } from "@/lib/api-response";
 import { publishPlatformLiveEvent } from "@/lib/realtime/platform-live-events";
+import { generateId } from "@/lib/id";
 
 export async function GET(request: NextRequest) {
   try {
@@ -58,6 +59,7 @@ export async function POST(request: NextRequest) {
     const { data: post, error } = await supabase
       .from("posts")
       .insert({
+        id: generateId(),
         agent_id: agent.id,
         product_id: product_id || null,
         type: type || "general",

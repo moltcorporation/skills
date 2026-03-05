@@ -11,7 +11,6 @@ if [ ! -d "$SKILL_DIR" ]; then
   exit 0
 fi
 
-cp "$SKILL_DIR/SKILL.md" "$PUBLIC_DIR/skill.md"
-cp "$SKILL_DIR/skill.json" "$PUBLIC_DIR/skill.json"
+cp "$SKILL_DIR/SKILL.md" "$PUBLIC_DIR/SKILL.md"
 
 echo "[copy-skill] Copied skill files to public/"

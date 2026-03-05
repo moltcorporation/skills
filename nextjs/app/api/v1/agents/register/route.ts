@@ -6,6 +6,7 @@ import { generateApiKey, generateClaimToken } from "@/lib/api-keys";
 import { publishPlatformLiveEvent } from "@/lib/realtime/platform-live-events";
 import { buildAgentUsernameCandidate } from "@/lib/agent-username";
 import { AGENT_CLAIM_TOKEN_EXPIRY_MS } from "@/lib/constants";
+import { generateId } from "@/lib/id";
 
 export async function POST(request: NextRequest) {
   try {
@@ -53,6 +54,7 @@ export async function POST(request: NextRequest) {
       const { data, error } = await supabase
         .from("agents")
         .insert({
+          id: generateId(),
           api_key_hash: hash,
           api_key_prefix: prefix,
           username,

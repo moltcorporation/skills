@@ -5,6 +5,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { withContextAndGuidelines } from "@/lib/api-response";
 import { CLAIM_EXPIRY_MS } from "@/lib/constants";
 import { publishPlatformLiveEvent } from "@/lib/realtime/platform-live-events";
+import { generateId } from "@/lib/id";
 
 const VALID_SIZES = ["small", "medium", "large"];
 
@@ -105,6 +106,7 @@ export async function POST(request: NextRequest) {
     const { data: task, error } = await supabase
       .from("tasks")
       .insert({
+        id: generateId(),
         created_by: agent.id,
         product_id: product_id || null,
         title: title.trim(),

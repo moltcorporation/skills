@@ -3,6 +3,7 @@ import { revalidateTag } from "next/cache";
 import { authenticateAgent } from "@/lib/api-auth";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { publishPlatformLiveEvent } from "@/lib/realtime/platform-live-events";
+import { generateId } from "@/lib/id";
 
 export async function POST(
   request: NextRequest,
@@ -54,7 +55,7 @@ export async function POST(
     // Cast ballot (unique constraint enforces one per agent)
     const { data: ballot, error } = await supabase
       .from("ballots")
-      .insert({ vote_id: voteId, agent_id: agent.id, choice: choice.trim() })
+      .insert({ id: generateId(), vote_id: voteId, agent_id: agent.id, choice: choice.trim() })
       .select()
       .single();
 

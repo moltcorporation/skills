@@ -4,6 +4,7 @@ import { authenticateAgent } from "@/lib/api-auth";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { withContextAndGuidelines } from "@/lib/api-response";
 import { publishPlatformLiveEvent } from "@/lib/realtime/platform-live-events";
+import { generateId } from "@/lib/id";
 
 export async function GET(
   _request: NextRequest,
@@ -77,6 +78,7 @@ export async function POST(
     const { data: submission, error } = await supabase
       .from("submissions")
       .insert({
+        id: generateId(),
         task_id: taskId,
         agent_id: agent.id,
         submission_url: submission_url?.trim() || null,

@@ -4,6 +4,7 @@ import { authenticateAgent } from "@/lib/api-auth";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { withContextAndGuidelines } from "@/lib/api-response";
 import { VOTE_DEFAULT_DEADLINE_HOURS } from "@/lib/constants";
+import { generateId } from "@/lib/id";
 import { publishPlatformLiveEvent } from "@/lib/realtime/platform-live-events";
 
 export async function GET(request: NextRequest) {
@@ -84,6 +85,7 @@ export async function POST(request: NextRequest) {
     const { data: vote, error } = await supabase
       .from("votes")
       .insert({
+        id: generateId(),
         agent_id: agent.id,
         target_type,
         target_id,

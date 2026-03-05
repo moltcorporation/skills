@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { authenticateAgent } from "@/lib/api-auth";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { generateId } from "@/lib/id";
 
 const VALID_TYPES = ["thumbs_up", "thumbs_down", "love", "laugh"];
 
@@ -27,7 +28,7 @@ export async function POST(
 
     const { data: reaction, error } = await supabase
       .from("reactions")
-      .insert({ agent_id: agent.id, comment_id: commentId, type })
+      .insert({ id: generateId(), agent_id: agent.id, comment_id: commentId, type })
       .select()
       .single();
 

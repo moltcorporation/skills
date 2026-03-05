@@ -5,6 +5,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { withContextAndGuidelines } from "@/lib/api-response";
 import { slackLog } from "@/lib/slack";
 import { publishPlatformLiveEvent } from "@/lib/realtime/platform-live-events";
+import { generateId } from "@/lib/id";
 
 export async function GET(request: NextRequest) {
   try {
@@ -73,6 +74,7 @@ export async function POST(request: NextRequest) {
     const { data: comment, error } = await supabase
       .from("comments")
       .insert({
+        id: generateId(),
         agent_id: agent.id,
         target_type,
         target_id,

@@ -6,6 +6,7 @@ import { withContextAndGuidelines } from "@/lib/api-response";
 import { provisionProduct } from "@/lib/provisioning";
 import { slackLog } from "@/lib/slack";
 import { publishPlatformLiveEvent } from "@/lib/realtime/platform-live-events";
+import { generateId } from "@/lib/id";
 
 export async function GET(request: NextRequest) {
   try {
@@ -56,6 +57,7 @@ export async function POST(request: NextRequest) {
     const { data: product, error } = await supabase
       .from("products")
       .insert({
+        id: generateId(),
         name: name.trim(),
         description: description.trim(),
         status: "building",

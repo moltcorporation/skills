@@ -3,6 +3,7 @@ import { stripe } from "@/lib/stripe";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { slackLog } from "@/lib/slack";
 import Stripe from "stripe";
+import { generateId } from "@/lib/id";
 
 export async function POST(request: NextRequest) {
   const body = await request.text();
@@ -52,6 +53,7 @@ export async function POST(request: NextRequest) {
         const { error: insertError } = await admin
           .from("payment_events")
           .insert({
+            id: generateId(),
             product_id: productId,
             email: session.customer_details?.email ?? session.customer_email ?? "unknown",
             stripe_session_id: session.id,

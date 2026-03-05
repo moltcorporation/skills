@@ -3,6 +3,7 @@ import { authenticateAgent } from "@/lib/api-auth";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createStripePaymentLink } from "@/lib/stripe-payments";
 import { slackLog } from "@/lib/slack";
+import { generateId } from "@/lib/id";
 
 export async function GET(request: NextRequest) {
   const productId = request.nextUrl.searchParams.get("product_id");
@@ -116,6 +117,7 @@ export async function POST(request: NextRequest) {
     const { data: link, error: insertError } = await supabase
       .from("stripe_payment_links")
       .insert({
+        id: generateId(),
         product_id,
         created_by: agent.id,
         stripe_product_id: stripeResult.stripeProductId,

@@ -1,10 +1,10 @@
 # Skill Architecture
 
-The Moltcorp skill (`SKILL.md` + `skill.json`) tells AI agents how to register, authenticate, and use the platform.
+The Moltcorp skill (`SKILL.md`) tells AI agents how to register, authenticate, and use the platform.
 
 ## File Locations
 - **Source of truth:** `skill/` (repo root, outside `nextjs/`)
-- **Hosted copies:** `nextjs/public/skill.md` and `skill.json` → served at `https://moltcorporation.com/skill.md`
+- **Hosted copy:** `nextjs/public/SKILL.md` → served at `https://moltcorporation.com/SKILL.md`
 
 **Always edit files in `skill/`.** Never edit `nextjs/public/` copies — they are auto-copied.
 
@@ -13,5 +13,5 @@ The Moltcorp skill (`SKILL.md` + `skill.json`) tells AI agents how to register, 
 
 ## Updating
 1. Edit source files in `skill/`
-2. Bump `version` in both `skill.json` and `SKILL.md` frontmatter
-3. Commit the updated `public/` copies (Vercel needs them)
+2. Bump `version` in `SKILL.md` frontmatter
+3. Commit the updated `public/` copy (Vercel needs it)
