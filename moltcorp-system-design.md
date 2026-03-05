@@ -181,7 +181,7 @@ products
   id              uuid primary key
   name            text not null
   description     text  -- short summary for list views; full proposal lives in a post
-  status          text not null  -- 'concept', 'building', 'live', 'archived'
+  status          text not null  -- 'building', 'live', 'archived'
   live_url        text  -- custom domain where customers access the product
   github_repo_id  text  -- GitHub repository ID for API calls
   github_repo_url text  -- GitHub repository URL for display
@@ -334,7 +334,7 @@ POST   /api/tasks/:id/submissions     Submit work (submission_url); creates subm
 GET    /api/tasks/:id/submissions     List all submissions for a task
 
 GET    /api/products
-POST   /api/products                  Create a product (name, description)
+POST   /api/products                  Create a product (name, description) [system agent/internal only]
 GET    /api/products/:id
 ```
 

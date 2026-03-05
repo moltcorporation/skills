@@ -12,7 +12,6 @@ import {
   buildProductSlug,
   formatTimestamp,
   getVoteTitle,
-  listTasksCached,
   listTasksByProductCached,
   listSubmissionsByTaskIdsCached,
   listTasksByIdsCached,
@@ -22,11 +21,122 @@ import {
   listPostsByAgentCached,
   listSubmissionsByAgentCached,
   listVotesByAgentCached,
-  listProductsCached,
 } from "./shared";
 import { getAgentBySlug } from "./agents";
 import { getProductById } from "./products";
 import { createAdminClient } from "@/lib/supabase/admin";
+
+interface PlatformCounters {
+  activeAgents: number;
+  buildingProducts: number;
+  activeTasks: number;
+  completedTasks: number;
+}
+
+export interface PlatformPulseStats {
+  activeAgents: number;
+  productsBuilding: number;
+  openVotes: number;
+  totalCredits: number;
+}
+
+async function getRegisteredAgentsCount(): Promise<number> {
+  "use cache";
+  cacheLife("minutes");
+  cacheTag("agents");
+
+  const supabase = createAdminClient();
+  const { count, error } = await supabase
+    .from("agents")
+    .select("id", { count: "exact", head: true });
+
+  if (error) {
+    console.error("[data] getRegisteredAgentsCount:", error);
+    return 0;
+  }
+
+  return count ?? 0;
+}
+
+async function getPlatformCounters(): Promise<PlatformCounters> {
+  "use cache";
+  cacheLife("minutes");
+  cacheTag("products", "tasks");
+
+  const supabase = createAdminClient();
+
+  const [registeredAgents, buildingProductsRes, activeTasksRes, completedTasksRes] = await Promise.all([
+    getRegisteredAgentsCount(),
+    supabase
+      .from("products")
+      .select("id", { count: "exact", head: true })
+      .eq("status", "building"),
+    supabase
+      .from("tasks")
+      .select("id", { count: "exact", head: true })
+      .in("status", ["claimed", "submitted"]),
+    supabase
+      .from("tasks")
+      .select("id", { count: "exact", head: true })
+      .eq("status", "approved"),
+  ]);
+
+  if (buildingProductsRes.error || activeTasksRes.error || completedTasksRes.error) {
+    console.error("[data] getPlatformCounters:", {
+      buildingProducts: buildingProductsRes.error,
+      activeTasks: activeTasksRes.error,
+      completedTasks: completedTasksRes.error,
+    });
+    return {
+      activeAgents: 0,
+      buildingProducts: 0,
+      activeTasks: 0,
+      completedTasks: 0,
+    };
+  }
+
+  return {
+    activeAgents: registeredAgents,
+    buildingProducts: buildingProductsRes.count ?? 0,
+    activeTasks: activeTasksRes.count ?? 0,
+    completedTasks: completedTasksRes.count ?? 0,
+  };
+}
+
+async function getOpenVotesCount(): Promise<number> {
+  "use cache";
+  cacheLife("minutes");
+  cacheTag("votes");
+
+  const supabase = createAdminClient();
+  const { count, error } = await supabase
+    .from("votes")
+    .select("id", { count: "exact", head: true })
+    .eq("status", "open");
+
+  if (error) {
+    console.error("[data] getOpenVotesCount:", error);
+    return 0;
+  }
+
+  return count ?? 0;
+}
+
+async function getTotalCredits(): Promise<number> {
+  "use cache";
+  cacheLife("minutes");
+  cacheTag("tasks", "agents");
+
+  const supabase = createAdminClient();
+  const { data, error } = await supabase.from("credits").select("amount");
+
+  if (error) {
+    console.error("[data] getTotalCredits:", error);
+    return 0;
+  }
+
+  return ((data ?? []) as Array<{ amount: number }>).reduce((sum, row) => sum + row.amount, 0);
+}
 
 function toActivityEvents(
   agentsById: Map<string, AgentRow>,
@@ -415,46 +525,46 @@ export async function getSidebarRecentActivity(limit = 5): Promise<SidebarActivi
 }
 
 export async function getSidebarSnapshotStats(): Promise<SidebarSnapshotStats> {
-  const [products, tasks] = await Promise.all([listProductsCached(), listTasksCached()]);
-
-  const activeAgents = new Set<string>();
-  for (const task of tasks) {
-    if (task.claimed_by && (task.status === "claimed" || task.status === "submitted")) {
-      activeAgents.add(task.claimed_by);
-    }
-  }
-
-  const activeTasks = tasks.filter(
-    (task) => task.status === "claimed" || task.status === "submitted",
-  ).length;
-
-  const completedTasks = tasks.filter((task) => task.status === "approved").length;
-  const buildingProducts = products.filter((product) => product.status === "building").length;
+  const counters = await getPlatformCounters();
 
   return {
-    activeAgents: activeAgents.size,
-    buildingProducts,
-    activeTasks,
-    completedTasks,
+    activeAgents: counters.activeAgents,
+    buildingProducts: counters.buildingProducts,
+    activeTasks: counters.activeTasks,
+    completedTasks: counters.completedTasks,
+  };
+}
+
+export async function getPlatformPulseStats(): Promise<PlatformPulseStats> {
+  const [counters, openVotes, totalCredits] = await Promise.all([
+    getPlatformCounters(),
+    getOpenVotesCount(),
+    getTotalCredits(),
+  ]);
+
+  return {
+    activeAgents: counters.activeAgents,
+    productsBuilding: counters.buildingProducts,
+    openVotes,
+    totalCredits,
   };
 }
 
 export async function getSidebarNavCounts(): Promise<SidebarNavCounts> {
   "use cache";
   cacheLife("minutes");
-  cacheTag("agents", "products", "posts");
+  cacheTag("products", "posts");
 
   const supabase = createAdminClient();
-  const [productsRes, agentsRes, postsRes] = await Promise.all([
+  const [productsRes, agents, postsRes] = await Promise.all([
     supabase.from("products").select("id", { count: "exact", head: true }),
-    supabase.from("agents").select("id", { count: "exact", head: true }),
+    getRegisteredAgentsCount(),
     supabase.from("posts").select("id", { count: "exact", head: true }),
   ]);
 
-  if (productsRes.error || agentsRes.error || postsRes.error) {
+  if (productsRes.error || postsRes.error) {
     console.error("[data] getSidebarNavCounts:", {
       products: productsRes.error,
-      agents: agentsRes.error,
       posts: postsRes.error,
     });
     return { products: 0, agents: 0, posts: 0 };
@@ -462,7 +572,7 @@ export async function getSidebarNavCounts(): Promise<SidebarNavCounts> {
 
   return {
     products: productsRes.count ?? 0,
-    agents: agentsRes.count ?? 0,
+    agents,
     posts: postsRes.count ?? 0,
   };
 }

@@ -27,6 +27,10 @@ export async function getAgentBySlug(slug: string): Promise<AgentView | null> {
 }
 
 export async function getAllAgents(options?: PaginationOptions): Promise<AgentCardView[]> {
+  "use cache";
+  cacheLife("minutes");
+  cacheTag("agents", "tasks");
+
   const [agents, tasks, credits] = await Promise.all([
     listAgentsCached(options),
     listTasksCached(options),

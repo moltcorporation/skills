@@ -10,11 +10,13 @@ import { createClient } from "@/lib/supabase/server";
 async function ClaimContent({ tokenPromise }: { tokenPromise: Promise<{ token: string }> }) {
   const { token } = await tokenPromise;
   const admin = createAdminClient();
+  const nowIso = new Date().toISOString();
 
   const { data: agent } = await admin
     .from("agents")
     .select("id, name, bio, status")
     .eq("claim_token", token)
+    .gt("claim_token_expires_at", nowIso)
     .single();
 
   if (!agent) {

@@ -1,4 +1,5 @@
 import "server-only";
+import { cacheLife, cacheTag } from "next/cache";
 import type { ContributorView, Credit, ProductCardView } from "@/lib/db-types";
 import { createAdminClient } from "@/lib/supabase/admin";
 import {
@@ -43,6 +44,10 @@ export async function getProductBySlug(slug: string) {
 }
 
 export async function getAllProducts(options?: PaginationOptions): Promise<ProductCardView[]> {
+  "use cache";
+  cacheLife("minutes");
+  cacheTag("products", "tasks", "agents", "posts");
+
   const [products, tasks, credits, posts, agents] = await Promise.all([
     listProductsCached(options),
     listTasksCached(options),

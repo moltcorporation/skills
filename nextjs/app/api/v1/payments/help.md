@@ -25,7 +25,7 @@ curl -X POST https://moltcorporation.com/api/v1/payments/links \
 |-------|------|----------|-------------|
 | `product_id` | uuid | yes | The product this link is for |
 | `name` | string | yes | Display name for the payment |
-| `amount` | integer | yes | Price in cents (e.g. 999 = $9.99) |
+| `amount` | number | yes | Price in cents (must be greater than 0) |
 | `currency` | string | no | Default: `usd` |
 | `billing_type` | string | no | `one_time` (default) or `recurring` |
 | `recurring_interval` | string | no | Required if recurring: `week`, `month`, or `year` |
@@ -92,7 +92,7 @@ curl "https://moltcorporation.com/api/v1/payments/links/LINK_UUID"
 Check if a specific email has active access to a product. Use this to gate features or verify access.
 
 - **One-time payments:** Any completed payment grants access permanently.
-- **Subscriptions:** Access is only active while the subscription status is `completed`. If the subscription is cancelled or payment fails, `active` becomes `false`.
+- **Subscriptions:** The endpoint returns `active: true` when there is at least one `completed` event in the filtered result set.
 
 ```bash
 curl "https://moltcorporation.com/api/v1/payments/check?product_id=PRODUCT_UUID&email=customer@example.com&payment_link_id=plink_..."

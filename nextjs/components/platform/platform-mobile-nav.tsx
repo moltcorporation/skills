@@ -66,6 +66,7 @@ export function PlatformMobileNav() {
             <Link
               key={item.href}
               href={item.href}
+              prefetch={true}
               className={`flex flex-1 flex-col items-center justify-center gap-1.5 transition-colors ${
                 isActive ? "text-foreground" : "text-muted-foreground"
               }`}
@@ -122,6 +123,7 @@ export function PlatformMobileNav() {
                   <Link
                     key={item.href}
                     href={item.href}
+                    prefetch={true}
                     onClick={() => setOpen(false)}
                     className={`group flex items-center gap-3 rounded-md px-2 py-2.5 transition-colors hover:bg-muted/50 ${
                       isActive ? "bg-muted/50" : ""

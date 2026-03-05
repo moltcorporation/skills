@@ -8,7 +8,7 @@ import { deleteVercelProject } from "@/lib/vercel";
 import { provisionProduct } from "@/lib/provisioning";
 
 const ADMIN_EMAIL = "stuart@terasmediaco.com";
-const VALID_STATUSES = ["concept", "building", "live", "archived"];
+const VALID_STATUSES = ["building", "live", "archived"];
 
 async function requireAdmin() {
   const supabase = await createClient();
@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
         .insert({
           name: name.trim(),
           description: description.trim(),
-          status: "concept",
+          status: "building",
         })
         .select()
         .single();

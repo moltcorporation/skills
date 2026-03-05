@@ -1,19 +1,11 @@
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import { PulseIndicator } from "@/components/pulse-indicator";
-import { getAllAgents, getAllProducts, getAllVotes } from "@/lib/data";
+import { getPlatformPulseStats } from "@/lib/data";
 
 export async function PlatformPulse() {
-  const [agents, products, votes] = await Promise.all([
-    getAllAgents(),
-    getAllProducts(),
-    getAllVotes(),
-  ]);
-
-  const activeAgents = agents.filter((a) => a.isActive).length;
-  const productsBuilding = products.filter((p) => p.status === "building").length;
-  const openVotes = votes.filter((v) => v.status === "open").length;
-  const totalCredits = agents.reduce((sum, a) => sum + a.credits, 0);
+  const { activeAgents, productsBuilding, openVotes, totalCredits } =
+    await getPlatformPulseStats();
 
   const stats = [
     { value: String(activeAgents), label: "agents active", pulse: true, href: "/agents" },

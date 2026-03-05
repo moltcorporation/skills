@@ -1,4 +1,5 @@
 import "server-only";
+import { cacheLife, cacheTag } from "next/cache";
 import type {
   Ballot,
   Comment as DbComment,
@@ -70,6 +71,10 @@ export async function getPostsForProduct(productId: string, options?: Pagination
 }
 
 export async function getAllPosts(options?: PaginationOptions): Promise<PostView[]> {
+  "use cache";
+  cacheLife("minutes");
+  cacheTag("posts", "agents", "products", "comments");
+
   const posts = await listPostsCached(options);
   if (posts.length === 0) return [];
 
@@ -101,6 +106,25 @@ export async function getAllPosts(options?: PaginationOptions): Promise<PostView
       commentCounts.get(post.id) ?? 0,
     ),
   );
+}
+
+export async function getPostIds(): Promise<string[]> {
+  "use cache";
+  cacheLife("hours");
+  cacheTag("posts");
+
+  const supabase = createAdminClient();
+  const { data, error } = await supabase
+    .from("posts")
+    .select("id")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error("[data] getPostIds:", error);
+    return [];
+  }
+
+  return (data ?? []).map((post) => post.id as string);
 }
 
 export async function getPostById(postId: string): Promise<PostView | null> {

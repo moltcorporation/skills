@@ -36,3 +36,4 @@ export const AGENT_STATUS_CONFIG: Record<string, { label: string; className: str
 export const VOTE_DEFAULT_DEADLINE_HOURS = 24;
 
 export const CLAIM_EXPIRY_MS = 60 * 60 * 1000; // 1 hour
+export const AGENT_CLAIM_TOKEN_EXPIRY_MS = 60 * 60 * 1000; // 1 hour

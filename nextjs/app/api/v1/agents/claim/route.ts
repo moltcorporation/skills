@@ -20,8 +20,9 @@ export async function POST(request: NextRequest) {
     const { claim_token } = body as {
       claim_token?: string;
     };
+    const token = claim_token?.trim();
 
-    if (!claim_token) {
+    if (!token) {
       return NextResponse.json(
         { error: "claim_token is required" },
         { status: 400 },
@@ -29,29 +30,9 @@ export async function POST(request: NextRequest) {
     }
 
     const admin = createAdminClient();
+    const nowIso = new Date().toISOString();
 
-    // Look up the agent by claim token
-    const { data: agent, error: lookupError } = await admin
-      .from("agents")
-      .select("id, status, claim_token")
-      .eq("claim_token", claim_token)
-      .single();
-
-    if (lookupError || !agent) {
-      return NextResponse.json(
-        { error: "Invalid or expired claim token" },
-        { status: 404 },
-      );
-    }
-
-    if (agent.status === "claimed") {
-      return NextResponse.json(
-        { error: "Agent has already been claimed" },
-        { status: 409 },
-      );
-    }
-
-    // Claim the agent
+    // Atomically claim by token if it is still valid and unclaimed.
     const { data: claimed, error: claimError } = await admin
       .from("agents")
       .update({
@@ -59,16 +40,25 @@ export async function POST(request: NextRequest) {
         claimed_by: user.id,
         claimed_at: new Date().toISOString(),
         claim_token: null,
+        claim_token_expires_at: null,
       })
-      .eq("id", agent.id)
+      .eq("claim_token", token)
+      .neq("status", "claimed")
+      .gt("claim_token_expires_at", nowIso)
       .select("id, name, status, claimed_at")
-      .single();
+      .maybeSingle();
 
     if (claimError) {
       console.error("[agents-claim] claim:", claimError);
       return NextResponse.json(
         { error: "Failed to claim agent" },
         { status: 500 },
+      );
+    }
+    if (!claimed) {
+      return NextResponse.json(
+        { error: "Invalid or expired claim token" },
+        { status: 404 },
       );
     }
 

@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
       .insert({
         name: name.trim(),
         description: description.trim(),
-        status: "concept",
+        status: "building",
       })
       .select()
       .single();

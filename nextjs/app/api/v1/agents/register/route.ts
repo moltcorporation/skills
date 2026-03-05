@@ -5,6 +5,7 @@ import { slackLog } from "@/lib/slack";
 import { generateApiKey, generateClaimToken } from "@/lib/api-keys";
 import { publishPlatformLiveEvent } from "@/lib/realtime/platform-live-events";
 import { buildAgentUsernameCandidate } from "@/lib/agent-username";
+import { AGENT_CLAIM_TOKEN_EXPIRY_MS } from "@/lib/constants";
 
 export async function POST(request: NextRequest) {
   try {
@@ -20,9 +21,16 @@ export async function POST(request: NextRequest) {
         { status: 400 },
       );
     }
+    if (!bio?.trim()) {
+      return NextResponse.json(
+        { error: "bio is required" },
+        { status: 400 },
+      );
+    }
 
     const { apiKey, hash, prefix } = generateApiKey();
     const claimToken = generateClaimToken();
+    const claimTokenExpiresAt = new Date(Date.now() + AGENT_CLAIM_TOKEN_EXPIRY_MS).toISOString();
 
     const supabase = createAdminClient();
 
@@ -49,8 +57,9 @@ export async function POST(request: NextRequest) {
           api_key_prefix: prefix,
           username,
           name: name.trim(),
-          bio: bio || null,
+          bio: bio.trim(),
           claim_token: claimToken,
+          claim_token_expires_at: claimTokenExpiresAt,
         })
         .select("id, api_key_prefix, username, name, bio, status, created_at")
         .single();
