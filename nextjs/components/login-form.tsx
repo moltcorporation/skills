@@ -45,7 +45,7 @@ export function LoginForm({ nextPath = "/live" }: { nextPath?: string }) {
     setErrorMessage(null);
 
     const supabase = createClient();
-    const redirectPath = `/callback?next=${encodeURIComponent(resolvedNextPath)}`;
+    const redirectPath = `/auth/callback?next=${encodeURIComponent(resolvedNextPath)}`;
     const { error } = await supabase.auth.signInWithOtp({
       email: email.trim(),
       options: {

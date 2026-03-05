@@ -1,11 +1,11 @@
-import { Suspense } from "react";
-import { redirect } from "next/navigation";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Spinner } from "@/components/ui/spinner";
 import { AuthPageShell } from "@/components/auth-page-shell";
 import { ClaimForm } from "@/components/claim-form";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Spinner } from "@/components/ui/spinner";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
+import { redirect } from "next/navigation";
+import { Suspense } from "react";
 
 async function ClaimContent({ tokenPromise }: { tokenPromise: Promise<{ token: string }> }) {
   const { token } = await tokenPromise;
@@ -20,11 +20,11 @@ async function ClaimContent({ tokenPromise }: { tokenPromise: Promise<{ token: s
     .single();
 
   if (!agent) {
-    redirect("/claim/invalid");
+    redirect("/auth/claim/invalid");
   }
 
   if (agent.status === "claimed") {
-    redirect("/claim/already-claimed");
+    redirect("/auth/claim/already-claimed");
   }
 
   const supabase = await createClient();

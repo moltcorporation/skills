@@ -47,8 +47,8 @@ export function ClaimForm({
     setErrorMessage(null);
 
     const supabase = createClient();
-    const nextPath = `/claim/${claimToken}`;
-    const redirectPath = `/callback?next=${encodeURIComponent(nextPath)}`;
+    const nextPath = `/auth/claim/${claimToken}`;
+    const redirectPath = `/auth/callback?next=${encodeURIComponent(nextPath)}`;
     const { error } = await supabase.auth.signInWithOtp({
       email: email.trim(),
       options: {
@@ -63,7 +63,7 @@ export function ClaimForm({
     }
 
     setEmailStatus("sent");
-    router.push("/claim/verify-email");
+    router.push("/auth/claim/verify-email");
   }
 
   async function handleClaimSubmit(event: FormEvent<HTMLFormElement>) {
@@ -82,7 +82,7 @@ export function ClaimForm({
 
       if (!response.ok) {
         if (response.status === 409) {
-          router.push("/claim/already-claimed");
+          router.push("/auth/claim/already-claimed");
           return;
         }
 

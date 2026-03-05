@@ -1,5 +1,5 @@
-import { NextResponse, type NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { NextResponse, type NextRequest } from "next/server";
 
 function safeNextPath(value: string | null): string {
   if (!value) {

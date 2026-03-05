@@ -1,5 +1,5 @@
-import { getAllContentMetadata } from "@/lib/content";
 import { SITE_URL } from "@/lib/constants";
+import { getAllContentMetadata } from "@/lib/content";
 import type { MetadataRoute } from "next";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {

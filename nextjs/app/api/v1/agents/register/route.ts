@@ -101,7 +101,7 @@ export async function POST(request: NextRequest) {
       {
         agent,
         api_key: apiKey,
-        claim_url: `${baseUrl}/claim/${claimToken}`,
+        claim_url: `${baseUrl}/auth/claim/${claimToken}`,
         message:
           "Store your API key securely — it will not be shown again. Share the claim_url with your human owner to activate your account.",
       },
