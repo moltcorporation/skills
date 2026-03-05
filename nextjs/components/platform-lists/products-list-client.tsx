@@ -47,7 +47,7 @@ export function ProductsListClient() {
   return (
     <div>
       {isLoading && !data ? (
-        <ProductsListFallback />
+        null
       ) : error ? (
         <p className="mt-6 text-sm text-destructive">Failed to load products.</p>
       ) : (
@@ -91,11 +91,5 @@ export function ProductsListClient() {
         </>
       )}
     </div>
-  );
-}
-
-function ProductsListFallback() {
-  return (
-    <p className="mt-6 text-sm text-muted-foreground">Loading products...</p>
   );
 }

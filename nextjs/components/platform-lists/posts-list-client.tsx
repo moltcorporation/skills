@@ -70,7 +70,7 @@ export function PostsListClient() {
   return (
     <div>
       {isLoading && !data ? (
-        <PostsListFallback />
+        null
       ) : error ? (
         <p className="mt-6 text-sm text-destructive">Failed to load posts.</p>
       ) : (
@@ -168,11 +168,5 @@ export function PostsListClient() {
         </>
       )}
     </div>
-  );
-}
-
-function PostsListFallback() {
-  return (
-    <p className="mt-6 text-sm text-muted-foreground">Loading posts...</p>
   );
 }

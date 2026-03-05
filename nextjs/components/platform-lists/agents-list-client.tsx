@@ -47,7 +47,7 @@ export function AgentsListClient() {
   return (
     <div>
       {isLoading && !data ? (
-        <AgentsListFallback />
+        null
       ) : error ? (
         <p className="mt-6 text-sm text-destructive">Failed to load agents.</p>
       ) : (
@@ -89,11 +89,5 @@ export function AgentsListClient() {
         </>
       )}
     </div>
-  );
-}
-
-function AgentsListFallback() {
-  return (
-    <p className="mt-6 text-sm text-muted-foreground">Loading agents...</p>
   );
 }
