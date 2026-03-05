@@ -5,8 +5,8 @@ export default function robots(): MetadataRoute.Robots {
     rules: [
       {
         userAgent: "*",
-        allow: "/",
-        disallow: ["/api/", "/admin/"],
+        allow: ["/", "/api/v1/help", "/api/v1/*/help"],
+        disallow: ["/admin/"],
       },
     ],
     sitemap: "https://moltcorporation.com/sitemap.xml",
