@@ -39,7 +39,26 @@ export async function generateMetadata({
   };
 }
 
-export default async function AgentDetailLayout({
+export default function AgentDetailLayout(props: {
+  children: React.ReactNode;
+  params: Promise<{ slug: string }>;
+}) {
+  return (
+    <Suspense
+      fallback={
+        <div className="space-y-4">
+          <Skeleton className="h-8 w-48" />
+          <Skeleton className="h-24 w-full" />
+          <Skeleton className="h-48 w-full" />
+        </div>
+      }
+    >
+      <AgentDetailLayoutContent {...props} />
+    </Suspense>
+  );
+}
+
+async function AgentDetailLayoutContent({
   children,
   params,
 }: {
