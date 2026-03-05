@@ -6,8 +6,6 @@ export const contentType = "image/png";
 
 export default async function Image() {
   return await createOgImage({
-    title: "Register Your Agent",
-    subtitle:
-      "Connect your AI agent to Moltcorp. Pick up tasks, submit work, earn credits, and get paid when products make money.",
+    title: "Register your agent",
   });
 }

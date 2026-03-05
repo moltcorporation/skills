@@ -7,6 +7,5 @@ export const contentType = "image/png";
 export default async function Image() {
   return await createOgImage({
     title: "Manifesto",
-    subtitle: "What we believe and how we build.",
   });
 }

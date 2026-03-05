@@ -1,6 +1,11 @@
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { ImageResponse } from "next/og";
+import type { ReactElement } from "react";
+import {
+  BRAND_WORDMARK_LETTER_SPACING,
+  getBrandLockupMetrics,
+} from "@/lib/brand-lockup";
 
 // --- Inlined ASCII utils (Satori can't import from components) ---
 
@@ -60,7 +65,7 @@ function generateAsciiArt(seed: string): string {
         }
       }
 
-      if (rand() < density) {
+      if (rand() < Math.min(density * 1.2, 0.92)) {
         text += DENSE_CHARS[Math.floor(rand() * DENSE_CHARS.length)];
       } else {
         text += " ";
@@ -90,7 +95,6 @@ const COLONY_RECTS = [
   { x: 228, y: 361, w: 58, h: 58 },
 ];
 
-const ICON_SCALE = 56 / 322; // render icon at ~56px to sit beside logo text
 const ICON_OFFSET_X = 96;
 const ICON_OFFSET_Y = 97;
 
@@ -112,123 +116,197 @@ async function loadFonts() {
 
 // --- Main export ---
 
+type OgImageLayout = "root" | "short-title" | "long-title";
+
+function ColonyIcon({ size }: { size: number }) {
+  const logoScale = size / 322;
+  return (
+    <div
+      style={{
+        display: "flex",
+        position: "relative",
+        width: size,
+        height: size,
+      }}
+    >
+      {COLONY_RECTS.map((rect, i) => (
+        <div
+          key={i}
+          style={{
+            position: "absolute",
+            left: (rect.x - ICON_OFFSET_X) * logoScale,
+            top: (rect.y - ICON_OFFSET_Y) * logoScale,
+            width: rect.w * logoScale,
+            height: rect.h * logoScale,
+            borderRadius: 1,
+            backgroundColor: "#fafafa",
+          }}
+        />
+      ))}
+    </div>
+  );
+}
+
+function OgFrame({
+  asciiArt,
+  children,
+}: {
+  asciiArt: string;
+  children: ReactElement;
+}) {
+  return (
+    <div
+      style={{
+        width: "100%",
+        height: "100%",
+        display: "flex",
+        backgroundColor: "#0a0a0a",
+        position: "relative",
+      }}
+    >
+      <div
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          display: "flex",
+          color: "rgba(250, 250, 250, 0.075)",
+          fontSize: "11px",
+          lineHeight: "16px",
+          fontFamily: "Geist Mono",
+          fontWeight: 600,
+          whiteSpace: "pre",
+          overflow: "hidden",
+        }}
+      >
+        {asciiArt}
+      </div>
+
+      <div
+        style={{
+          position: "absolute",
+          top: 40,
+          left: 40,
+          right: 40,
+          bottom: 40,
+          border: "1px solid rgba(250, 250, 250, 0.12)",
+          display: "flex",
+        }}
+      />
+
+      {[
+        { top: 37, left: 37 },
+        { top: 37, right: 37 },
+        { bottom: 37, left: 37 },
+        { bottom: 37, right: 37 },
+      ].map((pos, i) => (
+        <div
+          key={i}
+          style={{
+            position: "absolute",
+            width: 7,
+            height: 7,
+            borderRadius: "50%",
+            backgroundColor: "rgba(250, 250, 250, 0.18)",
+            ...pos,
+          }}
+        />
+      ))}
+
+      {children}
+    </div>
+  );
+}
+
 export async function createOgImage({
   title,
-  subtitle,
+  layout = "short-title",
+  seed,
 }: {
-  title: string;
-  subtitle?: string;
+  title?: string;
+  layout?: OgImageLayout;
+  seed?: string;
 }): Promise<ImageResponse> {
+  if (layout !== "root" && !title) {
+    throw new Error("createOgImage: title is required for non-root layouts");
+  }
+
   const [asciiArt, fonts] = await Promise.all([
-    Promise.resolve(generateAsciiArt(title)),
+    Promise.resolve(generateAsciiArt(seed ?? title ?? "moltcorp-root-og")),
     loadFonts(),
   ]);
 
-  return new ImageResponse(
-    (
+  // All brand lockups use shared ratios so icon/text spacing stays consistent at any scale.
+  const rootIconSize = 120;
+  const rootLockup = getBrandLockupMetrics(rootIconSize);
+  const longIconSize = 44;
+  const longLockup = getBrandLockupMetrics(longIconSize);
+  const shortIconSize = 64;
+  const shortLockup = getBrandLockupMetrics(shortIconSize);
+
+  const content =
+    layout === "root" ? (
       <div
         style={{
-          width: "100%",
-          height: "100%",
           display: "flex",
-          flexDirection: "column",
-          backgroundColor: "#0a0a0a",
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
           position: "relative",
         }}
       >
-        {/* ASCII art background */}
-        <div
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            display: "flex",
-            color: "rgba(250, 250, 250, 0.045)",
-            fontSize: "11px",
-            lineHeight: "16px",
-            whiteSpace: "pre",
-            overflow: "hidden",
-          }}
-        >
-          {asciiArt}
-        </div>
-
-        {/* Blueprint border box */}
-        <div
-          style={{
-            position: "absolute",
-            top: 40,
-            left: 40,
-            right: 40,
-            bottom: 40,
-            border: "1px solid rgba(250, 250, 250, 0.12)",
-            display: "flex",
-          }}
-        />
-
-        {/* Corner dots */}
-        {[
-          { top: 37, left: 37 },
-          { top: 37, right: 37 },
-          { bottom: 37, left: 37 },
-          { bottom: 37, right: 37 },
-        ].map((pos, i) => (
-          <div
-            key={i}
-            style={{
-              position: "absolute",
-              width: 7,
-              height: 7,
-              borderRadius: "50%",
-              backgroundColor: "rgba(250, 250, 250, 0.18)",
-              ...pos,
-            }}
-          />
-        ))}
-
-        {/* Logo — top left */}
         <div
           style={{
             display: "flex",
             alignItems: "center",
-            gap: 14,
             position: "relative",
-            padding: "64px 0 0 72px",
           }}
         >
-          {/* Colony icon */}
+          <ColonyIcon size={rootIconSize} />
           <div
             style={{
               display: "flex",
-              position: "relative",
-              width: 44,
-              height: 44,
+              marginLeft: rootLockup.wordmarkGap,
+              fontSize: rootLockup.wordmarkSize,
+              fontFamily: "Geist Mono",
+              fontWeight: 600,
+              color: "rgba(250, 250, 250, 0.95)",
+              letterSpacing: BRAND_WORDMARK_LETTER_SPACING,
+              lineHeight: 1,
             }}
           >
-            {COLONY_RECTS.map((rect, i) => (
-              <div
-                key={i}
-                style={{
-                  position: "absolute",
-                  left: (rect.x - ICON_OFFSET_X) * (44 / 322),
-                  top: (rect.y - ICON_OFFSET_Y) * (44 / 322),
-                  width: rect.w * (44 / 322),
-                  height: rect.h * (44 / 322),
-                  borderRadius: 1,
-                  backgroundColor: "#fafafa",
-                }}
-              />
-            ))}
+            moltcorp
           </div>
+        </div>
+      </div>
+    ) : layout === "long-title" ? (
+      <div
+        style={{
+          display: "flex",
+          flex: 1,
+          flexDirection: "column",
+          position: "relative",
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            padding: "64px 0 0 72px",
+          }}
+        >
+          <ColonyIcon size={longIconSize} />
           <div
             style={{
-              fontSize: 42,
+              display: "flex",
+              marginLeft: longLockup.wordmarkGap,
+              fontSize: longLockup.wordmarkSize,
               fontFamily: "Geist Mono",
               fontWeight: 600,
               color: "#fafafa",
-              letterSpacing: "-0.02em",
+              letterSpacing: BRAND_WORDMARK_LETTER_SPACING,
               lineHeight: 1,
             }}
           >
@@ -236,67 +314,88 @@ export async function createOgImage({
           </div>
         </div>
 
-        {/* Title + subtitle — vertically centered in remaining space */}
         <div
           style={{
             display: "flex",
             flex: 1,
-            flexDirection: "column",
-            justifyContent: "center",
-            position: "relative",
-            padding: "0 72px",
+            alignItems: "center",
+            padding: "0 96px 32px 72px",
           }}
         >
           <div
             style={{
-              fontSize: 56,
+              display: "flex",
+              fontSize: 76,
               fontFamily: "Inter",
               fontWeight: 500,
               color: "#fafafa",
-              lineHeight: 1.15,
-              maxWidth: 800,
+              lineHeight: 1.06,
+              letterSpacing: "-0.02em",
+              maxWidth: 760,
             }}
           >
             {title}
           </div>
-
-          {subtitle && (
-            <div
-              style={{
-                fontSize: 24,
-                color: "rgba(250, 250, 250, 0.5)",
-                marginTop: 20,
-                lineHeight: 1.4,
-                maxWidth: 700,
-              }}
-            >
-              {subtitle}
-            </div>
-          )}
-        </div>
-
-        {/* Footer URL */}
-        <div
-          style={{
-            position: "absolute",
-            bottom: 54,
-            left: 72,
-            display: "flex",
-            fontSize: 14,
-            fontFamily: "Geist Mono",
-            fontWeight: 600,
-            color: "rgba(250, 250, 250, 0.4)",
-            letterSpacing: "0.04em",
-          }}
-        >
-          moltcorporation.com
         </div>
       </div>
-    ),
-    {
-      width: 1200,
-      height: 630,
-      fonts,
-    }
-  );
+    ) : (
+      <div
+        style={{
+          display: "flex",
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+          position: "relative",
+        }}
+      >
+        <ColonyIcon size={shortIconSize} />
+        <div
+          style={{
+            display: "flex",
+            marginLeft: shortLockup.wordmarkGap,
+            fontSize: shortLockup.wordmarkSize,
+            fontFamily: "Geist Mono",
+            fontWeight: 600,
+            color: "#fafafa",
+            letterSpacing: BRAND_WORDMARK_LETTER_SPACING,
+            lineHeight: 1,
+          }}
+        >
+          moltcorp
+        </div>
+        <div
+          style={{
+            display: "flex",
+            marginLeft: shortLockup.dividerGap,
+            width: 1,
+            height: 76,
+            backgroundColor: "rgba(250, 250, 250, 0.2)",
+          }}
+        />
+        <div
+          style={{
+            display: "flex",
+            marginLeft: shortLockup.dividerGap,
+            fontSize: 56,
+            fontFamily: "Inter",
+            fontWeight: 500,
+            color: "#fafafa",
+            lineHeight: 1.1,
+            maxWidth: 420,
+          }}
+        >
+          {title}
+        </div>
+      </div>
+    );
+
+  return new ImageResponse(<OgFrame asciiArt={asciiArt}>{content}</OgFrame>, {
+    width: 1200,
+    height: 630,
+    fonts,
+  });
+}
+
+export async function createRootOgImage(): Promise<ImageResponse> {
+  return createOgImage({ layout: "root", seed: "moltcorp-root-og" });
 }

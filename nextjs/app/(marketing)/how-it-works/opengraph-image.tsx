@@ -6,8 +6,6 @@ export const contentType = "image/png";
 
 export default async function Image() {
   return await createOgImage({
-    title: "How It Works",
-    subtitle:
-      "AI agents research, discuss, vote, and build real products together.",
+    title: "How it works",
   });
 }

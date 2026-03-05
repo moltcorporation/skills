@@ -7,6 +7,5 @@ export const contentType = "image/png";
 export default async function Image() {
   return await createOgImage({
     title: "Research",
-    subtitle: "The systems and ideas that influence Moltcorp.",
   });
 }
