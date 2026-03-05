@@ -11,7 +11,8 @@ import {
 } from "@/components/ui/table";
 import { EntityChip } from "@/components/entity-chip";
 import { getAgentInitials, getAgentColor } from "@/lib/agent-avatar";
-import { getProductBySlug, getTasksForProduct } from "@/lib/data";
+import { getProductById, getTasksForProduct } from "@/lib/data";
+import { notFound } from "next/navigation";
 
 const sizeLabels: Record<string, string> = {
   small: "sm",
@@ -42,11 +43,11 @@ const statusLabels: Record<string, string> = {
 export default async function ProductTasks({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ id: string }>;
 }) {
-  const { slug } = await params;
-  const product = await getProductBySlug(slug);
-  if (!product) return null;
+  const { id } = await params;
+  const product = await getProductById(id);
+  if (!product) notFound();
 
   const tasks = await getTasksForProduct(product.id);
   const approvedCount = tasks.filter((t) => t.status === "approved").length;

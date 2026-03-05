@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
-import { Suspense } from "react";
+import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
-import { ListToolbar } from "@/components/platform/list-toolbar";
 import { ProductCard } from "@/components/products-page/product-card";
 import { getAllProducts } from "@/lib/data";
 
@@ -11,66 +9,12 @@ export const metadata: Metadata = {
   description: "Browse products being built and launched by AI agents.",
 };
 
-const statusFilterOptions = [
-  { value: "all", label: "All statuses" },
-  { value: "concept", label: "Concept" },
-  { value: "building", label: "Building" },
-  { value: "live", label: "Live" },
-  { value: "archived", label: "Archived" },
-];
+const PAGE_SIZE = 24;
 
-const sortOptions = [
-  { value: "recent", label: "Most recent" },
-  { value: "credits", label: "Most credits" },
-  { value: "progress", label: "Most progress" },
-];
-
-function ProductGridSkeleton() {
-  return (
-    <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      {Array.from({ length: 6 }).map((_, i) => (
-        <Skeleton key={i} className="h-32 w-full" />
-      ))}
-    </div>
-  );
-}
-
-async function ProductGrid({
-  statusFilter,
-  searchQuery,
-}: {
-  statusFilter: string;
-  searchQuery: string;
-}) {
-  const products = await getAllProducts();
-  let filtered = products;
-
-  if (statusFilter !== "all") {
-    filtered = filtered.filter((p) => p.status === statusFilter);
-  }
-
-  if (searchQuery) {
-    const q = searchQuery.toLowerCase();
-    filtered = filtered.filter(
-      (p) =>
-        p.name.toLowerCase().includes(q) ||
-        p.description.toLowerCase().includes(q)
-    );
-  }
-
-  return (
-    <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      {filtered.length > 0 ? (
-        filtered.map((product) => (
-          <ProductCard key={product.slug} product={product} />
-        ))
-      ) : (
-        <p className="col-span-full py-12 text-center text-sm text-muted-foreground">
-          No products match your filters.
-        </p>
-      )}
-    </div>
-  );
+function readPageParam(value: string | string[] | undefined): number {
+  const raw = typeof value === "string" ? Number(value) : Number(value?.[0]);
+  if (!Number.isFinite(raw) || raw < 1) return 1;
+  return Math.floor(raw);
 }
 
 export default async function ProductsPage({
@@ -79,10 +23,11 @@ export default async function ProductsPage({
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const params = await searchParams;
-  const statusFilter = (params.status as string) ?? "all";
-  const searchQuery = (params.q as string) ?? "";
-
-  const products = await getAllProducts();
+  const page = readPageParam(params.page);
+  const offset = (page - 1) * PAGE_SIZE;
+  const result = await getAllProducts({ limit: PAGE_SIZE + 1, offset });
+  const hasNextPage = result.length > PAGE_SIZE;
+  const products = result.slice(0, PAGE_SIZE);
 
   return (
     <div>
@@ -91,23 +36,44 @@ export default async function ProductsPage({
           <h1 className="text-xl font-medium tracking-tight sm:text-2xl">
             Products
           </h1>
-          <Badge variant="outline">{products.length} products</Badge>
+          <Badge variant="outline">Page {page}</Badge>
         </div>
       </div>
 
-      <div className="mt-4">
-        <Suspense>
-          <ListToolbar
-            searchPlaceholder="Search products..."
-            filterOptions={statusFilterOptions}
-            sortOptions={sortOptions}
-          />
-        </Suspense>
+      <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {products.length > 0 ? (
+          products.map((product) => (
+            <ProductCard key={product.slug} product={product} />
+          ))
+        ) : (
+          <p className="col-span-full py-12 text-center text-sm text-muted-foreground">
+            No products on this page.
+          </p>
+        )}
       </div>
 
-      <Suspense fallback={<ProductGridSkeleton />}>
-        <ProductGrid statusFilter={statusFilter} searchQuery={searchQuery} />
-      </Suspense>
+      <div className="mt-6 flex items-center justify-between">
+        {page > 1 ? (
+          <Link
+            href={page === 2 ? "/products" : `/products?page=${page - 1}`}
+            className="text-sm text-muted-foreground hover:text-foreground"
+          >
+            Previous page
+          </Link>
+        ) : (
+          <span />
+        )}
+        {hasNextPage ? (
+          <Link
+            href={`/products?page=${page + 1}`}
+            className="text-sm text-muted-foreground hover:text-foreground"
+          >
+            Next page
+          </Link>
+        ) : (
+          <span />
+        )}
+      </div>
     </div>
   );
 }

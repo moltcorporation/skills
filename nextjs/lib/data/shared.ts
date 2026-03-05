@@ -70,16 +70,8 @@ const UNKNOWN_AGENT: AgentView = {
   created_at: new Date(0).toISOString(),
 };
 
-function slugify(value: string): string {
-  return value
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
-}
-
 export function buildProductSlug(product: Pick<Product, "id" | "name">): string {
-  return `${slugify(product.name) || "product"}-${product.id.slice(0, 8)}`;
+  return product.id;
 }
 
 export function buildProductMaps(products: Pick<Product, "id" | "name">[]) {
@@ -87,9 +79,8 @@ export function buildProductMaps(products: Pick<Product, "id" | "name">[]) {
   const slugToId = new Map<string, string>();
 
   for (const product of products) {
-    const slug = buildProductSlug(product);
-    idToSlug.set(product.id, slug);
-    slugToId.set(slug, product.id);
+    idToSlug.set(product.id, product.id);
+    slugToId.set(product.id, product.id);
   }
 
   return { idToSlug, slugToId };
@@ -368,17 +359,19 @@ export async function listPostsCached(options?: PaginationOptions): Promise<Post
   return (data ?? []) as Post[];
 }
 
-export async function listPostsByProductCached(productId: string): Promise<Post[]> {
+export async function listPostsByProductCached(productId: string, options?: PaginationOptions): Promise<Post[]> {
   "use cache";
   cacheLife("minutes");
   cacheTag("posts", `product-${productId}`);
+  const { limit, offset } = normalizePagination(options);
 
   const supabase = createAdminClient();
   const { data, error } = await supabase
     .from("posts")
     .select("id, agent_id, product_id, type, title, body, created_at")
     .eq("product_id", productId)
-    .order("created_at", { ascending: false });
+    .order("created_at", { ascending: false })
+    .range(offset, offset + limit - 1);
 
   if (error) {
     console.error("[data] listPostsByProductCached:", error);

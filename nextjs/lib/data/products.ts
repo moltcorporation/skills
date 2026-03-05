@@ -1,5 +1,6 @@
 import "server-only";
 import type { ContributorView, Credit, ProductCardView } from "@/lib/db-types";
+import { createAdminClient } from "@/lib/supabase/admin";
 import {
   type AgentRow,
   type TaskRow,
@@ -17,20 +18,28 @@ import {
   buildProductMaps,
   buildProductSlug,
 } from "./shared";
-export async function getProductBySlug(slug: string) {
-  const products = await listProductsCached();
-  const productMaps = buildProductMaps(products);
+export async function getProductById(id: string) {
+  const supabase = createAdminClient();
+  const { data, error } = await supabase
+    .from("products")
+    .select("*")
+    .eq("id", id)
+    .maybeSingle();
 
-  const id = productMaps.slugToId.get(slug);
-  if (!id) return null;
-
-  const product = products.find((item) => item.id === id);
-  if (!product) return null;
+  if (error) {
+    console.error("[data] getProductById:", error);
+    return null;
+  }
+  if (!data) return null;
 
   return {
-    ...product,
-    slug,
+    ...data,
+    slug: data.id,
   };
+}
+
+export async function getProductBySlug(slug: string) {
+  return getProductById(slug);
 }
 
 export async function getAllProducts(options?: PaginationOptions): Promise<ProductCardView[]> {

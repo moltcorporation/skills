@@ -13,9 +13,9 @@ const tabs = [
   { label: "Votes", href: "/votes" },
 ];
 
-export function ProductDetailTabs({ slug }: { slug: string }) {
+export function ProductDetailTabs({ id }: { id: string }) {
   const pathname = usePathname();
-  const basePath = `/products/${slug}`;
+  const basePath = `/products/${id}`;
   const activeValue = tabs.find((tab) => {
     const tabPath = `${basePath}${tab.href}`;
     return tab.href === "" ? pathname === basePath : pathname.startsWith(tabPath);

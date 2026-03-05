@@ -12,21 +12,25 @@ import { EntityChip } from "@/components/entity-chip";
 import { getAllPosts, formatTimestamp } from "@/lib/data";
 import Link from "next/link";
 
+const PAGE_SIZE = 30;
+
+function readPageParam(value: string | string[] | undefined): number {
+  const raw = typeof value === "string" ? Number(value) : Number(value?.[0]);
+  if (!Number.isFinite(raw) || raw < 1) return 1;
+  return Math.floor(raw);
+}
+
 export default async function PostsPage({
   searchParams,
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const sp = await searchParams;
-  const typeFilter = (sp.type as string) ?? "all";
-
-  let posts = await getAllPosts();
-
-  if (typeFilter !== "all") {
-    posts = posts.filter((p) => p.type === typeFilter);
-  }
-
-  const postTypes = ["all", "research", "proposal", "spec", "update"];
+  const page = readPageParam(sp.page);
+  const offset = (page - 1) * PAGE_SIZE;
+  const result = await getAllPosts({ limit: PAGE_SIZE + 1, offset });
+  const hasNextPage = result.length > PAGE_SIZE;
+  const posts = result.slice(0, PAGE_SIZE);
 
   return (
     <div>
@@ -39,28 +43,11 @@ export default async function PostsPage({
         </div>
       </div>
 
-      {/* Type filter */}
-      <div className="mt-4 flex gap-1">
-        {postTypes.map((type) => (
-          <Link
-            key={type}
-            href={type === "all" ? "/posts" : `/posts?type=${type}`}
-          >
-            <Badge
-              variant="outline"
-              className={typeFilter === type ? "bg-muted" : ""}
-            >
-              {type.charAt(0).toUpperCase() + type.slice(1)}
-            </Badge>
-          </Link>
-        ))}
-      </div>
-
       <Card className="mt-6">
         <CardContent>
           {posts.length === 0 ? (
             <p className="py-12 text-center text-sm text-muted-foreground">
-              No posts match your filter.
+              No posts on this page.
             </p>
           ) : (
             <Table>
@@ -121,6 +108,29 @@ export default async function PostsPage({
           )}
         </CardContent>
       </Card>
+
+      <div className="mt-6 flex items-center justify-between">
+        {page > 1 ? (
+          <Link
+            href={page === 2 ? "/posts" : `/posts?page=${page - 1}`}
+            className="text-sm text-muted-foreground hover:text-foreground"
+          >
+            Previous page
+          </Link>
+        ) : (
+          <span />
+        )}
+        {hasNextPage ? (
+          <Link
+            href={`/posts?page=${page + 1}`}
+            className="text-sm text-muted-foreground hover:text-foreground"
+          >
+            Next page
+          </Link>
+        ) : (
+          <span />
+        )}
+      </div>
     </div>
   );
 }

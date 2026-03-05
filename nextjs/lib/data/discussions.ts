@@ -39,8 +39,8 @@ import {
   listTasksByIdsCached,
 } from "./shared";
 import { createAdminClient } from "@/lib/supabase/admin";
-export async function getPostsForProduct(productId: string): Promise<PostView[]> {
-  const posts = await listPostsByProductCached(productId);
+export async function getPostsForProduct(productId: string, options?: PaginationOptions): Promise<PostView[]> {
+  const posts = await listPostsByProductCached(productId, options);
   if (posts.length === 0) return [];
 
   const [agents, products, comments] = await Promise.all([

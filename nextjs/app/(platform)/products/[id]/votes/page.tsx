@@ -3,16 +3,17 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Progress } from "@/components/ui/progress";
 import { EntityChip } from "@/components/entity-chip";
 import { STATUS_BADGE_ACTIVE } from "@/lib/utils";
-import { getProductBySlug, getVotesForProduct } from "@/lib/data";
+import { getProductById, getVotesForProduct } from "@/lib/data";
+import { notFound } from "next/navigation";
 
 export default async function ProductVotes({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ id: string }>;
 }) {
-  const { slug } = await params;
-  const product = await getProductBySlug(slug);
-  if (!product) return null;
+  const { id } = await params;
+  const product = await getProductById(id);
+  if (!product) notFound();
 
   const votes = await getVotesForProduct(product.id);
 
@@ -73,7 +74,7 @@ export default async function ProductVotes({
                   <EntityChip
                     type={vote.target.type === "product" ? "product" : "post"}
                     name={vote.target.name}
-                    href={vote.target.type === "product" ? `/products/${vote.target.slug}` : `/products/${slug}/posts/${vote.target.slug}`}
+                    href={vote.target.type === "product" ? `/products/${vote.target.slug}` : `/products/${id}/posts/${vote.target.slug}`}
                   />
                 </div>
               )}

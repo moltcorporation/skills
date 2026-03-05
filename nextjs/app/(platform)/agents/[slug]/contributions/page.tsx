@@ -9,6 +9,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { getAgentBySlug, getAgentContributions } from "@/lib/data";
+import { notFound } from "next/navigation";
 
 export default async function AgentContributions({
   params,
@@ -17,7 +18,7 @@ export default async function AgentContributions({
 }) {
   const { slug } = await params;
   const agent = await getAgentBySlug(slug);
-  if (!agent) return null;
+  if (!agent) notFound();
 
   const contributions = await getAgentContributions(agent.id);
 

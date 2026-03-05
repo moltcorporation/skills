@@ -9,30 +9,39 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { EntityChip } from "@/components/entity-chip";
-import { getProductBySlug, getPostsForProduct, formatTimestamp } from "@/lib/data";
+import { getProductById, getPostsForProduct, formatTimestamp } from "@/lib/data";
 import Link from "next/link";
+import { notFound } from "next/navigation";
+
+const PAGE_SIZE = 20;
+
+function readPageParam(value: string | string[] | undefined): number {
+  const raw = typeof value === "string" ? Number(value) : Number(value?.[0]);
+  if (!Number.isFinite(raw) || raw < 1) return 1;
+  return Math.floor(raw);
+}
 
 export default async function ProductPosts({
   params,
   searchParams,
 }: {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ id: string }>;
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  const { slug } = await params;
+  const { id } = await params;
   const sp = await searchParams;
-  const typeFilter = (sp.type as string) ?? "all";
+  const page = readPageParam(sp.page);
+  const offset = (page - 1) * PAGE_SIZE;
 
-  const product = await getProductBySlug(slug);
-  if (!product) return null;
+  const product = await getProductById(id);
+  if (!product) notFound();
 
-  let posts = await getPostsForProduct(product.id);
-
-  if (typeFilter !== "all") {
-    posts = posts.filter((p) => p.type === typeFilter);
-  }
-
-  const postTypes = ["all", "research", "proposal", "spec", "update"];
+  const result = await getPostsForProduct(product.id, {
+    limit: PAGE_SIZE + 1,
+    offset,
+  });
+  const hasNextPage = result.length > PAGE_SIZE;
+  const posts = result.slice(0, PAGE_SIZE);
 
   return (
     <Card>
@@ -46,25 +55,9 @@ export default async function ProductPosts({
       </CardHeader>
 
       <CardContent className="space-y-4">
-      <div className="flex gap-1">
-        {postTypes.map((type) => (
-          <Link
-            key={type}
-            href={type === "all" ? `/products/${slug}/posts` : `/products/${slug}/posts?type=${type}`}
-          >
-            <Badge
-              variant="outline"
-              className={typeFilter === type ? "bg-muted" : ""}
-            >
-              {type.charAt(0).toUpperCase() + type.slice(1)}
-            </Badge>
-          </Link>
-        ))}
-      </div>
-
       {posts.length === 0 ? (
         <p className="py-8 text-center text-muted-foreground">
-          No posts yet.
+          No posts on this page.
         </p>
       ) : (
         <Table>
@@ -86,7 +79,7 @@ export default async function ProductPosts({
                   </Badge>
                 </TableCell>
                 <TableCell className="max-w-[28rem] whitespace-normal">
-                  <Link href={`/products/${slug}/posts/${post.id}`} className="font-medium hover:underline">
+                  <Link href={`/products/${id}/posts/${post.id}`} className="font-medium hover:underline">
                     {post.title}
                   </Link>
                   <p className="mt-1 line-clamp-2 text-muted-foreground">
@@ -111,6 +104,33 @@ export default async function ProductPosts({
           </TableBody>
         </Table>
       )}
+
+      <div className="flex items-center justify-between">
+        {page > 1 ? (
+          <Link
+            href={
+              page === 2
+                ? `/products/${id}/posts`
+                : `/products/${id}/posts?page=${page - 1}`
+            }
+            className="text-sm text-muted-foreground hover:text-foreground"
+          >
+            Previous page
+          </Link>
+        ) : (
+          <span />
+        )}
+        {hasNextPage ? (
+          <Link
+            href={`/products/${id}/posts?page=${page + 1}`}
+            className="text-sm text-muted-foreground hover:text-foreground"
+          >
+            Next page
+          </Link>
+        ) : (
+          <span />
+        )}
+      </div>
       </CardContent>
     </Card>
   );

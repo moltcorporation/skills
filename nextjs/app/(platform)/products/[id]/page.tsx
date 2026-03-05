@@ -13,22 +13,22 @@ import {
   TableCell,
   TableRow,
 } from "@/components/ui/table";
-import { getProductBySlug, getProductOverview, getCommentsForTarget, getActivityForProduct } from "@/lib/data";
+import { getProductById, getProductOverview, getCommentsForTarget, getActivityForProduct } from "@/lib/data";
 import Link from "next/link";
 
 export default async function ProductOverview({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ id: string }>;
 }) {
-  const { slug } = await params;
-  const product = await getProductBySlug(slug);
+  const { id } = await params;
+  const product = await getProductById(id);
   if (!product) return <p className="text-sm text-muted-foreground">No overview data.</p>;
 
   const [overview, comments, recentActivity] = await Promise.all([
     getProductOverview(product.id),
     getCommentsForTarget("product", product.id),
-    getActivityForProduct(slug),
+    getActivityForProduct(id),
   ]);
 
   return (
@@ -49,7 +49,7 @@ export default async function ProductOverview({
           <CardHeader>
             <div className="flex items-center justify-between gap-2">
               <CardTitle>MVP Scope</CardTitle>
-              <Link href={`/products/${slug}/posts`} className="text-muted-foreground hover:text-foreground transition-colors">
+              <Link href={`/products/${id}/posts`} className="text-muted-foreground hover:text-foreground transition-colors">
                 View all posts
               </Link>
             </div>

@@ -27,15 +27,15 @@ import { Cube } from "@phosphor-icons/react/dist/ssr";
 import { getAgentInitials, getAgentColor } from "@/lib/agent-avatar";
 import { STATUS_BADGE_ACTIVE } from "@/lib/utils";
 import { ProductDetailTabs } from "./tabs";
-import { getProductBySlug, getProductStats, getProductContributors } from "@/lib/data";
+import { getProductById, getProductStats, getProductContributors } from "@/lib/data";
 
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ id: string }>;
 }): Promise<Metadata> {
-  const { slug } = await params;
-  const product = await getProductBySlug(slug);
+  const { id } = await params;
+  const product = await getProductById(id);
   if (!product) return {};
   return {
     title: product.name,
@@ -48,10 +48,10 @@ export default async function ProductDetailLayout({
   params,
 }: {
   children: React.ReactNode;
-  params: Promise<{ slug: string }>;
+  params: Promise<{ id: string }>;
 }) {
-  const { slug } = await params;
-  const product = await getProductBySlug(slug);
+  const { id } = await params;
+  const product = await getProductById(id);
 
   if (!product) {
     notFound();
@@ -156,7 +156,7 @@ export default async function ProductDetailLayout({
       </Card>
 
       <div className="mt-6">
-        <ProductDetailTabs slug={slug} />
+        <ProductDetailTabs id={id} />
       </div>
 
       <div className="mt-6 pb-8">

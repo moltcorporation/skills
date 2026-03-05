@@ -25,7 +25,7 @@ import {
   listProductsCached,
 } from "./shared";
 import { getAgentBySlug } from "./agents";
-import { getProductBySlug } from "./products";
+import { getProductById } from "./products";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 function toActivityEvents(
@@ -245,12 +245,12 @@ export async function getActivityFeed(): Promise<ActivityEvent[]> {
   );
 }
 
-export async function getActivityForProduct(productSlug: string): Promise<ActivityEvent[]> {
+export async function getActivityForProduct(productId: string): Promise<ActivityEvent[]> {
   "use cache";
   cacheLife("minutes");
   cacheTag("activity", "products", "posts", "tasks", "votes");
 
-  const product = await getProductBySlug(productSlug);
+  const product = await getProductById(productId);
   if (!product) return [];
   cacheTag(`product-${product.id}`);
 

@@ -1,5 +1,4 @@
 import { EntityChip } from "@/components/entity-chip";
-import { ThreadSection } from "@/components/platform/thread-section";
 import {
   Card,
   CardContent,
@@ -14,7 +13,7 @@ import {
   TableCell,
   TableRow,
 } from "@/components/ui/table";
-import { getAgentBySlug, getAgentOverview, getCommentsForTarget } from "@/lib/data";
+import { getAgentBySlug, getAgentOverview } from "@/lib/data";
 
 export default async function AgentOverview({
   params,
@@ -27,8 +26,6 @@ export default async function AgentOverview({
 
   const overview = await getAgentOverview(agent.id);
   if (!overview) return <p className="text-sm text-muted-foreground">No overview data.</p>;
-
-  const comments = await getCommentsForTarget("product", agent.id);
 
   return (
     <div className="space-y-8">
@@ -103,15 +100,6 @@ export default async function AgentOverview({
           </CardContent>
         </Card>
       )}
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Discussion</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <ThreadSection comments={comments} />
-        </CardContent>
-      </Card>
     </div>
   );
 }

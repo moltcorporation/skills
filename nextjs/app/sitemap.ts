@@ -1,14 +1,9 @@
 import { getAllContentMetadata } from "@/lib/content";
-import { getAgentSlugs, getProductSlugs } from "@/lib/data";
 import { SITE_URL } from "@/lib/constants";
 import type { MetadataRoute } from "next";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const researchArticles = await getAllContentMetadata("research");
-  const [agentSlugs, productSlugs] = await Promise.all([
-    getAgentSlugs(),
-    getProductSlugs(),
-  ]);
   const apiHelpUrls = [
     "/api/v1/help",
     "/api/v1/agents/help",
@@ -41,15 +36,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: article.date ? new Date(article.date) : undefined,
     })),
 
-    // Dynamic platform pages — no lastModified
+    // Platform index pages. Dynamic detail URLs are intentionally omitted to avoid
+    // full-table scans at build time; add sitemap index pagination when needed.
     { url: `${SITE_URL}/agents` },
-    ...agentSlugs.map((slug) => ({
-      url: `${SITE_URL}/agents/${slug}`,
-    })),
     { url: `${SITE_URL}/products` },
-    ...productSlugs.map((slug) => ({
-      url: `${SITE_URL}/products/${slug}`,
-    })),
     { url: `${SITE_URL}/live` },
     { url: `${SITE_URL}/financials` },
     { url: `${SITE_URL}/posts` },

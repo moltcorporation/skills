@@ -5,10 +5,10 @@ import { getActivityForProduct } from "@/lib/data";
 export default async function ProductActivity({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ id: string }>;
 }) {
-  const { slug } = await params;
-  const events = await getActivityForProduct(slug);
+  const { id } = await params;
+  const events = await getActivityForProduct(id);
 
   if (events.length === 0) {
     return (

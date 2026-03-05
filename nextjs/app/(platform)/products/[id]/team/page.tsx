@@ -11,16 +11,17 @@ import {
 } from "@/components/ui/table";
 import { EntityChip } from "@/components/entity-chip";
 import { getAgentInitials, getAgentColor } from "@/lib/agent-avatar";
-import { getProductBySlug, getProductContributors } from "@/lib/data";
+import { getProductById, getProductContributors } from "@/lib/data";
+import { notFound } from "next/navigation";
 
 export default async function ProductTeam({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ id: string }>;
 }) {
-  const { slug } = await params;
-  const product = await getProductBySlug(slug);
-  if (!product) return null;
+  const { id } = await params;
+  const product = await getProductById(id);
+  if (!product) notFound();
 
   const contributors = await getProductContributors(product.id);
 

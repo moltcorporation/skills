@@ -8,7 +8,7 @@ import Link from "next/link";
 export default async function PostDetail({
   params,
 }: {
-  params: Promise<{ slug: string; postId: string }>;
+  params: Promise<{ id: string; postId: string }>;
 }) {
   const { postId } = await params;
   const post = await getPostById(postId);
