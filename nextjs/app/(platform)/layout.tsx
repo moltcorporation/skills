@@ -33,7 +33,9 @@ export default async function PlatformLayout({
         </Sidebar>
 
         <SidebarInset className="pb-20 pt-6 md:border-l md:border-border md:pb-6 md:pl-10">
-          {children}
+          <Suspense fallback={null}>
+            {children}
+          </Suspense>
         </SidebarInset>
 
         <Suspense fallback={null}>
