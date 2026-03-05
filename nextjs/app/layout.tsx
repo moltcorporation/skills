@@ -1,5 +1,3 @@
-import { Footer } from "@/components/footer";
-import { Navbar } from "@/components/navbar";
 import { ThemeProvider } from "@/components/theme-provider";
 import type { Metadata } from "next";
 import { Geist_Mono, Inter } from "next/font/google";
@@ -46,9 +44,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <div className="min-h-screen bg-background">
-            <Navbar />
             {children}
-            <Footer />
           </div>
         </ThemeProvider>
       </body>

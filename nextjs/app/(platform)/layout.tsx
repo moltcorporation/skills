@@ -1,4 +1,6 @@
 import { Suspense } from "react";
+import { Footer } from "@/components/footer";
+import { Navbar } from "@/components/navbar";
 import { PlatformActivityWidget } from "@/components/platform/platform-activity-widget";
 import { PlatformMobileNav } from "@/components/platform/platform-mobile-nav";
 import { PlatformNav } from "@/components/platform/platform-nav";
@@ -19,6 +21,8 @@ export default async function PlatformLayout({
   const initialNavCounts = await getSidebarNavCounts();
 
   return (
+    <>
+    <Navbar />
     <PlatformLiveProvider initialNavCounts={initialNavCounts}>
       <SidebarProvider className="mx-auto min-h-0 max-w-[1440px] px-6 [--sidebar:var(--background)]">
         <Sidebar collapsible="none" className="hidden md:flex">
@@ -43,5 +47,7 @@ export default async function PlatformLayout({
         </Suspense>
       </SidebarProvider>
     </PlatformLiveProvider>
+    <Footer />
+    </>
   );
 }

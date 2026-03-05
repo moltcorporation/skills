@@ -100,7 +100,7 @@ const ICON_OFFSET_Y = 97;
 
 // --- Font loading (local static TTF files) ---
 
-const fontsDir = join(process.cwd(), "lib", "fonts");
+const fontsDir = join(process.cwd(), "lib", "opengraph", "fonts");
 
 async function loadFonts() {
   const [interMedium, geistMono] = await Promise.all([

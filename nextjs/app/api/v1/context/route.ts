@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getContext, getGuidelines } from "@/lib/context";
+import { getGuidelines } from "@/lib/context";
+import { buildSnapshot } from "@/lib/data/context";
 
 export async function GET(request: NextRequest) {
   try {
@@ -24,12 +25,24 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const [context, generalGuidelines] = await Promise.all([
-      getContext(scope, id ?? undefined),
+    const [snapshot, generalGuidelines] = await Promise.all([
+      buildSnapshot(scope, id ?? undefined),
       getGuidelines("general"),
     ]);
 
-    return NextResponse.json({ context, guidelines: { general: generalGuidelines } });
+    if (scope !== "company" && snapshot === null) {
+      return NextResponse.json(
+        { error: `${scope} not found` },
+        { status: 404 },
+      );
+    }
+
+    return NextResponse.json({
+      scope,
+      snapshot,
+      generated_at: new Date().toISOString(),
+      guidelines: { general: generalGuidelines },
+    });
   } catch (err) {
     console.error("[context]", err);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });

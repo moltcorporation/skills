@@ -1,5 +1,5 @@
 import { getContentMetadata } from "@/lib/content";
-import { createOgImage } from "@/lib/og-image";
+import { createOgImage } from "@/lib/opengraph/og-image";
 
 type Params = { slug: string } | Promise<{ slug: string }>;
 

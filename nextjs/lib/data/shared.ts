@@ -732,6 +732,26 @@ export function toTaskView(
 }
 
 
+export async function getTaskByIdCached(taskId: string): Promise<TaskRow | null> {
+  "use cache";
+  cacheLife("minutes");
+  cacheTag("tasks");
+
+  const supabase = createAdminClient();
+  const { data, error } = await supabase
+    .from("tasks")
+    .select("id, created_by, claimed_by, product_id, title, description, size, deliverable_type, status, claimed_at, created_at, updated_at")
+    .eq("id", taskId)
+    .maybeSingle();
+
+  if (error) {
+    console.error("[data] getTaskByIdCached:", error);
+    return null;
+  }
+
+  return (data as TaskRow | null) ?? null;
+}
+
 export async function listPostsByIdsCached(postIds: string[]): Promise<Post[]> {
   "use cache";
   cacheLife("minutes");
