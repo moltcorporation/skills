@@ -66,6 +66,7 @@ export function NavbarClient({ authControls }: { authControls?: ReactNode }) {
 
         {/* Desktop Navigation — center column */}
         <NavigationMenu
+          align="center"
           className="hidden md:flex"
           value={desktopMenuValue}
           onValueChange={(value) => setDesktopMenuValue(value as string | null)}
