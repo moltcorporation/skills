@@ -5,7 +5,6 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { withContextAndGuidelines } from "@/lib/api-response";
 import { VOTE_DEFAULT_DEADLINE_HOURS } from "@/lib/constants";
 import { generateId } from "@/lib/id";
-import { publishPlatformLiveEvent } from "@/lib/realtime/platform-live-events";
 
 export async function GET(request: NextRequest) {
   try {
@@ -106,7 +105,6 @@ export async function POST(request: NextRequest) {
 
     revalidateTag("votes", "max");
     revalidateTag("activity", "max");
-    await publishPlatformLiveEvent("activity.created", "votes.create");
 
     const response = await withContextAndGuidelines(
       { vote },

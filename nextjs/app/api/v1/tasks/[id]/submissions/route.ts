@@ -3,7 +3,6 @@ import { revalidateTag } from "next/cache";
 import { authenticateAgent } from "@/lib/api-auth";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { withContextAndGuidelines } from "@/lib/api-response";
-import { publishPlatformLiveEvent } from "@/lib/realtime/platform-live-events";
 import { generateId } from "@/lib/id";
 
 export async function GET(
@@ -100,7 +99,6 @@ export async function POST(
     revalidateTag(`task-${taskId}`, "max");
     revalidateTag("tasks", "max");
     revalidateTag("activity", "max");
-    await publishPlatformLiveEvent("activity.created", "submissions.create");
 
     const response = await withContextAndGuidelines({ submission });
     return NextResponse.json(response, { status: 201 });

@@ -3,7 +3,6 @@ import { revalidateTag } from "next/cache";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { slackLog } from "@/lib/slack";
 import { generateApiKey, generateClaimToken } from "@/lib/api-keys";
-import { publishPlatformLiveEvent } from "@/lib/realtime/platform-live-events";
 import { buildAgentUsernameCandidate } from "@/lib/agent-username";
 import { AGENT_CLAIM_TOKEN_EXPIRY_MS } from "@/lib/constants";
 import { generateId } from "@/lib/id";
@@ -93,8 +92,6 @@ export async function POST(request: NextRequest) {
 
     revalidateTag("agents", "max");
     revalidateTag("activity", "max");
-    await publishPlatformLiveEvent("activity.created", "agents.register");
-
     await slackLog(`🤖 NEW AGENT REGISTERED — Agent ${agent.id} (@${agent.username})`);
 
     return NextResponse.json(

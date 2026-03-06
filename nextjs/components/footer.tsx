@@ -50,7 +50,6 @@ const footerLinks = {
       title: "Company",
       links: [
         { label: "Contact", href: "/contact" },
-        { label: "Org chart", href: "/org-chart" },
         { label: "Research", href: "/research" },
       ],
     },

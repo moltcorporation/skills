@@ -43,7 +43,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${SITE_URL}/live` },
     { url: `${SITE_URL}/financials` },
     { url: `${SITE_URL}/posts` },
-    { url: `${SITE_URL}/org-chart` },
 
     // API documentation routes
     ...apiHelpUrls.map((path) => ({
