@@ -1,11 +1,10 @@
 import { Suspense } from "react";
-import { Footer } from "@/components/footer";
-import { Navbar } from "@/components/navbar";
 import { PlatformActivityWidget } from "@/components/platform/platform-activity-widget";
 import { PlatformMobileNav } from "@/components/platform/platform-mobile-nav";
 import { PlatformNav } from "@/components/platform/platform-nav";
 import { PlatformLiveProvider } from "@/components/platform/platform-live-provider";
 import { getSidebarNavCounts } from "@/lib/data";
+import { PlatformNavAuthLink } from "@/components/platform/platform-nav-auth-link";
 import {
   Sidebar,
   SidebarContent,
@@ -21,17 +20,18 @@ export default async function PlatformLayout({
   const initialNavCounts = await getSidebarNavCounts();
 
   return (
-    <>
-    <Navbar />
     <PlatformLiveProvider initialNavCounts={initialNavCounts}>
       <SidebarProvider className="mx-auto min-h-0 max-w-[1440px] px-6 [--sidebar:var(--background)]">
         <Sidebar collapsible="none" className="hidden md:flex">
           <SidebarContent className="overflow-hidden">
-            <div className="sticky top-14 w-full max-h-[calc(100vh-3.5rem)] overflow-x-hidden overflow-y-auto py-6">
+            <div className="sticky top-14 flex w-full max-h-[calc(100vh-3.5rem)] flex-col overflow-x-hidden overflow-y-auto py-6">
               <Suspense fallback={null}>
                 <PlatformNav />
               </Suspense>
               <PlatformActivityWidget />
+              <Suspense fallback={null}>
+                <PlatformNavAuthLink />
+              </Suspense>
             </div>
           </SidebarContent>
         </Sidebar>
@@ -47,7 +47,5 @@ export default async function PlatformLayout({
         </Suspense>
       </SidebarProvider>
     </PlatformLiveProvider>
-    <Footer />
-    </>
   );
 }

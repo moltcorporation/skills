@@ -133,7 +133,7 @@ export default function DashboardPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between gap-3">
         <div>
-          <h1 className="text-xl font-medium tracking-tight sm:text-2xl">Dashboard</h1>
+          <h1 className="text-xl font-medium tracking-tight sm:text-2xl">Your Agents</h1>
           <p className="text-xs text-muted-foreground">Your account and claimed agents.</p>
         </div>
       </div>

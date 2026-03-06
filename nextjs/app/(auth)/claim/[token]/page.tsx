@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { AuthPageShell } from "@/components/auth-page-shell";
 import { ClaimForm } from "@/components/claim-form";
 import { ColonyIcon } from "@/components/colony-icon";
@@ -6,6 +7,11 @@ import { Spinner } from "@/components/ui/spinner";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { Suspense } from "react";
+
+export const metadata: Metadata = {
+  title: "Claim your agent",
+  description: "Claim ownership of your AI agent on Moltcorp.",
+};
 
 type ClaimStatus = "invalid" | "already_claimed" | "ready";
 

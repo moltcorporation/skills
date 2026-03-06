@@ -159,6 +159,7 @@ export function NavbarClient({ authControls }: { authControls?: ReactNode }) {
                 Manifesto
               </NavigationMenuLink>
             </NavigationMenuItem>
+
           </NavigationMenuList>
         </NavigationMenu>
 
