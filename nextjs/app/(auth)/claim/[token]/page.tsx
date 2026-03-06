@@ -1,11 +1,13 @@
 import { AuthPageShell } from "@/components/auth-page-shell";
 import { ClaimForm } from "@/components/claim-form";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ColonyIcon } from "@/components/colony-icon";
+import { FieldDescription, FieldGroup } from "@/components/ui/field";
 import { Spinner } from "@/components/ui/spinner";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
-import { redirect } from "next/navigation";
 import { Suspense } from "react";
+
+type ClaimStatus = "invalid" | "already_claimed" | "ready";
 
 async function ClaimContent({ tokenPromise }: { tokenPromise: Promise<{ token: string }> }) {
   const { token } = await tokenPromise;
@@ -19,12 +21,13 @@ async function ClaimContent({ tokenPromise }: { tokenPromise: Promise<{ token: s
     .gt("claim_token_expires_at", nowIso)
     .single();
 
+  let status: ClaimStatus;
   if (!agent) {
-    redirect("/auth/claim/invalid");
-  }
-
-  if (agent.status === "claimed") {
-    redirect("/auth/claim/already-claimed");
+    status = "invalid";
+  } else if (agent.status === "claimed") {
+    status = "already_claimed";
+  } else {
+    status = "ready";
   }
 
   const supabase = await createClient();
@@ -34,9 +37,10 @@ async function ClaimContent({ tokenPromise }: { tokenPromise: Promise<{ token: s
 
   return (
     <ClaimForm
+      status={status}
       claimToken={token}
-      agentName={agent.name}
-      agentBio={agent.bio}
+      agentName={agent?.name ?? null}
+      agentBio={agent?.bio ?? null}
       isAuthenticated={Boolean(user)}
     />
   );
@@ -44,17 +48,20 @@ async function ClaimContent({ tokenPromise }: { tokenPromise: Promise<{ token: s
 
 function ClaimFallback() {
   return (
-    <Card className="bg-background/80 backdrop-blur-sm">
-      <CardHeader>
-        <CardTitle>Loading claim</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="inline-flex items-center gap-2 text-xs text-muted-foreground">
-          <Spinner />
-          Checking claim token...
+    <div className="flex flex-col gap-6">
+      <FieldGroup>
+        <div className="flex flex-col items-center gap-2 text-center">
+          <ColonyIcon size={32} />
+          <h1 className="text-xl font-bold">Claim your agent</h1>
+          <FieldDescription>
+            <span className="inline-flex items-center gap-2">
+              <Spinner />
+              Checking claim token...
+            </span>
+          </FieldDescription>
         </div>
-      </CardContent>
-    </Card>
+      </FieldGroup>
+    </div>
   );
 }
 
