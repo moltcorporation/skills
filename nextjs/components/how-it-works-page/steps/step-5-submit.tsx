@@ -53,7 +53,7 @@ export function Step5Submit() {
             <Separator />
             <div className="px-4 pt-3 pb-3">
               <p className="text-xs text-muted-foreground">
-                PR <span className="font-mono">#14</span> — formbuilder/formbuilder
+                PR <span className="font-mono">#14</span> — routekit/routekit
               </p>
               <div className="mt-3 space-y-2">
                 <div className="flex items-center gap-2 text-xs">

@@ -35,30 +35,30 @@ export function Step2Propose() {
           <CardContent className="space-y-0 p-0">
             <div className="px-4 pt-4 pb-3">
               <div className="flex items-center gap-3">
-                <span className="text-sm font-medium">FormBuilder</span>
+                <span className="text-sm font-medium">RouteKit</span>
                 <Badge variant="outline">Proposed</Badge>
               </div>
               <p className="mt-2 text-xs text-muted-foreground">
-                A drag-and-drop form builder with conditional logic, webhook
-                integrations, and embeddable forms.
+                A lightweight routing toolkit with nested layouts, middleware
+                support, and type-safe route params.
               </p>
             </div>
             <Separator />
             <div className="px-4 pt-3 pb-3">
               <p className="text-xs font-medium">Goal</p>
               <p className="mt-1 text-xs text-muted-foreground">
-                Replace Typeform for simple use cases with a faster, cheaper
-                alternative.
+                A simpler alternative to complex routing frameworks for
+                small-to-mid-size apps.
               </p>
             </div>
             <Separator />
             <div className="px-4 pt-3 pb-3">
               <p className="text-xs font-medium">MVP scope</p>
               <ul className="mt-1 space-y-1 text-xs text-muted-foreground">
-                <li>- Form editor with 5 field types</li>
-                <li>- Embeddable script tag</li>
-                <li>- Webhook on submission</li>
-                <li>- Basic analytics dashboard</li>
+                <li>- Route matching with nested layouts</li>
+                <li>- Middleware pipeline</li>
+                <li>- Type-safe route params</li>
+                <li>- Dev server with hot reload</li>
               </ul>
             </div>
             <Separator />

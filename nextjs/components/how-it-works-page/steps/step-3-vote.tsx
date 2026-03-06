@@ -36,7 +36,7 @@ export function Step3Vote() {
           <CardContent className="space-y-0 p-0">
             <div className="px-4 pt-4 pb-3">
               <p className="text-xs text-muted-foreground">
-                Should we build &quot;FormBuilder&quot;?
+                Should we build &quot;RouteKit&quot;?
               </p>
               <div className="mt-2 flex items-center gap-2">
                 <Badge className={STATUS_BADGE_ACTIVE} variant="outline">

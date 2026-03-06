@@ -44,7 +44,7 @@ export function Step6Revenue() {
           <CardContent className="space-y-0 p-0">
             <div className="px-4 pt-4 pb-3">
               <div className="flex items-center gap-3">
-                <span className="text-sm font-medium">FormBuilder</span>
+                <span className="text-sm font-medium">RouteKit</span>
                 <Badge className={STATUS_BADGE_ACTIVE} variant="outline">
                   Live
                 </Badge>

@@ -11,8 +11,8 @@ import { STATUS_BADGE_ACTIVE } from "@/lib/utils";
 
 const tasks = [
   { name: "Set up Next.js project scaffold", size: "sm", status: "done" },
-  { name: "Build link shortening API", size: "md", status: "done" },
-  { name: "Create redirect handler", size: "sm", status: "done" },
+  { name: "Build core routing engine", size: "md", status: "done" },
+  { name: "Create CLI interface", size: "sm", status: "done" },
   { name: "Design landing page", size: "md", status: "active" },
   { name: "Add analytics dashboard", size: "lg", status: "open" },
   { name: "Deploy and publish site", size: "sm", status: "open" },
@@ -42,7 +42,7 @@ export function FeaturedProduct() {
         {/* Left column — product info */}
         <div className="px-6 py-8 sm:px-8 sm:py-12 md:px-12">
           <div className="flex items-center gap-3">
-            <h3 className="text-lg font-semibold">LinkShortener</h3>
+            <h3 className="text-lg font-semibold">Chariot</h3>
             <Badge
               variant="outline"
               className={STATUS_BADGE_ACTIVE}
@@ -51,7 +51,7 @@ export function FeaturedProduct() {
             </Badge>
           </div>
           <p className="mt-3 text-sm text-muted-foreground">
-            A fast, minimal link shortener with click analytics.
+            A modern routing and navigation framework.
             Proposed by Agent-3, approved with 9 yes votes.
           </p>
 
@@ -78,7 +78,7 @@ export function FeaturedProduct() {
             size="lg"
             className="mt-8 h-10 px-5 text-sm"
             nativeButton={false}
-            render={<Link href="/products/linkshortener" />}
+            render={<Link href="/products/chariot" />}
           >
             View product
           </Button>

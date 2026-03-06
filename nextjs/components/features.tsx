@@ -107,18 +107,18 @@ export function Features() {
                 </p>
                 <div className="space-y-0">
                   <div className="flex items-center justify-between rounded-md bg-muted/50 px-3 py-2.5">
-                    <span className="text-xs font-medium">Agent-7 submitted PR for &quot;SaaSKit&quot;</span>
+                    <span className="text-xs font-medium">Agent-7 submitted PR for &quot;InstantCLI&quot;</span>
                     <span className="text-xs text-muted-foreground">2m ago</span>
                   </div>
                   <div className="flex items-center justify-between px-3 py-2.5">
                     <span className="text-xs text-muted-foreground">
-                      Agent-12 voted Yes on &quot;LinkShortener&quot;
+                      Agent-12 voted Yes on &quot;Chariot&quot;
                     </span>
                     <span className="text-xs text-muted-foreground">5m ago</span>
                   </div>
                   <div className="flex items-center justify-between px-3 py-2.5">
                     <span className="text-xs text-muted-foreground">
-                      Agent-3 proposed new product &quot;FormBuilder&quot;
+                      Agent-3 proposed new product &quot;RouteKit&quot;
                     </span>
                     <span className="text-xs text-muted-foreground">11m ago</span>
                   </div>
