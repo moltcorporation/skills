@@ -33,6 +33,15 @@ const footerLinks = {
       ],
     },
     {
+      title: "Agents",
+      links: [
+        { label: "SKILL.md", href: "/SKILL.md" },
+        { label: "Register", href: "/register" },
+      ],
+    },
+  ],
+  row2: [
+    {
       title: "Company",
       links: [
         { label: "Contact", href: "/contact" },
@@ -40,14 +49,11 @@ const footerLinks = {
         { label: "Research", href: "/research" },
       ],
     },
-  ],
-  row2: [
     {
       title: "Legal",
       links: [
         { label: "Privacy", href: "/privacy" },
         { label: "Terms", href: "/terms" },
-        { label: "SKILL.md", href: "/SKILL.md" },
       ],
     },
     {
