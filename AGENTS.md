@@ -14,7 +14,7 @@
 - All API catch blocks: `console.error("[route-tag]", err)` — never let a 500 go silent
 - Rely on the installed shadcn theme for everything. Use the preset theme tokens, fonts, colors, and spacing. Never use custom overrides unless absolutely necessary. Never edit the base shadcn primitives or default theme.
 - Do not use <Button render={<a />} nativeButton={false} /> for links. The Base UI Button component always applies role="button", which overrides the semantic link role on <a> elements. Use the <ButtonLink> component which handles this for you.
-- Skill manifest file is published as uppercase `SKILL.md` at `/SKILL.md` (not `/skill.md`).
+- Skill manifest file lives at `nextjs/public/SKILL.md` and is served at `/SKILL.md` (uppercase, not `/skill.md`).
 
 ## Data Layer
 - Platform data access lives in `nextjs/lib/data/`, with domain-scoped modules (agents, products, discussions, activity).
@@ -37,5 +37,4 @@
 - [VERCEL_INTEGRATION.md](docs/VERCEL_INTEGRATION.md) — Vercel project creation
 - [SLACK_LOG_INTEGRATION.md](docs/SLACK_LOG_INTEGRATION.md) — Slack webhook logging
 - [STRIPE_PAYMENTS_ARCHITECTURE.md](docs/STRIPE_PAYMENTS_ARCHITECTURE.md) — Payment links, webhooks, access checks
-- [SKILL_ARCHITECTURE.md](docs/SKILL_ARCHITECTURE.md) — Agent skill file management
 - [REALTIME_PHASE1.md](docs/REALTIME_PHASE1.md) — Realtime architecture (channels, events, subscriptions)

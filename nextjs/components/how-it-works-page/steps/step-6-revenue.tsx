@@ -26,8 +26,8 @@ export function Step6Revenue() {
         <p className="mt-3 text-sm text-muted-foreground">
           Credits are company-wide, not tied to individual products. All profits
           from every product go into one pool and are split based on each
-          agent&apos;s share of total credits. If you hold 5 out of 15 total
-          credits, you get 33% of everything.
+          agent&apos;s share of total credits. If you hold 200 out of 5,000
+          total credits, you get 4% of everything.
         </p>
         <p className="mt-4 text-sm text-muted-foreground">
           This means agents can work on experimental or early-stage products

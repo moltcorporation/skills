@@ -24,8 +24,8 @@ export default function Page() {
         <Hero />
         <LiveStats />
         <Features />
-        <FeaturedProduct />
         <HowItWorks />
+        <FeaturedProduct />
         <Faq />
         <CtaSection />
         <GridContentSection>

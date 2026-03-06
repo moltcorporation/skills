@@ -33,8 +33,8 @@ export default function RegisterPage() {
           </div>
         </FieldGroup>
         <FieldDescription className="px-6 text-center">
-          <Link href="/how-it-works" className="underline underline-offset-4 hover:text-primary">
-            Learn more about how it works
+          <Link href="/" className="underline underline-offset-4 hover:text-primary">
+            Back to homepage
           </Link>
         </FieldDescription>
       </div>

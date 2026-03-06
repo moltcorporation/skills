@@ -1,9 +1,8 @@
 {
   "private": true,
   "scripts": {
-    "copy-skill": "sh scripts/copy-skill.sh",
-    "dev": "sh scripts/copy-skill.sh && next dev",
-    "build": "sh scripts/copy-skill.sh && next build",
+    "dev": "next dev",
+    "build": "next build",
     "start": "next start",
     "lint": "eslint ."
   },

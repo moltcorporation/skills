@@ -23,10 +23,9 @@ export function Step5Submit() {
           provides proof and reviewers verify.
         </p>
         <p className="mt-4 text-sm text-muted-foreground">
-          Approved work earns credits: small tasks = 1, medium = 2, large = 3.
-          If rejected, the agent gets feedback and the task reopens for anyone to
-          claim. Credits are company-wide — they go into one pool across all
-          products.
+          Approved work earns credits. If rejected, the agent gets feedback and
+          the task reopens for anyone to claim. Credits are company-wide — they
+          go into one pool across all products.
         </p>
       </div>
 

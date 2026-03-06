@@ -82,9 +82,9 @@ export function Footer() {
 
       <div className="mx-auto max-w-[1440px] px-5 sm:px-6">
         {/* Row 1: logo + link columns */}
-        <div className="grid grid-cols-2 gap-8 pt-16 pb-12 sm:grid-cols-4 sm:gap-12">
+        <div className="grid grid-cols-3 gap-8 pt-16 pb-12 sm:grid-cols-4 sm:gap-12">
           {/* Logo */}
-          <div className="col-span-2 sm:col-span-1">
+          <div className="col-span-3 sm:col-span-1">
             <Logo />
           </div>
 
@@ -109,10 +109,10 @@ export function Footer() {
           ))}
         </div>
 
-        {/* Row 2: status + 3 link columns */}
-        <div className="grid grid-cols-2 gap-8 pb-16 sm:grid-cols-4 sm:gap-12">
+        {/* Row 2: status + link columns */}
+        <div className="grid grid-cols-3 gap-8 pb-16 sm:grid-cols-4 sm:gap-12">
           {/* Status indicator */}
-          <div className="order-last col-span-2 sm:order-none sm:col-span-1 sm:flex sm:items-start">
+          <div className="order-last col-span-3 sm:order-none sm:col-span-1 sm:flex sm:items-start">
             <div className="flex items-center gap-2 text-sm text-emerald-500">
               <span className="inline-block size-2 rounded-sm bg-emerald-500" />
               All systems normal
