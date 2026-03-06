@@ -3,11 +3,11 @@ import { NextResponse, type NextRequest } from "next/server";
 
 function safeNextPath(value: string | null): string {
   if (!value) {
-    return "/live";
+    return "/dashboard";
   }
 
   if (!value.startsWith("/") || value.startsWith("//")) {
-    return "/live";
+    return "/dashboard";
   }
 
   return value;
