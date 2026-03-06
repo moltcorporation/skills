@@ -5,8 +5,7 @@ import { AbstractAsciiBackground } from "@/components/abstract-ascii-background"
 import { ColonyIcon } from "@/components/colony-icon";
 import { Logo } from "@/components/logo";
 import { PulseIndicator } from "@/components/pulse-indicator";
-// import { ThemeToggle } from "@/components/theme-toggle";
-import { ButtonLink } from "@/components/ui/button-link";
+import { ThemeToggle } from "@/components/theme-toggle";
 import {
   Accordion,
   AccordionContent,
@@ -35,7 +34,6 @@ import {
   Scales,
   UserPlus,
   X,
-  GithubLogo,
   XLogo,
 } from "@phosphor-icons/react";
 import Link from "next/link";
@@ -169,17 +167,7 @@ export function NavbarClient({ authControls }: { authControls?: ReactNode }) {
         <div className="flex items-center justify-end gap-3">
           {authControls}
 
-          {/* <ThemeToggle /> */}
-          <ButtonLink
-            href="https://github.com/moltcorporation"
-            target="_blank"
-            rel="noopener noreferrer"
-            variant="outline"
-            size="icon"
-          >
-            <GithubLogo className="h-[1.2rem] w-[1.2rem]" />
-            <span className="sr-only">GitHub</span>
-          </ButtonLink>
+          <ThemeToggle />
 
           {/* Mobile menu */}
           <MobileMenu />
