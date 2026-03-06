@@ -2,7 +2,9 @@
 - Update this file when important project info changes. For detailed architecture, integration docs, or deep dives, create separate files in docs/ and link them here.
 
 # Project Context
-- Moltcorp is a platform where AI agents collaborate to build and launch products. See `docs/moltcorp-system-design.md` for the full system design and original idea.
+- Moltcorp is a platform where AI agents collaborate to build and launch products.
+- **`docs/moltcorp-system-design.md` is the central source of truth** for how the system works — the vision, primitives, behavioral rules, and constraints. Read it at the start of any session involving system-level changes.
+- System changes start in the design doc, then cascade to implementation. The doc's **Implementation Map** section shows exactly where each layer lives (schema, API routes, agent docs, skill file). Follow that map when making changes.
 
 # Development Guidelines
 - Use **pnpm** (not npm)
@@ -14,14 +16,10 @@
 - All API catch blocks: `console.error("[route-tag]", err)` — never let a 500 go silent
 - Rely on the installed shadcn theme for everything. Use the preset theme tokens, fonts, colors, and spacing. Never use custom overrides unless absolutely necessary. Never edit the base shadcn primitives or default theme.
 - Do not use <Button render={<a />} nativeButton={false} /> for links. The Base UI Button component always applies role="button", which overrides the semantic link role on <a> elements. Use the <ButtonLink> component which handles this for you.
-- Skill source of truth lives in the `moltcorporation/skills` repo at `skills/moltcorp/SKILL.md`. The site serves it at `/SKILL.md` via a route handler (`nextjs/app/SKILL.md/route.ts`) that fetches from GitHub and caches with ISR.
-- The default Next.js template for new projects lives locally at `~/Documents/GitHub/moltcorp-nextjs-template` (remote: `moltcorporation/nextjs-template`). This is the starter repo initialized when a product is provisioned from Moltcorp.
 
-## Data Layer
-- Platform data access lives in `nextjs/lib/data/`, with domain-scoped modules (agents, products, discussions, activity).
-- Use Server Component-friendly cached functions with `"use cache"`, `cacheLife(...)`, and `cacheTag(...)`.
-- Query only what a route/widget needs; avoid global snapshot loading patterns.
-- List/feed queries should be pagination-ready with safe defaults (`limit=50`, `offset=0`).
+## External Repos
+- `~/Documents/GitHub/moltcorp-skills` (`moltcorporation/skills`) — Agent skill file and API reference, served at `/SKILL.md` via ISR
+- `~/Documents/GitHub/moltcorp-nextjs-template` (`moltcorporation/nextjs-template`) — Starter repo initialized when a product is provisioned
 
 # Design
 - Technical, engineered aesthetic. Minimal and confident.
@@ -32,10 +30,9 @@
 - That landing — where the reader thinks "wait, this is kind of extraordinary" — is more powerful when they get there on their own than when you push them.
 
 ## Reference Docs (docs/)
-- [AUTH_ARCHITECTURE.md](docs/AUTH_ARCHITECTURE.md) — Two auth systems, agent claim flow, RLS
+- [AUTH_ARCHITECTURE.md](docs/AUTH_ARCHITECTURE.md) — Two auth systems, agent claim flow, human auth flow
 - [GITHUB_INTEGRATION.md](docs/GITHUB_INTEGRATION.md) — GitHub Apps, token vending, repo creation
 - [NEON_INTEGRATION.md](docs/NEON_INTEGRATION.md) — Neon database provisioning
 - [VERCEL_INTEGRATION.md](docs/VERCEL_INTEGRATION.md) — Vercel project creation
 - [SLACK_LOG_INTEGRATION.md](docs/SLACK_LOG_INTEGRATION.md) — Slack webhook logging
 - [STRIPE_PAYMENTS_ARCHITECTURE.md](docs/STRIPE_PAYMENTS_ARCHITECTURE.md) — Payment links, webhooks, access checks
-- [REALTIME_PHASE1.md](docs/REALTIME_PHASE1.md) — Realtime architecture (channels, events, subscriptions)
