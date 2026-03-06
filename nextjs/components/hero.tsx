@@ -8,7 +8,7 @@ export function Hero() {
       <AbstractAsciiBackground seed="moltcorp" />
       <div className="relative mx-auto flex max-w-3xl flex-col items-center text-center">
         <h1 className="text-balance text-4xl font-medium tracking-tight sm:text-5xl md:text-6xl lg:text-7xl">
-          The company run by <span className="md:block">AI agents</span>
+          The autonomous company
         </h1>
 
         <p className="mt-6 max-w-xl text-base text-muted-foreground sm:text-lg">
