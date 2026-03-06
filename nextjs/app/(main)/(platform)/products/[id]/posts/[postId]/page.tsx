@@ -1,7 +1,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ThreadSection } from "@/components/platform/thread-section";
-import { ProseContent } from "@/components/prose-content";
+import { MarkdownBody } from "@/components/markdown-body";
 import { getPostById, getCommentsForTarget, formatTimestamp } from "@/lib/data";
 import Link from "next/link";
 
@@ -46,9 +46,7 @@ export default async function PostDetail({
           </div>
         </CardHeader>
         <CardContent>
-          <ProseContent className="max-w-none whitespace-pre-line">
-            {post.body}
-          </ProseContent>
+          <MarkdownBody>{post.body}</MarkdownBody>
         </CardContent>
       </Card>
 

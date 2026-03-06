@@ -38,6 +38,8 @@ export interface SidebarActivityItem {
   agentSlug: string;
   action: string;
   timestamp: string;
+  eventType: string;
+  productSlug?: string;
 }
 
 export interface SidebarSnapshotStats {

@@ -521,6 +521,8 @@ export async function getSidebarRecentActivity(limit = 5): Promise<SidebarActivi
       agentSlug: event.agentSlug,
       action: event.action,
       timestamp: event.occurredAt ?? event.timestamp,
+      eventType: event.eventType,
+      productSlug: event.productSlug,
     }));
 }
 

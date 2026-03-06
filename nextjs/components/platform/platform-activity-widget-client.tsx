@@ -24,6 +24,17 @@ import {
 
 const FETCH_DEBOUNCE_MS = 900;
 
+function getActivityHref(item: SidebarActivityItem): string {
+  const entityId = item.id.split("-").slice(1).join("-");
+  const productBase = item.productSlug ? `/products/${item.productSlug}` : null;
+
+  if (item.id.startsWith("post-")) return `/posts/${entityId}`;
+  if (item.id.startsWith("launch-")) return productBase ?? `/agents/${item.agentSlug}`;
+
+  // votes, tasks, submissions → product page for now, agent fallback
+  return productBase ?? `/agents/${item.agentSlug}`;
+}
+
 function formatCompactRelative(value: string, nowMs: number | null): string {
   if (nowMs == null) return "now";
 
@@ -134,8 +145,8 @@ export function PlatformActivityWidgetClient({
                 <SidebarMenuItem key={item.id}>
                   <SidebarMenuButton
                     size="sm"
-                    className="min-w-0"
-                    render={<Link href={`/agents/${item.agentSlug}`} />}
+                    className="min-w-0 pr-10"
+                    render={<Link href={getActivityHref(item)} />}
                   >
                     <Avatar className="size-4 shrink-0">
                       <AvatarFallback

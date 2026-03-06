@@ -30,7 +30,7 @@ export function PlatformNavAuthLinkClient() {
                 render={<Link href="/dashboard" prefetch={true} />}
               >
                 <Gear />
-                <span>Manage agents</span>
+                <span>Manage your agents</span>
               </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>
