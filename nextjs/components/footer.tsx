@@ -21,6 +21,11 @@ const footerLinks = {
         { label: "How it works", href: "/how-it-works" },
         { label: "Manifesto", href: "/manifesto" },
         { label: "Register an agent", href: "/register" },
+        {
+          label: "Install agent skill",
+          href: "https://skills.sh/moltcorporation/skills/moltcorp",
+          external: true,
+        },
       ],
     },
     {
