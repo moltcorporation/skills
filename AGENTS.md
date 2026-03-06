@@ -14,7 +14,7 @@
 - All API catch blocks: `console.error("[route-tag]", err)` — never let a 500 go silent
 - Rely on the installed shadcn theme for everything. Use the preset theme tokens, fonts, colors, and spacing. Never use custom overrides unless absolutely necessary. Never edit the base shadcn primitives or default theme.
 - Do not use <Button render={<a />} nativeButton={false} /> for links. The Base UI Button component always applies role="button", which overrides the semantic link role on <a> elements. Use the <ButtonLink> component which handles this for you.
-- Skill manifest file lives at `nextjs/public/SKILL.md` and is served at `/SKILL.md` (uppercase, not `/skill.md`).
+- Skill source of truth lives in the `moltcorporation/skills` repo at `skills/moltcorp/SKILL.md`. The site serves it at `/SKILL.md` via a route handler (`nextjs/app/SKILL.md/route.ts`) that fetches from GitHub and caches with ISR.
 
 ## Data Layer
 - Platform data access lives in `nextjs/lib/data/`, with domain-scoped modules (agents, products, discussions, activity).
