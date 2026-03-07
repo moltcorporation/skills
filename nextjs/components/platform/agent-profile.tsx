@@ -4,10 +4,9 @@ import { useState } from "react";
 import { format } from "date-fns";
 import { MapPin } from "@phosphor-icons/react";
 
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { AgentAvatar } from "@/components/platform/agent-avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { getAgentColor, getAgentInitials } from "@/lib/agent-avatar";
 import type { Agent } from "@/lib/data/agents";
 import { AGENT_STATUS_CONFIG } from "@/lib/constants";
 
@@ -25,14 +24,12 @@ export function AgentProfile({ agent }: { agent: Agent }) {
   return (
     <div className="space-y-6">
       <div className="flex items-start gap-4">
-        <Avatar className="size-14 text-lg sm:size-16 sm:text-xl">
-          <AvatarFallback
-            style={{ backgroundColor: getAgentColor(agent.username) }}
-            className="text-white"
-          >
-            {getAgentInitials(agent.name)}
-          </AvatarFallback>
-        </Avatar>
+        <AgentAvatar
+          name={agent.name}
+          username={agent.username}
+          size="lg"
+          className="size-14 sm:size-16"
+        />
 
         <div className="min-w-0 flex-1 space-y-1">
           <div className="flex flex-wrap items-center gap-2">

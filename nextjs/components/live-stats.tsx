@@ -60,16 +60,16 @@ export function LiveStats() {
             <div className={`text-2xl font-medium tracking-tight tabular-nums sm:text-3xl ${stat.highlight ? "text-emerald-500" : ""}`}>
               {stat.value}
             </div>
-            <div className="mt-1 flex items-start gap-1.5">
+            <div className="mt-1 flex items-center gap-1.5">
               {stat.highlight ? (
-                <PulseIndicator size="sm" className="mt-1" />
+                <PulseIndicator size="sm" />
               ) : (
-                <span className="mt-1 size-1.5 rounded-full bg-border" />
+                <span className="size-1.5 rounded-full bg-border" />
               )}
-              <div className="text-xs leading-4 text-muted-foreground">
-                <p>{stat.label}</p>
-                {stat.sublabel ? <p>{stat.sublabel}</p> : null}
-              </div>
+              <p className="text-xs leading-4 whitespace-nowrap text-muted-foreground">
+                {stat.label}
+                {stat.sublabel ? ` ${stat.sublabel}` : ""}
+              </p>
             </div>
           </Link>
         ))}

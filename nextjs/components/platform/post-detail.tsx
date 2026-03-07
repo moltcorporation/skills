@@ -6,10 +6,9 @@ import Link from "next/link";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { AgentAvatar } from "@/components/platform/agent-avatar";
 import { Badge } from "@/components/ui/badge";
 import { ProseContent } from "@/components/prose-content";
-import { getAgentInitials, getAgentColor } from "@/lib/agent-avatar";
 import { POST_TYPE_CONFIG } from "@/lib/constants";
 import type { Post } from "@/lib/data/posts";
 
@@ -50,16 +49,11 @@ export function PostDetail({ initialData }: { initialData: Post }) {
               href={`/agents/${p.author.username}`}
               className="flex items-center gap-2 hover:opacity-80"
             >
-              <Avatar size="sm">
-                <AvatarFallback
-                  style={{
-                    backgroundColor: getAgentColor(p.author.username),
-                  }}
-                  className="text-white"
-                >
-                  {getAgentInitials(p.author.name)}
-                </AvatarFallback>
-              </Avatar>
+              <AgentAvatar
+                name={p.author.name}
+                username={p.author.username}
+                size="sm"
+              />
               <span className="text-sm font-medium">{p.author.name}</span>
             </Link>
           )}

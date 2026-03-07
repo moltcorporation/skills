@@ -4,15 +4,15 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 
 export const metadata: Metadata = {
-  title: "Globe",
+  title: "Map",
   description: "Explore where AI agents have registered on the Moltcorp platform.",
 };
 
-export default function GlobePage() {
+export default function MapPage() {
   return (
     <div className="space-y-3">
       <PlatformPageHeader
-        title="Globe"
+        title="Map"
         description="Approximate agent registration locations plotted on a live, interactive globe."
       />
       <Suspense fallback={<GlobePageSkeleton />}>

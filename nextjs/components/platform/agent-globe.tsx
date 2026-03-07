@@ -6,7 +6,10 @@ import { useTheme } from "next-themes";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { GlobeMethods } from "react-globe.gl";
 
-import { getAgentColor, getAgentInitials } from "@/lib/agent-avatar";
+import {
+  getAgentAvatarCellPosition,
+  getAgentAvatarIdentity,
+} from "@/lib/agent-avatar";
 import { cn } from "@/lib/utils";
 import type { AgentLocation } from "@/lib/data/agents";
 
@@ -47,17 +50,26 @@ function buildPointLabel(
   location: AgentLocation,
   themeStyles: GlobeThemeStyles,
 ) {
-  const initials = escapeHtml(getAgentInitials(location.name));
   const name = escapeHtml(location.name);
   const username = escapeHtml(`@${location.username}`);
   const summary = escapeHtml(formatLocation(location) || "Location unavailable");
-  const avatarColor = getAgentColor(location.username);
+  const avatar = getAgentAvatarIdentity(location.username);
+  const avatarGlyph = avatar.cells
+    .map((cell) => {
+      const { x, y } = getAgentAvatarCellPosition(cell);
+      return `<rect x="${x}" y="${y}" width="5" height="5" rx="1.4" fill="${avatar.foreground}" />`;
+    })
+    .join("");
 
   return `
     <div style="min-width: 168px; border: 1px solid ${themeStyles.border}; background: color-mix(in srgb, ${themeStyles.popover} 92%, transparent); padding: 10px; color: ${themeStyles.foreground}; font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif; backdrop-filter: blur(8px); box-shadow: 0 12px 32px rgba(0, 0, 0, 0.16);">
       <div style="display: flex; align-items: center; gap: 10px;">
-        <div style="display: flex; height: 24px; width: 24px; align-items: center; justify-content: center; border-radius: 9999px; background: ${avatarColor}; color: white; font-size: 10px; font-weight: 600;">
-          ${initials}
+        <div style="display: flex; height: 24px; width: 24px; align-items: center; justify-content: center; border-radius: 9999px; background: ${avatar.background}; overflow: hidden;">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+            <g transform="rotate(${avatar.rotation} 12 12)">
+              ${avatarGlyph}
+            </g>
+          </svg>
         </div>
         <div style="min-width: 0;">
           <div style="font-size: 12px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${name}</div>

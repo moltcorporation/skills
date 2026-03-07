@@ -1,18 +1,21 @@
 "use client";
 
 import { useState } from "react";
-import { formatDistanceToNow } from "date-fns";
 import Link from "next/link";
 import {
   MagnifyingGlass,
   List,
   SquaresFour,
   SpinnerGap,
-  ArrowSquareOut,
 } from "@phosphor-icons/react";
 
-import { CardLinkOverlay } from "@/components/platform/card-link-overlay";
 import { PlatformFilterSortMenu } from "@/components/platform/filter-sort-menu";
+import {
+  ProductListCard,
+  ProductLiveUrlLink,
+  ProductRelativeTime,
+  ProductStatusBadge,
+} from "@/components/platform/products/product-card";
 import { usePlatformInfiniteList } from "@/components/platform/use-platform-infinite-list";
 import { Input } from "@/components/ui/input";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
@@ -24,24 +27,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   PLATFORM_SORT_OPTIONS,
-  PRODUCT_STATUS_CONFIG,
   PRODUCT_STATUS_FILTER_OPTIONS,
 } from "@/lib/constants";
-import { getUrlHostname } from "@/lib/url";
 import type { ListProductsResponse } from "@/app/api/v1/products/schema";
-import type { Product, ProductStatus } from "@/lib/data/products";
+import type { Product } from "@/lib/data/products";
 
 type ApiResponse = Pick<ListProductsResponse, "products" | "hasMore">;
 
@@ -161,44 +154,6 @@ export function ProductsList({
   );
 }
 
-function ProductStatusBadge({ status }: { status: ProductStatus }) {
-  const config = PRODUCT_STATUS_CONFIG[status];
-  if (!config) return <Badge variant="outline">{status}</Badge>;
-  return (
-    <Badge variant="outline" className={config.className}>
-      {config.label}
-    </Badge>
-  );
-}
-
-function RelativeTime({ date }: { date: string }) {
-  return (
-    <span className="text-muted-foreground">
-      {formatDistanceToNow(new Date(date), { addSuffix: true })}
-    </span>
-  );
-}
-
-function LiveUrlLink({ url }: { url: string | null }) {
-  const hostname = getUrlHostname(url);
-
-  if (!url || !hostname) {
-    return <span className="text-muted-foreground">&mdash;</span>;
-  }
-
-  return (
-    <a
-      href={url}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="relative z-10 inline-flex items-center gap-1 text-sm text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
-    >
-      <ArrowSquareOut className="size-3" />
-      {hostname}
-    </a>
-  );
-}
-
 function ProductsTable({ products }: { products: Product[] }) {
   return (
     <Table>
@@ -230,10 +185,10 @@ function ProductsTable({ products }: { products: Product[] }) {
               <ProductStatusBadge status={product.status} />
             </TableCell>
             <TableCell>
-              <LiveUrlLink url={product.live_url} />
+              <ProductLiveUrlLink url={product.live_url} />
             </TableCell>
             <TableCell>
-              <RelativeTime date={product.created_at} />
+              <ProductRelativeTime date={product.created_at} />
             </TableCell>
           </TableRow>
         ))}
@@ -246,42 +201,7 @@ function ProductsCards({ products }: { products: Product[] }) {
   return (
     <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3">
       {products.map((product) => (
-        <Card
-          key={product.id}
-          size="sm"
-          className="relative transition-colors hover:bg-muted/50"
-        >
-          <CardHeader>
-            <div className="flex items-start justify-between gap-2">
-              <CardTitle className="truncate">{product.name}</CardTitle>
-              <ProductStatusBadge status={product.status} />
-            </div>
-          </CardHeader>
-          {product.description && (
-            <CardContent>
-              <CardDescription className="line-clamp-2">
-                {product.description}
-              </CardDescription>
-            </CardContent>
-          )}
-          <CardContent>
-            <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 text-sm">
-              {product.live_url && (
-                <>
-                  <LiveUrlLink url={product.live_url} />
-                  <span className="text-muted-foreground" aria-hidden>
-                    &middot;
-                  </span>
-                </>
-              )}
-              <RelativeTime date={product.created_at} />
-            </div>
-          </CardContent>
-          <CardLinkOverlay
-            href={`/products/${product.id}`}
-            label={`View ${product.name}`}
-          />
-        </Card>
+        <ProductListCard key={product.id} product={product} />
       ))}
     </div>
   );

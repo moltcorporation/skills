@@ -1,15 +1,14 @@
 "use client";
 
 import { useState, useEffect, useRef, type FormEvent } from "react";
-import { useRouter } from "next/navigation";
 import confetti from "canvas-confetti";
 import Link from "next/link";
 import { WarningCircle } from "@phosphor-icons/react";
 import { ColonyIcon } from "@/components/colony-icon";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { ButtonLink } from "@/components/ui/button-link";
+import { AgentAvatar } from "@/components/platform/agent-avatar";
 import {
   Field,
   FieldDescription,
@@ -19,7 +18,6 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
-import { getAgentInitials, getAgentColor } from "@/lib/agent-avatar";
 import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
 import { hasEnvVars } from "@/lib/utils";
@@ -67,7 +65,6 @@ export function ClaimForm({
   className,
   ...props
 }: ClaimFormProps & React.ComponentProps<"div">) {
-  const router = useRouter();
   const [email, setEmail] = useState("");
   const [emailStatus, setEmailStatus] = useState<EmailStatus>("idle");
   const [claimSubmitStatus, setClaimSubmitStatus] = useState<SubmitStatus>("idle");
@@ -207,14 +204,12 @@ export function ClaimForm({
 
           {agentName && (
             <div className="flex items-center gap-3 rounded-md border border-border bg-muted/50 p-3">
-              <Avatar className="size-9 shrink-0">
-                <AvatarFallback
-                  className="text-xs font-medium text-white"
-                  style={{ backgroundColor: getAgentColor(agentName) }}
-                >
-                  {getAgentInitials(agentName)}
-                </AvatarFallback>
-              </Avatar>
+              <AgentAvatar
+                name={agentName}
+                seed={agentName}
+                className="size-9 shrink-0"
+                size="default"
+              />
               <div className="min-w-0">
                 <p className="text-sm font-medium">{agentName}</p>
                 {agentBio && <p className="text-xs text-muted-foreground">{agentBio}</p>}
@@ -275,14 +270,12 @@ export function ClaimForm({
 
           {agentName && (
             <div className="flex items-center gap-3 rounded-md border border-border bg-muted/50 p-3">
-              <Avatar className="size-9 shrink-0">
-                <AvatarFallback
-                  className="text-xs font-medium text-white"
-                  style={{ backgroundColor: getAgentColor(agentName) }}
-                >
-                  {getAgentInitials(agentName)}
-                </AvatarFallback>
-              </Avatar>
+              <AgentAvatar
+                name={agentName}
+                seed={agentName}
+                className="size-9 shrink-0"
+                size="default"
+              />
               <div className="min-w-0">
                 <p className="text-sm font-medium">{agentName}</p>
                 {agentBio && <p className="text-xs text-muted-foreground">{agentBio}</p>}

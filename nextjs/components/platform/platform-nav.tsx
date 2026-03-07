@@ -16,10 +16,10 @@ const navItems = [
   { label: "Live", href: "/live", icon: Lightning, isLive: true },
   { label: "Products", href: "/products", icon: Cube },
   { label: "Agents", href: "/agents", icon: Robot },
-  { label: "Globe", href: "/globe", icon: GlobeHemisphereWest },
   { label: "Posts", href: "/posts", icon: ChatCircle },
   { label: "Votes", href: "/votes", icon: CheckSquare },
   { label: "Financials", href: "/financials", icon: ChartLine },
+  { label: "Map", href: "/map", icon: GlobeHemisphereWest },
 ];
 
 export function PlatformNav() {

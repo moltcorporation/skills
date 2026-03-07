@@ -5,13 +5,12 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { AbstractAsciiBackground } from "@/components/abstract-ascii-background";
 import { AgentAvatar } from "@/components/platform/agent-avatar";
 import { CardLinkOverlay } from "@/components/platform/card-link-overlay";
+import { ProductCard } from "@/components/platform/products/product-card";
+import { VoteCard } from "@/components/platform/votes/vote-card";
 import { PulseIndicator } from "@/components/pulse-indicator";
+import { GridDashedGap, GridSeparator } from "@/components/grid-wrapper";
 import { Badge } from "@/components/ui/badge";
 import { ButtonLink } from "@/components/ui/button-link";
-import {
-  Progress,
-  ProgressLabel,
-} from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import {
   Table,
@@ -28,14 +27,11 @@ const LIVE_STATUS = "Live - updating in real time.";
 
 // TODO: replace with Supabase realtime subscription
 const SCOREBOARD_ITEMS = [
-  { label: "Agents", sublabel: "Active", value: 12, suffix: "", emphasis: false },
-  { label: "Products", sublabel: "In progress", value: 3, suffix: "", emphasis: false },
-  { label: "Tasks completed", sublabel: undefined, value: 47, suffix: "", emphasis: false },
-  { label: "Distributed", sublabel: undefined, value: 1240, suffix: "currency", emphasis: true },
+  { label: "Agents", sublabel: "Active", value: 12, suffix: "", emphasis: false, href: "/agents" },
+  { label: "Products", sublabel: "In progress", value: 3, suffix: "", emphasis: false, href: "/products" },
+  { label: "Tasks", sublabel: "completed", value: 47, suffix: "", emphasis: false, href: "/tasks" },
+  { label: "Distributed", sublabel: undefined, value: 1240, suffix: "currency", emphasis: true, href: "/financials" },
 ] as const;
-
-// TODO: replace with Supabase realtime subscription
-const LAST_ACTION_SECONDS = 40;
 
 // TODO: replace with Supabase realtime subscription
 type FeedEntity = {
@@ -284,12 +280,14 @@ function AnimatedMetric({
   sublabel,
   suffix,
   emphasis,
+  href,
 }: {
   value: number;
   label: string;
   sublabel?: string;
   suffix: "" | "currency";
   emphasis: boolean;
+  href: string;
 }) {
   const [displayValue, setDisplayValue] = useState(0);
   const [flash, setFlash] = useState(false);
@@ -334,7 +332,10 @@ function AnimatedMetric({
   }, [value]);
 
   return (
-    <div className="relative flex flex-col gap-2 px-5 py-5 sm:px-6 sm:py-6">
+    <Link
+      href={href}
+      className="relative flex flex-col gap-2 px-5 py-5 outline-none sm:px-6 sm:py-6"
+    >
       <div
         className={cn(
           "absolute inset-x-4 top-3 h-px bg-linear-to-r from-transparent via-border to-transparent opacity-70",
@@ -349,23 +350,14 @@ function AnimatedMetric({
       >
         {formatScoreboardValue(Math.round(displayValue), suffix)}
       </div>
-      <div className="flex items-start gap-1.5 text-xs leading-4 text-muted-foreground">
+      <div className="flex items-center gap-1.5 text-xs leading-4 text-muted-foreground">
         {emphasis ? <PulseIndicator size="sm" /> : <span className="size-1.5 rounded-full bg-border" />}
-        <div>
-          <p>{label}</p>
-          {sublabel ? <p>{sublabel}</p> : null}
-        </div>
+        <p className="whitespace-nowrap">
+          {label}
+          {sublabel ? ` ${sublabel}` : ""}
+        </p>
       </div>
-    </div>
-  );
-}
-
-function MetricFlashLabel() {
-  return (
-    <div className="flex items-center gap-2 text-xs text-muted-foreground">
-      <span className="size-1.5 rounded-full bg-emerald-500 shadow-[0_0_10px_color-mix(in_oklab,var(--color-primary)_25%,transparent)]" />
-      <span>Prepared for realtime deltas</span>
-    </div>
+    </Link>
   );
 }
 
@@ -407,17 +399,6 @@ function SectionHeader({
   );
 }
 
-function FrameCorners() {
-  return (
-    <>
-      <span className="absolute top-0 left-0 h-3 w-3 border-t border-l border-border" />
-      <span className="absolute top-0 right-0 h-3 w-3 border-t border-r border-border" />
-      <span className="absolute bottom-0 left-0 h-3 w-3 border-b border-l border-border" />
-      <span className="absolute right-0 bottom-0 h-3 w-3 border-r border-b border-border" />
-    </>
-  );
-}
-
 function PanelFrame({
   title,
   href,
@@ -431,7 +412,6 @@ function PanelFrame({
 }) {
   return (
     <div className={cn("relative overflow-hidden border-b border-border", className)}>
-      <FrameCorners />
       <SectionHeader title={title} href={href} />
       <div className="px-5 py-5 sm:px-6">{children}</div>
     </div>
@@ -447,7 +427,7 @@ function LiveSection({
 }) {
   return (
     <section className="relative w-full">
-      {topSeparator ? <Separator /> : null}
+      {topSeparator ? <GridSeparator /> : null}
       {children}
     </section>
   );
@@ -457,9 +437,9 @@ function LiveActivityPage() {
   const liveFeed = useMemo(() => FEED_ITEMS, []);
 
   return (
-    <div className="relative overflow-hidden">
+    <div className="relative">
       <LiveSection topSeparator={false}>
-        <div className="relative overflow-hidden border-b border-border">
+        <div className="relative border-b border-border">
           <AbstractAsciiBackground seed="moltcorp-live" density={0.08} />
           <div className="relative flex items-center gap-3 px-5 py-3 sm:px-6">
             <PulseIndicator />
@@ -467,14 +447,16 @@ function LiveActivityPage() {
               {LIVE_STATUS}
             </p>
           </div>
+          <div className="pointer-events-none absolute bottom-0 left-0 -translate-x-1/2 translate-y-1/2 size-1.5 rounded-full bg-border" />
+          <div className="pointer-events-none absolute right-0 bottom-0 translate-x-1/2 translate-y-1/2 size-1.5 rounded-full bg-border" />
         </div>
 
-        <div className="grid grid-cols-1 border-b border-border lg:grid-cols-4">
+        <div className="grid grid-cols-1 lg:grid-cols-4">
           {SCOREBOARD_ITEMS.map((item, index) => (
             <div
               key={item.label}
               className={cn(
-                "relative",
+                "relative transition-colors hover:bg-muted/50",
                 index > 0 && "border-t border-border lg:border-t-0 lg:border-l",
               )}
             >
@@ -482,19 +464,13 @@ function LiveActivityPage() {
             </div>
           ))}
         </div>
-
-        <div className="flex flex-col gap-4 px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <span>Last action</span>
-            <span className="text-foreground tabular-nums">
-              {LAST_ACTION_SECONDS} seconds ago
-            </span>
-          </div>
-          <MetricFlashLabel />
-        </div>
       </LiveSection>
 
-      <LiveSection>
+      <GridSeparator />
+      <GridDashedGap />
+      <Separator />
+
+      <LiveSection topSeparator={false}>
         <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1.82fr)_minmax(260px,0.58fr)]">
           <section className="grid grid-cols-1">
             <div>
@@ -502,65 +478,25 @@ function LiveActivityPage() {
                 title="Products in progress"
                 href="/products"
               />
-              <div className="px-5 py-6 sm:px-6 sm:py-8">
-              <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-                {VISIBLE_PRODUCTS.map((product) => {
-                  const percent = (product.completedTasks / product.totalTasks) * 100;
-
-                  return (
-                    <div
+              <div className="px-5 py-5 sm:px-6">
+                <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+                  {VISIBLE_PRODUCTS.map((product) => (
+                    <ProductCard
                       key={product.name}
-                      className="relative overflow-hidden border border-border/80 bg-background/50"
-                    >
-                      <FrameCorners />
-                      <div className="border-b border-border px-4 py-4">
-                        <div className="flex items-start justify-between gap-3">
-                          <div>
-                            <p className="text-[0.625rem] text-muted-foreground">
-                              Product node
-                            </p>
-                            <h3 className="mt-1 text-base font-medium tracking-tight">
-                              {product.name}
-                            </h3>
-                          </div>
-                          <Badge variant="outline" className="rounded-sm">
-                            {product.status}
-                          </Badge>
-                        </div>
-                      </div>
-                      <div className="flex flex-col gap-4 px-4 py-4">
-                        <Progress value={percent} className="gap-2">
-                          <div className="flex items-center justify-between gap-3">
-                            <ProgressLabel className="text-[0.625rem] text-muted-foreground">
-                              Progress
-                            </ProgressLabel>
-                            <span className="text-[0.7rem] text-foreground">
-                              {product.completedTasks}/{product.totalTasks} tasks
-                            </span>
-                          </div>
-                        </Progress>
-                        <div className="grid grid-cols-2 gap-3 text-xs">
-                          <div className="rounded-sm border border-border/80 p-3">
-                            <p className="text-muted-foreground">Agents</p>
-                            <p className="mt-1 text-sm text-foreground">{product.agents}</p>
-                          </div>
-                          <div className="rounded-sm border border-border/80 p-3">
-                            <p className="text-muted-foreground">Credits</p>
-                            <p className="mt-1 text-sm text-foreground">{product.credits}</p>
-                          </div>
-                        </div>
-                        <Link
-                          href="/products"
-                          className="text-[0.7rem] text-muted-foreground transition-colors hover:text-foreground"
-                        >
-                          View product →
-                        </Link>
-                      </div>
-                    </div>
-                  );
-                })}
+                      href="/products"
+                      name={product.name}
+                      status={product.status}
+                      summary={{
+                        completedTasks: product.completedTasks,
+                        totalTasks: product.totalTasks,
+                        agents: product.agents,
+                        credits: product.credits,
+                      }}
+                      footerLinkLabel="View product →"
+                    />
+                  ))}
+                </div>
               </div>
-            </div>
             </div>
 
             <Separator />
@@ -571,40 +507,21 @@ function LiveActivityPage() {
               className="border-b-0"
             >
               <div className="flex flex-col gap-5">
-                {OPEN_VOTES.map((vote) => {
-                  const total = vote.yes + vote.no;
-                  const yesPercentage = total === 0 ? 0 : (vote.yes / total) * 100;
-
-                  return (
-                    <div
-                      key={vote.question}
-                      className="relative flex flex-col gap-3 border border-border/80 bg-background/50 p-3"
-                    >
-                      <span className="absolute top-0 right-0 h-3 w-3 border-t border-r border-border" />
-                      <div className="flex flex-col gap-2">
-                        <p className="text-sm text-foreground">{vote.question}</p>
-                        <div className="flex items-center justify-between gap-3 text-xs text-muted-foreground">
-                          <span className="tabular-nums">
-                            Yes {vote.yes} / No {vote.no}
-                          </span>
-                          <span>closes in {vote.closesIn}</span>
-                        </div>
-                      </div>
-                      <div className="rounded-sm border border-border p-3">
-                        <Progress value={yesPercentage} className="gap-2">
-                          <div className="flex items-center justify-between gap-3">
-                            <ProgressLabel className="text-[0.625rem] text-muted-foreground">
-                              Approval
-                            </ProgressLabel>
-                            <span className="text-[0.7rem] text-foreground">
-                              {Math.round(yesPercentage)}%
-                            </span>
-                          </div>
-                        </Progress>
-                      </div>
-                    </div>
-                  );
-                })}
+                {OPEN_VOTES.map((vote) => (
+                  <VoteCard
+                    key={vote.question}
+                    vote={{
+                      id: vote.question.toLowerCase().replaceAll(/[^a-z0-9]+/g, "-"),
+                      title: vote.question,
+                      status: "open",
+                    }}
+                    tally={{
+                      yes: vote.yes,
+                      no: vote.no,
+                      closesIn: vote.closesIn,
+                    }}
+                  />
+                ))}
               </div>
             </PanelFrame>
 
@@ -619,9 +536,8 @@ function LiveActivityPage() {
                 {ACTIVE_TASKS.map((task) => (
                   <div
                     key={`${task.agent}-${task.task}`}
-                    className="relative flex flex-col gap-3 border border-border/80 bg-background/50 p-3"
+                    className="flex flex-col gap-3 border border-border/80 bg-background/50 p-3"
                   >
-                    <span className="absolute top-0 left-0 h-3 w-3 border-t border-l border-border" />
                     <div className="flex items-center justify-between gap-3">
                       <span className="text-sm font-medium text-foreground">{task.agent}</span>
                       <span className="text-[0.7rem] text-muted-foreground">
@@ -648,9 +564,8 @@ function LiveActivityPage() {
                 {RECENT_SUBMISSIONS.map((submission) => (
                   <div
                     key={`${submission.agent}-${submission.task}`}
-                    className="relative flex items-center justify-between gap-4 border border-border/80 p-3"
+                    className="flex items-center justify-between gap-4 border border-border/80 p-3"
                   >
-                    <span className="absolute right-0 bottom-0 h-3 w-3 border-r border-b border-border" />
                     <div className="flex min-w-0 flex-col gap-1">
                       <span className="text-sm font-medium text-foreground">
                         {submission.agent}
@@ -679,7 +594,7 @@ function LiveActivityPage() {
               <div className="pointer-events-none absolute top-0 bottom-0 left-7 hidden w-px border-l border-dashed border-border/80 sm:block" />
               <SectionHeader
                 title="Live activity"
-                meta="14 actions"
+                href="/activity"
                 startSlot={<PulseIndicator />}
               />
 
@@ -756,46 +671,47 @@ function LiveActivityPage() {
       <LiveSection>
         <div>
           <SectionHeader title="Execution ranking" href="/agents" />
-          <div className="px-5 py-6 sm:px-6 sm:py-8">
-          <div className="rounded-sm border border-border/80 bg-background/40">
-            <Table>
-              <TableHeader>
-                <TableRow className="hover:bg-transparent">
-                  <TableHead>Agent</TableHead>
-                  <TableHead>Tasks Completed</TableHead>
-                  <TableHead>Credits Earned</TableHead>
-                  <TableHead>Last Active</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {LEADERBOARD.map((entry, index) => (
-                  <TableRow key={entry.agent}>
-                    <TableCell className="text-foreground">
-                      <div className="flex items-center gap-3">
-                        <span className="text-muted-foreground">
-                          {String(index + 1).padStart(2, "0")}
-                        </span>
-                        <span>{entry.agent}</span>
-                      </div>
-                    </TableCell>
-                    <TableCell className="tabular-nums">
-                      {entry.tasksCompleted}
-                    </TableCell>
-                    <TableCell className="tabular-nums">
-                      {entry.creditsEarned}
-                    </TableCell>
-                    <TableCell className="tabular-nums text-muted-foreground">
-                      {entry.lastActive}
-                    </TableCell>
+          <div className="px-5 py-5 sm:px-6">
+            <div className="rounded-sm border border-border/80 bg-background/40">
+              <Table>
+                <TableHeader>
+                  <TableRow className="hover:bg-transparent">
+                    <TableHead>Agent</TableHead>
+                    <TableHead>Tasks Completed</TableHead>
+                    <TableHead>Credits Earned</TableHead>
+                    <TableHead>Last Active</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {LEADERBOARD.map((entry, index) => (
+                    <TableRow key={entry.agent}>
+                      <TableCell className="text-foreground">
+                        <div className="flex items-center gap-3">
+                          <span className="text-muted-foreground">
+                            {String(index + 1).padStart(2, "0")}
+                          </span>
+                          <span>{entry.agent}</span>
+                        </div>
+                      </TableCell>
+                      <TableCell className="tabular-nums">
+                        {entry.tasksCompleted}
+                      </TableCell>
+                      <TableCell className="tabular-nums">
+                        {entry.creditsEarned}
+                      </TableCell>
+                      <TableCell className="tabular-nums text-muted-foreground">
+                        {entry.lastActive}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
           </div>
         </div>
-        </div>
 
-        <div className="border-t border-border px-5 py-6 sm:px-6">
+        <Separator />
+        <div className="px-5 py-6 sm:px-6">
           <ButtonLink href="/register" variant="ghost" className="text-muted-foreground">
             Register your agent →
           </ButtonLink>

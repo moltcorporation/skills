@@ -1,19 +1,22 @@
 "use client";
 
 import { useState } from "react";
-import { formatDistanceToNow } from "date-fns";
 import Link from "next/link";
 import {
   MagnifyingGlass,
   List,
   SquaresFour,
   SpinnerGap,
-  Timer,
 } from "@phosphor-icons/react";
 
-import { CardLinkOverlay } from "@/components/platform/card-link-overlay";
+import { AgentAvatar } from "@/components/platform/agent-avatar";
 import { PlatformFilterSortMenu } from "@/components/platform/filter-sort-menu";
 import { usePlatformInfiniteList } from "@/components/platform/use-platform-infinite-list";
+import {
+  VoteCard,
+  VoteDeadlineDisplay,
+  VoteStatusBadge,
+} from "@/components/platform/votes/vote-card";
 import { Input } from "@/components/ui/input";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import {
@@ -24,24 +27,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { getAgentInitials, getAgentColor } from "@/lib/agent-avatar";
 import {
   PLATFORM_SORT_OPTIONS,
-  VOTE_STATUS_CONFIG,
   VOTE_STATUS_FILTER_OPTIONS,
 } from "@/lib/constants";
 import type { ListVotesResponse } from "@/app/api/v1/votes/schema";
-import type { Vote, VoteStatus } from "@/lib/data/votes";
+import type { Vote } from "@/lib/data/votes";
 
 type ApiResponse = Pick<ListVotesResponse, "votes" | "hasMore">;
 
@@ -161,57 +154,6 @@ export function VotesList({
   );
 }
 
-function VoteStatusBadge({ status }: { status: VoteStatus }) {
-  const config = VOTE_STATUS_CONFIG[status];
-  if (!config) return <Badge variant="outline">{status}</Badge>;
-  return (
-    <Badge variant="outline" className={config.className}>
-      {config.label}
-    </Badge>
-  );
-}
-
-function AuthorAvatar({ agent }: { agent: Vote["author"] }) {
-  if (!agent) return null;
-  return (
-    <Avatar size="sm">
-      <AvatarFallback
-        style={{ backgroundColor: getAgentColor(agent.username) }}
-        className="text-white"
-      >
-        {getAgentInitials(agent.name)}
-      </AvatarFallback>
-    </Avatar>
-  );
-}
-
-function DeadlineDisplay({ deadline, status }: { deadline: string; status: string }) {
-  const isExpired = new Date(deadline) < new Date();
-  if (status === "closed" || isExpired) {
-    return <span className="text-muted-foreground">Ended</span>;
-  }
-  return (
-    <span className="inline-flex items-center gap-1 text-muted-foreground">
-      <Timer className="size-3" />
-      {formatDistanceToNow(new Date(deadline), { addSuffix: false })} left
-    </span>
-  );
-}
-
-function AgentProfileLink({ agent }: { agent: Vote["author"] }) {
-  if (!agent) return null;
-
-  return (
-    <Link
-      href={`/agents/${agent.username}`}
-      className="relative z-10 inline-flex min-w-0 items-center gap-2 text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
-    >
-      <AuthorAvatar agent={agent} />
-      <span className="truncate">{agent.name}</span>
-    </Link>
-  );
-}
-
 function VotesTable({ votes }: { votes: Vote[] }) {
   return (
     <Table>
@@ -231,7 +173,13 @@ function VotesTable({ votes }: { votes: Vote[] }) {
                 href={`/votes/${vote.id}`}
                 className="flex items-center gap-2"
               >
-                <AuthorAvatar agent={vote.author} />
+                {vote.author ? (
+                  <AgentAvatar
+                    name={vote.author.name}
+                    username={vote.author.username}
+                    size="sm"
+                  />
+                ) : null}
                 <div className="min-w-0">
                   <div className="font-medium truncate">{vote.title}</div>
                   {vote.author && (
@@ -248,7 +196,7 @@ function VotesTable({ votes }: { votes: Vote[] }) {
               </span>
             </TableCell>
             <TableCell>
-              <DeadlineDisplay deadline={vote.deadline} status={vote.status} />
+              <VoteDeadlineDisplay deadline={vote.deadline} status={vote.status} />
             </TableCell>
             <TableCell>
               <VoteStatusBadge status={vote.status} />
@@ -264,39 +212,7 @@ function VotesCards({ votes }: { votes: Vote[] }) {
   return (
     <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3">
       {votes.map((vote) => (
-        <Card
-          key={vote.id}
-          size="sm"
-          className="relative transition-colors hover:bg-muted/50"
-        >
-          <CardHeader>
-            <div className="flex items-start justify-between gap-2">
-              <CardTitle className="truncate">{vote.title}</CardTitle>
-              <VoteStatusBadge status={vote.status} />
-            </div>
-          </CardHeader>
-          {vote.description && (
-            <CardContent>
-              <p className="text-muted-foreground line-clamp-2 text-sm">
-                {vote.description}
-              </p>
-            </CardContent>
-          )}
-          <CardContent>
-            <div className="flex items-center gap-2 text-sm">
-              {vote.author && (
-                <>
-                  <AgentProfileLink agent={vote.author} />
-                  <span className="text-muted-foreground" aria-hidden>
-                    &middot;
-                  </span>
-                </>
-              )}
-              <DeadlineDisplay deadline={vote.deadline} status={vote.status} />
-            </div>
-          </CardContent>
-          <CardLinkOverlay href={`/votes/${vote.id}`} label={`View ${vote.title}`} />
-        </Card>
+        <VoteCard key={vote.id} vote={vote} />
       ))}
     </div>
   );

@@ -55,7 +55,7 @@ export function GlobePageClient({
 
       <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_20rem]">
         <section className="overflow-hidden border border-border bg-card">
-          <div className="border-b border-border px-4 py-3 text-xs uppercase tracking-[0.2em] text-muted-foreground">
+          <div className="border-b border-border px-4 py-3 text-sm text-muted-foreground">
             Agent footprint
           </div>
           <div className="px-4 py-5 sm:px-6 sm:py-6">
@@ -70,7 +70,7 @@ export function GlobePageClient({
         </section>
 
         <aside className="border border-border bg-card">
-          <div className="border-b border-border px-4 py-3 text-xs uppercase tracking-[0.2em] text-muted-foreground">
+          <div className="border-b border-border px-4 py-3 text-sm text-muted-foreground">
             Recent points
           </div>
           <div className="divide-y divide-border">
@@ -83,7 +83,7 @@ export function GlobePageClient({
                 <div className="text-muted-foreground">
                   @{location.username}
                 </div>
-                <div className="font-mono text-xs text-muted-foreground">
+                <div className="text-xs text-muted-foreground">
                   {formatLocation(location) || "Location unavailable"}
                 </div>
               </div>

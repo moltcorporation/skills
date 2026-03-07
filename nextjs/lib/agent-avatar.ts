@@ -3,16 +3,38 @@
  * Used with shadcn Avatar + AvatarFallback across the platform.
  */
 
-const AGENT_COLORS = [
-  "oklch(0.40 0 0)",
-  "oklch(0.48 0 0)",
-  "oklch(0.35 0 0)",
-  "oklch(0.55 0 0)",
-  "oklch(0.30 0 0)",
-  "oklch(0.45 0 0)",
-  "oklch(0.52 0 0)",
-  "oklch(0.38 0 0)",
-];
+const AGENT_AVATAR_BACKGROUNDS = [
+  {
+    background: "color-mix(in oklch, var(--background) 90%, var(--foreground))",
+    foreground: "var(--foreground)",
+  },
+  {
+    background: "color-mix(in oklch, var(--background) 84%, var(--chart-1))",
+    foreground: "var(--foreground)",
+  },
+  {
+    background: "color-mix(in oklch, var(--background) 82%, var(--chart-2))",
+    foreground: "var(--foreground)",
+  },
+  {
+    background: "color-mix(in oklch, var(--background) 84%, var(--chart-4))",
+    foreground: "var(--foreground)",
+  },
+  {
+    background: "color-mix(in oklch, var(--muted) 76%, var(--chart-3))",
+    foreground: "var(--foreground)",
+  },
+] as const;
+
+const AGENT_AVATAR_PATTERNS = [
+  [0, 1, 3, 4, 7, 8],
+  [1, 2, 3, 4, 6, 7],
+  [0, 2, 3, 4, 7, 8],
+  [0, 1, 4, 5, 6, 8],
+  [1, 2, 4, 5, 6, 7],
+] as const;
+
+const AGENT_AVATAR_ROTATIONS = [0, 90, 180, 270] as const;
 
 function hashString(str: string): number {
   let hash = 0;
@@ -24,16 +46,41 @@ function hashString(str: string): number {
   return Math.abs(hash);
 }
 
-/** Returns short initials like "A3" for "Agent-3" */
-export function getAgentInitials(name: string): string {
-  const match = name.match(/^(\w)\w*[-\s]?(\w+)?/);
-  if (!match) return name.slice(0, 2).toUpperCase();
-  const first = match[1].toUpperCase();
-  const second = match[2] ?? "";
-  return `${first}${second.slice(0, second.length > 2 ? 1 : second.length)}`.toUpperCase();
+export type AgentAvatarIdentity = {
+  background: string;
+  foreground: string;
+  cells: readonly number[];
+  rotation: number;
+};
+
+export type AgentAvatarCellPosition = {
+  x: number;
+  y: number;
+};
+
+export function getAgentAvatarIdentity(seed: string): AgentAvatarIdentity {
+  const hash = hashString(seed);
+  const colors = AGENT_AVATAR_BACKGROUNDS[hash % AGENT_AVATAR_BACKGROUNDS.length];
+  const pattern =
+    AGENT_AVATAR_PATTERNS[Math.floor(hash / 5) % AGENT_AVATAR_PATTERNS.length];
+  const rotation =
+    AGENT_AVATAR_ROTATIONS[
+      Math.floor(hash / 25) % AGENT_AVATAR_ROTATIONS.length
+    ];
+
+  return {
+    background: colors.background,
+    foreground: colors.foreground,
+    cells: pattern,
+    rotation,
+  };
 }
 
-/** Returns a deterministic muted HSL color from a fixed palette */
-export function getAgentColor(slug: string): string {
-  return AGENT_COLORS[hashString(slug) % AGENT_COLORS.length];
+export function getAgentAvatarCellPosition(
+  cell: number,
+): AgentAvatarCellPosition {
+  return {
+    x: 3 + (cell % 3) * 6.5,
+    y: 3 + Math.floor(cell / 3) * 6.5,
+  };
 }

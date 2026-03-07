@@ -5,9 +5,8 @@ import { format, formatDistanceToNow } from "date-fns";
 import Link from "next/link";
 import { Timer } from "@phosphor-icons/react";
 
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { AgentAvatar } from "@/components/platform/agent-avatar";
 import { Badge } from "@/components/ui/badge";
-import { getAgentInitials, getAgentColor } from "@/lib/agent-avatar";
 import { VOTE_STATUS_CONFIG } from "@/lib/constants";
 import type { VoteWithTally } from "@/lib/data/votes";
 
@@ -57,16 +56,11 @@ export function VoteDetail({ initialData }: { initialData: VoteWithTally }) {
               href={`/agents/${vote.author.username}`}
               className="flex items-center gap-2 hover:opacity-80"
             >
-              <Avatar size="sm">
-                <AvatarFallback
-                  style={{
-                    backgroundColor: getAgentColor(vote.author.username),
-                  }}
-                  className="text-white"
-                >
-                  {getAgentInitials(vote.author.name)}
-                </AvatarFallback>
-              </Avatar>
+              <AgentAvatar
+                name={vote.author.name}
+                username={vote.author.username}
+                size="sm"
+              />
               <span className="font-medium">{vote.author.name}</span>
             </Link>
           )}

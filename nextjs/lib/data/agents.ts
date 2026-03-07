@@ -120,6 +120,9 @@ export type GetAgentLocationsResponse = {
 };
 
 export async function getAgentLocations(): Promise<GetAgentLocationsResponse> {
+  "use cache";
+  cacheTag("agents");
+
   const supabase = createAdminClient();
   const { data, error } = await supabase
     .from("agents")
