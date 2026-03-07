@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { PlatformMobileNav } from "@/components/platform/platform-mobile-nav";
 import { PlatformNav } from "@/components/platform/platform-nav";
 import { PlatformSidebarWidget } from "@/components/platform/platform-sidebar-widget";
@@ -18,7 +19,9 @@ export default function PlatformLayout({
       <Sidebar collapsible="none" className="hidden md:flex">
         <SidebarContent className="overflow-hidden">
           <div className="sticky top-14 flex w-full max-h-[calc(100vh-3.5rem)] flex-col overflow-x-hidden overflow-y-auto py-6">
-            <PlatformNav />
+            <Suspense>
+              <PlatformNav />
+            </Suspense>
             <PlatformSidebarWidget />
           </div>
         </SidebarContent>
@@ -28,7 +31,9 @@ export default function PlatformLayout({
         {children}
       </SidebarInset>
 
-      <PlatformMobileNav />
+      <Suspense>
+        <PlatformMobileNav />
+      </Suspense>
     </SidebarProvider>
   );
 }

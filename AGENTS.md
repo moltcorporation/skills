@@ -16,6 +16,8 @@
 - All API catch blocks: `console.error("[route-tag]", err)` — never let a 500 go silent
 - Rely on the installed shadcn theme for everything. Use the preset theme tokens, fonts, colors, and spacing. Never use custom overrides unless absolutely necessary. Never edit the base shadcn primitives or default theme.
 - Do not use <Button render={<a />} nativeButton={false} /> for links. The Base UI Button component always applies role="button", which overrides the semantic link role on <a> elements. Use the <ButtonLink> component which handles this for you.
+- All data fetching and CRUD functions live in the /lib/data folder, this is the shared data access layer that should be used throughout the app. It handles caching data and revalidating it properly using cache tags when the data changes. Reference your next-cache-components skill for how to properly use the cache.
+- Avoid wrapping entire pages or sections in a <Suspsense> boundary. Always make suspsense boundaries target the specific components that need them for optimal prerendering and to maximize the static shell that can be rendered.
 
 ## External Repos
 - `~/Documents/GitHub/moltcorp-skills` (`moltcorporation/skills`) — Agent skill file and API reference, served at `/SKILL.md` via ISR

@@ -22,18 +22,23 @@ export function PlatformSidebarWidget() {
     <>
       <SidebarSeparator className="my-3" />
 
-      <SidebarGroup className="px-0">
+      <SidebarGroup className="pl-2 pr-0">
         <SidebarGroupLabel>Recent Activity</SidebarGroupLabel>
         <SidebarGroupContent className="pr-4">
           <SidebarMenu>
             <SidebarMenuItem>
-              <SidebarMenuButton size="sm" render={<div />}>
+              <SidebarMenuButton
+                size="sm"
+                className="-ml-2 w-[calc(100%+0.5rem)] focus-visible:ring-inset"
+                render={<div />}
+              >
                 <span className="text-muted-foreground">No activity yet.</span>
               </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
               <SidebarMenuButton
                 size="sm"
+                className="-ml-2 w-[calc(100%+0.5rem)] focus-visible:ring-inset"
                 render={<Link href="/live" />}
               >
                 <span>View all activity</span>
@@ -45,13 +50,17 @@ export function PlatformSidebarWidget() {
 
       <SidebarSeparator className="my-3" />
 
-      <SidebarGroup className="px-0">
+      <SidebarGroup className="pl-2 pr-0">
         <SidebarGroupLabel>Snapshot</SidebarGroupLabel>
         <SidebarGroupContent className="pr-4">
           <SidebarMenu>
             {snapshotItems.map((item) => (
               <SidebarMenuItem key={item.id}>
-                <SidebarMenuButton size="sm" render={<div />}>
+                <SidebarMenuButton
+                  size="sm"
+                  className="-ml-2 w-[calc(100%+0.5rem)] focus-visible:ring-inset"
+                  render={<div />}
+                >
                   <span className="size-1.5 shrink-0" />
                   <span>{item.label}</span>
                 </SidebarMenuButton>
