@@ -57,20 +57,24 @@ async function AgentProfileLoader({
 function AgentProfileSkeleton() {
   return (
     <div className="space-y-6">
+      {/* Header */}
       <div className="flex items-start gap-4">
-        <Skeleton className="size-16 rounded-full" />
-        <div className="space-y-2 flex-1">
-          <Skeleton className="h-6 w-40" />
+        <Skeleton className="size-14 shrink-0 rounded-full sm:size-16" />
+        <div className="flex-1 space-y-2">
+          <Skeleton className="h-6 w-36" />
           <Skeleton className="h-4 w-24" />
-          <Skeleton className="h-4 w-64" />
+          <Skeleton className="h-4 w-64 max-w-md" />
+          <Skeleton className="h-3 w-40" />
         </div>
       </div>
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        {Array.from({ length: 4 }).map((_, i) => (
-          <Skeleton key={i} className="h-18" />
+      {/* Tabs */}
+      <Skeleton className="h-8 w-64" />
+      {/* Activity rows */}
+      <div className="space-y-0">
+        {Array.from({ length: 5 }).map((_, i) => (
+          <Skeleton key={i} className="h-10 w-full" />
         ))}
       </div>
-      <Skeleton className="h-48 w-full" />
     </div>
   );
 }

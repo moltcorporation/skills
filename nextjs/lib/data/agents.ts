@@ -17,11 +17,12 @@ import { createAdminClient } from "@/lib/supabase/admin";
 
 // Only public fields — never expose api_key_hash, claim_token, etc.
 const AGENT_PUBLIC_FIELDS =
-  "id, name, username, bio, status, claimed_at, created_at" as const;
+  "id, name, username, bio, status, claimed_at, created_at, city, region, country, latitude, longitude" as const;
 
 export async function getAgents(opts?: {
   status?: string;
   search?: string;
+  sort?: "newest" | "oldest";
   after?: string;
   limit?: number;
 }) {
@@ -29,19 +30,23 @@ export async function getAgents(opts?: {
   cacheTag("agents");
 
   const limit = opts?.limit ?? 20;
+  const sort = opts?.sort ?? "newest";
+  const ascending = sort === "oldest";
   const supabase = createAdminClient();
 
-  // Base query: newest first (KSUIDs sort lexicographically by time)
+  // Base query: order by KSUID id, which is time-ordered lexicographically.
   let query = supabase
     .from("agents")
     .select(AGENT_PUBLIC_FIELDS)
-    .order("id", { ascending: false })
+    .order("id", { ascending })
     .limit(limit + 1); // +1 to detect if there are more pages
 
   // Optional filters — each combo becomes a unique cache key
   if (opts?.status) query = query.eq("status", opts.status);
   if (opts?.search) query = query.ilike("name", `%${opts.search}%`);
-  if (opts?.after) query = query.lt("id", opts.after); // cursor
+  if (opts?.after) {
+    query = ascending ? query.gt("id", opts.after) : query.lt("id", opts.after);
+  }
 
   const { data, error } = await query;
 

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Lightning, Cube, Robot, ChartLine, ChatCircle } from "@phosphor-icons/react";
+import { Lightning, Cube, Robot, ChartLine, ChatCircle, CheckSquare } from "@phosphor-icons/react";
 import { PulseIndicator } from "@/components/pulse-indicator";
 import {
   SidebarGroup,
@@ -17,6 +17,7 @@ const navItems = [
   { label: "Products", href: "/products", icon: Cube },
   { label: "Agents", href: "/agents", icon: Robot },
   { label: "Posts", href: "/posts", icon: ChatCircle },
+  { label: "Votes", href: "/votes", icon: CheckSquare },
   { label: "Financials", href: "/financials", icon: ChartLine },
 ];
 

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { revalidateTag } from "next/cache";
+import { geolocation } from "@vercel/functions";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { slackLog } from "@/lib/slack";
 import { generateApiKey, generateClaimToken } from "@/lib/api-keys";
@@ -33,6 +34,15 @@ export async function POST(request: NextRequest) {
     const claimToken = generateClaimToken();
     const claimTokenExpiresAt = new Date(Date.now() + AGENT_CLAIM_TOKEN_EXPIRY_MS).toISOString();
 
+    // Capture approximate location from Vercel geo headers
+    const geo = geolocation(request);
+    const hasGeo = !!(geo.city || geo.country);
+    const city = hasGeo ? (geo.city ?? null) : null;
+    const region = hasGeo ? (geo.region ?? null) : null;
+    const country = hasGeo ? (geo.country ?? null) : null;
+    const latitude = hasGeo && geo.latitude ? parseFloat(geo.latitude) : null;
+    const longitude = hasGeo && geo.longitude ? parseFloat(geo.longitude) : null;
+
     const supabase = createAdminClient();
 
     let agent:
@@ -62,6 +72,11 @@ export async function POST(request: NextRequest) {
           bio: bio.trim(),
           claim_token: claimToken,
           claim_token_expires_at: claimTokenExpiresAt,
+          city,
+          region,
+          country,
+          latitude,
+          longitude,
         })
         .select("id, api_key_prefix, username, name, bio, status, created_at")
         .single();
@@ -93,7 +108,8 @@ export async function POST(request: NextRequest) {
 
     revalidateTag("agents", "max");
     revalidateTag("activity", "max");
-    await slackLog(`🤖 NEW AGENT REGISTERED — Agent ${agent.id} (@${agent.username})`);
+    const locationStr = (city || country) ? ` from ${[city, country].filter(Boolean).join(", ")}` : "";
+    await slackLog(`🤖 NEW AGENT REGISTERED — Agent ${agent.id} (@${agent.username})${locationStr}`);
 
     return NextResponse.json(
       {

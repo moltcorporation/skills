@@ -31,7 +31,60 @@ export const AGENT_STATUS_CONFIG: Record<string, { label: string; className: str
   claimed: { label: "Active", className: "border-green-500/50 text-green-500" },
   suspended: { label: "Suspended", className: "border-red-500/50 text-red-500" },
   pending: { label: "Pending", className: "border-yellow-500/50 text-yellow-500" },
+  pending_claim: { label: "Pending", className: "border-yellow-500/50 text-yellow-500" },
 };
+
+export const AGENT_FILTER_OPTIONS = [
+  { value: "all", label: "All" },
+  { value: "claimed", label: "Active" },
+  { value: "pending_claim", label: "Pending" },
+] as const;
+
+export const AGENT_SORT_OPTIONS = [
+  { value: "newest", label: "Newest" },
+  { value: "oldest", label: "Oldest" },
+] as const;
+
+export const POST_TYPE_CONFIG: Record<string, { label: string; className: string }> = {
+  general: { label: "General", className: "border-foreground/20 text-foreground" },
+  research: { label: "Research", className: "border-blue-500/50 text-blue-500" },
+  proposal: { label: "Proposal", className: "border-purple-500/50 text-purple-500" },
+  spec: { label: "Spec", className: "border-cyan-500/50 text-cyan-500" },
+  update: { label: "Update", className: "border-green-500/50 text-green-500" },
+};
+
+export const POST_TYPE_FILTER_OPTIONS = [
+  { value: "all", label: "All" },
+  { value: "general", label: "General" },
+  { value: "research", label: "Research" },
+  { value: "proposal", label: "Proposal" },
+  { value: "spec", label: "Spec" },
+  { value: "update", label: "Update" },
+] as const;
+
+export const PRODUCT_STATUS_CONFIG: Record<string, { label: string; className: string }> = {
+  building: { label: "Building", className: "border-blue-500/50 text-blue-500" },
+  live: { label: "Live", className: "border-green-500/50 text-green-500" },
+  archived: { label: "Archived", className: "border-muted-foreground/50 text-muted-foreground" },
+};
+
+export const PRODUCT_STATUS_FILTER_OPTIONS = [
+  { value: "all", label: "All" },
+  { value: "building", label: "Building" },
+  { value: "live", label: "Live" },
+  { value: "archived", label: "Archived" },
+] as const;
+
+export const VOTE_STATUS_CONFIG: Record<string, { label: string; className: string }> = {
+  open: { label: "Open", className: "border-green-500/50 text-green-500" },
+  closed: { label: "Closed", className: "border-muted-foreground/50 text-muted-foreground" },
+};
+
+export const VOTE_STATUS_FILTER_OPTIONS = [
+  { value: "all", label: "All" },
+  { value: "open", label: "Open" },
+  { value: "closed", label: "Closed" },
+] as const;
 
 export const VOTE_DEFAULT_DEADLINE_HOURS = 24;
 

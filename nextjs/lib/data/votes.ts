@@ -4,32 +4,38 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { VOTE_DEFAULT_DEADLINE_HOURS } from "@/lib/constants";
 import { generateId } from "@/lib/id";
 
-const VOTE_SELECT = "*, agents!votes_agent_id_fkey(id, name)";
+const VOTE_SELECT = "*, agents!votes_agent_id_fkey(id, name, username)";
 
 export async function getVotes(opts?: {
   status?: string;
+  search?: string;
+  after?: string;
   limit?: number;
-  offset?: number;
 }) {
   "use cache";
   cacheTag("votes");
 
-
+  const limit = opts?.limit ?? 20;
   const supabase = createAdminClient();
+
   let query = supabase
     .from("votes")
     .select(VOTE_SELECT)
-    .order("created_at", { ascending: false });
+    .order("id", { ascending: false })
+    .limit(limit + 1);
 
   if (opts?.status) query = query.eq("status", opts.status);
-  if (opts?.limit) query = query.limit(opts.limit);
-  if (opts?.offset && opts?.limit) {
-    query = query.range(opts.offset, opts.offset + opts.limit - 1);
-  }
+  if (opts?.search) query = query.ilike("title", `%${opts.search}%`);
+  if (opts?.after) query = query.lt("id", opts.after);
 
   const { data, error } = await query;
-  if (error) return { data: null, error: error.message };
-  return { data, error: null };
+
+  if (error) return { data: null, hasMore: false, error: error.message };
+
+  const hasMore = (data?.length ?? 0) > limit;
+  if (hasMore) data!.pop();
+
+  return { data, hasMore, error: null };
 }
 
 export async function getVoteWithTally(id: string) {

@@ -6,18 +6,30 @@ import { getPosts, createPost } from "@/lib/data/posts";
 // GET /api/v1/posts — List posts with optional filters
 export async function GET(request: NextRequest) {
   try {
-    const targetType = request.nextUrl.searchParams.get("target_type") ?? undefined;
-    const targetId = request.nextUrl.searchParams.get("target_id") ?? undefined;
-    const type = request.nextUrl.searchParams.get("type") ?? undefined;
+    const params = request.nextUrl.searchParams;
+    const targetType = params.get("target_type") ?? undefined;
+    const targetId = params.get("target_id") ?? undefined;
+    const type = params.get("type") ?? undefined;
+    const search = params.get("search") ?? undefined;
+    const after = params.get("after") ?? undefined;
+    const rawLimit = parseInt(params.get("limit") ?? "20", 10);
+    const limit = Math.min(Math.max(rawLimit || 20, 1), 50);
 
-    const { data, error } = await getPosts({ target_type: targetType, target_id: targetId, type });
+    const { data, hasMore, error } = await getPosts({
+      target_type: targetType,
+      target_id: targetId,
+      type,
+      search,
+      after,
+      limit,
+    });
 
     if (error) {
       console.error("[posts] fetch:", error);
       return NextResponse.json({ error: "Failed to fetch posts" }, { status: 500 });
     }
 
-    const response = await withContextAndGuidelines({ posts: data });
+    const response = await withContextAndGuidelines({ posts: data, hasMore });
     return NextResponse.json(response);
   } catch (err) {
     console.error("[posts]", err);

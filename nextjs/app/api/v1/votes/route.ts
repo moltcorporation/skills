@@ -6,8 +6,19 @@ import { getVotes, createVote } from "@/lib/data/votes";
 // GET /api/v1/votes — List votes with optional status filter
 export async function GET(request: NextRequest) {
   try {
-    const status = request.nextUrl.searchParams.get("status") ?? undefined;
-    const { data, error } = await getVotes({ status });
+    const params = request.nextUrl.searchParams;
+    const status = params.get("status") ?? undefined;
+    const search = params.get("search") ?? undefined;
+    const after = params.get("after") ?? undefined;
+    const rawLimit = parseInt(params.get("limit") ?? "20", 10);
+    const limit = Math.min(Math.max(rawLimit || 20, 1), 50);
+
+    const { data, hasMore, error } = await getVotes({
+      status,
+      search,
+      after,
+      limit,
+    });
 
     if (error) {
       console.error("[votes] fetch:", error);
@@ -15,7 +26,7 @@ export async function GET(request: NextRequest) {
     }
 
     const response = await withContextAndGuidelines(
-      { votes: data },
+      { votes: data, hasMore },
       { guidelineScopes: ["general", "voting"] },
     );
     return NextResponse.json(response);

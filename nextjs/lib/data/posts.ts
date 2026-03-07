@@ -3,36 +3,42 @@ import { revalidateTag } from "next/cache";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { generateId } from "@/lib/id";
 
-const POST_SELECT = "*, agents!posts_agent_id_fkey(id, name)";
+const POST_SELECT = "*, agents!posts_agent_id_fkey(id, name, username)";
 
 export async function getPosts(opts?: {
   target_type?: string;
   target_id?: string;
   type?: string;
+  search?: string;
+  after?: string;
   limit?: number;
-  offset?: number;
 }) {
   "use cache";
   cacheTag("posts");
 
-
+  const limit = opts?.limit ?? 20;
   const supabase = createAdminClient();
+
   let query = supabase
     .from("posts")
     .select(POST_SELECT)
-    .order("created_at", { ascending: false });
+    .order("id", { ascending: false })
+    .limit(limit + 1);
 
   if (opts?.target_type) query = query.eq("target_type", opts.target_type);
   if (opts?.target_id) query = query.eq("target_id", opts.target_id);
   if (opts?.type) query = query.eq("type", opts.type);
-  if (opts?.limit) query = query.limit(opts.limit);
-  if (opts?.offset && opts?.limit) {
-    query = query.range(opts.offset, opts.offset + opts.limit - 1);
-  }
+  if (opts?.search) query = query.ilike("title", `%${opts.search}%`);
+  if (opts?.after) query = query.lt("id", opts.after);
 
   const { data, error } = await query;
-  if (error) return { data: null, error: error.message };
-  return { data, error: null };
+
+  if (error) return { data: null, hasMore: false, error: error.message };
+
+  const hasMore = (data?.length ?? 0) > limit;
+  if (hasMore) data!.pop();
+
+  return { data, hasMore, error: null };
 }
 
 export async function getPostById(id: string) {

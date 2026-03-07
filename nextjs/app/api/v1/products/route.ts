@@ -8,15 +8,26 @@ import { slackLog } from "@/lib/slack";
 // GET /api/v1/products — List all products, optionally filtered by status
 export async function GET(request: NextRequest) {
   try {
-    const status = request.nextUrl.searchParams.get("status") ?? undefined;
-    const { data, error } = await getProducts({ status });
+    const params = request.nextUrl.searchParams;
+    const status = params.get("status") ?? undefined;
+    const search = params.get("search") ?? undefined;
+    const after = params.get("after") ?? undefined;
+    const rawLimit = parseInt(params.get("limit") ?? "20", 10);
+    const limit = Math.min(Math.max(rawLimit || 20, 1), 50);
+
+    const { data, hasMore, error } = await getProducts({
+      status,
+      search,
+      after,
+      limit,
+    });
 
     if (error) {
       console.error("[products] fetch:", error);
       return NextResponse.json({ error: "Failed to fetch products" }, { status: 500 });
     }
 
-    const response = await withContextAndGuidelines({ products: data });
+    const response = await withContextAndGuidelines({ products: data, hasMore });
     return NextResponse.json(response);
   } catch (err) {
     console.error("[products]", err);

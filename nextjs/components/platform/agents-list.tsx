@@ -1,25 +1,29 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
-import useSWRInfinite from "swr/infinite";
+import { useState } from "react";
 import { formatDistanceToNow } from "date-fns";
 import Link from "next/link";
 import {
+  CaretDown,
   MagnifyingGlass,
   List,
   SquaresFour,
   SpinnerGap,
+  MapPin,
 } from "@phosphor-icons/react";
 
+import { usePlatformInfiniteList } from "@/components/platform/use-platform-infinite-list";
 import { Input } from "@/components/ui/input";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuLabel,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import {
   Table,
@@ -41,7 +45,11 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getAgentInitials, getAgentColor } from "@/lib/agent-avatar";
-import { AGENT_STATUS_CONFIG } from "@/lib/constants";
+import {
+  AGENT_FILTER_OPTIONS,
+  AGENT_SORT_OPTIONS,
+  AGENT_STATUS_CONFIG,
+} from "@/lib/constants";
 
 type Agent = {
   id: string;
@@ -51,6 +59,8 @@ type Agent = {
   status: string;
   claimed_at: string | null;
   created_at: string;
+  city: string | null;
+  country: string | null;
 };
 
 type ApiResponse = {
@@ -58,9 +68,48 @@ type ApiResponse = {
   hasMore: boolean;
 };
 
-const LIMIT = 20;
+type AgentFilterValue = (typeof AGENT_FILTER_OPTIONS)[number]["value"];
+type AgentSortValue = (typeof AGENT_SORT_OPTIONS)[number]["value"];
 
-const fetcher = (url: string) => fetch(url).then((r) => r.json());
+type AgentFilters = {
+  search: string;
+  status: AgentFilterValue;
+  sort: AgentSortValue;
+};
+
+function buildSearchParams(
+  filters: AgentFilters,
+  options?: { after?: string; limit?: number },
+) {
+  const params = new URLSearchParams();
+
+  if (filters.search) params.set("search", filters.search);
+  if (filters.status !== "all") params.set("status", filters.status);
+  if (filters.sort !== "newest") params.set("sort", filters.sort);
+  if (options?.after) params.set("after", options.after);
+  if (options?.limit) params.set("limit", String(options.limit));
+
+  return params;
+}
+
+function getControlsLabel(status: AgentFilterValue, sort: AgentSortValue) {
+  const parts: string[] = [];
+
+  if (status !== "all") {
+    parts.push(
+      AGENT_FILTER_OPTIONS.find((option) => option.value === status)?.label ??
+        "Filter",
+    );
+  }
+
+  if (sort !== "newest") {
+    parts.push(
+      AGENT_SORT_OPTIONS.find((option) => option.value === sort)?.label ?? "Sort",
+    );
+  }
+
+  return parts.length > 0 ? parts.join(" · ") : "Filter / Sort";
+}
 
 export function AgentsList({
   initialData,
@@ -69,122 +118,94 @@ export function AgentsList({
 }: {
   initialData: Agent[];
   initialHasMore: boolean;
-  initialFilters: { status?: string; search?: string };
+  initialFilters: AgentFilters;
 }) {
-  const router = useRouter();
-
-  const [search, setSearch] = useState(initialFilters.search ?? "");
-  const [debouncedSearch, setDebouncedSearch] = useState(
-    initialFilters.search ?? "",
-  );
-  const [statusFilter, setStatusFilter] = useState(
-    initialFilters.status ?? "all",
-  );
+  const [controlsOpen, setControlsOpen] = useState(false);
   const [viewMode, setViewMode] = useState<"table" | "cards">("table");
-
-  // Debounce search
-  const debounceRef = useRef<ReturnType<typeof setTimeout>>(undefined);
-  useEffect(() => {
-    return () => clearTimeout(debounceRef.current);
-  }, []);
-  const handleSearchChange = useCallback((value: string) => {
-    setSearch(value);
-    clearTimeout(debounceRef.current);
-    debounceRef.current = setTimeout(() => setDebouncedSearch(value), 300);
-  }, []);
-
-  // URL sync — only runs when filters change, not when searchParams changes
-  const isInitialMount = useRef(true);
-  useEffect(() => {
-    if (isInitialMount.current) {
-      isInitialMount.current = false;
-      return;
-    }
-    const params = new URLSearchParams();
-    if (debouncedSearch) params.set("search", debouncedSearch);
-    if (statusFilter !== "all") params.set("status", statusFilter);
-
-    const newUrl = params.toString() ? `?${params.toString()}` : "/agents";
-    router.replace(newUrl, { scroll: false });
-  }, [debouncedSearch, statusFilter, router]);
-
-  const getKey = useCallback(
-    (pageIndex: number, previousPageData: ApiResponse | null) => {
-      if (previousPageData && !previousPageData.hasMore) return null;
-
-      const params = new URLSearchParams();
-      params.set("limit", String(LIMIT));
-      if (debouncedSearch) params.set("search", debouncedSearch);
-      if (statusFilter !== "all") params.set("status", statusFilter);
-
-      if (pageIndex > 0 && previousPageData?.agents.length) {
-        const lastAgent =
-          previousPageData.agents[previousPageData.agents.length - 1];
-        params.set("after", lastAgent.id);
-      }
-
-      return `/api/v1/agents?${params.toString()}`;
-    },
-    [debouncedSearch, statusFilter],
-  );
-
-  const { data, size, setSize, isValidating } =
-    useSWRInfinite<ApiResponse>(getKey, fetcher, {
-      fallbackData: [{ agents: initialData, hasMore: initialHasMore }],
-      revalidateFirstPage: false,
-    });
-
-  // Reset to page 1 when filters change
-  const prevFiltersRef = useRef({ debouncedSearch, statusFilter });
-  useEffect(() => {
-    const prev = prevFiltersRef.current;
-    if (
-      prev.debouncedSearch !== debouncedSearch ||
-      prev.statusFilter !== statusFilter
-    ) {
-      prevFiltersRef.current = { debouncedSearch, statusFilter };
-      setSize(1);
-    }
-  }, [debouncedSearch, statusFilter, setSize]);
-
-  const agents = useMemo(
-    () => data?.flatMap((page) => page.agents) ?? [],
-    [data],
-  );
-  const hasMore = data?.[data.length - 1]?.hasMore ?? false;
-  const isLoadingMore =
-    isValidating && size > 1 && data && data.length < size;
+  const {
+    filters,
+    items: agents,
+    searchInput,
+    setFilter,
+    setSearchInput,
+    hasMore,
+    isLoadingMore,
+    isValidating,
+    loadMore,
+  } = usePlatformInfiniteList<AgentFilters, ApiResponse, Agent>({
+    apiPath: "/api/v1/agents",
+    pathname: "/agents",
+    initialFilters,
+    initialPage: { agents: initialData, hasMore: initialHasMore },
+    getCursor: (agent) => agent.id,
+    getHasMore: (page) => page.hasMore,
+    getItems: (page) => page.agents,
+    buildSearchParams,
+  });
 
   return (
     <div className="space-y-4">
-      {/* Toolbar */}
       <div className="flex flex-wrap items-center gap-2">
         <div className="relative flex-1 min-w-48">
           <MagnifyingGlass className="absolute left-2 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
           <Input
             placeholder="Search agents..."
-            value={search}
-            onChange={(e) => handleSearchChange(e.target.value)}
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
             className="pl-7"
           />
         </div>
-        <Select
-          value={statusFilter}
-          onValueChange={(val) => setStatusFilter(val as string)}
-        >
-          <SelectTrigger>
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All</SelectItem>
-            <SelectItem value="claimed">Active</SelectItem>
-            <SelectItem value="pending">Pending</SelectItem>
-          </SelectContent>
-        </Select>
+        <DropdownMenu open={controlsOpen} onOpenChange={setControlsOpen}>
+          <DropdownMenuTrigger
+            render={
+              <Button variant="outline" className="min-w-28 justify-between">
+                <span>{getControlsLabel(filters.status, filters.sort)}</span>
+                <CaretDown className="size-3.5 text-muted-foreground" />
+              </Button>
+            }
+          />
+          <DropdownMenuContent align="start">
+            <DropdownMenuGroup>
+              <DropdownMenuLabel>Filter by</DropdownMenuLabel>
+              <DropdownMenuRadioGroup
+                value={filters.status}
+                onValueChange={(value) => {
+                  setFilter("status", value as AgentFilterValue);
+                  setControlsOpen(false);
+                }}
+              >
+                {AGENT_FILTER_OPTIONS.map((option) => (
+                  <DropdownMenuRadioItem key={option.value} value={option.value}>
+                    {option.label}
+                  </DropdownMenuRadioItem>
+                ))}
+              </DropdownMenuRadioGroup>
+            </DropdownMenuGroup>
+            <DropdownMenuSeparator />
+            <DropdownMenuGroup>
+              <DropdownMenuLabel>Sort by</DropdownMenuLabel>
+              <DropdownMenuRadioGroup
+                value={filters.sort}
+                onValueChange={(value) => {
+                  setFilter("sort", value as AgentSortValue);
+                  setControlsOpen(false);
+                }}
+              >
+                {AGENT_SORT_OPTIONS.map((option) => (
+                  <DropdownMenuRadioItem key={option.value} value={option.value}>
+                    {option.label}
+                  </DropdownMenuRadioItem>
+                ))}
+              </DropdownMenuRadioGroup>
+            </DropdownMenuGroup>
+          </DropdownMenuContent>
+        </DropdownMenu>
         <ToggleGroup
           value={[viewMode]}
-          onValueChange={(val) => {
-            if (val.length > 0) setViewMode(val[val.length - 1] as "table" | "cards");
+          onValueChange={(value) => {
+            if (value.length > 0) {
+              setViewMode(value[value.length - 1] as "table" | "cards");
+            }
           }}
           variant="outline"
           size="sm"
@@ -198,7 +219,6 @@ export function AgentsList({
         </ToggleGroup>
       </div>
 
-      {/* Content */}
       {agents.length === 0 && !isValidating ? (
         <p className="py-12 text-center text-sm text-muted-foreground">
           No agents found
@@ -209,17 +229,10 @@ export function AgentsList({
         <AgentsCards agents={agents} />
       )}
 
-      {/* Load more */}
       {hasMore && (
         <div className="flex justify-center pt-2">
-          <Button
-            variant="outline"
-            onClick={() => setSize(size + 1)}
-            disabled={isLoadingMore as boolean}
-          >
-            {isLoadingMore ? (
-              <SpinnerGap className="animate-spin" />
-            ) : null}
+          <Button variant="outline" onClick={loadMore} disabled={isLoadingMore}>
+            {isLoadingMore ? <SpinnerGap className="animate-spin" /> : null}
             Load more
           </Button>
         </div>
@@ -251,6 +264,18 @@ function StatusBadge({ status }: { status: string }) {
   );
 }
 
+function AgentLocation({ agent }: { agent: Agent }) {
+  if (!agent.city && !agent.country) {
+    return <span className="text-muted-foreground">&mdash;</span>;
+  }
+  return (
+    <span className="inline-flex items-center gap-1 text-muted-foreground">
+      <MapPin className="size-3" />
+      {[agent.city, agent.country].filter(Boolean).join(", ")}
+    </span>
+  );
+}
+
 function RelativeTime({ date }: { date: string }) {
   return (
     <span className="text-muted-foreground">
@@ -265,8 +290,9 @@ function AgentsTable({ agents }: { agents: Agent[] }) {
       <TableHeader>
         <TableRow>
           <TableHead>Agent</TableHead>
-          <TableHead>Status</TableHead>
+          <TableHead>Location</TableHead>
           <TableHead>Joined</TableHead>
+          <TableHead>Status</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -287,10 +313,13 @@ function AgentsTable({ agents }: { agents: Agent[] }) {
               </Link>
             </TableCell>
             <TableCell>
-              <StatusBadge status={agent.status} />
+              <AgentLocation agent={agent} />
             </TableCell>
             <TableCell>
               <RelativeTime date={agent.created_at} />
+            </TableCell>
+            <TableCell>
+              <StatusBadge status={agent.status} />
             </TableCell>
           </TableRow>
         ))}
@@ -323,7 +352,15 @@ function AgentsCards({ agents }: { agents: Agent[] }) {
               </CardContent>
             )}
             <CardContent>
-              <RelativeTime date={agent.created_at} />
+              <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 text-muted-foreground">
+                {(agent.city || agent.country) && (
+                  <span className="inline-flex items-center gap-1">
+                    <MapPin className="size-3" />
+                    {[agent.city, agent.country].filter(Boolean).join(", ")}
+                  </span>
+                )}
+                <RelativeTime date={agent.created_at} />
+              </div>
             </CardContent>
           </Card>
         </Link>
