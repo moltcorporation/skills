@@ -33,10 +33,13 @@ function stringToSeed(str: string): number {
 // --- ASCII art generation ---
 // Dense characters only, filling the entire 1200x630 canvas.
 
-const COLS = 240;
-const ROWS = 50;
+const DEFAULT_COLS = 240;
+const DEFAULT_ROWS = 50;
 
-function generateAsciiArt(seed: string): string {
+function generateAsciiArt(
+  seed: string,
+  { cols = DEFAULT_COLS, rows = DEFAULT_ROWS }: { cols?: number; rows?: number } = {},
+): string {
   const rand = mulberry32(stringToSeed(seed));
 
   // Create a few random "blobs" of density across the canvas
@@ -44,16 +47,16 @@ function generateAsciiArt(seed: string): string {
   const blobCount = 6 + Math.floor(rand() * 8);
   for (let i = 0; i < blobCount; i++) {
     blobs.push({
-      cx: rand() * COLS,
-      cy: rand() * ROWS,
+      cx: rand() * cols,
+      cy: rand() * rows,
       r: 8 + rand() * 30,
       strength: 0.2 + rand() * 0.6,
     });
   }
 
   let text = "";
-  for (let r = 0; r < ROWS; r++) {
-    for (let c = 0; c < COLS; c++) {
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
       // Sum blob influence at this position
       let density = 0.08;
       for (const b of blobs) {
@@ -150,9 +153,13 @@ function ColonyIcon({ size }: { size: number }) {
 function OgFrame({
   asciiArt,
   children,
+  inset = 40,
+  dotInset = 37,
 }: {
   asciiArt: string;
   children: ReactElement;
+  inset?: number;
+  dotInset?: number;
 }) {
   return (
     <div
@@ -187,10 +194,10 @@ function OgFrame({
       <div
         style={{
           position: "absolute",
-          top: 40,
-          left: 40,
-          right: 40,
-          bottom: 40,
+          top: inset,
+          left: inset,
+          right: inset,
+          bottom: inset,
           border: "1px solid rgba(250, 250, 250, 0.12)",
           display: "flex",
         }}
@@ -210,7 +217,9 @@ function OgFrame({
             height: 7,
             borderRadius: "50%",
             backgroundColor: "rgba(250, 250, 250, 0.18)",
-            ...pos,
+            ...Object.fromEntries(
+              Object.entries(pos).map(([key, value]) => [key, value === 37 ? dotInset : value]),
+            ),
           }}
         />
       ))}
@@ -398,4 +407,102 @@ export async function createOgImage({
 
 export async function createRootOgImage(): Promise<ImageResponse> {
   return createOgImage({ layout: "root", seed: "moltcorp-root-og" });
+}
+
+export async function createIphoneWallpaperImage(): Promise<ImageResponse> {
+  const width = 1290;
+  const height = 2796;
+
+  const [asciiArt, fonts] = await Promise.all([
+    Promise.resolve(
+      generateAsciiArt("moltcorp-iphone-wallpaper", {
+        cols: 120,
+        rows: 172,
+      }),
+    ),
+    loadFonts(),
+  ]);
+
+  return new ImageResponse(
+    (
+      <div
+        style={{
+          width: "100%",
+          height: "100%",
+          display: "flex",
+          backgroundColor: "#0a0a0a",
+          position: "relative",
+        }}
+      >
+        <div
+          style={{
+            position: "absolute",
+            top: -140,
+            left: -120,
+            right: -200,
+            bottom: -140,
+            display: "flex",
+            color: "rgba(250, 250, 250, 0.12)",
+            fontSize: "18px",
+            lineHeight: "22px",
+            fontFamily: "Geist Mono",
+            fontWeight: 600,
+            whiteSpace: "pre",
+            overflow: "hidden",
+            transform: "scale(1.08)",
+          }}
+        >
+          {asciiArt}
+        </div>
+
+        <div
+          style={{
+            position: "absolute",
+            top: 56,
+            left: 56,
+            right: 56,
+            bottom: 56,
+            border: "1px solid rgba(250, 250, 250, 0.14)",
+            display: "flex",
+          }}
+        />
+
+        {[
+          { top: 53, left: 53 },
+          { top: 53, right: 53 },
+          { bottom: 53, left: 53 },
+          { bottom: 53, right: 53 },
+        ].map((pos, i) => (
+          <div
+            key={i}
+            style={{
+              position: "absolute",
+              width: 7,
+              height: 7,
+              borderRadius: "50%",
+              backgroundColor: "rgba(250, 250, 250, 0.22)",
+              ...pos,
+            }}
+          />
+        ))}
+
+        <div
+          style={{
+            display: "flex",
+            flex: 1,
+            justifyContent: "center",
+            alignItems: "center",
+            position: "relative",
+          }}
+        >
+          <ColonyIcon size={360} />
+        </div>
+      </div>
+    ),
+    {
+      width,
+      height,
+      fonts,
+    },
+  );
 }

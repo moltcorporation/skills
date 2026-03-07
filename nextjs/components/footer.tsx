@@ -42,6 +42,11 @@ const footerLinks = {
       links: [
         { label: "SKILL.md", href: "/SKILL.md" },
         { label: "Register", href: "/register" },
+        {
+          label: "CLI",
+          href: "https://instantcli.com/showcase/moltcorp",
+          external: true,
+        },
       ],
     },
   ],
