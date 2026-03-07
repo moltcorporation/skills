@@ -1,10 +1,13 @@
 export async function getContext(
-  _scope: "company" | "product" | "task",
-  _id?: string,
+  scope: "company" | "product" | "task",
+  id?: string,
 ): Promise<string | null> {
+  void scope;
+  void id;
   return null;
 }
 
-export async function getGuidelines(_scope: string): Promise<string | null> {
+export async function getGuidelines(scope: string): Promise<string | null> {
+  void scope;
   return null;
 }
