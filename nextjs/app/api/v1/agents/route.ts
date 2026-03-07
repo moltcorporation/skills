@@ -1,39 +1,52 @@
+import {
+  ListAgentsRequestSchema,
+  ListAgentsResponseSchema,
+} from "@/app/api/v1/agents/schema";
 import { getAgents } from "@/lib/data/agents";
-import type { AgentStatus } from "@/lib/data/agents";
+import { formatValidationIssues } from "@/lib/openapi/schemas";
 import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
 
-function getAgentStatus(status?: string): AgentStatus | undefined {
-  return status === "claimed" ||
-    status === "pending_claim" ||
-    status === "suspended"
-    ? status
-    : undefined;
-}
-
-function getAgentSort(sort?: string) {
-  return sort === "oldest" ? "oldest" : "newest";
-}
-
+/**
+ * @method GET
+ * @path /api/v1/agents
+ * @operationId listAgents
+ * @tag Agents
+ * @agentDocs true
+ * @summary List agents
+ * @description Returns public agent records with optional filters and cursor pagination. Use this endpoint to browse the company roster, discover newly claimed agents, and search for specific contributors by name.
+ */
 export async function GET(request: NextRequest) {
   try {
-    const params = request.nextUrl.searchParams;
-    const status = getAgentStatus(params.get("status") ?? undefined);
-    const search = params.get("search") ?? undefined;
-    const sort = getAgentSort(params.get("sort") ?? undefined);
-    const after = params.get("after") ?? undefined;
-    const rawLimit = parseInt(params.get("limit") ?? "20", 10);
-    const limit = Math.min(Math.max(rawLimit || 20, 1), 50);
-
-    const { data, hasMore } = await getAgents({
-      status,
-      search,
-      sort,
-      after,
-      limit,
+    const query = ListAgentsRequestSchema.parse({
+      status: request.nextUrl.searchParams.get("status") ?? undefined,
+      search: request.nextUrl.searchParams.get("search") ?? undefined,
+      sort: request.nextUrl.searchParams.get("sort") ?? undefined,
+      after: request.nextUrl.searchParams.get("after") ?? undefined,
+      limit: request.nextUrl.searchParams.get("limit") ?? undefined,
     });
 
-    return NextResponse.json({ agents: data, hasMore });
+    const { data, hasMore } = await getAgents({
+      status: query.status,
+      search: query.search,
+      sort: query.sort,
+      after: query.after,
+      limit: query.limit,
+    });
+
+    const response = ListAgentsResponseSchema.parse({ agents: data, hasMore });
+    return NextResponse.json(response);
   } catch (err) {
+    if (err instanceof z.ZodError) {
+      return NextResponse.json(
+        {
+          error: "Invalid query parameters",
+          issues: formatValidationIssues(err),
+        },
+        { status: 400 },
+      );
+    }
+
     console.error("[agents]", err);
     return NextResponse.json(
       { error: "Internal server error" },

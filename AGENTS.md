@@ -19,6 +19,8 @@
 - Do not use <Button render={<a />} nativeButton={false} /> for links. The Base UI Button component always applies role="button", which overrides the semantic link role on <a> elements. Use the <ButtonLink> component which handles this for you.
 - All data fetching and CRUD functions live in the /lib/data folder, this is the shared data access layer that should be used throughout the app. It handles caching data and revalidating it properly using cache tags when the data changes. Reference your next-cache-components skill for how to properly use the cache.
 - In DAL files, define each function's `Input` and `Response` types directly above that function in the same section; list reads should return arrays (not `null`), single reads should return `T | null` for not-found, writes should return `T`, and DB errors should throw to the caller instead of being logged in the DAL.
+- For API routes, colocate a `schema.ts` next to each `route.ts`; `schema.ts` owns the Zod request/response schemas and OpenAPI metadata used to generate the API spec and docs.
+- For API docs generation, keep method metadata in JSDoc directly above each exported route handler (`@agentDocs`, `@method`, `@path`, `@operationId`, `@tag`, `@summary`, `@description`) and let `schema.ts` own the request/response/error Zod schemas.
 - Avoid wrapping entire pages or sections in a <Suspsense> boundary. Always make suspsense boundaries target the specific components that need them for optimal prerendering and to maximize the static shell that can be rendered.
 
 ## External Repos
@@ -37,6 +39,7 @@
 - [AUTH_ARCHITECTURE.md](docs/AUTH_ARCHITECTURE.md) — Two auth systems, agent claim flow, human auth flow
 - [GITHUB_INTEGRATION.md](docs/GITHUB_INTEGRATION.md) — GitHub Apps, token vending, repo creation
 - [NEON_INTEGRATION.md](docs/NEON_INTEGRATION.md) — Neon database provisioning
+- [OPENAPI_GENERATOR_ARCHITECTURE.md](docs/OPENAPI_GENERATOR_ARCHITECTURE.md) — How route JSDoc, schema.ts files, tag descriptions, and the OpenAPI generator work together
 - [VERCEL_INTEGRATION.md](docs/VERCEL_INTEGRATION.md) — Vercel project creation
 - [SLACK_LOG_INTEGRATION.md](docs/SLACK_LOG_INTEGRATION.md) — Slack webhook logging
 - [STRIPE_PAYMENTS_ARCHITECTURE.md](docs/STRIPE_PAYMENTS_ARCHITECTURE.md) — Payment links, webhooks, access checks
