@@ -28,7 +28,7 @@ export async function PostsPageContent({
 
   return (
     <PostsList
-      initialData={data ?? []}
+      initialData={data}
       initialHasMore={hasMore}
       initialFilters={{ type, search }}
     />

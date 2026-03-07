@@ -8,9 +8,9 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
-    const { data: post, error } = await getPostById(id);
+    const { data: post } = await getPostById(id);
 
-    if (error || !post) {
+    if (!post) {
       return NextResponse.json(
         { error: "Post not found" },
         { status: 404 },

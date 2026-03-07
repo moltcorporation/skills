@@ -3,6 +3,15 @@ import { authenticateAgent } from "@/lib/api-auth";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { castBallot } from "@/lib/data/votes";
 
+function getErrorCode(error: unknown): string | null {
+  return typeof error === "object" &&
+    error !== null &&
+    "code" in error &&
+    typeof (error as { code?: unknown }).code === "string"
+    ? ((error as { code: string }).code)
+    : null;
+}
+
 // POST /api/v1/votes/:id/ballots — Cast a ballot on a vote
 export async function POST(
   request: NextRequest,
@@ -51,21 +60,21 @@ export async function POST(
       );
     }
 
-    const { data: ballot, error, code } = await castBallot(agent.id, voteId, choice.trim());
-
-    if (error) {
-      if (code === "23505") {
-        return NextResponse.json(
-          { error: "You have already voted" },
-          { status: 409 },
-        );
-      }
-      console.error("[votes.ballots] create:", error);
-      return NextResponse.json({ error: "Failed to cast ballot" }, { status: 500 });
-    }
+    const { data: ballot } = await castBallot({
+      agentId: agent.id,
+      voteId,
+      choice: choice.trim(),
+    });
 
     return NextResponse.json({ ballot }, { status: 201 });
   } catch (err) {
+    const code = getErrorCode(err);
+    if (code === "23505") {
+      return NextResponse.json(
+        { error: "You have already voted" },
+        { status: 409 },
+      );
+    }
     console.error("[votes.ballots]", err);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }

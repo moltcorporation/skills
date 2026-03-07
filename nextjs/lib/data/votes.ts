@@ -1,22 +1,99 @@
-import { cacheTag } from "next/cache";
-import { revalidateTag } from "next/cache";
-import { createAdminClient } from "@/lib/supabase/admin";
 import { VOTE_DEFAULT_DEADLINE_HOURS } from "@/lib/constants";
 import { generateId } from "@/lib/id";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { cacheTag, revalidateTag } from "next/cache";
 
-const VOTE_SELECT = "*, agents!votes_agent_id_fkey(id, name, username)";
+// ======================================================
+// Shared
+// ======================================================
 
-export async function getVotes(opts?: {
+const VOTE_SELECT = "*, agents!votes_agent_id_fkey(id, name, username)" as const;
+
+export type VoteStatus = "open" | "closed";
+
+export type VoteAuthor = {
+  id: string;
+  name: string;
+  username: string;
+};
+
+export type VoteOption = string;
+
+export type Vote = {
+  id: string;
+  agent_id: string;
+  target_type: string;
+  target_id: string;
+  title: string;
+  description: string | null;
+  product_id: string | null;
+  options: VoteOption[];
+  deadline: string;
+  status: VoteStatus;
+  outcome: string | null;
+  created_at: string;
+  resolved_at: string | null;
+  winning_option: string | null;
+  agents: VoteAuthor;
+};
+
+export type VoteWithTally = {
+  vote: Vote;
+  tally: Record<string, number>;
+};
+
+export type Ballot = {
+  id: string;
+  vote_id: string;
+  agent_id: string;
+  choice: string;
+};
+
+type VoteRecord = Omit<Vote, "options"> & { options: unknown };
+
+function normalizeVoteOptions(options: unknown): string[] {
+  if (!Array.isArray(options) || !options.every((option) => typeof option === "string")) {
+    throw new Error("Invalid vote options shape");
+  }
+
+  return options as VoteOption[];
+}
+
+function mapVote(vote: VoteRecord): Vote {
+  return {
+    ...vote,
+    options: normalizeVoteOptions(vote.options),
+  };
+}
+
+function mapVotes(votes: VoteRecord[]): Vote[] {
+  return votes.map(mapVote);
+}
+
+// ======================================================
+// GetVotes
+// ======================================================
+
+export type GetVotesInput = {
   agentId?: string;
-  status?: string;
+  status?: VoteStatus;
   search?: string;
   after?: string;
   limit?: number;
-}) {
+};
+
+export type GetVotesResponse = {
+  data: Vote[];
+  hasMore: boolean;
+};
+
+export async function getVotes(
+  opts: GetVotesInput = {},
+): Promise<GetVotesResponse> {
   "use cache";
   cacheTag("votes");
 
-  const limit = opts?.limit ?? 20;
+  const limit = opts.limit ?? 20;
   const supabase = createAdminClient();
 
   let query = supabase
@@ -25,57 +102,85 @@ export async function getVotes(opts?: {
     .order("id", { ascending: false })
     .limit(limit + 1);
 
-  if (opts?.agentId) query = query.eq("agent_id", opts.agentId);
-  if (opts?.status) query = query.eq("status", opts.status);
-  if (opts?.search) query = query.ilike("title", `%${opts.search}%`);
-  if (opts?.after) query = query.lt("id", opts.after);
+  if (opts.agentId) query = query.eq("agent_id", opts.agentId);
+  if (opts.status) query = query.eq("status", opts.status);
+  if (opts.search) query = query.ilike("title", `%${opts.search}%`);
+  if (opts.after) query = query.lt("id", opts.after);
 
   const { data, error } = await query;
-
-  if (error) return { data: null, hasMore: false, error: error.message };
+  if (error) throw error;
 
   const hasMore = (data?.length ?? 0) > limit;
   if (hasMore) data!.pop();
 
-  return { data, hasMore, error: null };
+  return {
+    data: data ? mapVotes(data as VoteRecord[]) : [],
+    hasMore,
+  };
 }
 
-export async function getVoteWithTally(id: string) {
+// ======================================================
+// GetVoteWithTally
+// ======================================================
+
+export type GetVoteWithTallyInput = string;
+
+export type GetVoteWithTallyResponse = {
+  data: VoteWithTally | null;
+};
+
+export async function getVoteWithTally(
+  id: GetVoteWithTallyInput,
+): Promise<GetVoteWithTallyResponse> {
   "use cache";
   cacheTag(`vote-${id}`);
-
 
   const supabase = createAdminClient();
 
   const [voteResult, ballotsResult] = await Promise.all([
-    supabase.from("votes").select(VOTE_SELECT).eq("id", id).single(),
+    supabase.from("votes").select(VOTE_SELECT).eq("id", id).maybeSingle(),
     supabase.from("ballots").select("choice").eq("vote_id", id),
   ]);
 
-  if (voteResult.error || !voteResult.data) {
-    return { data: null, error: voteResult.error?.message ?? "Vote not found" };
-  }
+  if (voteResult.error) throw voteResult.error;
+  if (ballotsResult.error) throw ballotsResult.error;
+  if (!voteResult.data) return { data: null };
 
   const tally: Record<string, number> = {};
-  for (const b of ballotsResult.data ?? []) {
-    tally[b.choice] = (tally[b.choice] ?? 0) + 1;
+  for (const ballot of ballotsResult.data ?? []) {
+    tally[ballot.choice] = (tally[ballot.choice] ?? 0) + 1;
   }
 
-  return { data: { vote: voteResult.data, tally }, error: null };
+  return {
+    data: {
+      vote: mapVote(voteResult.data as VoteRecord),
+      tally,
+    },
+  };
 }
 
+// ======================================================
+// CreateVote
+// ======================================================
+
+export type CreateVoteInput = {
+  agentId: string;
+  target_type: string;
+  target_id: string;
+  title: string;
+  description?: string;
+  product_id?: string;
+  options: string[];
+  deadline_hours?: number;
+};
+
+export type CreateVoteResponse = {
+  data: Vote;
+};
+
 export async function createVote(
-  agentId: string,
-  input: {
-    target_type: string;
-    target_id: string;
-    title: string;
-    description?: string;
-    product_id?: string;
-    options: string[];
-    deadline_hours?: number;
-  },
-) {
+  input: CreateVoteInput,
+): Promise<CreateVoteResponse> {
   const hours = input.deadline_hours ?? VOTE_DEFAULT_DEADLINE_HOURS;
   const deadline = new Date(Date.now() + hours * 60 * 60 * 1000).toISOString();
 
@@ -88,50 +193,60 @@ export async function createVote(
     .from("votes")
     .insert({
       id: generateId(),
-      agent_id: agentId,
+      agent_id: input.agentId,
       target_type: input.target_type,
       target_id: input.target_id,
       title: input.title.trim(),
       description: input.description?.trim() || null,
       product_id: resolvedProductId || null,
-      options: input.options.map((o) => o.trim()),
+      options: input.options.map((option) => option.trim()),
       deadline,
       status: "open",
     })
     .select(VOTE_SELECT)
     .single();
 
-  if (error) return { data: null, error: error.message };
+  if (error) throw error;
 
   revalidateTag("votes", "max");
-  revalidateTag("activity", "max");
 
-  return { data, error: null };
+  return { data: mapVote(data as VoteRecord) };
 }
 
+// ======================================================
+// CastBallot
+// ======================================================
+
+export type CastBallotInput = {
+  agentId: string;
+  voteId: string;
+  choice: string;
+};
+
+export type CastBallotResponse = {
+  data: Ballot;
+};
+
 export async function castBallot(
-  agentId: string,
-  voteId: string,
-  choice: string,
-) {
+  input: CastBallotInput,
+): Promise<CastBallotResponse> {
   const supabase = createAdminClient();
 
   const { data, error } = await supabase
     .from("ballots")
     .insert({
       id: generateId(),
-      vote_id: voteId,
-      agent_id: agentId,
-      choice: choice.trim(),
+      vote_id: input.voteId,
+      agent_id: input.agentId,
+      choice: input.choice.trim(),
     })
     .select()
     .single();
 
-  if (error) return { data: null, error: error.message, code: error.code };
+  if (error) throw error;
 
-  revalidateTag(`vote-${voteId}`, "max");
+  revalidateTag(`vote-${input.voteId}`, "max");
   revalidateTag("votes", "max");
-  revalidateTag("activity", "max");
 
-  return { data, error: null, code: null };
+  return { data: data as Ballot };
 }

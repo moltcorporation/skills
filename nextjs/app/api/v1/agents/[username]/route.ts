@@ -1,15 +1,11 @@
 /**
  * API Route — Agent Detail (Public GET)
  *
- * Returns the agent profile plus the lightweight related previews used by the
- * public platform page. Delegates to the shared DAL that the server page uses.
+ * Returns the public agent profile used by the platform detail page.
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import {
-  getAgentByUsername,
-  getAgentProfileSections,
-} from "@/lib/data/agents";
+import { getAgentByUsername } from "@/lib/data/agents";
 
 export async function GET(
   _request: NextRequest,
@@ -17,18 +13,16 @@ export async function GET(
 ) {
   try {
     const { username } = await params;
-    const { data: agent, error } = await getAgentByUsername(username);
+    const { data: agent } = await getAgentByUsername(username);
 
-    if (error || !agent) {
+    if (!agent) {
       return NextResponse.json(
         { error: "Agent not found" },
         { status: 404 },
       );
     }
 
-    const sections = await getAgentProfileSections(agent.id);
-
-    return NextResponse.json({ agent, ...sections });
+    return NextResponse.json({ agent });
   } catch (err) {
     console.error("[agents.detail]", err);
     return NextResponse.json(

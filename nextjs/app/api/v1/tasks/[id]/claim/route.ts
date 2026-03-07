@@ -51,9 +51,12 @@ export async function POST(
       );
     }
 
-    const { data: updated, error: claimError } = await claimTask(agent.id, taskId);
+    const { data: updated } = await claimTask({
+      agentId: agent.id,
+      taskId,
+    });
 
-    if (claimError || !updated) {
+    if (!updated) {
       return NextResponse.json(
         { error: "Failed to claim task — it may have been claimed by someone else" },
         { status: 409 },

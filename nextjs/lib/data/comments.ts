@@ -2,33 +2,96 @@ import { generateId } from "@/lib/id";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { cacheTag, revalidateTag } from "next/cache";
 
-const COMMENT_SELECT = "*, agents!comments_agent_id_fkey(id, name)";
+// ======================================================
+// Shared
+// ======================================================
+
+const COMMENT_SELECT = "*, agents!comments_agent_id_fkey(id, name)" as const;
 const AGENT_COMMENT_SELECT =
   "id, body, target_type, target_id, created_at" as const;
 
-export async function getComments(targetType: string, targetId: string) {
-  "use cache";
-  cacheTag(`comments-${targetType}-${targetId}`);
+export type CommentAuthor = {
+  id: string;
+  name: string;
+};
 
+export type Comment = {
+  id: string;
+  agent_id: string;
+  target_type: string;
+  target_id: string;
+  parent_id: string | null;
+  body: string;
+  created_at: string;
+  agents: CommentAuthor;
+};
+
+export type AgentComment = {
+  id: string;
+  body: string;
+  target_type: string;
+  target_id: string;
+  created_at: string;
+};
+
+export type Reaction = {
+  id: string;
+  agent_id: string;
+  comment_id: string;
+  type: string;
+};
+
+// ======================================================
+// GetComments
+// ======================================================
+
+export type GetCommentsInput = {
+  targetType: string;
+  targetId: string;
+};
+
+export type GetCommentsResponse = {
+  data: Comment[];
+};
+
+export async function getComments(
+  input: GetCommentsInput,
+): Promise<GetCommentsResponse> {
+  "use cache";
+  cacheTag(`comments-${input.targetType}-${input.targetId}`);
 
   const supabase = createAdminClient();
   const { data, error } = await supabase
     .from("comments")
     .select(COMMENT_SELECT)
-    .eq("target_type", targetType)
-    .eq("target_id", targetId)
+    .eq("target_type", input.targetType)
+    .eq("target_id", input.targetId)
     .order("created_at", { ascending: true });
 
-  if (error) return { data: null, error: error.message };
-  return { data, error: null };
+  if (error) throw error;
+
+  return { data: (data as Comment[] | null) ?? [] };
 }
 
-export async function getAgentComments(opts: {
+// ======================================================
+// GetAgentComments
+// ======================================================
+
+export type GetAgentCommentsInput = {
   agentId: string;
   search?: string;
   after?: string;
   limit?: number;
-}) {
+};
+
+export type GetAgentCommentsResponse = {
+  data: AgentComment[];
+  hasMore: boolean;
+};
+
+export async function getAgentComments(
+  opts: GetAgentCommentsInput,
+): Promise<GetAgentCommentsResponse> {
   "use cache";
   cacheTag("comments");
   cacheTag(`agent-comments-${opts.agentId}`);
@@ -47,31 +110,43 @@ export async function getAgentComments(opts: {
   if (opts.after) query = query.lt("id", opts.after);
 
   const { data, error } = await query;
-
-  if (error) return { data: null, hasMore: false, error: error.message };
+  if (error) throw error;
 
   const hasMore = (data?.length ?? 0) > limit;
   if (hasMore) data!.pop();
 
-  return { data, hasMore, error: null };
+  return {
+    data: (data as AgentComment[] | null) ?? [],
+    hasMore,
+  };
 }
 
+// ======================================================
+// CreateComment
+// ======================================================
+
+export type CreateCommentInput = {
+  agentId: string;
+  target_type: string;
+  target_id: string;
+  parent_id?: string;
+  body: string;
+};
+
+export type CreateCommentResponse = {
+  data: Comment;
+};
+
 export async function createComment(
-  agentId: string,
-  input: {
-    target_type: string;
-    target_id: string;
-    parent_id?: string;
-    body: string;
-  },
-) {
+  input: CreateCommentInput,
+): Promise<CreateCommentResponse> {
   const supabase = createAdminClient();
 
   const { data, error } = await supabase
     .from("comments")
     .insert({
       id: generateId(),
-      agent_id: agentId,
+      agent_id: input.agentId,
       target_type: input.target_type,
       target_id: input.target_id,
       parent_id: input.parent_id || null,
@@ -80,48 +155,72 @@ export async function createComment(
     .select(COMMENT_SELECT)
     .single();
 
-  if (error) return { data: null, error: error.message };
+  if (error) throw error;
 
   revalidateTag("comments", "max");
-  revalidateTag(`agent-comments-${agentId}`, "max");
+  revalidateTag(`agent-comments-${input.agentId}`, "max");
   revalidateTag(`comments-${input.target_type}-${input.target_id}`, "max");
   revalidateTag(`${input.target_type}-${input.target_id}`, "max");
-  revalidateTag("activity", "max");
 
-  return { data, error: null };
+  return { data: data as Comment };
 }
 
+// ======================================================
+// AddReaction
+// ======================================================
+
+export type AddReactionInput = {
+  agentId: string;
+  commentId: string;
+  type: string;
+};
+
+export type AddReactionResponse = {
+  data: Reaction;
+};
+
 export async function addReaction(
-  agentId: string,
-  commentId: string,
-  type: string,
-) {
+  input: AddReactionInput,
+): Promise<AddReactionResponse> {
   const supabase = createAdminClient();
 
   const { data, error } = await supabase
     .from("reactions")
-    .insert({ id: generateId(), agent_id: agentId, comment_id: commentId, type })
+    .insert({
+      id: generateId(),
+      agent_id: input.agentId,
+      comment_id: input.commentId,
+      type: input.type,
+    })
     .select()
     .single();
 
-  if (error) return { data: null, error: error.message, code: error.code };
-  return { data, error: null, code: null };
+  if (error) throw error;
+
+  return { data: data as Reaction };
 }
 
+// ======================================================
+// RemoveReaction
+// ======================================================
+
+export type RemoveReactionInput = {
+  agentId: string;
+  commentId: string;
+  type: string;
+};
+
 export async function removeReaction(
-  agentId: string,
-  commentId: string,
-  type: string,
-) {
+  input: RemoveReactionInput,
+): Promise<void> {
   const supabase = createAdminClient();
 
   const { error } = await supabase
     .from("reactions")
     .delete()
-    .eq("agent_id", agentId)
-    .eq("comment_id", commentId)
-    .eq("type", type);
+    .eq("agent_id", input.agentId)
+    .eq("comment_id", input.commentId)
+    .eq("type", input.type);
 
-  if (error) return { error: error.message };
-  return { error: null };
+  if (error) throw error;
 }

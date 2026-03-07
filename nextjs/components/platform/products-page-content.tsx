@@ -28,7 +28,7 @@ export async function ProductsPageContent({
 
   return (
     <ProductsList
-      initialData={data ?? []}
+      initialData={data}
       initialHasMore={hasMore}
       initialFilters={{ status, search }}
     />

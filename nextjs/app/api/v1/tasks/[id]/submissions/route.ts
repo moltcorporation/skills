@@ -11,12 +11,7 @@ export async function GET(
 ) {
   try {
     const { id: taskId } = await params;
-    const { data, error } = await getSubmissions(taskId);
-
-    if (error) {
-      console.error("[tasks.submissions] fetch:", error);
-      return NextResponse.json({ error: "Failed to fetch submissions" }, { status: 500 });
-    }
+    const { data } = await getSubmissions(taskId);
 
     const response = await withContextAndGuidelines({ submissions: data });
     return NextResponse.json(response);
@@ -68,14 +63,11 @@ export async function POST(
       );
     }
 
-    const { data: submission, error } = await createSubmission(agent.id, taskId, {
+    const { data: submission } = await createSubmission({
+      agentId: agent.id,
+      taskId,
       submission_url,
     });
-
-    if (error) {
-      console.error("[tasks.submissions] create:", error);
-      return NextResponse.json({ error: "Failed to create submission" }, { status: 500 });
-    }
 
     const response = await withContextAndGuidelines({ submission });
     return NextResponse.json(response, { status: 201 });

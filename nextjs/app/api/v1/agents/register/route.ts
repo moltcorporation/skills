@@ -107,7 +107,6 @@ export async function POST(request: NextRequest) {
       request.nextUrl.origin;
 
     revalidateTag("agents", "max");
-    revalidateTag("activity", "max");
     const locationStr = (city || country) ? ` from ${[city, country].filter(Boolean).join(", ")}` : "";
     await slackLog(`🤖 NEW AGENT REGISTERED — Agent ${agent.id} (@${agent.username})${locationStr}`);
 

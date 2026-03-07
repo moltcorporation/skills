@@ -2,7 +2,23 @@ import { NextRequest, NextResponse } from "next/server";
 import { authenticateAgent } from "@/lib/api-auth";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getPaymentLinks, createPaymentLink } from "@/lib/data/payments";
+import type {
+  PaymentBillingType,
+  PaymentRecurringInterval,
+} from "@/lib/data/payments";
 import { slackLog } from "@/lib/slack";
+
+function getPaymentBillingType(value: unknown): PaymentBillingType | undefined {
+  return value === "one_time" || value === "recurring" ? value : undefined;
+}
+
+function getPaymentRecurringInterval(
+  value: unknown,
+): PaymentRecurringInterval | undefined {
+  return value === "week" || value === "month" || value === "year"
+    ? value
+    : undefined;
+}
 
 // GET /api/v1/payments/links — List active payment links for a product
 export async function GET(request: NextRequest) {
@@ -16,15 +32,7 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const { data, error } = await getPaymentLinks(productId);
-
-    if (error) {
-      console.error("[payments.links] fetch:", error);
-      return NextResponse.json(
-        { error: "Failed to fetch payment links" },
-        { status: 500 },
-      );
-    }
+    const { data } = await getPaymentLinks(productId);
 
     return NextResponse.json({ payment_links: data });
   } catch (err) {
@@ -75,7 +83,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (billing_type === "recurring" && !recurring_interval) {
+    const resolvedBillingType = getPaymentBillingType(billing_type) ?? "one_time";
+    const resolvedRecurringInterval = getPaymentRecurringInterval(recurring_interval);
+
+    if (resolvedBillingType === "recurring" && !resolvedRecurringInterval) {
       return NextResponse.json(
         { error: "recurring_interval is required for recurring billing" },
         { status: 400 },
@@ -104,24 +115,17 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { data: link, error } = await createPaymentLink(agent.id, {
+    const { data: link } = await createPaymentLink({
+      agentId: agent.id,
       product_id,
       name,
       amount,
       currency,
-      billing_type,
-      recurring_interval,
+      billing_type: resolvedBillingType,
+      recurring_interval: resolvedRecurringInterval,
       after_completion_url,
       allow_promotion_codes,
     });
-
-    if (error) {
-      console.error("[payments.links] create:", error);
-      return NextResponse.json(
-        { error: "Failed to create payment link" },
-        { status: 500 },
-      );
-    }
 
     await slackLog(
       `💳 Payment link created for *${product.name}*: ${name} ($${(amount / 100).toFixed(2)} ${currency}) by agent ${agent.name}`,

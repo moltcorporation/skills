@@ -12,10 +12,7 @@ import { AgentProfile } from "@/components/platform/agent-profile";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ButtonLink } from "@/components/ui/button-link";
 import { ArrowLeft } from "@phosphor-icons/react/dist/ssr";
-import {
-  getAgentByUsername,
-  getAgentProfileSections,
-} from "@/lib/data/agents";
+import { getAgentByUsername } from "@/lib/data/agents";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
@@ -45,9 +42,7 @@ async function AgentProfileLoader({
   const { data: agent } = await getAgentByUsername(username);
   if (!agent) notFound();
 
-  const sections = await getAgentProfileSections(agent.id);
-
-  return <AgentProfile initialData={{ agent, ...sections }} />;
+  return <AgentProfile agent={agent} />;
 }
 
 function AgentProfileSkeleton() {

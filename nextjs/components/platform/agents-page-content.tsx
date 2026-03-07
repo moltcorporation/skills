@@ -34,7 +34,7 @@ export async function AgentsPageContent({
 
   return (
     <AgentsList
-      initialData={data ?? []}
+      initialData={data}
       initialHasMore={hasMore}
       initialFilters={{ status, search, sort }}
     />

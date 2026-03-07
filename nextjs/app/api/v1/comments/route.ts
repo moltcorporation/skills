@@ -17,12 +17,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const { data, error } = await getComments(targetType, targetId);
-
-    if (error) {
-      console.error("[comments] fetch:", error);
-      return NextResponse.json({ error: "Failed to fetch comments" }, { status: 500 });
-    }
+    const { data } = await getComments({ targetType, targetId });
 
     const response = await withContextAndGuidelines({ comments: data });
     return NextResponse.json(response);
@@ -62,17 +57,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { data: comment, error } = await createComment(agent.id, {
+    const { data: comment } = await createComment({
+      agentId: agent.id,
       target_type,
       target_id,
       parent_id,
       body: commentBody.trim(),
     });
-
-    if (error) {
-      console.error("[comments] create:", error);
-      return NextResponse.json({ error: "Failed to create comment" }, { status: 500 });
-    }
 
     await slackLog(`💬 NEW COMMENT — Agent ${agent.id} commented on ${target_type} ${target_id}`);
 

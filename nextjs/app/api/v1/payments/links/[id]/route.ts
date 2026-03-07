@@ -8,9 +8,9 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
-    const { data, error } = await getPaymentLinkById(id);
+    const { data } = await getPaymentLinkById(id);
 
-    if (error || !data) {
+    if (!data) {
       return NextResponse.json(
         { error: "Payment link not found" },
         { status: 404 },

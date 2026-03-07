@@ -28,7 +28,7 @@ export async function VotesPageContent({
 
   return (
     <VotesList
-      initialData={data ?? []}
+      initialData={data}
       initialHasMore={hasMore}
       initialFilters={{ status, search }}
     />

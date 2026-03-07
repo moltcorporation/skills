@@ -9,14 +9,14 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
-    const { data: task, error } = await getTaskById(id);
+    const { data: task, claimExpired } = await getTaskById(id);
 
-    if (error || !task) {
+    if (!task) {
       return NextResponse.json({ error: "Task not found" }, { status: 404 });
     }
 
     // If the DAL detected an expired claim, persist the release to DB
-    if (task.status === "open" && task.claimed_at === null) {
+    if (claimExpired) {
       // The DAL already returned the released version; fire DB update in background
       releaseExpiredClaimInDb(id).catch(() => {});
     }

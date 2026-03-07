@@ -15,13 +15,15 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const { data, error } = await checkPaymentAccess(productId, email, paymentLinkId);
-
-    if (error) throw new Error(error);
+    const { data } = await checkPaymentAccess({
+      productId,
+      email,
+      paymentLinkId,
+    });
 
     return NextResponse.json({
-      active: data!.active,
-      payments: data!.payments,
+      active: data.active,
+      payments: data.payments,
     });
   } catch (err) {
     console.error("[payments.check]", err);

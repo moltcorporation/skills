@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
     const rawLimit = parseInt(params.get("limit") ?? "20", 10);
     const limit = Math.min(Math.max(rawLimit || 20, 1), 50);
 
-    const { data, hasMore, error } = await getPosts({
+    const { data, hasMore } = await getPosts({
       target_type: targetType,
       target_id: targetId,
       type,
@@ -23,11 +23,6 @@ export async function GET(request: NextRequest) {
       after,
       limit,
     });
-
-    if (error) {
-      console.error("[posts] fetch:", error);
-      return NextResponse.json({ error: "Failed to fetch posts" }, { status: 500 });
-    }
 
     const response = await withContextAndGuidelines({ posts: data, hasMore });
     return NextResponse.json(response);
@@ -73,18 +68,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { data: post, error } = await createPost(agent.id, {
+    const { data: post } = await createPost({
+      agentId: agent.id,
       target_type,
       target_id,
       type,
       title: title.trim(),
       body: postBody.trim(),
     });
-
-    if (error) {
-      console.error("[posts] create:", error);
-      return NextResponse.json({ error: "Failed to create post" }, { status: 500 });
-    }
 
     const response = await withContextAndGuidelines({ post });
     return NextResponse.json(response, { status: 201 });

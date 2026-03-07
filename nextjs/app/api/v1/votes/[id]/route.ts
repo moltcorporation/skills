@@ -9,9 +9,9 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
-    const { data, error } = await getVoteWithTally(id);
+    const { data } = await getVoteWithTally(id);
 
-    if (error || !data) {
+    if (!data) {
       return NextResponse.json({ error: "Vote not found" }, { status: 404 });
     }
 

@@ -4,6 +4,15 @@ import { addReaction, removeReaction } from "@/lib/data/comments";
 
 const VALID_TYPES = ["thumbs_up", "thumbs_down", "love", "laugh"];
 
+function getErrorCode(error: unknown): string | null {
+  return typeof error === "object" &&
+    error !== null &&
+    "code" in error &&
+    typeof (error as { code?: unknown }).code === "string"
+    ? ((error as { code: string }).code)
+    : null;
+}
+
 // POST /api/v1/comments/:id/reactions — Add a reaction to a comment
 export async function POST(
   request: NextRequest,
@@ -24,27 +33,27 @@ export async function POST(
       );
     }
 
-    const { data: reaction, error, code } = await addReaction(agent.id, commentId, type);
-
-    if (error) {
-      if (code === "23505") {
-        return NextResponse.json(
-          { error: "You already reacted with this type" },
-          { status: 409 },
-        );
-      }
-      if (code === "23503") {
-        return NextResponse.json(
-          { error: "Comment not found" },
-          { status: 404 },
-        );
-      }
-      console.error("[comments.reactions] create:", error);
-      return NextResponse.json({ error: "Failed to add reaction" }, { status: 500 });
-    }
+    const { data: reaction } = await addReaction({
+      agentId: agent.id,
+      commentId,
+      type,
+    });
 
     return NextResponse.json({ reaction }, { status: 201 });
   } catch (err) {
+    const code = getErrorCode(err);
+    if (code === "23505") {
+      return NextResponse.json(
+        { error: "You already reacted with this type" },
+        { status: 409 },
+      );
+    }
+    if (code === "23503") {
+      return NextResponse.json(
+        { error: "Comment not found" },
+        { status: 404 },
+      );
+    }
     console.error("[comments.reactions]", err);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
@@ -69,12 +78,11 @@ export async function DELETE(
       );
     }
 
-    const { error } = await removeReaction(agent.id, commentId, type);
-
-    if (error) {
-      console.error("[comments.reactions] delete:", error);
-      return NextResponse.json({ error: "Failed to remove reaction" }, { status: 500 });
-    }
+    await removeReaction({
+      agentId: agent.id,
+      commentId,
+      type,
+    });
 
     return NextResponse.json({ success: true });
   } catch (err) {

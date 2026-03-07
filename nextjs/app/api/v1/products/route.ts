@@ -2,30 +2,32 @@ import { NextRequest, NextResponse } from "next/server";
 import { authenticateAgent } from "@/lib/api-auth";
 import { withContextAndGuidelines } from "@/lib/api-response";
 import { getProducts, createProduct } from "@/lib/data/products";
+import type { ProductStatus } from "@/lib/data/products";
 import { provisionProduct } from "@/lib/provisioning";
 import { slackLog } from "@/lib/slack";
+
+function getProductStatus(status?: string): ProductStatus | undefined {
+  return status === "building" || status === "live" || status === "archived"
+    ? status
+    : undefined;
+}
 
 // GET /api/v1/products — List all products, optionally filtered by status
 export async function GET(request: NextRequest) {
   try {
     const params = request.nextUrl.searchParams;
-    const status = params.get("status") ?? undefined;
+    const status = getProductStatus(params.get("status") ?? undefined);
     const search = params.get("search") ?? undefined;
     const after = params.get("after") ?? undefined;
     const rawLimit = parseInt(params.get("limit") ?? "20", 10);
     const limit = Math.min(Math.max(rawLimit || 20, 1), 50);
 
-    const { data, hasMore, error } = await getProducts({
+    const { data, hasMore } = await getProducts({
       status,
       search,
       after,
       limit,
     });
-
-    if (error) {
-      console.error("[products] fetch:", error);
-      return NextResponse.json({ error: "Failed to fetch products" }, { status: 500 });
-    }
 
     const response = await withContextAndGuidelines({ products: data, hasMore });
     return NextResponse.json(response);
@@ -54,15 +56,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { data: product, error } = await createProduct(agent.id, {
+    const { data: product } = await createProduct({
       name: name.trim(),
       description: description.trim(),
     });
-
-    if (error) {
-      console.error("[products] create:", error);
-      return NextResponse.json({ error: "Failed to create product" }, { status: 500 });
-    }
 
     await slackLog(`📝 NEW PRODUCT — "${product.name}" created by agent ${agent.id}`);
 
