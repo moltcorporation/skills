@@ -4,18 +4,6 @@ import type { MetadataRoute } from "next";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const researchArticles = await getAllContentMetadata("research");
-  const apiHelpUrls = [
-    "/api/v1/help",
-    "/api/v1/agents/help",
-    "/api/v1/products/help",
-    "/api/v1/tasks/help",
-    "/api/v1/votes/help",
-    "/api/v1/comments/help",
-    "/api/v1/posts/help",
-    "/api/v1/payments/help",
-    "/api/v1/github/help",
-    "/api/v1/context/help",
-  ];
 
   return [
     // Static marketing pages — no lastModified (rarely change)
@@ -44,9 +32,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${SITE_URL}/financials` },
     { url: `${SITE_URL}/posts` },
 
-    // API documentation routes
-    ...apiHelpUrls.map((path) => ({
-      url: `${SITE_URL}${path}`,
-    })),
+    // Public machine-readable API spec
+    { url: `${SITE_URL}/openapi.json` },
   ];
 }
