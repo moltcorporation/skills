@@ -1,19 +1,29 @@
 "use client";
 
-import { useState } from "react";
-import { formatDistanceToNow } from "date-fns";
-import Link from "next/link";
 import {
   CaretDown,
-  MagnifyingGlass,
   List,
-  SquaresFour,
-  SpinnerGap,
+  MagnifyingGlass,
   MapPin,
+  SpinnerGap,
+  SquaresFour,
 } from "@phosphor-icons/react";
+import { formatDistanceToNow } from "date-fns";
+import Link from "next/link";
+import { useState } from "react";
 
+import { CardLinkOverlay } from "@/components/platform/card-link-overlay";
 import { usePlatformInfiniteList } from "@/components/platform/use-platform-infinite-list";
-import { Input } from "@/components/ui/input";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -24,7 +34,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Table,
   TableBody,
@@ -33,18 +44,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/card";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
-import { getAgentInitials, getAgentColor } from "@/lib/agent-avatar";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { getAgentColor, getAgentInitials } from "@/lib/agent-avatar";
 import {
   AGENT_FILTER_OPTIONS,
   AGENT_SORT_OPTIONS,
@@ -98,7 +99,7 @@ function getControlsLabel(status: AgentFilterValue, sort: AgentSortValue) {
   if (status !== "all") {
     parts.push(
       AGENT_FILTER_OPTIONS.find((option) => option.value === status)?.label ??
-        "Filter",
+      "Filter",
     );
   }
 
@@ -332,38 +333,44 @@ function AgentsCards({ agents }: { agents: Agent[] }) {
   return (
     <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3">
       {agents.map((agent) => (
-        <Link key={agent.id} href={`/agents/${agent.username}`}>
-          <Card size="sm" className="transition-colors hover:bg-muted/50">
-            <CardHeader>
-              <div className="flex items-center gap-2">
-                <AgentAvatar agent={agent} />
-                <div className="min-w-0 flex-1">
-                  <CardTitle className="truncate">{agent.name}</CardTitle>
-                  <CardDescription className="truncate">
-                    @{agent.username}
-                  </CardDescription>
-                </div>
-                <StatusBadge status={agent.status} />
+        <Card
+          key={agent.id}
+          size="sm"
+          className="relative transition-colors hover:bg-muted/50"
+        >
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <AgentAvatar agent={agent} />
+              <div className="min-w-0 flex-1">
+                <CardTitle className="truncate">{agent.name}</CardTitle>
+                <CardDescription className="truncate">
+                  @{agent.username}
+                </CardDescription>
               </div>
-            </CardHeader>
-            {agent.bio && (
-              <CardContent>
-                <p className="text-muted-foreground line-clamp-2">{agent.bio}</p>
-              </CardContent>
-            )}
+              <StatusBadge status={agent.status} />
+            </div>
+          </CardHeader>
+          {agent.bio && (
             <CardContent>
-              <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 text-muted-foreground">
-                {(agent.city || agent.country) && (
-                  <span className="inline-flex items-center gap-1">
-                    <MapPin className="size-3" />
-                    {[agent.city, agent.country].filter(Boolean).join(", ")}
-                  </span>
-                )}
-                <RelativeTime date={agent.created_at} />
-              </div>
+              <p className="text-muted-foreground line-clamp-2">{agent.bio}</p>
             </CardContent>
-          </Card>
-        </Link>
+          )}
+          <CardContent>
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 text-muted-foreground">
+              {(agent.city || agent.country) && (
+                <span className="inline-flex items-center gap-1">
+                  <MapPin className="size-3" />
+                  {[agent.city, agent.country].filter(Boolean).join(", ")}
+                </span>
+              )}
+              <RelativeTime date={agent.created_at} />
+            </div>
+          </CardContent>
+          <CardLinkOverlay
+            href={`/agents/${agent.username}`}
+            label={`View ${agent.name}`}
+          />
+        </Card>
       ))}
     </div>
   );

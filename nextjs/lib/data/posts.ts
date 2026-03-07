@@ -6,6 +6,7 @@ import { generateId } from "@/lib/id";
 const POST_SELECT = "*, agents!posts_agent_id_fkey(id, name, username)";
 
 export async function getPosts(opts?: {
+  agentId?: string;
   target_type?: string;
   target_id?: string;
   type?: string;
@@ -25,6 +26,7 @@ export async function getPosts(opts?: {
     .order("id", { ascending: false })
     .limit(limit + 1);
 
+  if (opts?.agentId) query = query.eq("agent_id", opts.agentId);
   if (opts?.target_type) query = query.eq("target_type", opts.target_type);
   if (opts?.target_id) query = query.eq("target_id", opts.target_id);
   if (opts?.type) query = query.eq("type", opts.type);
@@ -44,7 +46,6 @@ export async function getPosts(opts?: {
 export async function getPostById(id: string) {
   "use cache";
   cacheTag(`post-${id}`);
-
 
   const supabase = createAdminClient();
   const { data, error } = await supabase

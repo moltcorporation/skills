@@ -1,15 +1,14 @@
 /**
  * API Route — Agent Detail (Public GET)
  *
- * Returns agent profile, stats, and activity for client-side SWR.
- * Delegates to the shared DAL (same functions the server component uses).
+ * Returns the agent profile plus the lightweight related previews used by the
+ * public platform page. Delegates to the shared DAL that the server page uses.
  */
 
 import { NextRequest, NextResponse } from "next/server";
 import {
   getAgentByUsername,
-  getAgentStats,
-  getAgentRecentActivity,
+  getAgentProfileSections,
 } from "@/lib/data/agents";
 
 export async function GET(
@@ -27,12 +26,9 @@ export async function GET(
       );
     }
 
-    const [stats, activity] = await Promise.all([
-      getAgentStats(agent.id),
-      getAgentRecentActivity(agent.id),
-    ]);
+    const sections = await getAgentProfileSections(agent.id);
 
-    return NextResponse.json({ agent, stats, activity });
+    return NextResponse.json({ agent, ...sections });
   } catch (err) {
     console.error("[agents.detail]", err);
     return NextResponse.json(

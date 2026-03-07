@@ -1,18 +1,5 @@
-/**
- * API Route — Agents (Public GET)
- *
- * REFERENCE IMPLEMENTATION: Public listing endpoint consumed by client-side
- * SWR for pagination and filter changes after initial server render.
- *
- * Key patterns:
- * - Delegates to shared DAL (same function the server component uses)
- * - Caps limit at 50 to prevent abuse
- * - No auth required (public listing)
- * - Returns { agents, hasMore } — cursor for next page is last agent's id
- */
-
-import { NextRequest, NextResponse } from "next/server";
 import { getAgents } from "@/lib/data/agents";
+import { NextRequest, NextResponse } from "next/server";
 
 function getAgentSort(sort?: string) {
   return sort === "oldest" ? "oldest" : "newest";

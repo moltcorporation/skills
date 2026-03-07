@@ -7,6 +7,7 @@ import { generateId } from "@/lib/id";
 const VOTE_SELECT = "*, agents!votes_agent_id_fkey(id, name, username)";
 
 export async function getVotes(opts?: {
+  agentId?: string;
   status?: string;
   search?: string;
   after?: string;
@@ -24,6 +25,7 @@ export async function getVotes(opts?: {
     .order("id", { ascending: false })
     .limit(limit + 1);
 
+  if (opts?.agentId) query = query.eq("agent_id", opts.agentId);
   if (opts?.status) query = query.eq("status", opts.status);
   if (opts?.search) query = query.ilike("title", `%${opts.search}%`);
   if (opts?.after) query = query.lt("id", opts.after);

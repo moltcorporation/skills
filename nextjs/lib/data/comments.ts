@@ -3,6 +3,8 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { cacheTag, revalidateTag } from "next/cache";
 
 const COMMENT_SELECT = "*, agents!comments_agent_id_fkey(id, name)";
+const AGENT_COMMENT_SELECT =
+  "id, body, target_type, target_id, created_at" as const;
 
 export async function getComments(targetType: string, targetId: string) {
   "use cache";
@@ -19,6 +21,39 @@ export async function getComments(targetType: string, targetId: string) {
 
   if (error) return { data: null, error: error.message };
   return { data, error: null };
+}
+
+export async function getAgentComments(opts: {
+  agentId: string;
+  search?: string;
+  after?: string;
+  limit?: number;
+}) {
+  "use cache";
+  cacheTag("comments");
+  cacheTag(`agent-comments-${opts.agentId}`);
+
+  const limit = opts.limit ?? 5;
+  const supabase = createAdminClient();
+
+  let query = supabase
+    .from("comments")
+    .select(AGENT_COMMENT_SELECT)
+    .eq("agent_id", opts.agentId)
+    .order("id", { ascending: false })
+    .limit(limit + 1);
+
+  if (opts.search) query = query.ilike("body", `%${opts.search}%`);
+  if (opts.after) query = query.lt("id", opts.after);
+
+  const { data, error } = await query;
+
+  if (error) return { data: null, hasMore: false, error: error.message };
+
+  const hasMore = (data?.length ?? 0) > limit;
+  if (hasMore) data!.pop();
+
+  return { data, hasMore, error: null };
 }
 
 export async function createComment(
@@ -47,6 +82,8 @@ export async function createComment(
 
   if (error) return { data: null, error: error.message };
 
+  revalidateTag("comments", "max");
+  revalidateTag(`agent-comments-${agentId}`, "max");
   revalidateTag(`comments-${input.target_type}-${input.target_id}`, "max");
   revalidateTag(`${input.target_type}-${input.target_id}`, "max");
   revalidateTag("activity", "max");

@@ -11,6 +11,7 @@ import {
   ArrowSquareOut,
 } from "@phosphor-icons/react";
 
+import { CardLinkOverlay } from "@/components/platform/card-link-overlay";
 import { usePlatformInfiniteList } from "@/components/platform/use-platform-infinite-list";
 import { Input } from "@/components/ui/input";
 import {
@@ -218,8 +219,7 @@ function LiveUrlLink({ url }: { url: string | null }) {
       href={url}
       target="_blank"
       rel="noopener noreferrer"
-      className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
-      onClick={(e) => e.stopPropagation()}
+      className="relative z-10 inline-flex items-center gap-1 text-sm text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
     >
       <ArrowSquareOut className="size-3" />
       {hostname}
@@ -274,36 +274,42 @@ function ProductsCards({ products }: { products: Product[] }) {
   return (
     <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3">
       {products.map((product) => (
-        <Link key={product.id} href={`/products/${product.id}`}>
-          <Card size="sm" className="transition-colors hover:bg-muted/50">
-            <CardHeader>
-              <div className="flex items-start justify-between gap-2">
-                <CardTitle className="truncate">{product.name}</CardTitle>
-                <ProductStatusBadge status={product.status} />
-              </div>
-            </CardHeader>
-            {product.description && (
-              <CardContent>
-                <CardDescription className="line-clamp-2">
-                  {product.description}
-                </CardDescription>
-              </CardContent>
-            )}
+        <Card
+          key={product.id}
+          size="sm"
+          className="relative transition-colors hover:bg-muted/50"
+        >
+          <CardHeader>
+            <div className="flex items-start justify-between gap-2">
+              <CardTitle className="truncate">{product.name}</CardTitle>
+              <ProductStatusBadge status={product.status} />
+            </div>
+          </CardHeader>
+          {product.description && (
             <CardContent>
-              <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 text-sm">
-                {product.live_url && (
-                  <>
-                    <LiveUrlLink url={product.live_url} />
-                    <span className="text-muted-foreground" aria-hidden>
-                      &middot;
-                    </span>
-                  </>
-                )}
-                <RelativeTime date={product.created_at} />
-              </div>
+              <CardDescription className="line-clamp-2">
+                {product.description}
+              </CardDescription>
             </CardContent>
-          </Card>
-        </Link>
+          )}
+          <CardContent>
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 text-sm">
+              {product.live_url && (
+                <>
+                  <LiveUrlLink url={product.live_url} />
+                  <span className="text-muted-foreground" aria-hidden>
+                    &middot;
+                  </span>
+                </>
+              )}
+              <RelativeTime date={product.created_at} />
+            </div>
+          </CardContent>
+          <CardLinkOverlay
+            href={`/products/${product.id}`}
+            label={`View ${product.name}`}
+          />
+        </Card>
       ))}
     </div>
   );

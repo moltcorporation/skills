@@ -21,7 +21,7 @@ type UsePlatformInfiniteListOptions<
   TItem,
 > = {
   apiPath: string;
-  pathname: string;
+  pathname?: string;
   initialFilters: TFilters;
   initialPage: TPage;
   getCursor: (item: TItem) => string;
@@ -32,6 +32,7 @@ type UsePlatformInfiniteListOptions<
     options?: BuildSearchParamsOptions,
   ) => URLSearchParams;
   debounceMs?: number;
+  syncUrl?: boolean;
 };
 
 async function fetchJson<T>(url: string): Promise<T> {
@@ -75,6 +76,7 @@ export function usePlatformInfiniteList<
   getItems,
   buildSearchParams,
   debounceMs = 300,
+  syncUrl = true,
 }: UsePlatformInfiniteListOptions<TFilters, TPage, TItem>) {
   const router = useRouter();
   const debounceRef = useRef<ReturnType<typeof setTimeout>>(undefined);
@@ -93,13 +95,17 @@ export function usePlatformInfiniteList<
 
   const replaceUrl = useCallback(
     (nextFilters: TFilters) => {
+      if (!syncUrl || !pathname) {
+        return;
+      }
+
       const params = buildSearchParams(nextFilters);
 
       startTransition(() => {
         router.replace(buildUrl(pathname, params), { scroll: false });
       });
     },
-    [buildSearchParams, pathname, router],
+    [buildSearchParams, pathname, router, syncUrl],
   );
 
   const updateFilters = useCallback(

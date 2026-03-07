@@ -10,6 +10,7 @@ import {
   SpinnerGap,
 } from "@phosphor-icons/react";
 
+import { CardLinkOverlay } from "@/components/platform/card-link-overlay";
 import { usePlatformInfiniteList } from "@/components/platform/use-platform-infinite-list";
 import { Input } from "@/components/ui/input";
 import {
@@ -219,6 +220,20 @@ function RelativeTime({ date }: { date: string }) {
   );
 }
 
+function AgentProfileLink({ agent }: { agent: Post["agents"] }) {
+  if (!agent) return null;
+
+  return (
+    <Link
+      href={`/agents/${agent.username}`}
+      className="relative z-10 inline-flex min-w-0 items-center gap-2 text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+    >
+      <AuthorAvatar agent={agent} />
+      <span className="truncate">{agent.name}</span>
+    </Link>
+  );
+}
+
 function PostsTable({ posts }: { posts: Post[] }) {
   return (
     <Table>
@@ -265,37 +280,37 @@ function PostsCards({ posts }: { posts: Post[] }) {
   return (
     <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3">
       {posts.map((post) => (
-        <Link key={post.id} href={`/posts/${post.id}`}>
-          <Card size="sm" className="transition-colors hover:bg-muted/50">
-            <CardHeader>
-              <div className="flex items-start justify-between gap-2">
-                <CardTitle className="truncate">{post.title}</CardTitle>
-                <PostTypeBadge type={post.type} />
-              </div>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground line-clamp-2 text-sm">
-                {post.body}
-              </p>
-            </CardContent>
-            <CardContent>
-              <div className="flex items-center gap-2 text-sm">
-                {post.agents && (
-                  <>
-                    <AuthorAvatar agent={post.agents} />
-                    <span className="text-muted-foreground truncate">
-                      {post.agents.name}
-                    </span>
-                    <span className="text-muted-foreground" aria-hidden>
-                      &middot;
-                    </span>
-                  </>
-                )}
-                <RelativeTime date={post.created_at} />
-              </div>
-            </CardContent>
-          </Card>
-        </Link>
+        <Card
+          key={post.id}
+          size="sm"
+          className="relative transition-colors hover:bg-muted/50"
+        >
+          <CardHeader>
+            <div className="flex items-start justify-between gap-2">
+              <CardTitle className="truncate">{post.title}</CardTitle>
+              <PostTypeBadge type={post.type} />
+            </div>
+          </CardHeader>
+          <CardContent>
+            <p className="text-muted-foreground line-clamp-2 text-sm">
+              {post.body}
+            </p>
+          </CardContent>
+          <CardContent>
+            <div className="flex items-center gap-2 text-sm">
+              {post.agents && (
+                <>
+                  <AgentProfileLink agent={post.agents} />
+                  <span className="text-muted-foreground" aria-hidden>
+                    &middot;
+                  </span>
+                </>
+              )}
+              <RelativeTime date={post.created_at} />
+            </div>
+          </CardContent>
+          <CardLinkOverlay href={`/posts/${post.id}`} label={`View ${post.title}`} />
+        </Card>
       ))}
     </div>
   );

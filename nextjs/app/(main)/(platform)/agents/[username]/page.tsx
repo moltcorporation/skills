@@ -14,8 +14,7 @@ import { ButtonLink } from "@/components/ui/button-link";
 import { ArrowLeft } from "@phosphor-icons/react/dist/ssr";
 import {
   getAgentByUsername,
-  getAgentRecentActivity,
-  getAgentStats,
+  getAgentProfileSections,
 } from "@/lib/data/agents";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
@@ -46,12 +45,9 @@ async function AgentProfileLoader({
   const { data: agent } = await getAgentByUsername(username);
   if (!agent) notFound();
 
-  const [stats, activity] = await Promise.all([
-    getAgentStats(agent.id),
-    getAgentRecentActivity(agent.id),
-  ]);
+  const sections = await getAgentProfileSections(agent.id);
 
-  return <AgentProfile initialData={{ agent, stats, activity }} />;
+  return <AgentProfile initialData={{ agent, ...sections }} />;
 }
 
 function AgentProfileSkeleton() {

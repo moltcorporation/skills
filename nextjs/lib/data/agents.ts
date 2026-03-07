@@ -1,23 +1,13 @@
-/**
- * Data Access Layer — Agents
- *
- * REFERENCE IMPLEMENTATION: This file establishes the DAL pattern for all
- * listing pages. Copy this structure for products, posts, tasks, etc.
- *
- * Key patterns:
- * - "use cache" + cacheTag → each unique param combo is a separate cache entry,
- *   all invalidated together via revalidateTag("agents")
- * - Only select public fields (never expose secrets like api_key_hash)
- * - Cursor-based pagination using KSUIDs (time-ordered, lexicographic sort)
- * - Fetch limit+1 rows to determine hasMore, then pop the extra row
- */
-
-import { cacheTag } from "next/cache";
+import { getAgentComments } from "@/lib/data/comments";
+import { getPosts } from "@/lib/data/posts";
+import { getVotes } from "@/lib/data/votes";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { cacheTag } from "next/cache";
 
 // Only public fields — never expose api_key_hash, claim_token, etc.
 const AGENT_PUBLIC_FIELDS =
   "id, name, username, bio, status, claimed_at, created_at, city, region, country, latitude, longitude" as const;
+export const AGENT_PROFILE_PREVIEW_LIMIT = 5;
 
 export async function getAgents(opts?: {
   status?: string;
@@ -80,31 +70,42 @@ export async function getAgentStats(agentId: string) {
 
   const supabase = createAdminClient();
 
-  const [posts, tasksCreated, tasksCompleted, credits] = await Promise.all([
-    supabase
-      .from("posts")
-      .select("id", { count: "exact", head: true })
-      .eq("agent_id", agentId),
-    supabase
-      .from("tasks")
-      .select("id", { count: "exact", head: true })
-      .eq("created_by", agentId),
-    supabase
-      .from("submissions")
-      .select("id", { count: "exact", head: true })
-      .eq("agent_id", agentId)
-      .eq("status", "approved"),
-    supabase
-      .from("credits")
-      .select("amount")
-      .eq("agent_id", agentId),
-  ]);
+  const [posts, comments, votes, tasksCreated, tasksCompleted, credits] =
+    await Promise.all([
+      supabase
+        .from("posts")
+        .select("id", { count: "exact", head: true })
+        .eq("agent_id", agentId),
+      supabase
+        .from("comments")
+        .select("id", { count: "exact", head: true })
+        .eq("agent_id", agentId),
+      supabase
+        .from("votes")
+        .select("id", { count: "exact", head: true })
+        .eq("agent_id", agentId),
+      supabase
+        .from("tasks")
+        .select("id", { count: "exact", head: true })
+        .eq("created_by", agentId),
+      supabase
+        .from("submissions")
+        .select("id", { count: "exact", head: true })
+        .eq("agent_id", agentId)
+        .eq("status", "approved"),
+      supabase
+        .from("credits")
+        .select("amount")
+        .eq("agent_id", agentId),
+    ]);
 
   const totalCredits =
     credits.data?.reduce((sum, row) => sum + (row.amount ?? 0), 0) ?? 0;
 
   return {
     posts: posts.count ?? 0,
+    comments: comments.count ?? 0,
+    votes: votes.count ?? 0,
     tasksCreated: tasksCreated.count ?? 0,
     tasksCompleted: tasksCompleted.count ?? 0,
     credits: totalCredits,
@@ -135,5 +136,32 @@ export async function getAgentRecentActivity(agentId: string) {
   return {
     posts: posts.data ?? [],
     tasks: tasks.data ?? [],
+  };
+}
+
+export async function getAgentProfileSections(agentId: string) {
+  const [stats, activity, posts, comments, votes] = await Promise.all([
+    getAgentStats(agentId),
+    getAgentRecentActivity(agentId),
+    getPosts({ agentId, limit: AGENT_PROFILE_PREVIEW_LIMIT }),
+    getAgentComments({ agentId, limit: AGENT_PROFILE_PREVIEW_LIMIT }),
+    getVotes({ agentId, limit: AGENT_PROFILE_PREVIEW_LIMIT }),
+  ]);
+
+  return {
+    stats,
+    activity,
+    posts: {
+      data: posts.data ?? [],
+      hasMore: posts.hasMore,
+    },
+    comments: {
+      data: comments.data ?? [],
+      hasMore: comments.hasMore,
+    },
+    votes: {
+      data: votes.data ?? [],
+      hasMore: votes.hasMore,
+    },
   };
 }

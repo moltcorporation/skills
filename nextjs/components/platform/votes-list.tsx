@@ -11,6 +11,7 @@ import {
   Timer,
 } from "@phosphor-icons/react";
 
+import { CardLinkOverlay } from "@/components/platform/card-link-overlay";
 import { usePlatformInfiniteList } from "@/components/platform/use-platform-infinite-list";
 import { Input } from "@/components/ui/input";
 import {
@@ -231,6 +232,20 @@ function DeadlineDisplay({ deadline, status }: { deadline: string; status: strin
   );
 }
 
+function AgentProfileLink({ agent }: { agent: Vote["agents"] }) {
+  if (!agent) return null;
+
+  return (
+    <Link
+      href={`/agents/${agent.username}`}
+      className="relative z-10 inline-flex min-w-0 items-center gap-2 text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+    >
+      <AuthorAvatar agent={agent} />
+      <span className="truncate">{agent.name}</span>
+    </Link>
+  );
+}
+
 function VotesTable({ votes }: { votes: Vote[] }) {
   return (
     <Table>
@@ -283,39 +298,39 @@ function VotesCards({ votes }: { votes: Vote[] }) {
   return (
     <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3">
       {votes.map((vote) => (
-        <Link key={vote.id} href={`/votes/${vote.id}`}>
-          <Card size="sm" className="transition-colors hover:bg-muted/50">
-            <CardHeader>
-              <div className="flex items-start justify-between gap-2">
-                <CardTitle className="truncate">{vote.title}</CardTitle>
-                <VoteStatusBadge status={vote.status} />
-              </div>
-            </CardHeader>
-            {vote.description && (
-              <CardContent>
-                <p className="text-muted-foreground line-clamp-2 text-sm">
-                  {vote.description}
-                </p>
-              </CardContent>
-            )}
+        <Card
+          key={vote.id}
+          size="sm"
+          className="relative transition-colors hover:bg-muted/50"
+        >
+          <CardHeader>
+            <div className="flex items-start justify-between gap-2">
+              <CardTitle className="truncate">{vote.title}</CardTitle>
+              <VoteStatusBadge status={vote.status} />
+            </div>
+          </CardHeader>
+          {vote.description && (
             <CardContent>
-              <div className="flex items-center gap-2 text-sm">
-                {vote.agents && (
-                  <>
-                    <AuthorAvatar agent={vote.agents} />
-                    <span className="text-muted-foreground truncate">
-                      {vote.agents.name}
-                    </span>
-                    <span className="text-muted-foreground" aria-hidden>
-                      &middot;
-                    </span>
-                  </>
-                )}
-                <DeadlineDisplay deadline={vote.deadline} status={vote.status} />
-              </div>
+              <p className="text-muted-foreground line-clamp-2 text-sm">
+                {vote.description}
+              </p>
             </CardContent>
-          </Card>
-        </Link>
+          )}
+          <CardContent>
+            <div className="flex items-center gap-2 text-sm">
+              {vote.agents && (
+                <>
+                  <AgentProfileLink agent={vote.agents} />
+                  <span className="text-muted-foreground" aria-hidden>
+                    &middot;
+                  </span>
+                </>
+              )}
+              <DeadlineDisplay deadline={vote.deadline} status={vote.status} />
+            </div>
+          </CardContent>
+          <CardLinkOverlay href={`/votes/${vote.id}`} label={`View ${vote.title}`} />
+        </Card>
       ))}
     </div>
   );
