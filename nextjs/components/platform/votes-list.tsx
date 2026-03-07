@@ -12,15 +12,9 @@ import {
 } from "@phosphor-icons/react";
 
 import { CardLinkOverlay } from "@/components/platform/card-link-overlay";
+import { PlatformFilterSortMenu } from "@/components/platform/filter-sort-menu";
 import { usePlatformInfiniteList } from "@/components/platform/use-platform-infinite-list";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import {
   Table,
@@ -42,38 +36,23 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getAgentInitials, getAgentColor } from "@/lib/agent-avatar";
 import {
+  PLATFORM_SORT_OPTIONS,
   VOTE_STATUS_CONFIG,
   VOTE_STATUS_FILTER_OPTIONS,
 } from "@/lib/constants";
+import type { ListVotesResponse } from "@/app/api/v1/votes/schema";
+import type { Vote, VoteStatus } from "@/lib/data/votes";
 
-type Vote = {
-  id: string;
-  title: string;
-  description: string | null;
-  options: string[];
-  status: string;
-  deadline: string;
-  outcome: string | null;
-  winning_option: string | null;
-  created_at: string;
-  agents: {
-    id: string;
-    name: string;
-    username: string;
-  } | null;
-};
-
-type ApiResponse = {
-  votes: Vote[];
-  hasMore: boolean;
-};
+type ApiResponse = Pick<ListVotesResponse, "votes" | "hasMore">;
 
 type StatusFilterValue =
   (typeof VOTE_STATUS_FILTER_OPTIONS)[number]["value"];
+type VoteSortValue = (typeof PLATFORM_SORT_OPTIONS)[number]["value"];
 
 type VoteFilters = {
   search: string;
   status: StatusFilterValue;
+  sort: VoteSortValue;
 };
 
 function buildSearchParams(
@@ -84,6 +63,7 @@ function buildSearchParams(
 
   if (filters.search) params.set("search", filters.search);
   if (filters.status !== "all") params.set("status", filters.status);
+  if (filters.sort !== "newest") params.set("sort", filters.sort);
   if (options?.after) params.set("after", options.after);
   if (options?.limit) params.set("limit", String(options.limit));
 
@@ -124,36 +104,6 @@ export function VotesList({
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center gap-2">
-        <div className="relative flex-1 min-w-48">
-          <MagnifyingGlass className="absolute left-2 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
-          <Input
-            placeholder="Search votes..."
-            value={searchInput}
-            onChange={(e) => setSearchInput(e.target.value)}
-            className="pl-7"
-          />
-        </div>
-        <Select
-          value={filters.status}
-          onValueChange={(value) => setFilter("status", value as StatusFilterValue)}
-        >
-          <SelectTrigger>
-            <SelectValue>
-              {
-                VOTE_STATUS_FILTER_OPTIONS.find(
-                  (option) => option.value === filters.status,
-                )?.label
-              }
-            </SelectValue>
-          </SelectTrigger>
-          <SelectContent>
-            {VOTE_STATUS_FILTER_OPTIONS.map((option) => (
-              <SelectItem key={option.value} value={option.value}>
-                {option.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
         <ToggleGroup
           value={[viewMode]}
           onValueChange={(value) => {
@@ -162,7 +112,6 @@ export function VotesList({
             }
           }}
           variant="outline"
-          size="sm"
         >
           <ToggleGroupItem value="table" aria-label="Table view">
             <List />
@@ -171,6 +120,23 @@ export function VotesList({
             <SquaresFour />
           </ToggleGroupItem>
         </ToggleGroup>
+        <PlatformFilterSortMenu
+          filterValue={filters.status}
+          sortValue={filters.sort}
+          filterOptions={VOTE_STATUS_FILTER_OPTIONS}
+          sortOptions={PLATFORM_SORT_OPTIONS}
+          onFilterChange={(value) => setFilter("status", value as StatusFilterValue)}
+          onSortChange={(value) => setFilter("sort", value as VoteSortValue)}
+        />
+        <div className="relative min-w-48 flex-1">
+          <MagnifyingGlass className="absolute left-2 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
+          <Input
+            placeholder="Search votes..."
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            className="pl-7"
+          />
+        </div>
       </div>
 
       {votes.length === 0 && !isValidating ? (
@@ -195,7 +161,7 @@ export function VotesList({
   );
 }
 
-function VoteStatusBadge({ status }: { status: string }) {
+function VoteStatusBadge({ status }: { status: VoteStatus }) {
   const config = VOTE_STATUS_CONFIG[status];
   if (!config) return <Badge variant="outline">{status}</Badge>;
   return (
@@ -205,7 +171,7 @@ function VoteStatusBadge({ status }: { status: string }) {
   );
 }
 
-function AuthorAvatar({ agent }: { agent: Vote["agents"] }) {
+function AuthorAvatar({ agent }: { agent: Vote["author"] }) {
   if (!agent) return null;
   return (
     <Avatar size="sm">
@@ -232,7 +198,7 @@ function DeadlineDisplay({ deadline, status }: { deadline: string; status: strin
   );
 }
 
-function AgentProfileLink({ agent }: { agent: Vote["agents"] }) {
+function AgentProfileLink({ agent }: { agent: Vote["author"] }) {
   if (!agent) return null;
 
   return (
@@ -265,12 +231,12 @@ function VotesTable({ votes }: { votes: Vote[] }) {
                 href={`/votes/${vote.id}`}
                 className="flex items-center gap-2"
               >
-                <AuthorAvatar agent={vote.agents} />
+                <AuthorAvatar agent={vote.author} />
                 <div className="min-w-0">
                   <div className="font-medium truncate">{vote.title}</div>
-                  {vote.agents && (
+                  {vote.author && (
                     <div className="text-muted-foreground truncate">
-                      {vote.agents.name}
+                      {vote.author.name}
                     </div>
                   )}
                 </div>
@@ -318,9 +284,9 @@ function VotesCards({ votes }: { votes: Vote[] }) {
           )}
           <CardContent>
             <div className="flex items-center gap-2 text-sm">
-              {vote.agents && (
+              {vote.author && (
                 <>
-                  <AgentProfileLink agent={vote.agents} />
+                  <AgentProfileLink agent={vote.author} />
                   <span className="text-muted-foreground" aria-hidden>
                     &middot;
                   </span>

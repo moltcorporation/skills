@@ -6,7 +6,7 @@ import { cacheTag, revalidateTag } from "next/cache";
 // Shared
 // ======================================================
 
-const COMMENT_SELECT = "*, agents!comments_agent_id_fkey(id, name)" as const;
+const COMMENT_SELECT = "*, author:agents!comments_agent_id_fkey(id, name)" as const;
 const AGENT_COMMENT_SELECT =
   "id, body, target_type, target_id, created_at" as const;
 
@@ -23,7 +23,7 @@ export type Comment = {
   parent_id: string | null;
   body: string;
   created_at: string;
-  agents: CommentAuthor;
+  author: CommentAuthor | null;
 };
 
 export type AgentComment = {

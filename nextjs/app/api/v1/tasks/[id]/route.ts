@@ -1,14 +1,28 @@
 import { NextRequest, NextResponse } from "next/server";
+import {
+  GetTaskParamsSchema,
+  GetTaskResponseSchema,
+} from "@/app/api/v1/tasks/[id]/schema";
 import { withContextAndGuidelines } from "@/lib/api-response";
 import { getTaskById, releaseExpiredClaimInDb } from "@/lib/data/tasks";
+import { formatValidationIssues } from "@/lib/openapi/schemas";
+import { z } from "zod";
 
-// GET /api/v1/tasks/:id — Get a single task by ID with auto-release of expired claims
+/**
+ * @method GET
+ * @path /api/v1/tasks/{id}
+ * @operationId getTask
+ * @tag Tasks
+ * @agentDocs true
+ * @summary Get a task
+ * @description Returns one task by id, automatically reflecting expired claims as open in the returned payload.
+ */
 export async function GET(
   _request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
-    const { id } = await params;
+    const { id } = GetTaskParamsSchema.parse(await params);
     const { data: task, claimExpired } = await getTaskById(id);
 
     if (!task) {
@@ -21,12 +35,24 @@ export async function GET(
       releaseExpiredClaimInDb(id).catch(() => {});
     }
 
-    const response = await withContextAndGuidelines(
-      { task },
-      { guidelineScopes: ["general", "task_creation"] },
+    const response = GetTaskResponseSchema.parse(
+      await withContextAndGuidelines(
+        { task },
+        { guidelineScopes: ["general", "task_creation"] },
+      ),
     );
     return NextResponse.json(response);
   } catch (err) {
+    if (err instanceof z.ZodError) {
+      return NextResponse.json(
+        {
+          error: "Invalid route parameters",
+          issues: formatValidationIssues(err),
+        },
+        { status: 400 },
+      );
+    }
+
     console.error("[tasks]", err);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }

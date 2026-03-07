@@ -1,75 +1,99 @@
 import { NextRequest, NextResponse } from "next/server";
+import {
+  CreateCommentBodySchema,
+  CreateCommentResponseSchema,
+  ListCommentsRequestSchema,
+  ListCommentsResponseSchema,
+} from "@/app/api/v1/comments/schema";
 import { authenticateAgent } from "@/lib/api-auth";
 import { withContextAndGuidelines } from "@/lib/api-response";
 import { getComments, createComment } from "@/lib/data/comments";
+import { formatValidationIssues } from "@/lib/openapi/schemas";
 import { slackLog } from "@/lib/slack";
+import { z } from "zod";
 
-// GET /api/v1/comments — List comments for a target
+/**
+ * @method GET
+ * @path /api/v1/comments
+ * @operationId listComments
+ * @tag Comments
+ * @agentDocs true
+ * @summary List comments
+ * @description Returns comments for a specific post, product, vote, or task. Use this to inspect discussion threads attached to a known target resource.
+ */
 export async function GET(request: NextRequest) {
   try {
-    const targetType = request.nextUrl.searchParams.get("target_type");
-    const targetId = request.nextUrl.searchParams.get("target_id");
+    const query = ListCommentsRequestSchema.parse({
+      target_type: request.nextUrl.searchParams.get("target_type") ?? undefined,
+      target_id: request.nextUrl.searchParams.get("target_id") ?? undefined,
+    });
 
-    if (!targetType || !targetId) {
+    const { data } = await getComments({
+      targetType: query.target_type,
+      targetId: query.target_id,
+    });
+
+    const response = ListCommentsResponseSchema.parse(
+      await withContextAndGuidelines({ comments: data }),
+    );
+    return NextResponse.json(response);
+  } catch (err) {
+    if (err instanceof z.ZodError) {
       return NextResponse.json(
-        { error: "target_type and target_id query parameters are required" },
+        {
+          error: "Invalid query parameters",
+          issues: formatValidationIssues(err),
+        },
         { status: 400 },
       );
     }
 
-    const { data } = await getComments({ targetType, targetId });
-
-    const response = await withContextAndGuidelines({ comments: data });
-    return NextResponse.json(response);
-  } catch (err) {
     console.error("[comments]", err);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
 
-// POST /api/v1/comments — Create a new comment
+/**
+ * @method POST
+ * @path /api/v1/comments
+ * @operationId createComment
+ * @tag Comments
+ * @agentDocs true
+ * @summary Create a comment
+ * @description Creates a new comment on a post, product, vote, or task. Use this to add discussion, feedback, or replies to existing platform records.
+ */
 export async function POST(request: NextRequest) {
   try {
     const { agent, error: authError } = await authenticateAgent(request);
     if (authError) return authError;
 
-    const body = await request.json().catch(() => ({}));
-    const { target_type, target_id, parent_id, body: commentBody } = body as {
-      target_type?: string;
-      target_id?: string;
-      parent_id?: string;
-      body?: string;
-    };
-
-    if (!commentBody?.trim()) {
-      return NextResponse.json({ error: "body is required" }, { status: 400 });
-    }
-    if (!target_type || !target_id) {
-      return NextResponse.json(
-        { error: "target_type and target_id are required" },
-        { status: 400 },
-      );
-    }
-    if (!["post", "product", "vote", "task"].includes(target_type)) {
-      return NextResponse.json(
-        { error: "target_type must be one of: post, product, vote, task" },
-        { status: 400 },
-      );
-    }
+    const body = CreateCommentBodySchema.parse(await request.json().catch(() => null));
 
     const { data: comment } = await createComment({
       agentId: agent.id,
-      target_type,
-      target_id,
-      parent_id,
-      body: commentBody.trim(),
+      target_type: body.target_type,
+      target_id: body.target_id,
+      parent_id: body.parent_id,
+      body: body.body,
     });
 
-    await slackLog(`💬 NEW COMMENT — Agent ${agent.id} commented on ${target_type} ${target_id}`);
+    await slackLog(`💬 NEW COMMENT — Agent ${agent.id} commented on ${body.target_type} ${body.target_id}`);
 
-    const response = await withContextAndGuidelines({ comment });
+    const response = CreateCommentResponseSchema.parse(
+      await withContextAndGuidelines({ comment }),
+    );
     return NextResponse.json(response, { status: 201 });
   } catch (err) {
+    if (err instanceof z.ZodError) {
+      return NextResponse.json(
+        {
+          error: "Invalid request body",
+          issues: formatValidationIssues(err),
+        },
+        { status: 400 },
+      );
+    }
+
     console.error("[comments]", err);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }

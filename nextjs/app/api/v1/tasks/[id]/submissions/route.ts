@@ -1,27 +1,62 @@
 import { NextRequest, NextResponse } from "next/server";
+import {
+  CreateTaskSubmissionBodySchema,
+  CreateTaskSubmissionResponseSchema,
+  ListTaskSubmissionsResponseSchema,
+  TaskSubmissionParamsSchema,
+} from "@/app/api/v1/tasks/[id]/submissions/schema";
 import { authenticateAgent } from "@/lib/api-auth";
-import { createAdminClient } from "@/lib/supabase/admin";
 import { withContextAndGuidelines } from "@/lib/api-response";
-import { getSubmissions, createSubmission } from "@/lib/data/tasks";
+import { getSubmissions, createSubmission, getTaskAccessState } from "@/lib/data/tasks";
+import { formatValidationIssues } from "@/lib/openapi/schemas";
+import { z } from "zod";
 
-// GET /api/v1/tasks/:id/submissions — List submissions for a task
+/**
+ * @method GET
+ * @path /api/v1/tasks/{id}/submissions
+ * @operationId listTaskSubmissions
+ * @tag Tasks
+ * @agentDocs true
+ * @summary List task submissions
+ * @description Returns submissions for one task.
+ */
 export async function GET(
   _request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
-    const { id: taskId } = await params;
+    const { id: taskId } = TaskSubmissionParamsSchema.parse(await params);
     const { data } = await getSubmissions(taskId);
 
-    const response = await withContextAndGuidelines({ submissions: data });
+    const response = ListTaskSubmissionsResponseSchema.parse(
+      await withContextAndGuidelines({ submissions: data }),
+    );
     return NextResponse.json(response);
   } catch (err) {
+    if (err instanceof z.ZodError) {
+      return NextResponse.json(
+        {
+          error: "Invalid route parameters",
+          issues: formatValidationIssues(err),
+        },
+        { status: 400 },
+      );
+    }
+
     console.error("[tasks.submissions]", err);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
 
-// POST /api/v1/tasks/:id/submissions — Submit work for a claimed task
+/**
+ * @method POST
+ * @path /api/v1/tasks/{id}/submissions
+ * @operationId createTaskSubmission
+ * @tag Tasks
+ * @agentDocs true
+ * @summary Create a task submission
+ * @description Submits work for a task currently claimed by the authenticated agent.
+ */
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
@@ -30,22 +65,11 @@ export async function POST(
     const { agent, error: authError } = await authenticateAgent(request);
     if (authError) return authError;
 
-    const { id: taskId } = await params;
-    const body = await request.json().catch(() => ({}));
-    const { submission_url } = body as {
-      submission_url?: string;
-    };
+    const { id: taskId } = TaskSubmissionParamsSchema.parse(await params);
+    const body = CreateTaskSubmissionBodySchema.parse(await request.json().catch(() => null));
+    const { data: task } = await getTaskAccessState(taskId);
 
-    const supabase = createAdminClient();
-
-    // Verify task exists and is claimed by this agent
-    const { data: task, error: taskError } = await supabase
-      .from("tasks")
-      .select("id, status, claimed_by, product_id")
-      .eq("id", taskId)
-      .single();
-
-    if (taskError || !task) {
+    if (!task) {
       return NextResponse.json({ error: "Task not found" }, { status: 404 });
     }
 
@@ -66,12 +90,24 @@ export async function POST(
     const { data: submission } = await createSubmission({
       agentId: agent.id,
       taskId,
-      submission_url,
+      submission_url: body.submission_url,
     });
 
-    const response = await withContextAndGuidelines({ submission });
+    const response = CreateTaskSubmissionResponseSchema.parse(
+      await withContextAndGuidelines({ submission }),
+    );
     return NextResponse.json(response, { status: 201 });
   } catch (err) {
+    if (err instanceof z.ZodError) {
+      return NextResponse.json(
+        {
+          error: "Invalid request",
+          issues: formatValidationIssues(err),
+        },
+        { status: 400 },
+      );
+    }
+
     console.error("[tasks.submissions]", err);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }

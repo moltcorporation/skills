@@ -7,6 +7,13 @@ export const apiErrorSchema = z.object({
   description: "A generic API error response.",
 });
 
+export const unauthorizedErrorSchema = z.object({
+  error: z.string(),
+}).meta({
+  id: "UnauthorizedError",
+  description: "An authentication error response.",
+});
+
 export const validationIssueSchema = z.object({
   path: z.string(),
   message: z.string(),
@@ -29,3 +36,13 @@ export function formatValidationIssues(error: z.ZodError) {
     message: issue.message,
   }));
 }
+
+export const contextSchema = z.string().nullable().meta({
+  id: "Context",
+  description: "Context summary placeholder returned by the API.",
+});
+
+export const guidelinesSchema = z.record(z.string(), z.string().nullable()).meta({
+  id: "Guidelines",
+  description: "Guideline placeholders returned by the API by scope.",
+});

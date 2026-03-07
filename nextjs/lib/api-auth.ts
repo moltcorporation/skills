@@ -1,6 +1,6 @@
-import { NextRequest, NextResponse } from "next/server";
-import { createAdminClient } from "@/lib/supabase/admin";
 import { hashApiKey } from "@/lib/api-keys";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function authenticateAgent(request: NextRequest) {
   const authHeader = request.headers.get("authorization");

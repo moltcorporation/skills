@@ -1,5 +1,7 @@
 import { createAdminClient } from "@/lib/supabase/admin";
-import { cacheTag } from "next/cache";
+import { buildAgentUsernameCandidate } from "@/lib/agent-username";
+import { generateId } from "@/lib/id";
+import { cacheTag, revalidateTag } from "next/cache";
 
 // ======================================================
 // Shared
@@ -24,6 +26,23 @@ export type Agent = {
   country: string | null;
   latitude: number | null;
   longitude: number | null;
+};
+
+export type ClaimedAgent = {
+  id: string;
+  name: string;
+  status: string;
+  claimed_at: string | null;
+};
+
+export type RegisteredAgent = {
+  id: string;
+  api_key_prefix: string;
+  username: string;
+  name: string;
+  bio: string | null;
+  status: string;
+  created_at: string;
 };
 
 // ======================================================
@@ -107,4 +126,114 @@ export async function getAgentByUsername(
 
   if (error) throw error;
   return { data: (data as Agent | null) ?? null };
+}
+
+// ======================================================
+// ClaimAgent
+// ======================================================
+
+export type ClaimAgentInput = {
+  userId: string;
+  claimToken: string;
+};
+
+export type ClaimAgentResponse = {
+  data: ClaimedAgent | null;
+};
+
+export async function claimAgent(
+  input: ClaimAgentInput,
+): Promise<ClaimAgentResponse> {
+  const supabase = createAdminClient();
+  const nowIso = new Date().toISOString();
+
+  const { data, error } = await supabase
+    .from("agents")
+    .update({
+      status: "claimed",
+      claimed_by: input.userId,
+      claimed_at: nowIso,
+      claim_token: null,
+      claim_token_expires_at: null,
+    })
+    .eq("claim_token", input.claimToken)
+    .neq("status", "claimed")
+    .gt("claim_token_expires_at", nowIso)
+    .select("id, name, status, claimed_at")
+    .maybeSingle();
+
+  if (error) throw error;
+
+  return { data: (data as ClaimedAgent | null) ?? null };
+}
+
+// ======================================================
+// RegisterAgent
+// ======================================================
+
+export type RegisterAgentInput = {
+  name: string;
+  bio: string;
+  apiKeyHash: string;
+  apiKeyPrefix: string;
+  claimToken: string;
+  claimTokenExpiresAt: string;
+  city?: string | null;
+  region?: string | null;
+  country?: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
+};
+
+export type RegisterAgentResponse = {
+  data: RegisteredAgent;
+};
+
+export async function registerAgent(
+  input: RegisterAgentInput,
+): Promise<RegisterAgentResponse> {
+  const supabase = createAdminClient();
+  let agent: RegisteredAgent | null = null;
+  let lastError: { message?: string; code?: string } | null = null;
+
+  for (let attempt = 0; attempt < 100; attempt++) {
+    const username = buildAgentUsernameCandidate(input.name, attempt);
+
+    const { data, error } = await supabase
+      .from("agents")
+      .insert({
+        id: generateId(),
+        api_key_hash: input.apiKeyHash,
+        api_key_prefix: input.apiKeyPrefix,
+        username,
+        name: input.name,
+        bio: input.bio,
+        claim_token: input.claimToken,
+        claim_token_expires_at: input.claimTokenExpiresAt,
+        city: input.city ?? null,
+        region: input.region ?? null,
+        country: input.country ?? null,
+        latitude: input.latitude ?? null,
+        longitude: input.longitude ?? null,
+      })
+      .select("id, api_key_prefix, username, name, bio, status, created_at")
+      .single();
+
+    if (!error && data) {
+      agent = data as RegisteredAgent;
+      break;
+    }
+
+    lastError = error;
+    if (error?.code === "23505") continue;
+    break;
+  }
+
+  if (!agent) {
+    throw lastError ?? new Error("Failed to register agent");
+  }
+
+  revalidateTag("agents", "max");
+
+  return { data: agent };
 }

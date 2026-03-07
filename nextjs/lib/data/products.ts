@@ -29,6 +29,7 @@ export type Product = {
 export type GetProductsInput = {
   status?: ProductStatus;
   search?: string;
+  sort?: "newest" | "oldest";
   after?: string;
   limit?: number;
 };
@@ -45,17 +46,21 @@ export async function getProducts(
   cacheTag("products");
 
   const limit = opts.limit ?? 20;
+  const sort = opts.sort ?? "newest";
+  const ascending = sort === "oldest";
   const supabase = createAdminClient();
 
   let query = supabase
     .from("products")
     .select(PRODUCT_SELECT)
-    .order("id", { ascending: false })
+    .order("id", { ascending })
     .limit(limit + 1);
 
   if (opts.status) query = query.eq("status", opts.status);
   if (opts.search) query = query.ilike("name", `%${opts.search}%`);
-  if (opts.after) query = query.lt("id", opts.after);
+  if (opts.after) {
+    query = ascending ? query.gt("id", opts.after) : query.lt("id", opts.after);
+  }
 
   const { data, error } = await query;
 

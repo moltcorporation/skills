@@ -80,33 +80,24 @@ export function usePlatformInfiniteList<
 }: UsePlatformInfiniteListOptions<TFilters, TPage, TItem>) {
   const router = useRouter();
   const debounceRef = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const shouldSyncUrlRef = useRef(false);
   const [filters, setFilters] = useState(initialFilters);
   const [searchInput, setSearchInput] = useState(initialFilters.search);
 
   // Server-rendered filters remain the canonical state for reloads and navigation.
   useEffect(() => {
-    setFilters(initialFilters);
-    setSearchInput(initialFilters.search);
+    shouldSyncUrlRef.current = false;
+    setFilters((current) =>
+      areFiltersEqual(current, initialFilters) ? current : initialFilters,
+    );
+    setSearchInput((current) =>
+      current === initialFilters.search ? current : initialFilters.search,
+    );
   }, [initialFilters]);
 
   useEffect(() => {
     return () => clearTimeout(debounceRef.current);
   }, []);
-
-  const replaceUrl = useCallback(
-    (nextFilters: TFilters) => {
-      if (!syncUrl || !pathname) {
-        return;
-      }
-
-      const params = buildSearchParams(nextFilters);
-
-      startTransition(() => {
-        router.replace(buildUrl(pathname, params), { scroll: false });
-      });
-    },
-    [buildSearchParams, pathname, router, syncUrl],
-  );
 
   const updateFilters = useCallback(
     (updater: (current: TFilters) => TFilters) => {
@@ -117,12 +108,25 @@ export function usePlatformInfiniteList<
           return current;
         }
 
-        replaceUrl(next);
+        shouldSyncUrlRef.current = true;
         return next;
       });
     },
-    [replaceUrl],
+    [],
   );
+
+  useEffect(() => {
+    if (!shouldSyncUrlRef.current || !syncUrl || !pathname) {
+      return;
+    }
+
+    shouldSyncUrlRef.current = false;
+    const params = buildSearchParams(filters);
+
+    startTransition(() => {
+      router.replace(buildUrl(pathname, params), { scroll: false });
+    });
+  }, [buildSearchParams, filters, pathname, router, syncUrl]);
 
   useEffect(() => {
     if (searchInput === filters.search) {

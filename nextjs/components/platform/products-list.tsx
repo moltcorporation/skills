@@ -12,15 +12,9 @@ import {
 } from "@phosphor-icons/react";
 
 import { CardLinkOverlay } from "@/components/platform/card-link-overlay";
+import { PlatformFilterSortMenu } from "@/components/platform/filter-sort-menu";
 import { usePlatformInfiniteList } from "@/components/platform/use-platform-infinite-list";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import {
   Table,
@@ -41,33 +35,24 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
+  PLATFORM_SORT_OPTIONS,
   PRODUCT_STATUS_CONFIG,
   PRODUCT_STATUS_FILTER_OPTIONS,
 } from "@/lib/constants";
 import { getUrlHostname } from "@/lib/url";
+import type { ListProductsResponse } from "@/app/api/v1/products/schema";
+import type { Product, ProductStatus } from "@/lib/data/products";
 
-type Product = {
-  id: string;
-  name: string;
-  description: string | null;
-  status: string;
-  live_url: string | null;
-  github_repo_url: string | null;
-  created_at: string;
-  updated_at: string;
-};
-
-type ApiResponse = {
-  products: Product[];
-  hasMore: boolean;
-};
+type ApiResponse = Pick<ListProductsResponse, "products" | "hasMore">;
 
 type StatusFilterValue =
   (typeof PRODUCT_STATUS_FILTER_OPTIONS)[number]["value"];
+type ProductSortValue = (typeof PLATFORM_SORT_OPTIONS)[number]["value"];
 
 type ProductFilters = {
   search: string;
   status: StatusFilterValue;
+  sort: ProductSortValue;
 };
 
 function buildSearchParams(
@@ -78,6 +63,7 @@ function buildSearchParams(
 
   if (filters.search) params.set("search", filters.search);
   if (filters.status !== "all") params.set("status", filters.status);
+  if (filters.sort !== "newest") params.set("sort", filters.sort);
   if (options?.after) params.set("after", options.after);
   if (options?.limit) params.set("limit", String(options.limit));
 
@@ -118,36 +104,6 @@ export function ProductsList({
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center gap-2">
-        <div className="relative flex-1 min-w-48">
-          <MagnifyingGlass className="absolute left-2 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
-          <Input
-            placeholder="Search products..."
-            value={searchInput}
-            onChange={(e) => setSearchInput(e.target.value)}
-            className="pl-7"
-          />
-        </div>
-        <Select
-          value={filters.status}
-          onValueChange={(value) => setFilter("status", value as StatusFilterValue)}
-        >
-          <SelectTrigger>
-            <SelectValue>
-              {
-                PRODUCT_STATUS_FILTER_OPTIONS.find(
-                  (option) => option.value === filters.status,
-                )?.label
-              }
-            </SelectValue>
-          </SelectTrigger>
-          <SelectContent>
-            {PRODUCT_STATUS_FILTER_OPTIONS.map((option) => (
-              <SelectItem key={option.value} value={option.value}>
-                {option.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
         <ToggleGroup
           value={[viewMode]}
           onValueChange={(value) => {
@@ -156,7 +112,6 @@ export function ProductsList({
             }
           }}
           variant="outline"
-          size="sm"
         >
           <ToggleGroupItem value="table" aria-label="Table view">
             <List />
@@ -165,6 +120,23 @@ export function ProductsList({
             <SquaresFour />
           </ToggleGroupItem>
         </ToggleGroup>
+        <PlatformFilterSortMenu
+          filterValue={filters.status}
+          sortValue={filters.sort}
+          filterOptions={PRODUCT_STATUS_FILTER_OPTIONS}
+          sortOptions={PLATFORM_SORT_OPTIONS}
+          onFilterChange={(value) => setFilter("status", value as StatusFilterValue)}
+          onSortChange={(value) => setFilter("sort", value as ProductSortValue)}
+        />
+        <div className="relative min-w-48 flex-1">
+          <MagnifyingGlass className="absolute left-2 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
+          <Input
+            placeholder="Search products..."
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            className="pl-7"
+          />
+        </div>
       </div>
 
       {products.length === 0 && !isValidating ? (
@@ -189,7 +161,7 @@ export function ProductsList({
   );
 }
 
-function ProductStatusBadge({ status }: { status: string }) {
+function ProductStatusBadge({ status }: { status: ProductStatus }) {
   const config = PRODUCT_STATUS_CONFIG[status];
   if (!config) return <Badge variant="outline">{status}</Badge>;
   return (

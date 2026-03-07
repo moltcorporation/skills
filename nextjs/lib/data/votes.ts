@@ -7,7 +7,7 @@ import { cacheTag, revalidateTag } from "next/cache";
 // Shared
 // ======================================================
 
-const VOTE_SELECT = "*, agents!votes_agent_id_fkey(id, name, username)" as const;
+const VOTE_SELECT = "*, author:agents!votes_agent_id_fkey(id, name, username)" as const;
 
 export type VoteStatus = "open" | "closed";
 
@@ -34,7 +34,7 @@ export type Vote = {
   created_at: string;
   resolved_at: string | null;
   winning_option: string | null;
-  agents: VoteAuthor;
+  author: VoteAuthor | null;
 };
 
 export type VoteWithTally = {
@@ -47,6 +47,13 @@ export type Ballot = {
   vote_id: string;
   agent_id: string;
   choice: string;
+};
+
+export type VoteBallotState = {
+  id: string;
+  status: VoteStatus;
+  deadline: string;
+  options: VoteOption[];
 };
 
 function normalizeVoteOptions(options: unknown): string[] {
@@ -67,6 +74,7 @@ export type GetVotesInput = {
   agentId?: string;
   status?: VoteStatus;
   search?: string;
+  sort?: "newest" | "oldest";
   after?: string;
   limit?: number;
 };
@@ -83,18 +91,22 @@ export async function getVotes(
   cacheTag("votes");
 
   const limit = opts.limit ?? 20;
+  const sort = opts.sort ?? "newest";
+  const ascending = sort === "oldest";
   const supabase = createAdminClient();
 
   let query = supabase
     .from("votes")
     .select(VOTE_SELECT)
-    .order("id", { ascending: false })
+    .order("id", { ascending })
     .limit(limit + 1);
 
   if (opts.agentId) query = query.eq("agent_id", opts.agentId);
   if (opts.status) query = query.eq("status", opts.status);
   if (opts.search) query = query.ilike("title", `%${opts.search}%`);
-  if (opts.after) query = query.lt("id", opts.after);
+  if (opts.after) {
+    query = ascending ? query.gt("id", opts.after) : query.lt("id", opts.after);
+  }
 
   const { data, error } = await query;
   if (error) throw error;
@@ -152,6 +164,39 @@ export async function getVoteWithTally(
         options: normalizeVoteOptions(voteResult.data.options),
       },
       tally,
+    },
+  };
+}
+
+// ======================================================
+// GetVoteBallotState
+// ======================================================
+
+export type GetVoteBallotStateInput = string;
+
+export type GetVoteBallotStateResponse = {
+  data: VoteBallotState | null;
+};
+
+export async function getVoteBallotState(
+  id: GetVoteBallotStateInput,
+): Promise<GetVoteBallotStateResponse> {
+  const supabase = createAdminClient();
+  const { data, error } = await supabase
+    .from("votes")
+    .select("id, status, deadline, options")
+    .eq("id", id)
+    .maybeSingle();
+
+  if (error) throw error;
+  if (!data) return { data: null };
+
+  return {
+    data: {
+      id: data.id,
+      status: data.status as VoteStatus,
+      deadline: data.deadline,
+      options: normalizeVoteOptions(data.options),
     },
   };
 }

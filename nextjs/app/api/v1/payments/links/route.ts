@@ -1,41 +1,52 @@
 import { NextRequest, NextResponse } from "next/server";
+import {
+  CreatePaymentLinkBodySchema,
+  CreatePaymentLinkResponseSchema,
+  ListPaymentLinksRequestSchema,
+  ListPaymentLinksResponseSchema,
+} from "@/app/api/v1/payments/links/schema";
 import { authenticateAgent } from "@/lib/api-auth";
-import { createAdminClient } from "@/lib/supabase/admin";
 import { getPaymentLinks, createPaymentLink } from "@/lib/data/payments";
+import { getProductById } from "@/lib/data/products";
 import type {
   PaymentBillingType,
   PaymentRecurringInterval,
 } from "@/lib/data/payments";
+import { formatValidationIssues } from "@/lib/openapi/schemas";
 import { slackLog } from "@/lib/slack";
+import { z } from "zod";
 
-function getPaymentBillingType(value: unknown): PaymentBillingType | undefined {
-  return value === "one_time" || value === "recurring" ? value : undefined;
-}
-
-function getPaymentRecurringInterval(
-  value: unknown,
-): PaymentRecurringInterval | undefined {
-  return value === "week" || value === "month" || value === "year"
-    ? value
-    : undefined;
-}
-
-// GET /api/v1/payments/links — List active payment links for a product
+/**
+ * @method GET
+ * @path /api/v1/payments/links
+ * @operationId listPaymentLinks
+ * @tag Payments
+ * @agentDocs true
+ * @summary List payment links
+ * @description Returns the active payment links for a product. Use this to inspect what purchase links are currently available for one product.
+ */
 export async function GET(request: NextRequest) {
-  const productId = request.nextUrl.searchParams.get("product_id");
-
-  if (!productId) {
-    return NextResponse.json(
-      { error: "product_id query parameter is required" },
-      { status: 400 },
-    );
-  }
-
   try {
-    const { data } = await getPaymentLinks(productId);
+    const query = ListPaymentLinksRequestSchema.parse({
+      product_id: request.nextUrl.searchParams.get("product_id") ?? undefined,
+    });
 
-    return NextResponse.json({ payment_links: data });
+    const { data } = await getPaymentLinks(query.product_id);
+
+    return NextResponse.json(
+      ListPaymentLinksResponseSchema.parse({ payment_links: data }),
+    );
   } catch (err) {
+    if (err instanceof z.ZodError) {
+      return NextResponse.json(
+        {
+          error: "Invalid query parameters",
+          issues: formatValidationIssues(err),
+        },
+        { status: 400 },
+      );
+    }
+
     console.error("[payments.links]", err);
     return NextResponse.json(
       { error: "Failed to fetch payment links" },
@@ -44,7 +55,15 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// POST /api/v1/payments/links — Create a Stripe payment link (auth required)
+/**
+ * @method POST
+ * @path /api/v1/payments/links
+ * @operationId createPaymentLink
+ * @tag Payments
+ * @agentDocs true
+ * @summary Create a payment link
+ * @description Creates a Stripe payment link for a product. Use this to issue one-time or recurring purchase links that grant product access after checkout.
+ */
 export async function POST(request: NextRequest) {
   try {
     const { agent, error: authError } = await authenticateAgent(request);
@@ -57,34 +76,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const body = await request.json().catch(() => ({}));
-    const {
-      product_id,
-      name,
-      amount,
-      currency = "usd",
-      billing_type = "one_time",
-      recurring_interval,
-      after_completion_url,
-      allow_promotion_codes,
-    } = body;
-
-    if (!product_id || !name || !amount) {
-      return NextResponse.json(
-        { error: "product_id, name, and amount are required" },
-        { status: 400 },
-      );
-    }
-
-    if (typeof amount !== "number" || amount <= 0) {
-      return NextResponse.json(
-        { error: "amount must be a positive integer (in cents)" },
-        { status: 400 },
-      );
-    }
-
-    const resolvedBillingType = getPaymentBillingType(billing_type) ?? "one_time";
-    const resolvedRecurringInterval = getPaymentRecurringInterval(recurring_interval);
+    const body = CreatePaymentLinkBodySchema.parse(await request.json().catch(() => null));
+    const resolvedBillingType = body.billing_type as PaymentBillingType;
+    const resolvedRecurringInterval = body.recurring_interval as PaymentRecurringInterval | undefined;
 
     if (resolvedBillingType === "recurring" && !resolvedRecurringInterval) {
       return NextResponse.json(
@@ -93,15 +87,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const supabase = createAdminClient();
+    const { data: product } = await getProductById(body.product_id);
 
-    const { data: product, error: productError } = await supabase
-      .from("products")
-      .select("id, name, status")
-      .eq("id", product_id)
-      .single();
-
-    if (productError || !product) {
+    if (!product) {
       return NextResponse.json(
         { error: "Product not found" },
         { status: 404 },
@@ -117,22 +105,35 @@ export async function POST(request: NextRequest) {
 
     const { data: link } = await createPaymentLink({
       agentId: agent.id,
-      product_id,
-      name,
-      amount,
-      currency,
+      product_id: body.product_id,
+      name: body.name,
+      amount: body.amount,
+      currency: body.currency,
       billing_type: resolvedBillingType,
       recurring_interval: resolvedRecurringInterval,
-      after_completion_url,
-      allow_promotion_codes,
+      after_completion_url: body.after_completion_url,
+      allow_promotion_codes: body.allow_promotion_codes,
     });
 
     await slackLog(
-      `💳 Payment link created for *${product.name}*: ${name} ($${(amount / 100).toFixed(2)} ${currency}) by agent ${agent.name}`,
+      `💳 Payment link created for *${product.name}*: ${body.name} ($${(body.amount / 100).toFixed(2)} ${body.currency}) by agent ${agent.name}`,
     );
 
-    return NextResponse.json(link, { status: 201 });
+    return NextResponse.json(
+      CreatePaymentLinkResponseSchema.parse(link),
+      { status: 201 },
+    );
   } catch (err) {
+    if (err instanceof z.ZodError) {
+      return NextResponse.json(
+        {
+          error: "Invalid request body",
+          issues: formatValidationIssues(err),
+        },
+        { status: 400 },
+      );
+    }
+
     console.error("[payments.links]", err);
     return NextResponse.json(
       { error: "Failed to create payment link" },

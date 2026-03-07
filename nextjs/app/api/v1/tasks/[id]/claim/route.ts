@@ -1,10 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
+import {
+  ClaimTaskParamsSchema,
+  ClaimTaskResponseSchema,
+} from "@/app/api/v1/tasks/[id]/claim/schema";
 import { authenticateAgent } from "@/lib/api-auth";
-import { createAdminClient } from "@/lib/supabase/admin";
-import { claimTask, releaseExpiredClaimInDb } from "@/lib/data/tasks";
-import { CLAIM_EXPIRY_MS } from "@/lib/constants";
+import { claimTask, getTaskAccessState, releaseExpiredClaimInDb } from "@/lib/data/tasks";
+import { formatValidationIssues } from "@/lib/openapi/schemas";
+import { z } from "zod";
 
-// POST /api/v1/tasks/:id/claim — Claim an open task for the authenticated agent
+/**
+ * @method POST
+ * @path /api/v1/tasks/{id}/claim
+ * @operationId claimTask
+ * @tag Tasks
+ * @agentDocs true
+ * @summary Claim a task
+ * @description Claims an open task for the authenticated agent. Use this to start work on a task that is currently available.
+ */
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
@@ -13,17 +25,10 @@ export async function POST(
     const { agent, error: authError } = await authenticateAgent(request);
     if (authError) return authError;
 
-    const { id: taskId } = await params;
-    const supabase = createAdminClient();
+    const { id: taskId } = ClaimTaskParamsSchema.parse(await params);
+    const { data: task, claimExpired } = await getTaskAccessState(taskId);
 
-    // Fetch the task
-    const { data: task, error: taskError } = await supabase
-      .from("tasks")
-      .select("id, status, created_by, claimed_by, claimed_at, product_id")
-      .eq("id", taskId)
-      .single();
-
-    if (taskError || !task) {
+    if (!task) {
       return NextResponse.json({ error: "Task not found" }, { status: 404 });
     }
 
@@ -35,13 +40,8 @@ export async function POST(
       );
     }
 
-    // Auto-release expired claims
-    if (task.status === "claimed" && task.claimed_at) {
-      const claimedAt = new Date(task.claimed_at).getTime();
-      if (Date.now() - claimedAt > CLAIM_EXPIRY_MS) {
-        await releaseExpiredClaimInDb(taskId);
-        task.status = "open";
-      }
+    if (claimExpired) {
+      await releaseExpiredClaimInDb(taskId);
     }
 
     if (task.status !== "open") {
@@ -68,8 +68,21 @@ export async function POST(
       revalidateTag(`product-${task.product_id}`, "max");
     }
 
-    return NextResponse.json({ task: updated }, { status: 200 });
+    return NextResponse.json(
+      ClaimTaskResponseSchema.parse({ task: updated }),
+      { status: 200 },
+    );
   } catch (err) {
+    if (err instanceof z.ZodError) {
+      return NextResponse.json(
+        {
+          error: "Invalid route parameters",
+          issues: formatValidationIssues(err),
+        },
+        { status: 400 },
+      );
+    }
+
     console.error("[tasks.claim]", err);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }

@@ -27,6 +27,8 @@ type OperationSchemas = {
   headersSchema?: unknown;
   bodySchema?: unknown;
   responseSchema?: unknown;
+  successStatus?: number;
+  successDescription?: string;
   errorResponses?: RouteConfig["responses"];
 };
 
@@ -64,6 +66,26 @@ function getRouteMethodDeclaration(
 
   visit(sourceFile);
   return match;
+}
+
+function getExportedRouteMethods(sourceFile: ts.SourceFile): RouteMethod[] {
+  const methods: RouteMethod[] = [];
+
+  function visit(node: ts.Node) {
+    if (
+      ts.isFunctionDeclaration(node) &&
+      node.name &&
+      ["GET", "POST", "PUT", "PATCH", "DELETE"].includes(node.name.text) &&
+      node.modifiers?.some((modifier) => modifier.kind === ts.SyntaxKind.ExportKeyword)
+    ) {
+      methods.push(node.name.text as RouteMethod);
+    }
+
+    ts.forEachChild(node, visit);
+  }
+
+  visit(sourceFile);
+  return methods;
 }
 
 function readRouteCommentMetadata(
@@ -157,6 +179,8 @@ function getOperationSchemas(
     headersSchema: schemaModule[`${prefix}HeadersSchema`],
     bodySchema: schemaModule[`${prefix}BodySchema`],
     responseSchema: schemaModule[`${prefix}ResponseSchema`],
+    successStatus: schemaModule[`${prefix}SuccessStatus`] as number | undefined,
+    successDescription: schemaModule[`${prefix}SuccessDescription`] as string | undefined,
     errorResponses: schemaModule[`${prefix}ErrorResponses`] as RouteConfig["responses"] | undefined,
   };
 }
@@ -188,8 +212,8 @@ function buildResponses(schemas: OperationSchemas): RouteConfig["responses"] {
   }
 
   return {
-    200: {
-      description: "Successful response.",
+    [schemas.successStatus ?? 200]: {
+      description: schemas.successDescription ?? "Successful response.",
       content: {
         "application/json": {
           schema: schemas.responseSchema as OpenApiSchema,
@@ -209,11 +233,15 @@ async function registerRouteDirectory(
 
   if (!existsSync(schemaFilePath)) return;
 
+  const sourceFile = ts.createSourceFile(
+    routeFilePath,
+    readFileSync(routeFilePath, "utf8"),
+    ts.ScriptTarget.ESNext,
+    true,
+    ts.ScriptKind.TS,
+  );
   const schemaModule = (await import(schemaFilePath)) as Record<string, unknown>;
-  const routeModule = await import(routeFilePath);
-  const exportedMethods = Object.keys(routeModule).filter((key) =>
-    ["GET", "POST", "PUT", "PATCH", "DELETE"].includes(key),
-  ) as RouteMethod[];
+  const exportedMethods = getExportedRouteMethods(sourceFile);
 
   for (const methodName of exportedMethods) {
     const metadata = readRouteCommentMetadata(routeFilePath, methodName);

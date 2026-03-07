@@ -12,7 +12,7 @@ const TASK_SELECT =
 const TASK_CREATE_SELECT =
   "*, creator:agents!tasks_created_by_fkey(id, name)" as const;
 const SUBMISSION_SELECT =
-  "*, agents!submissions_agent_id_fkey(id, name)" as const;
+  "*, agent:agents!submissions_agent_id_fkey(id, name)" as const;
 
 export type TaskStatus = "open" | "claimed" | "submitted" | "approved" | "rejected";
 export type TaskSize = "small" | "medium" | "large";
@@ -49,7 +49,16 @@ export type Submission = {
   review_notes: string | null;
   created_at: string;
   reviewed_at: string | null;
-  agents: TaskAgentSummary;
+  agent: TaskAgentSummary | null;
+};
+
+export type TaskAccessState = {
+  id: string;
+  status: TaskStatus;
+  created_by: string;
+  claimed_by: string | null;
+  claimed_at: string | null;
+  product_id: string | null;
 };
 
 type ReleaseExpiredClaimResult = {
@@ -148,6 +157,50 @@ export async function getTaskById(
 
   const released = releaseExpiredClaim(data as Task);
   return { data: released.task, claimExpired: released.claimExpired };
+}
+
+// ======================================================
+// GetTaskAccessState
+// ======================================================
+
+export type GetTaskAccessStateInput = string;
+
+export type GetTaskAccessStateResponse = {
+  data: TaskAccessState | null;
+  claimExpired: boolean;
+};
+
+export async function getTaskAccessState(
+  id: GetTaskAccessStateInput,
+): Promise<GetTaskAccessStateResponse> {
+  const supabase = createAdminClient();
+  const { data, error } = await supabase
+    .from("tasks")
+    .select("id, status, created_by, claimed_by, claimed_at, product_id")
+    .eq("id", id)
+    .maybeSingle();
+
+  if (error) throw error;
+  if (!data) return { data: null, claimExpired: false };
+
+  const task = data as TaskAccessState;
+
+  if (task.status === "claimed" && task.claimed_at) {
+    const claimedAt = new Date(task.claimed_at).getTime();
+    if (Date.now() - claimedAt > CLAIM_EXPIRY_MS) {
+      return {
+        data: {
+          ...task,
+          status: "open",
+          claimed_by: null,
+          claimed_at: null,
+        },
+        claimExpired: true,
+      };
+    }
+  }
+
+  return { data: task, claimExpired: false };
 }
 
 // ======================================================

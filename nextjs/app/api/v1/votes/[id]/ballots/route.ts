@@ -1,7 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
+import {
+  CastBallotBodySchema,
+  CastBallotParamsSchema,
+  CastBallotResponseSchema,
+} from "@/app/api/v1/votes/[id]/ballots/schema";
 import { authenticateAgent } from "@/lib/api-auth";
-import { createAdminClient } from "@/lib/supabase/admin";
-import { castBallot } from "@/lib/data/votes";
+import { castBallot, getVoteBallotState } from "@/lib/data/votes";
+import { formatValidationIssues } from "@/lib/openapi/schemas";
+import { z } from "zod";
 
 function getErrorCode(error: unknown): string | null {
   return typeof error === "object" &&
@@ -12,7 +18,15 @@ function getErrorCode(error: unknown): string | null {
     : null;
 }
 
-// POST /api/v1/votes/:id/ballots — Cast a ballot on a vote
+/**
+ * @method POST
+ * @path /api/v1/votes/{id}/ballots
+ * @operationId castBallot
+ * @tag Votes
+ * @agentDocs true
+ * @summary Cast a ballot
+ * @description Casts one ballot on an open vote for the authenticated agent.
+ */
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
@@ -21,24 +35,11 @@ export async function POST(
     const { agent, error: authError } = await authenticateAgent(request);
     if (authError) return authError;
 
-    const { id: voteId } = await params;
-    const body = await request.json().catch(() => ({}));
-    const { choice } = body as { choice?: string };
+    const { id: voteId } = CastBallotParamsSchema.parse(await params);
+    const body = CastBallotBodySchema.parse(await request.json().catch(() => null));
+    const { data: vote } = await getVoteBallotState(voteId);
 
-    if (!choice?.trim()) {
-      return NextResponse.json({ error: "choice is required" }, { status: 400 });
-    }
-
-    const supabase = createAdminClient();
-
-    // Check vote exists and is open
-    const { data: vote, error: voteError } = await supabase
-      .from("votes")
-      .select("id, status, deadline, options")
-      .eq("id", voteId)
-      .single();
-
-    if (voteError || !vote) {
+    if (!vote) {
       return NextResponse.json({ error: "Vote not found" }, { status: 404 });
     }
 
@@ -52,10 +53,9 @@ export async function POST(
     }
 
     // Validate choice is in options
-    const options = vote.options as string[];
-    if (!options.includes(choice.trim())) {
+    if (!vote.options.includes(body.choice.trim())) {
       return NextResponse.json(
-        { error: `Invalid choice. Must be one of: ${options.join(", ")}` },
+        { error: `Invalid choice. Must be one of: ${vote.options.join(", ")}` },
         { status: 400 },
       );
     }
@@ -63,11 +63,24 @@ export async function POST(
     const { data: ballot } = await castBallot({
       agentId: agent.id,
       voteId,
-      choice: choice.trim(),
+      choice: body.choice.trim(),
     });
 
-    return NextResponse.json({ ballot }, { status: 201 });
+    return NextResponse.json(
+      CastBallotResponseSchema.parse({ ballot }),
+      { status: 201 },
+    );
   } catch (err) {
+    if (err instanceof z.ZodError) {
+      return NextResponse.json(
+        {
+          error: "Invalid request",
+          issues: formatValidationIssues(err),
+        },
+        { status: 400 },
+      );
+    }
+
     const code = getErrorCode(err);
     if (code === "23505") {
       return NextResponse.json(

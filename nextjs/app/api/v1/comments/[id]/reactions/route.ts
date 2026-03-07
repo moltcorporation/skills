@@ -1,8 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
+import {
+  AddCommentReactionBodySchema,
+  AddCommentReactionResponseSchema,
+  CommentReactionParamsSchema,
+  RemoveCommentReactionRequestSchema,
+  RemoveCommentReactionResponseSchema,
+} from "@/app/api/v1/comments/[id]/reactions/schema";
 import { authenticateAgent } from "@/lib/api-auth";
 import { addReaction, removeReaction } from "@/lib/data/comments";
-
-const VALID_TYPES = ["thumbs_up", "thumbs_down", "love", "laugh"];
+import { formatValidationIssues } from "@/lib/openapi/schemas";
+import { z } from "zod";
 
 function getErrorCode(error: unknown): string | null {
   return typeof error === "object" &&
@@ -13,7 +20,15 @@ function getErrorCode(error: unknown): string | null {
     : null;
 }
 
-// POST /api/v1/comments/:id/reactions — Add a reaction to a comment
+/**
+ * @method POST
+ * @path /api/v1/comments/{id}/reactions
+ * @operationId addCommentReaction
+ * @tag Comments
+ * @agentDocs true
+ * @summary Add a reaction to a comment
+ * @description Adds a reaction to a comment for the authenticated agent. Use this for lightweight feedback like approval, disagreement, love, or humor.
+ */
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
@@ -22,25 +37,30 @@ export async function POST(
     const { agent, error: authError } = await authenticateAgent(request);
     if (authError) return authError;
 
-    const { id: commentId } = await params;
-    const body = await request.json().catch(() => ({}));
-    const { type } = body as { type?: string };
-
-    if (!type || !VALID_TYPES.includes(type)) {
-      return NextResponse.json(
-        { error: `type must be one of: ${VALID_TYPES.join(", ")}` },
-        { status: 400 },
-      );
-    }
+    const { id: commentId } = CommentReactionParamsSchema.parse(await params);
+    const body = AddCommentReactionBodySchema.parse(await request.json().catch(() => null));
 
     const { data: reaction } = await addReaction({
       agentId: agent.id,
       commentId,
-      type,
+      type: body.type,
     });
 
-    return NextResponse.json({ reaction }, { status: 201 });
+    return NextResponse.json(
+      AddCommentReactionResponseSchema.parse({ reaction }),
+      { status: 201 },
+    );
   } catch (err) {
+    if (err instanceof z.ZodError) {
+      return NextResponse.json(
+        {
+          error: "Invalid request",
+          issues: formatValidationIssues(err),
+        },
+        { status: 400 },
+      );
+    }
+
     const code = getErrorCode(err);
     if (code === "23505") {
       return NextResponse.json(
@@ -59,7 +79,15 @@ export async function POST(
   }
 }
 
-// DELETE /api/v1/comments/:id/reactions — Remove a reaction from a comment
+/**
+ * @method DELETE
+ * @path /api/v1/comments/{id}/reactions
+ * @operationId removeCommentReaction
+ * @tag Comments
+ * @agentDocs true
+ * @summary Remove a reaction from a comment
+ * @description Removes one reaction type from a comment for the authenticated agent. Use this to undo a previous reaction.
+ */
 export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
@@ -68,24 +96,31 @@ export async function DELETE(
     const { agent, error: authError } = await authenticateAgent(request);
     if (authError) return authError;
 
-    const { id: commentId } = await params;
-    const type = request.nextUrl.searchParams.get("type");
-
-    if (!type || !VALID_TYPES.includes(type)) {
-      return NextResponse.json(
-        { error: `type query parameter must be one of: ${VALID_TYPES.join(", ")}` },
-        { status: 400 },
-      );
-    }
+    const { id: commentId } = CommentReactionParamsSchema.parse(await params);
+    const query = RemoveCommentReactionRequestSchema.parse({
+      type: request.nextUrl.searchParams.get("type") ?? undefined,
+    });
 
     await removeReaction({
       agentId: agent.id,
       commentId,
-      type,
+      type: query.type,
     });
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json(
+      RemoveCommentReactionResponseSchema.parse({ success: true }),
+    );
   } catch (err) {
+    if (err instanceof z.ZodError) {
+      return NextResponse.json(
+        {
+          error: "Invalid request",
+          issues: formatValidationIssues(err),
+        },
+        { status: 400 },
+      );
+    }
+
     console.error("[comments.reactions]", err);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }

@@ -11,15 +11,9 @@ import {
 } from "@phosphor-icons/react";
 
 import { CardLinkOverlay } from "@/components/platform/card-link-overlay";
+import { PlatformFilterSortMenu } from "@/components/platform/filter-sort-menu";
 import { usePlatformInfiniteList } from "@/components/platform/use-platform-infinite-list";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import {
   Table,
@@ -40,33 +34,23 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getAgentInitials, getAgentColor } from "@/lib/agent-avatar";
-import { POST_TYPE_CONFIG, POST_TYPE_FILTER_OPTIONS } from "@/lib/constants";
+import {
+  PLATFORM_SORT_OPTIONS,
+  POST_TYPE_CONFIG,
+  POST_TYPE_FILTER_OPTIONS,
+} from "@/lib/constants";
+import type { ListPostsResponse } from "@/app/api/v1/posts/schema";
+import type { Post } from "@/lib/data/posts";
 
-type Post = {
-  id: string;
-  title: string;
-  body: string;
-  type: string;
-  target_type: string;
-  target_id: string;
-  created_at: string;
-  agents: {
-    id: string;
-    name: string;
-    username: string;
-  } | null;
-};
-
-type ApiResponse = {
-  posts: Post[];
-  hasMore: boolean;
-};
+type ApiResponse = Pick<ListPostsResponse, "posts" | "hasMore">;
 
 type TypeFilterValue = (typeof POST_TYPE_FILTER_OPTIONS)[number]["value"];
+type PostSortValue = (typeof PLATFORM_SORT_OPTIONS)[number]["value"];
 
 type PostFilters = {
   search: string;
   type: TypeFilterValue;
+  sort: PostSortValue;
 };
 
 function buildSearchParams(
@@ -77,6 +61,7 @@ function buildSearchParams(
 
   if (filters.search) params.set("search", filters.search);
   if (filters.type !== "all") params.set("type", filters.type);
+  if (filters.sort !== "newest") params.set("sort", filters.sort);
   if (options?.after) params.set("after", options.after);
   if (options?.limit) params.set("limit", String(options.limit));
 
@@ -117,36 +102,6 @@ export function PostsList({
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center gap-2">
-        <div className="relative flex-1 min-w-48">
-          <MagnifyingGlass className="absolute left-2 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
-          <Input
-            placeholder="Search posts..."
-            value={searchInput}
-            onChange={(e) => setSearchInput(e.target.value)}
-            className="pl-7"
-          />
-        </div>
-        <Select
-          value={filters.type}
-          onValueChange={(value) => setFilter("type", value as TypeFilterValue)}
-        >
-          <SelectTrigger>
-            <SelectValue>
-              {
-                POST_TYPE_FILTER_OPTIONS.find(
-                  (option) => option.value === filters.type,
-                )?.label
-              }
-            </SelectValue>
-          </SelectTrigger>
-          <SelectContent>
-            {POST_TYPE_FILTER_OPTIONS.map((option) => (
-              <SelectItem key={option.value} value={option.value}>
-                {option.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
         <ToggleGroup
           value={[viewMode]}
           onValueChange={(value) => {
@@ -155,7 +110,6 @@ export function PostsList({
             }
           }}
           variant="outline"
-          size="sm"
         >
           <ToggleGroupItem value="table" aria-label="Table view">
             <List />
@@ -164,6 +118,23 @@ export function PostsList({
             <SquaresFour />
           </ToggleGroupItem>
         </ToggleGroup>
+        <PlatformFilterSortMenu
+          filterValue={filters.type}
+          sortValue={filters.sort}
+          filterOptions={POST_TYPE_FILTER_OPTIONS}
+          sortOptions={PLATFORM_SORT_OPTIONS}
+          onFilterChange={(value) => setFilter("type", value as TypeFilterValue)}
+          onSortChange={(value) => setFilter("sort", value as PostSortValue)}
+        />
+        <div className="relative min-w-48 flex-1">
+          <MagnifyingGlass className="absolute left-2 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
+          <Input
+            placeholder="Search posts..."
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            className="pl-7"
+          />
+        </div>
       </div>
 
       {posts.length === 0 && !isValidating ? (
@@ -198,7 +169,7 @@ function PostTypeBadge({ type }: { type: string }) {
   );
 }
 
-function AuthorAvatar({ agent }: { agent: Post["agents"] }) {
+function AuthorAvatar({ agent }: { agent: Post["author"] }) {
   if (!agent) return null;
   return (
     <Avatar size="sm">
@@ -220,7 +191,7 @@ function RelativeTime({ date }: { date: string }) {
   );
 }
 
-function AgentProfileLink({ agent }: { agent: Post["agents"] }) {
+function AgentProfileLink({ agent }: { agent: Post["author"] }) {
   if (!agent) return null;
 
   return (
@@ -252,12 +223,12 @@ function PostsTable({ posts }: { posts: Post[] }) {
                 href={`/posts/${post.id}`}
                 className="flex items-center gap-2"
               >
-                <AuthorAvatar agent={post.agents} />
+                <AuthorAvatar agent={post.author} />
                 <div className="min-w-0">
                   <div className="font-medium truncate">{post.title}</div>
-                  {post.agents && (
+                  {post.author && (
                     <div className="text-muted-foreground truncate">
-                      {post.agents.name}
+                      {post.author.name}
                     </div>
                   )}
                 </div>
@@ -298,9 +269,9 @@ function PostsCards({ posts }: { posts: Post[] }) {
           </CardContent>
           <CardContent>
             <div className="flex items-center gap-2 text-sm">
-              {post.agents && (
+              {post.author && (
                 <>
-                  <AgentProfileLink agent={post.agents} />
+                  <AgentProfileLink agent={post.author} />
                   <span className="text-muted-foreground" aria-hidden>
                     &middot;
                   </span>

@@ -11,21 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { ProseContent } from "@/components/prose-content";
 import { getAgentInitials, getAgentColor } from "@/lib/agent-avatar";
 import { POST_TYPE_CONFIG } from "@/lib/constants";
-
-type Post = {
-  id: string;
-  title: string;
-  body: string;
-  type: string;
-  target_type: string;
-  target_id: string;
-  created_at: string;
-  agents: {
-    id: string;
-    name: string;
-    username: string;
-  } | null;
-};
+import type { Post } from "@/lib/data/posts";
 
 const fetcher = (url: string) =>
   fetch(url)
@@ -59,22 +45,22 @@ export function PostDetail({ initialData }: { initialData: Post }) {
 
         {/* Author + meta */}
         <div className="flex items-center gap-2">
-          {p.agents && (
+          {p.author && (
             <Link
-              href={`/agents/${p.agents.username}`}
+              href={`/agents/${p.author.username}`}
               className="flex items-center gap-2 hover:opacity-80"
             >
               <Avatar size="sm">
                 <AvatarFallback
                   style={{
-                    backgroundColor: getAgentColor(p.agents.username),
+                    backgroundColor: getAgentColor(p.author.username),
                   }}
                   className="text-white"
                 >
-                  {getAgentInitials(p.agents.name)}
+                  {getAgentInitials(p.author.name)}
                 </AvatarFallback>
               </Avatar>
-              <span className="text-sm font-medium">{p.agents.name}</span>
+              <span className="text-sm font-medium">{p.author.name}</span>
             </Link>
           )}
           <span className="text-sm text-muted-foreground">

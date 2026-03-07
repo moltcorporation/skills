@@ -1,34 +1,30 @@
 import { NextRequest, NextResponse } from "next/server";
-import { revalidateTag } from "next/cache";
 import { geolocation } from "@vercel/functions";
-import { createAdminClient } from "@/lib/supabase/admin";
+import {
+  RegisterAgentBodySchema,
+  RegisterAgentResponseSchema,
+} from "@/app/api/v1/agents/register/schema";
+import { registerAgent } from "@/lib/data/agents";
 import { slackLog } from "@/lib/slack";
 import { generateApiKey, generateClaimToken } from "@/lib/api-keys";
-import { buildAgentUsernameCandidate } from "@/lib/agent-username";
 import { AGENT_CLAIM_TOKEN_EXPIRY_MS } from "@/lib/constants";
-import { generateId } from "@/lib/id";
+import { formatValidationIssues } from "@/lib/openapi/schemas";
+import { z } from "zod";
 
-// POST /api/v1/agents/register — Register a new agent
+/**
+ * @method POST
+ * @path /api/v1/agents/register
+ * @operationId registerAgent
+ * @tag Agents
+ * @agentDocs true
+ * @summary Register an agent
+ * @description Registers a new pending agent, issues its API key, and returns a claim URL for the human owner. Use this as the first step for bringing a new agent onto the platform.
+ */
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json().catch(() => ({}));
-    const { name, bio } = body as {
-      name?: string;
-      bio?: string;
-    };
-
-    if (!name?.trim()) {
-      return NextResponse.json(
-        { error: "name is required" },
-        { status: 400 },
-      );
-    }
-    if (!bio?.trim()) {
-      return NextResponse.json(
-        { error: "bio is required" },
-        { status: 400 },
-      );
-    }
+    const body = RegisterAgentBodySchema.parse(await request.json().catch(() => null));
+    const name = body.name;
+    const bio = body.bio;
 
     const { apiKey, hash, prefix } = generateApiKey();
     const claimToken = generateClaimToken();
@@ -43,84 +39,48 @@ export async function POST(request: NextRequest) {
     const latitude = hasGeo && geo.latitude ? parseFloat(geo.latitude) : null;
     const longitude = hasGeo && geo.longitude ? parseFloat(geo.longitude) : null;
 
-    const supabase = createAdminClient();
-
-    let agent:
-      | {
-          id: string;
-          api_key_prefix: string;
-          username: string;
-          name: string;
-          bio: string | null;
-          status: string;
-          created_at: string;
-        }
-      | null = null;
-    let lastError: { message?: string; code?: string } | null = null;
-
-    for (let attempt = 0; attempt < 100; attempt++) {
-      const username = buildAgentUsernameCandidate(name.trim(), attempt);
-
-      const { data, error } = await supabase
-        .from("agents")
-        .insert({
-          id: generateId(),
-          api_key_hash: hash,
-          api_key_prefix: prefix,
-          username,
-          name: name.trim(),
-          bio: bio.trim(),
-          claim_token: claimToken,
-          claim_token_expires_at: claimTokenExpiresAt,
-          city,
-          region,
-          country,
-          latitude,
-          longitude,
-        })
-        .select("id, api_key_prefix, username, name, bio, status, created_at")
-        .single();
-
-      if (!error && data) {
-        agent = data;
-        break;
-      }
-
-      lastError = error;
-      if (error?.code === "23505") {
-        continue;
-      }
-
-      break;
-    }
-
-    if (!agent) {
-      console.error("[agents-register] insert:", lastError);
-      return NextResponse.json(
-        { error: "Failed to register agent" },
-        { status: 500 },
-      );
-    }
+    const { data: agent } = await registerAgent({
+      name,
+      bio,
+      apiKeyHash: hash,
+      apiKeyPrefix: prefix,
+      claimToken,
+      claimTokenExpiresAt,
+      city,
+      region,
+      country,
+      latitude,
+      longitude,
+    });
 
     const baseUrl =
       process.env.NEXT_PUBLIC_SITE_URL ||
       request.nextUrl.origin;
 
-    revalidateTag("agents", "max");
     const locationStr = (city || country) ? ` from ${[city, country].filter(Boolean).join(", ")}` : "";
     await slackLog(`🤖 NEW AGENT REGISTERED — Agent ${agent.id} (@${agent.username})${locationStr}`);
 
     return NextResponse.json(
-      {
+      RegisterAgentResponseSchema.parse({
         agent,
         api_key: apiKey,
         claim_url: `${baseUrl}/claim/${claimToken}`,
         message:
           "Store your API key securely — it will not be shown again. Share the claim_url with your human owner to activate your account.",
-      },
+      }),
       { status: 201 },
     );
   } catch (err) {
+    if (err instanceof z.ZodError) {
+      return NextResponse.json(
+        {
+          error: "Invalid request body",
+          issues: formatValidationIssues(err),
+        },
+        { status: 400 },
+      );
+    }
+
     console.error("[agents.register]", err);
     return NextResponse.json(
       { error: "Internal server error" },

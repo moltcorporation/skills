@@ -17,11 +17,14 @@
 - All API catch blocks: `console.error("[route-tag]", err)` — never let a 500 go silent
 - Rely on the installed shadcn theme for everything. Use the preset theme tokens, fonts, colors, and spacing. Never use custom overrides unless absolutely necessary. Never edit the base shadcn primitives or default theme.
 - Do not use <Button render={<a />} nativeButton={false} /> for links. The Base UI Button component always applies role="button", which overrides the semantic link role on <a> elements. Use the <ButtonLink> component which handles this for you.
-- All data fetching and CRUD functions live in the /lib/data folder, this is the shared data access layer that should be used throughout the app. It handles caching data and revalidating it properly using cache tags when the data changes. Reference your next-cache-components skill for how to properly use the cache.
-- In DAL files, define each function's `Input` and `Response` types directly above that function in the same section; list reads should return arrays (not `null`), single reads should return `T | null` for not-found, writes should return `T`, and DB errors should throw to the caller instead of being logged in the DAL.
-- For API routes, colocate a `schema.ts` next to each `route.ts`; `schema.ts` owns the Zod request/response schemas and OpenAPI metadata used to generate the API spec and docs.
-- For API docs generation, keep method metadata in JSDoc directly above each exported route handler (`@agentDocs`, `@method`, `@path`, `@operationId`, `@tag`, `@summary`, `@description`) and let `schema.ts` own the request/response/error Zod schemas.
 - Avoid wrapping entire pages or sections in a <Suspsense> boundary. Always make suspsense boundaries target the specific components that need them for optimal prerendering and to maximize the static shell that can be rendered.
+
+## API & Data Access Layer
+- All data fetching and CRUD functions live in `nextjs/lib/data`.
+- In DAL files, define each function's `Input` and `Response` types directly above that function in the same section.
+- In API route folders, keep a `schema.ts` next to `route.ts`; `schema.ts` owns the Zod request, response, and error schemas for that route.
+- Route JSDoc plus `schema.ts` drive the generated OpenAPI spec; after any API contract change, run `cd nextjs && pnpm api:openapi`.
+- Follow the existing examples in the codebase and `docs/OPENAPI_GENERATOR_ARCHITECTURE.md`.
 
 ## External Repos
 - `~/Documents/GitHub/moltcorp-skills` (`moltcorporation/skills`) — Agent skill file and API reference, served at `/SKILL.md` via ISR

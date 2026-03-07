@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  CaretDown,
   List,
   MagnifyingGlass,
   MapPin,
@@ -13,6 +12,7 @@ import Link from "next/link";
 import { useState } from "react";
 
 import { CardLinkOverlay } from "@/components/platform/card-link-overlay";
+import { PlatformFilterSortMenu } from "@/components/platform/filter-sort-menu";
 import { usePlatformInfiniteList } from "@/components/platform/use-platform-infinite-list";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -24,16 +24,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuLabel,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -48,29 +38,16 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { getAgentColor, getAgentInitials } from "@/lib/agent-avatar";
 import {
   AGENT_FILTER_OPTIONS,
-  AGENT_SORT_OPTIONS,
   AGENT_STATUS_CONFIG,
+  PLATFORM_SORT_OPTIONS,
 } from "@/lib/constants";
+import type { ListAgentsResponse } from "@/app/api/v1/agents/schema";
+import type { Agent, AgentStatus } from "@/lib/data/agents";
 
-type Agent = {
-  id: string;
-  name: string;
-  username: string;
-  bio: string | null;
-  status: string;
-  claimed_at: string | null;
-  created_at: string;
-  city: string | null;
-  country: string | null;
-};
-
-type ApiResponse = {
-  agents: Agent[];
-  hasMore: boolean;
-};
+type ApiResponse = ListAgentsResponse;
 
 type AgentFilterValue = (typeof AGENT_FILTER_OPTIONS)[number]["value"];
-type AgentSortValue = (typeof AGENT_SORT_OPTIONS)[number]["value"];
+type AgentSortValue = (typeof PLATFORM_SORT_OPTIONS)[number]["value"];
 
 type AgentFilters = {
   search: string;
@@ -93,25 +70,6 @@ function buildSearchParams(
   return params;
 }
 
-function getControlsLabel(status: AgentFilterValue, sort: AgentSortValue) {
-  const parts: string[] = [];
-
-  if (status !== "all") {
-    parts.push(
-      AGENT_FILTER_OPTIONS.find((option) => option.value === status)?.label ??
-      "Filter",
-    );
-  }
-
-  if (sort !== "newest") {
-    parts.push(
-      AGENT_SORT_OPTIONS.find((option) => option.value === sort)?.label ?? "Sort",
-    );
-  }
-
-  return parts.length > 0 ? parts.join(" · ") : "Filter / Sort";
-}
-
 export function AgentsList({
   initialData,
   initialHasMore,
@@ -121,7 +79,6 @@ export function AgentsList({
   initialHasMore: boolean;
   initialFilters: AgentFilters;
 }) {
-  const [controlsOpen, setControlsOpen] = useState(false);
   const [viewMode, setViewMode] = useState<"table" | "cards">("table");
   const {
     filters,
@@ -147,60 +104,6 @@ export function AgentsList({
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center gap-2">
-        <div className="relative flex-1 min-w-48">
-          <MagnifyingGlass className="absolute left-2 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
-          <Input
-            placeholder="Search agents..."
-            value={searchInput}
-            onChange={(e) => setSearchInput(e.target.value)}
-            className="pl-7"
-          />
-        </div>
-        <DropdownMenu open={controlsOpen} onOpenChange={setControlsOpen}>
-          <DropdownMenuTrigger
-            render={
-              <Button variant="outline" className="min-w-28 justify-between">
-                <span>{getControlsLabel(filters.status, filters.sort)}</span>
-                <CaretDown className="size-3.5 text-muted-foreground" />
-              </Button>
-            }
-          />
-          <DropdownMenuContent align="start">
-            <DropdownMenuGroup>
-              <DropdownMenuLabel>Filter by</DropdownMenuLabel>
-              <DropdownMenuRadioGroup
-                value={filters.status}
-                onValueChange={(value) => {
-                  setFilter("status", value as AgentFilterValue);
-                  setControlsOpen(false);
-                }}
-              >
-                {AGENT_FILTER_OPTIONS.map((option) => (
-                  <DropdownMenuRadioItem key={option.value} value={option.value}>
-                    {option.label}
-                  </DropdownMenuRadioItem>
-                ))}
-              </DropdownMenuRadioGroup>
-            </DropdownMenuGroup>
-            <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-              <DropdownMenuLabel>Sort by</DropdownMenuLabel>
-              <DropdownMenuRadioGroup
-                value={filters.sort}
-                onValueChange={(value) => {
-                  setFilter("sort", value as AgentSortValue);
-                  setControlsOpen(false);
-                }}
-              >
-                {AGENT_SORT_OPTIONS.map((option) => (
-                  <DropdownMenuRadioItem key={option.value} value={option.value}>
-                    {option.label}
-                  </DropdownMenuRadioItem>
-                ))}
-              </DropdownMenuRadioGroup>
-            </DropdownMenuGroup>
-          </DropdownMenuContent>
-        </DropdownMenu>
         <ToggleGroup
           value={[viewMode]}
           onValueChange={(value) => {
@@ -209,7 +112,6 @@ export function AgentsList({
             }
           }}
           variant="outline"
-          size="sm"
         >
           <ToggleGroupItem value="table" aria-label="Table view">
             <List />
@@ -218,6 +120,23 @@ export function AgentsList({
             <SquaresFour />
           </ToggleGroupItem>
         </ToggleGroup>
+        <PlatformFilterSortMenu
+          filterValue={filters.status}
+          sortValue={filters.sort}
+          filterOptions={AGENT_FILTER_OPTIONS}
+          sortOptions={PLATFORM_SORT_OPTIONS}
+          onFilterChange={(value) => setFilter("status", value as AgentFilterValue)}
+          onSortChange={(value) => setFilter("sort", value as AgentSortValue)}
+        />
+        <div className="relative min-w-48 flex-1">
+          <MagnifyingGlass className="absolute left-2 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
+          <Input
+            placeholder="Search agents..."
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            className="pl-7"
+          />
+        </div>
       </div>
 
       {agents.length === 0 && !isValidating ? (
@@ -255,7 +174,7 @@ function AgentAvatar({ agent }: { agent: Agent }) {
   );
 }
 
-function StatusBadge({ status }: { status: string }) {
+function StatusBadge({ status }: { status: AgentStatus }) {
   const config = AGENT_STATUS_CONFIG[status];
   if (!config) return null;
   return (

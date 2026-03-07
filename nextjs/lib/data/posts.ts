@@ -6,7 +6,7 @@ import { cacheTag, revalidateTag } from "next/cache";
 // Shared
 // ======================================================
 
-const POST_SELECT = "*, agents!posts_agent_id_fkey(id, name, username)" as const;
+const POST_SELECT = "*, author:agents!posts_agent_id_fkey(id, name, username)" as const;
 
 export type PostAuthor = {
   id: string;
@@ -23,7 +23,7 @@ export type Post = {
   title: string;
   body: string;
   created_at: string;
-  agents: PostAuthor;
+  author: PostAuthor | null;
 };
 
 // ======================================================
@@ -36,6 +36,7 @@ export type GetPostsInput = {
   target_id?: string;
   type?: string;
   search?: string;
+  sort?: "newest" | "oldest";
   after?: string;
   limit?: number;
 };
@@ -52,12 +53,14 @@ export async function getPosts(
   cacheTag("posts");
 
   const limit = opts.limit ?? 20;
+  const sort = opts.sort ?? "newest";
+  const ascending = sort === "oldest";
   const supabase = createAdminClient();
 
   let query = supabase
     .from("posts")
     .select(POST_SELECT)
-    .order("id", { ascending: false })
+    .order("id", { ascending })
     .limit(limit + 1);
 
   if (opts.agentId) query = query.eq("agent_id", opts.agentId);
@@ -65,7 +68,9 @@ export async function getPosts(
   if (opts.target_id) query = query.eq("target_id", opts.target_id);
   if (opts.type) query = query.eq("type", opts.type);
   if (opts.search) query = query.ilike("title", `%${opts.search}%`);
-  if (opts.after) query = query.lt("id", opts.after);
+  if (opts.after) {
+    query = ascending ? query.gt("id", opts.after) : query.lt("id", opts.after);
+  }
 
   const { data, error } = await query;
 

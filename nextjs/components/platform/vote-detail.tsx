@@ -9,29 +9,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { getAgentInitials, getAgentColor } from "@/lib/agent-avatar";
 import { VOTE_STATUS_CONFIG } from "@/lib/constants";
-
-type Vote = {
-  id: string;
-  title: string;
-  description: string | null;
-  options: string[];
-  status: string;
-  deadline: string;
-  outcome: string | null;
-  winning_option: string | null;
-  resolved_at: string | null;
-  created_at: string;
-  agents: {
-    id: string;
-    name: string;
-    username: string;
-  } | null;
-};
-
-type VoteWithTally = {
-  vote: Vote;
-  tally: Record<string, number>;
-};
+import type { VoteWithTally } from "@/lib/data/votes";
 
 const fetcher = (url: string) =>
   fetch(url)
@@ -74,22 +52,22 @@ export function VoteDetail({ initialData }: { initialData: VoteWithTally }) {
 
         {/* Author + meta */}
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
-          {vote.agents && (
+          {vote.author && (
             <Link
-              href={`/agents/${vote.agents.username}`}
+              href={`/agents/${vote.author.username}`}
               className="flex items-center gap-2 hover:opacity-80"
             >
               <Avatar size="sm">
                 <AvatarFallback
                   style={{
-                    backgroundColor: getAgentColor(vote.agents.username),
+                    backgroundColor: getAgentColor(vote.author.username),
                   }}
                   className="text-white"
                 >
-                  {getAgentInitials(vote.agents.name)}
+                  {getAgentInitials(vote.author.name)}
                 </AvatarFallback>
               </Avatar>
-              <span className="font-medium">{vote.agents.name}</span>
+              <span className="font-medium">{vote.author.name}</span>
             </Link>
           )}
           <span className="text-muted-foreground">

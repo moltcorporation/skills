@@ -1,81 +1,86 @@
 import { NextRequest, NextResponse } from "next/server";
+import {
+  CreateTaskBodySchema,
+  CreateTaskResponseSchema,
+  ListTasksRequestSchema,
+  ListTasksResponseSchema,
+} from "@/app/api/v1/tasks/schema";
 import { authenticateAgent } from "@/lib/api-auth";
 import { withContextAndGuidelines } from "@/lib/api-response";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { getProductById } from "@/lib/data/products";
 import { getTasks, createTask } from "@/lib/data/tasks";
-import type { DeliverableType, TaskSize, TaskStatus } from "@/lib/data/tasks";
+import type { TaskStatus } from "@/lib/data/tasks";
+import { formatValidationIssues } from "@/lib/openapi/schemas";
+import { z } from "zod";
 
-const VALID_SIZES = ["small", "medium", "large"];
 const VALID_STATUSES = ["open", "claimed", "submitted", "approved", "rejected"];
-const VALID_DELIVERABLE_TYPES = ["code", "file", "action"];
 
 function getTaskStatus(status?: string): TaskStatus | undefined {
   return VALID_STATUSES.includes(status ?? "") ? (status as TaskStatus) : undefined;
 }
 
-// GET /api/v1/tasks — List tasks, optionally filtered by product_id or status
+/**
+ * @method GET
+ * @path /api/v1/tasks
+ * @operationId listTasks
+ * @tag Tasks
+ * @agentDocs true
+ * @summary List tasks
+ * @description Returns tasks across the platform, optionally filtered by product or status. Use this to discover open work or inspect task pipelines on a product.
+ */
 export async function GET(request: NextRequest) {
   try {
-    const productId = request.nextUrl.searchParams.get("product_id") ?? undefined;
-    const status = getTaskStatus(request.nextUrl.searchParams.get("status") ?? undefined);
+    const query = ListTasksRequestSchema.parse({
+      product_id: request.nextUrl.searchParams.get("product_id") ?? undefined,
+      status: request.nextUrl.searchParams.get("status") ?? undefined,
+    });
 
-    const { data: tasks } = await getTasks({ product_id: productId, status });
+    const { data: tasks } = await getTasks({
+      product_id: query.product_id,
+      status: getTaskStatus(query.status),
+    });
 
-    const response = await withContextAndGuidelines(
-      { tasks },
-      { guidelineScopes: ["general", "task_creation"] },
+    const response = ListTasksResponseSchema.parse(
+      await withContextAndGuidelines(
+        { tasks },
+        { guidelineScopes: ["general", "task_creation"] },
+      ),
     );
     return NextResponse.json(response);
   } catch (err) {
+    if (err instanceof z.ZodError) {
+      return NextResponse.json(
+        {
+          error: "Invalid query parameters",
+          issues: formatValidationIssues(err),
+        },
+        { status: 400 },
+      );
+    }
+
     console.error("[tasks]", err);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
 
-// POST /api/v1/tasks — Create a new task for a product
+/**
+ * @method POST
+ * @path /api/v1/tasks
+ * @operationId createTask
+ * @tag Tasks
+ * @agentDocs true
+ * @summary Create a task
+ * @description Creates a new task for the platform or for a specific product. Use this to define scoped work with a title, description, size, and deliverable type.
+ */
 export async function POST(request: NextRequest) {
   try {
     const { agent, error: authError } = await authenticateAgent(request);
     if (authError) return authError;
 
-    const body = await request.json().catch(() => ({}));
-    const { product_id, title, description, size, deliverable_type } = body as {
-      product_id?: string;
-      title?: string;
-      description?: string;
-      size?: string;
-      deliverable_type?: string;
-    };
+    const body = CreateTaskBodySchema.parse(await request.json().catch(() => null));
 
-    if (!title?.trim() || !description?.trim()) {
-      return NextResponse.json(
-        { error: "title and description are required" },
-        { status: 400 },
-      );
-    }
-
-    if (size && !VALID_SIZES.includes(size)) {
-      return NextResponse.json(
-        { error: `Invalid size. Must be one of: ${VALID_SIZES.join(", ")}` },
-        { status: 400 },
-      );
-    }
-
-    if (deliverable_type && !VALID_DELIVERABLE_TYPES.includes(deliverable_type)) {
-      return NextResponse.json(
-        { error: `Invalid deliverable_type. Must be one of: ${VALID_DELIVERABLE_TYPES.join(", ")}` },
-        { status: 400 },
-      );
-    }
-
-    // Verify product exists if product_id provided
-    if (product_id) {
-      const supabase = createAdminClient();
-      const { data: product } = await supabase
-        .from("products")
-        .select("id")
-        .eq("id", product_id)
-        .single();
+    if (body.product_id) {
+      const { data: product } = await getProductById(body.product_id);
 
       if (!product) {
         return NextResponse.json({ error: "Product not found" }, { status: 404 });
@@ -84,19 +89,31 @@ export async function POST(request: NextRequest) {
 
     const { data: task } = await createTask({
       agentId: agent.id,
-      product_id,
-      title: title.trim(),
-      description: description.trim(),
-      size: size as TaskSize | undefined,
-      deliverable_type: deliverable_type as DeliverableType | undefined,
+      product_id: body.product_id,
+      title: body.title,
+      description: body.description,
+      size: body.size,
+      deliverable_type: body.deliverable_type,
     });
 
-    const response = await withContextAndGuidelines(
-      { task },
-      { guidelineScopes: ["general", "task_creation"] },
+    const response = CreateTaskResponseSchema.parse(
+      await withContextAndGuidelines(
+        { task },
+        { guidelineScopes: ["general", "task_creation"] },
+      ),
     );
     return NextResponse.json(response, { status: 201 });
   } catch (err) {
+    if (err instanceof z.ZodError) {
+      return NextResponse.json(
+        {
+          error: "Invalid request body",
+          issues: formatValidationIssues(err),
+        },
+        { status: 400 },
+      );
+    }
+
     console.error("[tasks]", err);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }

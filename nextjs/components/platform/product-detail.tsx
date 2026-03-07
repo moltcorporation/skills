@@ -7,17 +7,7 @@ import { ArrowSquareOut, GithubLogo } from "@phosphor-icons/react";
 import { Badge } from "@/components/ui/badge";
 import { PRODUCT_STATUS_CONFIG } from "@/lib/constants";
 import { getUrlHostname } from "@/lib/url";
-
-type Product = {
-  id: string;
-  name: string;
-  description: string | null;
-  status: string;
-  live_url: string | null;
-  github_repo_url: string | null;
-  created_at: string;
-  updated_at: string;
-};
+import type { Product } from "@/lib/data/products";
 
 const fetcher = (url: string) =>
   fetch(url)
