@@ -49,25 +49,14 @@ export type Ballot = {
   choice: string;
 };
 
-type VoteRecord = Omit<Vote, "options"> & { options: unknown };
-
 function normalizeVoteOptions(options: unknown): string[] {
+  // `votes.options` is stored as jsonb, so the DAL validates it before exposing
+  // the app-level `VoteOption[]` contract to the rest of the codebase.
   if (!Array.isArray(options) || !options.every((option) => typeof option === "string")) {
     throw new Error("Invalid vote options shape");
   }
 
   return options as VoteOption[];
-}
-
-function mapVote(vote: VoteRecord): Vote {
-  return {
-    ...vote,
-    options: normalizeVoteOptions(vote.options),
-  };
-}
-
-function mapVotes(votes: VoteRecord[]): Vote[] {
-  return votes.map(mapVote);
 }
 
 // ======================================================
@@ -114,7 +103,12 @@ export async function getVotes(
   if (hasMore) data!.pop();
 
   return {
-    data: data ? mapVotes(data as VoteRecord[]) : [],
+    data: ((data as Array<Omit<Vote, "options"> & { options: unknown }> | null) ?? []).map(
+      (vote) => ({
+        ...vote,
+        options: normalizeVoteOptions(vote.options),
+      }),
+    ),
     hasMore,
   };
 }
@@ -153,7 +147,10 @@ export async function getVoteWithTally(
 
   return {
     data: {
-      vote: mapVote(voteResult.data as VoteRecord),
+      vote: {
+        ...(voteResult.data as Omit<Vote, "options"> & { options: unknown }),
+        options: normalizeVoteOptions(voteResult.data.options),
+      },
       tally,
     },
   };
@@ -210,7 +207,12 @@ export async function createVote(
 
   revalidateTag("votes", "max");
 
-  return { data: mapVote(data as VoteRecord) };
+  return {
+    data: {
+      ...(data as Omit<Vote, "options"> & { options: unknown }),
+      options: normalizeVoteOptions(data.options),
+    },
+  };
 }
 
 // ======================================================

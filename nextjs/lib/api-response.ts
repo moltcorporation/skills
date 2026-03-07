@@ -12,7 +12,7 @@ export async function withContextAndGuidelines<T>(
 ) {
   const { scope = "company", scopeId, guidelineScopes = ["general"] } = opts;
 
-  const [context, ...guidelineResults] = await Promise.all([
+  const [context, ...guidelineResults]: [string | null, ...(string | null)[]] = await Promise.all([
     getContext(scope, scopeId),
     ...guidelineScopes.map((s) => getGuidelines(s)),
   ]);
