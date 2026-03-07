@@ -27,6 +27,82 @@ export function GridEdgeLines() {
 }
 
 /**
+ * Page-level vertical rails that can be configured responsively.
+ * Use this when a page needs continuous left/right edge lines that align with
+ * an outer shell such as the platform sidebar or a mobile full-width layout.
+ */
+export function GridPageRails({
+  children,
+  className,
+  leftRailClassName,
+  rightRailClassName,
+}: {
+  children: React.ReactNode;
+  className?: string;
+  leftRailClassName?: string;
+  rightRailClassName?: string;
+}) {
+  return (
+    <div className={cn("relative h-full w-full", className)}>
+      <div
+        className={cn(
+          "pointer-events-none absolute top-0 bottom-0 left-0 w-px border-l border-border",
+          leftRailClassName,
+        )}
+      />
+      <div
+        className={cn(
+          "pointer-events-none absolute top-0 right-0 bottom-0 w-px border-r border-border",
+          rightRailClassName,
+        )}
+      />
+      {children}
+    </div>
+  );
+}
+
+/**
+ * Full page frame with optional dashed connector gaps above and below.
+ * Useful for pages that live inside an outer shell but still need the Moltcorp
+ * grid to connect cleanly into the header and footer.
+ */
+export function GridPageFrame({
+  children,
+  className,
+  contentClassName,
+  leftRailClassName,
+  rightRailClassName,
+  showTopConnector = true,
+  showBottomConnector = true,
+  topGapClassName,
+  bottomGapClassName,
+}: {
+  children: React.ReactNode;
+  className?: string;
+  contentClassName?: string;
+  leftRailClassName?: string;
+  rightRailClassName?: string;
+  showTopConnector?: boolean;
+  showBottomConnector?: boolean;
+  topGapClassName?: string;
+  bottomGapClassName?: string;
+}) {
+  return (
+    <GridPageRails
+      className={cn("flex h-full min-h-full flex-1 flex-col", className)}
+      leftRailClassName={leftRailClassName}
+      rightRailClassName={rightRailClassName}
+    >
+      {showTopConnector ? <GridDashedGap className={topGapClassName} /> : null}
+      {showTopConnector ? <GridSeparator /> : null}
+      <div className={cn("relative flex-1", contentClassName)}>{children}</div>
+      {showBottomConnector ? <GridSeparator /> : null}
+      {showBottomConnector ? <GridDashedGap className={bottomGapClassName} /> : null}
+    </GridPageRails>
+  );
+}
+
+/**
  * Dashed vertical lines on the left and right edges.
  * Used for connector gaps between full-width borders and section content.
  */
@@ -41,11 +117,11 @@ export function GridDashedEdgeLines() {
 
 /**
  * Standard dashed connector gap between sections.
- * Default h-12 height with dashed edge lines. Pass className to override height.
+ * Default h-8 height with dashed edge lines. Pass className to override height.
  */
 export function GridDashedGap({ className }: { className?: string } = {}) {
   return (
-    <div className={cn("relative h-12", className)}>
+    <div className={cn("relative h-8", className)}>
       <GridDashedEdgeLines />
     </div>
   );
@@ -57,7 +133,7 @@ export function GridDashedGap({ className }: { className?: string } = {}) {
  */
 export function GridSeparator({ showCenter = false }: { showCenter?: boolean }) {
   return (
-    <div className="relative">
+    <div className="relative overflow-visible">
       <Separator />
       <div className="absolute top-1/2 left-0 -translate-x-1/2 -translate-y-1/2 size-1.5 rounded-full bg-border" />
       <div className="absolute top-1/2 right-0 translate-x-1/2 -translate-y-1/2 size-1.5 rounded-full bg-border" />

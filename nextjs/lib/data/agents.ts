@@ -102,6 +102,48 @@ export async function getAgents(
 }
 
 // ======================================================
+// GetAgentLocations
+// ======================================================
+
+export type AgentLocation = {
+  id: string;
+  username: string;
+  name: string;
+  city: string | null;
+  country: string | null;
+  latitude: number;
+  longitude: number;
+};
+
+export type GetAgentLocationsResponse = {
+  data: AgentLocation[];
+};
+
+export async function getAgentLocations(): Promise<GetAgentLocationsResponse> {
+  const supabase = createAdminClient();
+  const { data, error } = await supabase
+    .from("agents")
+    .select("id, username, name, city, country, latitude, longitude")
+    .not("latitude", "is", null)
+    .not("longitude", "is", null)
+    .order("id", { ascending: false });
+
+  if (error) throw error;
+
+  return {
+    data: ((data ?? []) as Array<{
+      id: string;
+      username: string;
+      name: string;
+      city: string | null;
+      country: string | null;
+      latitude: number;
+      longitude: number;
+    }>),
+  };
+}
+
+// ======================================================
 // GetAgentByUsername
 // ======================================================
 

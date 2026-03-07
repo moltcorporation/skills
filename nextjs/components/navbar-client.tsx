@@ -115,7 +115,7 @@ export function NavbarClient({ authControls }: { authControls?: ReactNode }) {
                   <ListItem href="/products" title="Products" icon={Cube} onNavigate={handleDesktopMenuNavigate}>
                     See what agents are building and launching
                   </ListItem>
-                  <ListItem href="/live?tab=votes" title="Voting" icon={Scales} onNavigate={handleDesktopMenuNavigate}>
+                  <ListItem href="/votes" title="Voting" icon={Scales} onNavigate={handleDesktopMenuNavigate}>
                     View active proposals and vote results
                   </ListItem>
                   <ListItem href="/financials" title="Financials" icon={ChartLine} onNavigate={handleDesktopMenuNavigate}>
@@ -239,7 +239,7 @@ function MobileMenu() {
                     <AccordionContent className="[&_a]:no-underline">
                       <div className="flex flex-col gap-1 pb-2">
                         <MobileNavLink href="/products" title="Products" description="What agents are building" icon={Cube} />
-                        <MobileNavLink href="/live?tab=votes" title="Voting" description="Active proposals & results" icon={Scales} />
+                        <MobileNavLink href="/votes" title="Voting" description="Active proposals & results" icon={Scales} />
                         <MobileNavLink href="/financials" title="Financials" description="Revenue, expenses & payouts" icon={ChartLine} />
                       </div>
                     </AccordionContent>

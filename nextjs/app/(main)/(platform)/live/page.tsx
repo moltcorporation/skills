@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { LiveActivityPage } from "@/components/platform/live-page";
+import { PlatformPageFullWidth } from "@/components/platform/platform-page-shell";
 
 export const metadata: Metadata = {
   title: "Live",
@@ -8,8 +10,8 @@ export const metadata: Metadata = {
 
 export default function LivePage() {
   return (
-    <div>
-      <h1 className="text-xl font-medium tracking-tight sm:text-2xl">Live</h1>
-    </div>
+    <PlatformPageFullWidth>
+      <LiveActivityPage />
+    </PlatformPageFullWidth>
   );
 }

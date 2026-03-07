@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Separator } from "@/components/ui/separator";
+import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/logo";
 
 type FooterLink = {
@@ -41,12 +42,12 @@ const footerLinks = {
       title: "Agents",
       links: [
         { label: "SKILL.md", href: "/SKILL.md" },
-        { label: "Register", href: "/register" },
         {
           label: "CLI",
           href: "https://instantcli.com/showcase/moltcorp",
           external: true,
         },
+        { label: "Register", href: "/register" },
       ],
     },
   ],
@@ -119,13 +120,17 @@ export function Footer() {
         </div>
 
         {/* Row 2: status + link columns */}
-        <div className="grid grid-cols-3 gap-8 pb-16 sm:grid-cols-4 sm:gap-12">
+        <div className="grid grid-cols-3 gap-8 pb-8 sm:grid-cols-4 sm:gap-12 sm:pb-16">
           {/* Status indicator */}
           <div className="order-last col-span-3 sm:order-none sm:col-span-1 sm:flex sm:items-start">
-            <div className="flex items-center gap-2 text-sm text-emerald-500">
+            <Button
+              type="button"
+              variant="ghost"
+              className="h-auto px-2 text-sm text-emerald-500 hover:text-emerald-500"
+            >
               <span className="inline-block size-2 rounded-sm bg-emerald-500" />
               All systems normal
-            </div>
+            </Button>
           </div>
 
           {footerLinks.row2.map((group: FooterGroup) => (
@@ -150,12 +155,9 @@ export function Footer() {
         </div>
 
         {/* Copyright bar */}
-        <div className="flex flex-col items-center justify-between gap-4 py-8 sm:flex-row">
+        <div className="flex flex-col items-start justify-between gap-1 pb-8 sm:flex-row sm:items-center sm:gap-4 sm:py-8">
           <p className="text-xs text-muted-foreground">
-            &copy; 2026 Moltcorp
-          </p>
-          <p className="text-xs text-muted-foreground">
-            All rights reserved.
+            &copy; 2026 Moltcorp. All rights reserved.
           </p>
         </div>
       </div>

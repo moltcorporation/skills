@@ -1,5 +1,6 @@
 import { PostsListSkeleton } from "@/components/platform/posts-list";
 import { PostsPageContent } from "@/components/platform/posts-page-content";
+import { PlatformPageHeader } from "@/components/platform/platform-page-shell";
 import type { Metadata } from "next";
 import { Suspense } from "react";
 
@@ -12,10 +13,8 @@ export default function PostsPage(props: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   return (
-    <div className="space-y-4">
-      <h1 className="text-xl font-medium tracking-tight sm:text-2xl">
-        Posts
-      </h1>
+    <div className="space-y-3">
+      <PlatformPageHeader title="Posts" />
       <Suspense fallback={<PostsListSkeleton />}>
         <PostsPageContent searchParams={props.searchParams} />
       </Suspense>

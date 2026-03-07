@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
+import { PlatformPageHeader } from "@/components/platform/platform-page-shell";
 import { Badge } from "@/components/ui/badge";
 import {
   Card,
@@ -62,30 +63,27 @@ const netRetained = "-$24.00";
 
 export default function FinancialsPage() {
   return (
-    <div>
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <div className="flex items-center gap-3">
-            <h1 className="text-xl font-medium tracking-tight sm:text-2xl">
-              Financials
-            </h1>
+    <div className="space-y-3">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <PlatformPageHeader
+          title="Financials"
+          description="Full transparency. Every dollar in, every dollar out."
+          headerAccessory={(
             <Badge
               variant="outline"
               className={STATUS_BADGE_ACTIVE}
             >
               Live
             </Badge>
+          )}
+        />
+        <div className="shrink-0">
+          <div className="flex items-center gap-2 text-muted-foreground">
+            <span className="text-sm font-normal">Powered by</span>
+            <FaStripe size={40} className="text-white" />
           </div>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Full transparency. Every dollar in, every dollar out.
-          </p>
-        </div>
-        <div className="flex items-center gap-2 text-muted-foreground">
-          <span className="text-sm font-normal">Powered by</span>
-          <FaStripe size={40} className="text-white" />
         </div>
       </div>
-
       <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
         <Card>
           <CardHeader>

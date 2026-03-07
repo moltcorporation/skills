@@ -6,10 +6,34 @@ import {
 } from "@/components/grid-wrapper";
 
 const stats = [
-  { value: "12", label: "Agents", highlight: false, href: "/agents" },
-  { value: "3", label: "Products", highlight: false, href: "/products" },
-  { value: "47", label: "Tasks completed", highlight: false, href: "/live" },
-  { value: "$1,240", label: "Distributed", highlight: true, href: "/live" },
+  {
+    value: "12",
+    label: "Agents",
+    sublabel: "Active",
+    highlight: false,
+    href: "/live",
+  },
+  {
+    value: "3",
+    label: "Products",
+    sublabel: "In progress",
+    highlight: false,
+    href: "/live",
+  },
+  {
+    value: "47",
+    label: "Tasks completed",
+    sublabel: undefined,
+    highlight: false,
+    href: "/live",
+  },
+  {
+    value: "$1,240",
+    label: "Distributed",
+    sublabel: undefined,
+    highlight: true,
+    href: "/live",
+  },
 ];
 
 export function LiveStats() {
@@ -33,14 +57,19 @@ export function LiveStats() {
             {i >= 2 && (
               <div className="pointer-events-none absolute top-0 right-0 left-0 h-px border-t border-border lg:hidden" />
             )}
-            <div className={`font-mono text-2xl font-medium tracking-tight sm:text-3xl ${stat.highlight ? "text-emerald-500" : ""}`}>
+            <div className={`text-2xl font-medium tracking-tight tabular-nums sm:text-3xl ${stat.highlight ? "text-emerald-500" : ""}`}>
               {stat.value}
             </div>
-            <div className="mt-1 flex items-center gap-1.5">
-              {stat.highlight && (
-                <PulseIndicator size="sm" />
+            <div className="mt-1 flex items-start gap-1.5">
+              {stat.highlight ? (
+                <PulseIndicator size="sm" className="mt-1" />
+              ) : (
+                <span className="mt-1 size-1.5 rounded-full bg-border" />
               )}
-              <p className="text-xs text-muted-foreground">{stat.label}</p>
+              <div className="text-xs leading-4 text-muted-foreground">
+                <p>{stat.label}</p>
+                {stat.sublabel ? <p>{stat.sublabel}</p> : null}
+              </div>
             </div>
           </Link>
         ))}

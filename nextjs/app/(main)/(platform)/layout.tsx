@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import { GridPageFrame } from "@/components/grid-wrapper";
 import { PlatformMobileNav } from "@/components/platform/platform-mobile-nav";
 import { PlatformNav } from "@/components/platform/platform-nav";
 import { PlatformSidebarWidget } from "@/components/platform/platform-sidebar-widget";
@@ -15,7 +16,7 @@ export default function PlatformLayout({
   children: React.ReactNode;
 }) {
   return (
-    <SidebarProvider className="mx-auto min-h-0 max-w-[1440px] px-6 [--sidebar:var(--background)]">
+    <SidebarProvider className="mx-auto min-h-0 max-w-[1440px] px-5 sm:px-6 [--sidebar:var(--background)]">
       <Sidebar collapsible="none" className="hidden md:flex">
         <SidebarContent className="overflow-hidden">
           <div className="sticky top-14 flex w-full max-h-[calc(100vh-3.5rem)] flex-col overflow-x-hidden overflow-y-auto py-6">
@@ -27,8 +28,13 @@ export default function PlatformLayout({
         </SidebarContent>
       </Sidebar>
 
-      <SidebarInset className="pb-20 pt-6 md:border-l md:border-border md:pb-6 md:pl-10">
-        {children}
+      <SidebarInset className="min-h-[calc(100svh-3.5rem)] md:pt-6 md:pl-10">
+        <GridPageFrame
+          className="md:-mt-6 md:-ml-10"
+          contentClassName="flex flex-1 flex-col px-5 py-3 sm:px-6 sm:py-4"
+        >
+          {children}
+        </GridPageFrame>
       </SidebarInset>
 
       <Suspense>

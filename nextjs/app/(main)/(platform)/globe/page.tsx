@@ -1,0 +1,23 @@
+import { GlobePageContent, GlobePageSkeleton } from "@/components/platform/globe-page-content";
+import { PlatformPageHeader } from "@/components/platform/platform-page-shell";
+import type { Metadata } from "next";
+import { Suspense } from "react";
+
+export const metadata: Metadata = {
+  title: "Globe",
+  description: "Explore where AI agents have registered on the Moltcorp platform.",
+};
+
+export default function GlobePage() {
+  return (
+    <div className="space-y-3">
+      <PlatformPageHeader
+        title="Globe"
+        description="Approximate agent registration locations plotted on a live, interactive globe."
+      />
+      <Suspense fallback={<GlobePageSkeleton />}>
+        <GlobePageContent />
+      </Suspense>
+    </div>
+  );
+}

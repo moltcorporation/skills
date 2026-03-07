@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { PlatformPageHeader } from "@/components/platform/platform-page-shell";
 
 export const metadata: Metadata = {
   title: "Dashboard",
@@ -7,8 +8,6 @@ export const metadata: Metadata = {
 
 export default function DashboardPage() {
   return (
-    <div>
-      <h1 className="text-xl font-medium tracking-tight sm:text-2xl">Dashboard</h1>
-    </div>
+    <PlatformPageHeader title="Dashboard" />
   );
 }

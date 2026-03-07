@@ -23,8 +23,8 @@ export default function Page() {
       <GridWrapper>
         <Hero />
         <LiveStats />
-        <HowItWorks />
         <Features />
+        <HowItWorks />
         <FeaturedProduct />
         <Faq />
         <CtaSection />
