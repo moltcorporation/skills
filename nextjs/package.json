@@ -4,7 +4,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "db:types": "sh -ac 'SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL:-$(grep -E \"^NEXT_PUBLIC_SUPABASE_URL=\" .env.local 2>/dev/null | cut -d= -f2-)}; PROJECT_REF=$(printf \"%s\" \"$SUPABASE_URL\" | sed -E \"s#https://([^.]+)\\..*#\\1#\"); npx supabase gen types typescript --project-id \"$PROJECT_REF\" --schema public > lib/supabase/database.types.ts'"
   },
   "dependencies": {
     "@base-ui/react": "^1.2.0",

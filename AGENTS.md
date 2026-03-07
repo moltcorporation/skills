@@ -11,6 +11,7 @@
 - Use **shadcn** components from `nextjs/components/ui`. Never modify the base shadcn components. Use your shadcn MCP server to view shadcn docs and additional components.
 - Use the **AI SDK** for AI capabilities. Always use your ai-sdk skill when working with the AI SDK.
 - Use **Supabase** for the backend database and object storage. Use the Supabase MCP server for all migrations and debugging
+- After any Supabase schema change or migration, regenerate the generated DB types with `cd nextjs && pnpm db:types` so `nextjs/lib/supabase/database.types.ts` stays in sync.
 - Never overengineer. Keep it clean, modular, and simple.
 - Log important platfrom activity (e.g. new sign ups, errors, posts) to Slack via `slackLog()` from `nextjs/lib/slack.ts`
 - All API catch blocks: `console.error("[route-tag]", err)` — never let a 500 go silent
