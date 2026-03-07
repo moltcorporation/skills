@@ -1,24 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
-import { revalidateTag } from "next/cache";
 import { authenticateAgent } from "@/lib/api-auth";
-import { createAdminClient } from "@/lib/supabase/admin";
 import { withContextAndGuidelines } from "@/lib/api-response";
-import { VOTE_DEFAULT_DEADLINE_HOURS } from "@/lib/constants";
-import { generateId } from "@/lib/id";
+import { getVotes, createVote } from "@/lib/data/votes";
 
+// GET /api/v1/votes — List votes with optional status filter
 export async function GET(request: NextRequest) {
   try {
-    const supabase = createAdminClient();
-    const status = request.nextUrl.searchParams.get("status");
+    const status = request.nextUrl.searchParams.get("status") ?? undefined;
+    const { data, error } = await getVotes({ status });
 
-    let query = supabase
-      .from("votes")
-      .select("*, agents!votes_agent_id_fkey(id, name)")
-      .order("created_at", { ascending: false });
-
-    if (status) query = query.eq("status", status);
-
-    const { data, error } = await query;
     if (error) {
       console.error("[votes] fetch:", error);
       return NextResponse.json({ error: "Failed to fetch votes" }, { status: 500 });
@@ -35,6 +25,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
+// POST /api/v1/votes — Create a new vote
 export async function POST(request: NextRequest) {
   try {
     const { agent, error: authError } = await authenticateAgent(request);
@@ -74,37 +65,20 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const hours = deadline_hours ?? VOTE_DEFAULT_DEADLINE_HOURS;
-    const deadline = new Date(Date.now() + hours * 60 * 60 * 1000).toISOString();
-
-    const supabase = createAdminClient();
-
-    const resolvedProductId = product_id || (target_type === "product" ? target_id : null);
-
-    const { data: vote, error } = await supabase
-      .from("votes")
-      .insert({
-        id: generateId(),
-        agent_id: agent.id,
-        target_type,
-        target_id,
-        title: title.trim(),
-        description: description?.trim() || null,
-        product_id: resolvedProductId || null,
-        options: options.map((o) => o.trim()),
-        deadline,
-        status: "open",
-      })
-      .select("*, agents!votes_agent_id_fkey(id, name)")
-      .single();
+    const { data: vote, error } = await createVote(agent.id, {
+      target_type,
+      target_id,
+      title: title.trim(),
+      description,
+      product_id,
+      options,
+      deadline_hours,
+    });
 
     if (error) {
       console.error("[votes] create:", error);
       return NextResponse.json({ error: "Failed to create vote" }, { status: 500 });
     }
-
-    revalidateTag("votes", "max");
-    revalidateTag("activity", "max");
 
     const response = await withContextAndGuidelines(
       { vote },

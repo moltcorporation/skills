@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { authenticateAgent } from "@/lib/api-auth";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { createStripePaymentLink } from "@/lib/stripe-payments";
+import { getPaymentLinks, createPaymentLink } from "@/lib/data/payments";
 import { slackLog } from "@/lib/slack";
-import { generateId } from "@/lib/id";
 
+// GET /api/v1/payments/links — List active payment links for a product
 export async function GET(request: NextRequest) {
   const productId = request.nextUrl.searchParams.get("product_id");
 
@@ -16,19 +16,19 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const supabase = createAdminClient();
-    const { data, error } = await supabase
-      .from("stripe_payment_links")
-      .select("*")
-      .eq("product_id", productId)
-      .eq("is_active", true)
-      .order("created_at", { ascending: false });
+    const { data, error } = await getPaymentLinks(productId);
 
-    if (error) throw error;
+    if (error) {
+      console.error("[payments.links] fetch:", error);
+      return NextResponse.json(
+        { error: "Failed to fetch payment links" },
+        { status: 500 },
+      );
+    }
 
     return NextResponse.json({ payment_links: data });
   } catch (err) {
-    console.error("[payments-links-list]", err);
+    console.error("[payments.links]", err);
     return NextResponse.json(
       { error: "Failed to fetch payment links" },
       { status: 500 },
@@ -36,6 +36,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
+// POST /api/v1/payments/links — Create a Stripe payment link (auth required)
 export async function POST(request: NextRequest) {
   try {
     const { agent, error: authError } = await authenticateAgent(request);
@@ -103,37 +104,24 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const stripeResult = await createStripePaymentLink({
-      productId: product_id,
+    const { data: link, error } = await createPaymentLink(agent.id, {
+      product_id,
       name,
       amount,
       currency,
-      billingType: billing_type,
-      recurringInterval: recurring_interval,
-      afterCompletionUrl: after_completion_url,
-      allowPromotionCodes: allow_promotion_codes,
+      billing_type,
+      recurring_interval,
+      after_completion_url,
+      allow_promotion_codes,
     });
 
-    const { data: link, error: insertError } = await supabase
-      .from("stripe_payment_links")
-      .insert({
-        id: generateId(),
-        product_id,
-        created_by: agent.id,
-        stripe_product_id: stripeResult.stripeProductId,
-        stripe_price_id: stripeResult.stripePriceId,
-        stripe_payment_link_id: stripeResult.stripePaymentLinkId,
-        url: stripeResult.url,
-        name,
-        amount,
-        currency,
-        billing_type,
-        recurring_interval: recurring_interval ?? null,
-      })
-      .select()
-      .single();
-
-    if (insertError) throw insertError;
+    if (error) {
+      console.error("[payments.links] create:", error);
+      return NextResponse.json(
+        { error: "Failed to create payment link" },
+        { status: 500 },
+      );
+    }
 
     await slackLog(
       `💳 Payment link created for *${product.name}*: ${name} ($${(amount / 100).toFixed(2)} ${currency}) by agent ${agent.name}`,
@@ -141,7 +129,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(link, { status: 201 });
   } catch (err) {
-    console.error("[payments-links-create]", err);
+    console.error("[payments.links]", err);
     return NextResponse.json(
       { error: "Failed to create payment link" },
       { status: 500 },

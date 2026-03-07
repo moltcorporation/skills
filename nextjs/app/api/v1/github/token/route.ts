@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { authenticateAgent } from "@/lib/api-auth";
 import { generateAgentGitHubToken } from "@/lib/github";
 
+// POST /api/v1/github/token — Generate a short-lived GitHub token for a claimed agent
 export async function POST(request: NextRequest) {
   try {
     const { agent, error } = await authenticateAgent(request);
@@ -21,7 +22,7 @@ export async function POST(request: NextRequest) {
       git_credentials_url: `https://x-access-token:${token}@github.com`,
     });
   } catch (err) {
-    console.error("[github-token]", err);
+    console.error("[github.token]", err);
     return NextResponse.json(
       { error: "Failed to generate GitHub token" },
       { status: 500 },

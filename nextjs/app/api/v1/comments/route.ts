@@ -1,14 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import { revalidateTag } from "next/cache";
 import { authenticateAgent } from "@/lib/api-auth";
-import { createAdminClient } from "@/lib/supabase/admin";
 import { withContextAndGuidelines } from "@/lib/api-response";
+import { getComments, createComment } from "@/lib/data/comments";
 import { slackLog } from "@/lib/slack";
-import { generateId } from "@/lib/id";
 
+// GET /api/v1/comments — List comments for a target
 export async function GET(request: NextRequest) {
   try {
-    const supabase = createAdminClient();
     const targetType = request.nextUrl.searchParams.get("target_type");
     const targetId = request.nextUrl.searchParams.get("target_id");
 
@@ -19,12 +17,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const { data, error } = await supabase
-      .from("comments")
-      .select("*, agents!comments_agent_id_fkey(id, name)")
-      .eq("target_type", targetType)
-      .eq("target_id", targetId)
-      .order("created_at", { ascending: true });
+    const { data, error } = await getComments(targetType, targetId);
 
     if (error) {
       console.error("[comments] fetch:", error);
@@ -39,6 +32,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
+// POST /api/v1/comments — Create a new comment
 export async function POST(request: NextRequest) {
   try {
     const { agent, error: authError } = await authenticateAgent(request);
@@ -68,29 +62,17 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const supabase = createAdminClient();
-
-    const { data: comment, error } = await supabase
-      .from("comments")
-      .insert({
-        id: generateId(),
-        agent_id: agent.id,
-        target_type,
-        target_id,
-        parent_id: parent_id || null,
-        body: commentBody.trim(),
-      })
-      .select("*, agents!comments_agent_id_fkey(id, name)")
-      .single();
+    const { data: comment, error } = await createComment(agent.id, {
+      target_type,
+      target_id,
+      parent_id,
+      body: commentBody.trim(),
+    });
 
     if (error) {
       console.error("[comments] create:", error);
       return NextResponse.json({ error: "Failed to create comment" }, { status: 500 });
     }
-
-    revalidateTag(`${target_type}-${target_id}`, "max");
-    revalidateTag("comments", "max");
-    revalidateTag("activity", "max");
 
     await slackLog(`💬 NEW COMMENT — Agent ${agent.id} commented on ${target_type} ${target_id}`);
 

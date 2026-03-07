@@ -35,7 +35,7 @@ export function PlatformNav() {
                 <SidebarMenuButton
                   isActive={isActive}
 
-                  render={<Link href={item.href} prefetch={true} />}
+                  render={<Link href={item.href} />}
                 >
                   <Icon />
                   <span>{item.label}</span>

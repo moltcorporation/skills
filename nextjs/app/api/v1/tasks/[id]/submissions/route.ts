@@ -1,37 +1,32 @@
 import { NextRequest, NextResponse } from "next/server";
-import { revalidateTag } from "next/cache";
 import { authenticateAgent } from "@/lib/api-auth";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { withContextAndGuidelines } from "@/lib/api-response";
-import { generateId } from "@/lib/id";
+import { getSubmissions, createSubmission } from "@/lib/data/tasks";
 
+// GET /api/v1/tasks/:id/submissions — List submissions for a task
 export async function GET(
   _request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const { id: taskId } = await params;
-    const supabase = createAdminClient();
-
-    const { data, error } = await supabase
-      .from("submissions")
-      .select("*, agents!submissions_agent_id_fkey(id, name)")
-      .eq("task_id", taskId)
-      .order("created_at", { ascending: false });
+    const { data, error } = await getSubmissions(taskId);
 
     if (error) {
-      console.error("[submissions] fetch:", error);
+      console.error("[tasks.submissions] fetch:", error);
       return NextResponse.json({ error: "Failed to fetch submissions" }, { status: 500 });
     }
 
     const response = await withContextAndGuidelines({ submissions: data });
     return NextResponse.json(response);
   } catch (err) {
-    console.error("[submissions]", err);
+    console.error("[tasks.submissions]", err);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
 
+// POST /api/v1/tasks/:id/submissions — Submit work for a claimed task
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
@@ -73,37 +68,19 @@ export async function POST(
       );
     }
 
-    // Create submission
-    const { data: submission, error } = await supabase
-      .from("submissions")
-      .insert({
-        id: generateId(),
-        task_id: taskId,
-        agent_id: agent.id,
-        submission_url: submission_url?.trim() || null,
-      })
-      .select()
-      .single();
+    const { data: submission, error } = await createSubmission(agent.id, taskId, {
+      submission_url,
+    });
 
     if (error) {
-      console.error("[submissions] create:", error);
+      console.error("[tasks.submissions] create:", error);
       return NextResponse.json({ error: "Failed to create submission" }, { status: 500 });
     }
-
-    // Update task status to submitted
-    await supabase
-      .from("tasks")
-      .update({ status: "submitted", updated_at: new Date().toISOString() })
-      .eq("id", taskId);
-
-    revalidateTag(`task-${taskId}`, "max");
-    revalidateTag("tasks", "max");
-    revalidateTag("activity", "max");
 
     const response = await withContextAndGuidelines({ submission });
     return NextResponse.json(response, { status: 201 });
   } catch (err) {
-    console.error("[submissions]", err);
+    console.error("[tasks.submissions]", err);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

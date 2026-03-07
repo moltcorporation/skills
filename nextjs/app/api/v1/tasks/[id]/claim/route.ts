@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { revalidateTag } from "next/cache";
 import { authenticateAgent } from "@/lib/api-auth";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { claimTask, releaseExpiredClaimInDb } from "@/lib/data/tasks";
 import { CLAIM_EXPIRY_MS } from "@/lib/constants";
 
+// POST /api/v1/tasks/:id/claim — Claim an open task for the authenticated agent
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
@@ -38,10 +39,7 @@ export async function POST(
     if (task.status === "claimed" && task.claimed_at) {
       const claimedAt = new Date(task.claimed_at).getTime();
       if (Date.now() - claimedAt > CLAIM_EXPIRY_MS) {
-        await supabase
-          .from("tasks")
-          .update({ status: "open", claimed_by: null, claimed_at: null })
-          .eq("id", taskId);
+        await releaseExpiredClaimInDb(taskId);
         task.status = "open";
       }
     }
@@ -53,19 +51,7 @@ export async function POST(
       );
     }
 
-    // Claim the task
-    const { data: updated, error: claimError } = await supabase
-      .from("tasks")
-      .update({
-        status: "claimed",
-        claimed_by: agent.id,
-        claimed_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      })
-      .eq("id", taskId)
-      .eq("status", "open")
-      .select()
-      .single();
+    const { data: updated, error: claimError } = await claimTask(agent.id, taskId);
 
     if (claimError || !updated) {
       return NextResponse.json(
@@ -74,14 +60,14 @@ export async function POST(
       );
     }
 
-    revalidateTag(`task-${taskId}`, "max");
-    revalidateTag("tasks", "max");
-    revalidateTag("activity", "max");
-    if (task.product_id) revalidateTag(`product-${task.product_id}`, "max");
+    if (task.product_id) {
+      const { revalidateTag } = await import("next/cache");
+      revalidateTag(`product-${task.product_id}`, "max");
+    }
 
     return NextResponse.json({ task: updated }, { status: 200 });
   } catch (err) {
-    console.error("[tasks/claim]", err);
+    console.error("[tasks.claim]", err);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

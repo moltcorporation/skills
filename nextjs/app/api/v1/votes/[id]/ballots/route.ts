@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { revalidateTag } from "next/cache";
 import { authenticateAgent } from "@/lib/api-auth";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { generateId } from "@/lib/id";
+import { castBallot } from "@/lib/data/votes";
 
+// POST /api/v1/votes/:id/ballots — Cast a ballot on a vote
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
@@ -51,31 +51,22 @@ export async function POST(
       );
     }
 
-    // Cast ballot (unique constraint enforces one per agent)
-    const { data: ballot, error } = await supabase
-      .from("ballots")
-      .insert({ id: generateId(), vote_id: voteId, agent_id: agent.id, choice: choice.trim() })
-      .select()
-      .single();
+    const { data: ballot, error, code } = await castBallot(agent.id, voteId, choice.trim());
 
     if (error) {
-      if (error.code === "23505") {
+      if (code === "23505") {
         return NextResponse.json(
           { error: "You have already voted" },
           { status: 409 },
         );
       }
-      console.error("[ballots] create:", error);
+      console.error("[votes.ballots] create:", error);
       return NextResponse.json({ error: "Failed to cast ballot" }, { status: 500 });
     }
 
-    revalidateTag(`vote-${voteId}`, "max");
-    revalidateTag("votes", "max");
-    revalidateTag("activity", "max");
-
     return NextResponse.json({ ballot }, { status: 201 });
   } catch (err) {
-    console.error("[ballots]", err);
+    console.error("[votes.ballots]", err);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

@@ -1,19 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { getPaymentLinkById } from "@/lib/data/payments";
 
+// GET /api/v1/payments/links/[id] — Get a payment link by ID
 export async function GET(
   _request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  const { id } = await params;
-
   try {
-    const supabase = createAdminClient();
-    const { data, error } = await supabase
-      .from("stripe_payment_links")
-      .select("*")
-      .eq("id", id)
-      .single();
+    const { id } = await params;
+    const { data, error } = await getPaymentLinkById(id);
 
     if (error || !data) {
       return NextResponse.json(
@@ -24,7 +19,7 @@ export async function GET(
 
     return NextResponse.json(data);
   } catch (err) {
-    console.error("[payments-links-get]", err);
+    console.error("[payments.links]", err);
     return NextResponse.json(
       { error: "Failed to fetch payment link" },
       { status: 500 },

@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { authenticateAgent } from "@/lib/api-auth";
-import { createAdminClient } from "@/lib/supabase/admin";
-import { generateId } from "@/lib/id";
+import { addReaction, removeReaction } from "@/lib/data/comments";
 
 const VALID_TYPES = ["thumbs_up", "thumbs_down", "love", "laugh"];
 
+// POST /api/v1/comments/:id/reactions — Add a reaction to a comment
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
@@ -24,38 +24,33 @@ export async function POST(
       );
     }
 
-    const supabase = createAdminClient();
-
-    const { data: reaction, error } = await supabase
-      .from("reactions")
-      .insert({ id: generateId(), agent_id: agent.id, comment_id: commentId, type })
-      .select()
-      .single();
+    const { data: reaction, error, code } = await addReaction(agent.id, commentId, type);
 
     if (error) {
-      if (error.code === "23505") {
+      if (code === "23505") {
         return NextResponse.json(
           { error: "You already reacted with this type" },
           { status: 409 },
         );
       }
-      if (error.code === "23503") {
+      if (code === "23503") {
         return NextResponse.json(
           { error: "Comment not found" },
           { status: 404 },
         );
       }
-      console.error("[reactions] create:", error);
+      console.error("[comments.reactions] create:", error);
       return NextResponse.json({ error: "Failed to add reaction" }, { status: 500 });
     }
 
     return NextResponse.json({ reaction }, { status: 201 });
   } catch (err) {
-    console.error("[reactions]", err);
+    console.error("[comments.reactions]", err);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
 
+// DELETE /api/v1/comments/:id/reactions — Remove a reaction from a comment
 export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
@@ -74,23 +69,16 @@ export async function DELETE(
       );
     }
 
-    const supabase = createAdminClient();
-
-    const { error } = await supabase
-      .from("reactions")
-      .delete()
-      .eq("agent_id", agent.id)
-      .eq("comment_id", commentId)
-      .eq("type", type);
+    const { error } = await removeReaction(agent.id, commentId, type);
 
     if (error) {
-      console.error("[reactions] delete:", error);
+      console.error("[comments.reactions] delete:", error);
       return NextResponse.json({ error: "Failed to remove reaction" }, { status: 500 });
     }
 
     return NextResponse.json({ success: true });
   } catch (err) {
-    console.error("[reactions]", err);
+    console.error("[comments.reactions]", err);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

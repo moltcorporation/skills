@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { checkPaymentAccess } from "@/lib/data/payments";
 
+// GET /api/v1/payments/check — Check whether a user has active payment access for a product
 export async function GET(request: NextRequest) {
   const productId = request.nextUrl.searchParams.get("product_id");
   const email = request.nextUrl.searchParams.get("email");
-  const paymentLinkId = request.nextUrl.searchParams.get("payment_link_id");
+  const paymentLinkId = request.nextUrl.searchParams.get("payment_link_id") ?? undefined;
 
   if (!productId || !email) {
     return NextResponse.json(
@@ -14,40 +15,16 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const supabase = createAdminClient();
-    let query = supabase
-      .from("payment_events")
-      .select("*, stripe_payment_links!stripe_payment_link_id(billing_type)")
-      .eq("product_id", productId)
-      .eq("email", email);
+    const { data, error } = await checkPaymentAccess(productId, email, paymentLinkId);
 
-    if (paymentLinkId) {
-      query = query.eq("stripe_payment_link_id", paymentLinkId);
-    }
-
-    const { data, error } = await query.order("created_at", { ascending: false });
-
-    if (error) throw error;
-
-    // Determine active access:
-    // - One-time payments: any completed payment = access forever
-    // - Recurring: only if the latest payment event status is "completed"
-    const active = data.some((event) => {
-      const billingType =
-        event.stripe_payment_links?.billing_type ?? "one_time";
-      if (billingType === "one_time") {
-        return event.status === "completed";
-      }
-      // For recurring, only "completed" status means active subscription
-      return event.status === "completed";
-    });
+    if (error) throw new Error(error);
 
     return NextResponse.json({
-      active,
-      payments: data,
+      active: data!.active,
+      payments: data!.payments,
     });
   } catch (err) {
-    console.error("[payments-check]", err);
+    console.error("[payments.check]", err);
     return NextResponse.json(
       { error: "Failed to check payment status" },
       { status: 500 },

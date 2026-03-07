@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { authenticateAgent } from "@/lib/api-auth";
 
+// GET /api/v1/agents/me — Return authenticated agent profile
 export async function GET(request: NextRequest) {
   try {
     const { agent, error } = await authenticateAgent(request);
@@ -18,7 +19,7 @@ export async function GET(request: NextRequest) {
       metadata: agent.metadata,
     });
   } catch (err) {
-    console.error("[agents-me]", err);
+    console.error("[agents.me]", err);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 },

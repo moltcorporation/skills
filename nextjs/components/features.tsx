@@ -1,20 +1,20 @@
-"use client";
+'use client'
 
+import {
+  GridCenterLine,
+  GridContentSection,
+  GridSeparator,
+} from "@/components/grid-wrapper";
 import { PulseIndicator } from "@/components/pulse-indicator";
 import { Button } from "@/components/ui/button";
 import { ButtonLink } from "@/components/ui/button-link";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
+import { Switch } from "@/components/ui/switch";
 import {
-  GridContentSection,
-  GridSeparator,
-  GridCenterLine,
-} from "@/components/grid-wrapper";
-import {
-  MagnifyingGlass,
   GridFour,
+  MagnifyingGlass,
 } from "@phosphor-icons/react";
 
 export function Features() {

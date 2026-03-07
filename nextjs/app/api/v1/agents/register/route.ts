@@ -7,6 +7,7 @@ import { buildAgentUsernameCandidate } from "@/lib/agent-username";
 import { AGENT_CLAIM_TOKEN_EXPIRY_MS } from "@/lib/constants";
 import { generateId } from "@/lib/id";
 
+// POST /api/v1/agents/register — Register a new agent
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json().catch(() => ({}));
@@ -105,7 +106,7 @@ export async function POST(request: NextRequest) {
       { status: 201 },
     );
   } catch (err) {
-    console.error("[agents-register]", err);
+    console.error("[agents.register]", err);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 },

@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
+// POST /api/waitlist — Submit email to waitlist
 export async function POST(request: Request) {
   try {
     const { email } = await request.json();

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 
+// POST /api/v1/agents/claim — Claim an agent with a claim token
 export async function POST(request: NextRequest) {
   try {
     const supabase = await createClient();
@@ -64,7 +65,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ agent: claimed });
   } catch (err) {
-    console.error("[agents-claim]", err);
+    console.error("[agents.claim]", err);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 },

@@ -5,6 +5,7 @@ import { slackLog } from "@/lib/slack";
 import Stripe from "stripe";
 import { generateId } from "@/lib/id";
 
+// POST /api/stripe/webhooks — Handle Stripe webhook events
 export async function POST(request: NextRequest) {
   const body = await request.text();
   const signature = request.headers.get("stripe-signature");
@@ -25,7 +26,7 @@ export async function POST(request: NextRequest) {
       process.env.STRIPE_WEBHOOK_SECRET!,
     );
   } catch (err) {
-    console.error("[stripe-webhook] signature verification:", err);
+    console.error("[stripe.webhooks] signature verification:", err);
     return NextResponse.json(
       { error: "Invalid signature" },
       { status: 400 },
@@ -65,7 +66,7 @@ export async function POST(request: NextRequest) {
           });
 
         if (insertError && !insertError.message.includes("duplicate")) {
-          console.error("[stripe-webhook] payment insert:", insertError);
+          console.error("[stripe.webhooks] payment insert:", insertError);
         }
 
         const { data: product } = await admin
@@ -78,7 +79,7 @@ export async function POST(request: NextRequest) {
           `💰 Payment received: $${((session.amount_total ?? 0) / 100).toFixed(2)} ${session.currency} for *${product?.name ?? productId}* from ${session.customer_details?.email ?? "unknown"}`,
         );
       } catch (err) {
-        console.error("[stripe-webhook] checkout.session.completed:", err);
+        console.error("[stripe.webhooks] checkout.session.completed:", err);
       }
     }
   } else if (
@@ -114,7 +115,7 @@ export async function POST(request: NextRequest) {
           .eq("stripe_subscription_id", subscription.id);
 
         if (updateError) {
-          console.error("[stripe-webhook] subscription update:", updateError);
+          console.error("[stripe.webhooks] subscription update:", updateError);
         }
 
         const { data: product } = await admin
@@ -129,7 +130,7 @@ export async function POST(request: NextRequest) {
           );
         }
       } catch (err) {
-        console.error("[stripe-webhook] subscription lifecycle:", err);
+        console.error("[stripe.webhooks] subscription lifecycle:", err);
       }
     }
   }

@@ -1,27 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
-import { revalidateTag } from "next/cache";
 import { authenticateAgent } from "@/lib/api-auth";
-import { createAdminClient } from "@/lib/supabase/admin";
 import { withContextAndGuidelines } from "@/lib/api-response";
-import { generateId } from "@/lib/id";
+import { getPosts, createPost } from "@/lib/data/posts";
 
+// GET /api/v1/posts — List posts with optional filters
 export async function GET(request: NextRequest) {
   try {
-    const supabase = createAdminClient();
-    const targetType = request.nextUrl.searchParams.get("target_type");
-    const targetId = request.nextUrl.searchParams.get("target_id");
-    const type = request.nextUrl.searchParams.get("type");
+    const targetType = request.nextUrl.searchParams.get("target_type") ?? undefined;
+    const targetId = request.nextUrl.searchParams.get("target_id") ?? undefined;
+    const type = request.nextUrl.searchParams.get("type") ?? undefined;
 
-    let query = supabase
-      .from("posts")
-      .select("*, agents!posts_agent_id_fkey(id, name)")
-      .order("created_at", { ascending: false });
+    const { data, error } = await getPosts({ target_type: targetType, target_id: targetId, type });
 
-    if (targetType) query = query.eq("target_type", targetType);
-    if (targetId) query = query.eq("target_id", targetId);
-    if (type) query = query.eq("type", type);
-
-    const { data, error } = await query;
     if (error) {
       console.error("[posts] fetch:", error);
       return NextResponse.json({ error: "Failed to fetch posts" }, { status: 500 });
@@ -35,6 +25,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
+// POST /api/v1/posts — Create a new post
 export async function POST(request: NextRequest) {
   try {
     const { agent, error: authError } = await authenticateAgent(request);
@@ -70,30 +61,18 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const supabase = createAdminClient();
-
-    const { data: post, error } = await supabase
-      .from("posts")
-      .insert({
-        id: generateId(),
-        agent_id: agent.id,
-        target_type,
-        target_id,
-        type: type || "general",
-        title: title.trim(),
-        body: postBody.trim(),
-      })
-      .select("*, agents!posts_agent_id_fkey(id, name)")
-      .single();
+    const { data: post, error } = await createPost(agent.id, {
+      target_type,
+      target_id,
+      type,
+      title: title.trim(),
+      body: postBody.trim(),
+    });
 
     if (error) {
       console.error("[posts] create:", error);
       return NextResponse.json({ error: "Failed to create post" }, { status: 500 });
     }
-
-    revalidateTag("posts", "max");
-    revalidateTag("activity", "max");
-    if (target_type === "product") revalidateTag(`product-${target_id}`, "max");
 
     const response = await withContextAndGuidelines({ post });
     return NextResponse.json(response, { status: 201 });

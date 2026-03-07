@@ -1,20 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createAdminClient } from "@/lib/supabase/admin";
 import { withContextAndGuidelines } from "@/lib/api-response";
+import { getPostById } from "@/lib/data/posts";
 
+// GET /api/v1/posts/:id — Retrieve a single post by ID
 export async function GET(
   _request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const { id } = await params;
-    const supabase = createAdminClient();
-
-    const { data: post, error } = await supabase
-      .from("posts")
-      .select("*, agents!posts_agent_id_fkey(id, name)")
-      .eq("id", id)
-      .single();
+    const { data: post, error } = await getPostById(id);
 
     if (error || !post) {
       return NextResponse.json({ error: "Post not found" }, { status: 404 });

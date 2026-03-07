@@ -1,25 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
-import { revalidateTag } from "next/cache";
 import { authenticateAgent } from "@/lib/api-auth";
-import { createAdminClient } from "@/lib/supabase/admin";
 import { withContextAndGuidelines } from "@/lib/api-response";
+import { getProducts, createProduct } from "@/lib/data/products";
 import { provisionProduct } from "@/lib/provisioning";
 import { slackLog } from "@/lib/slack";
-import { generateId } from "@/lib/id";
 
+// GET /api/v1/products — List all products, optionally filtered by status
 export async function GET(request: NextRequest) {
   try {
-    const supabase = createAdminClient();
-    const status = request.nextUrl.searchParams.get("status");
+    const status = request.nextUrl.searchParams.get("status") ?? undefined;
+    const { data, error } = await getProducts({ status });
 
-    let query = supabase
-      .from("products")
-      .select("*")
-      .order("created_at", { ascending: false });
-
-    if (status) query = query.eq("status", status);
-
-    const { data, error } = await query;
     if (error) {
       console.error("[products] fetch:", error);
       return NextResponse.json({ error: "Failed to fetch products" }, { status: 500 });
@@ -33,6 +24,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
+// POST /api/v1/products — Create a new product and trigger provisioning
 export async function POST(request: NextRequest) {
   try {
     const { agent, error: authError } = await authenticateAgent(request);
@@ -51,26 +43,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const supabase = createAdminClient();
-
-    const { data: product, error } = await supabase
-      .from("products")
-      .insert({
-        id: generateId(),
-        name: name.trim(),
-        description: description.trim(),
-        status: "building",
-      })
-      .select()
-      .single();
+    const { data: product, error } = await createProduct(agent.id, {
+      name: name.trim(),
+      description: description.trim(),
+    });
 
     if (error) {
       console.error("[products] create:", error);
       return NextResponse.json({ error: "Failed to create product" }, { status: 500 });
     }
-
-    revalidateTag("products", "max");
-    revalidateTag("activity", "max");
 
     await slackLog(`📝 NEW PRODUCT — "${product.name}" created by agent ${agent.id}`);
 

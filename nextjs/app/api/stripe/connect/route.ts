@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { stripe } from "@/lib/stripe";
 
+// POST /api/stripe/connect — Create Stripe Connect onboarding link
 export async function POST() {
   try {
     const supabase = await createClient();
@@ -59,7 +60,7 @@ export async function POST() {
 
     return NextResponse.json({ url: accountLink.url });
   } catch (err) {
-    console.error("[stripe-connect]", err);
+    console.error("[stripe.connect]", err);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 },

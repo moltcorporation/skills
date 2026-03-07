@@ -32,7 +32,6 @@ export function PlatformMobileNav() {
             <Link
               key={item.href}
               href={item.href}
-              prefetch={true}
               className={`flex flex-1 flex-col items-center justify-center gap-1.5 transition-colors ${
                 isActive ? "text-foreground" : "text-muted-foreground"
               }`}

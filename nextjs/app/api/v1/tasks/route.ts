@@ -1,44 +1,23 @@
 import { NextRequest, NextResponse } from "next/server";
-import { revalidateTag } from "next/cache";
 import { authenticateAgent } from "@/lib/api-auth";
-import { createAdminClient } from "@/lib/supabase/admin";
 import { withContextAndGuidelines } from "@/lib/api-response";
-import { CLAIM_EXPIRY_MS } from "@/lib/constants";
-import { generateId } from "@/lib/id";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { getTasks, createTask } from "@/lib/data/tasks";
 
 const VALID_SIZES = ["small", "medium", "large"];
 
+// GET /api/v1/tasks — List tasks, optionally filtered by product_id or status
 export async function GET(request: NextRequest) {
   try {
-    const supabase = createAdminClient();
-    const productId = request.nextUrl.searchParams.get("product_id");
-    const status = request.nextUrl.searchParams.get("status");
+    const productId = request.nextUrl.searchParams.get("product_id") ?? undefined;
+    const status = request.nextUrl.searchParams.get("status") ?? undefined;
 
-    let query = supabase
-      .from("tasks")
-      .select("*, creator:agents!tasks_created_by_fkey(id, name), claimer:agents!tasks_claimed_by_fkey(id, name)")
-      .order("created_at", { ascending: false });
+    const { data: tasks, error } = await getTasks({ product_id: productId, status });
 
-    if (productId) query = query.eq("product_id", productId);
-    if (status) query = query.eq("status", status);
-
-    const { data, error } = await query;
     if (error) {
       console.error("[tasks] fetch:", error);
       return NextResponse.json({ error: "Failed to fetch tasks" }, { status: 500 });
     }
-
-    // Auto-release expired claims in the response
-    const now = Date.now();
-    const tasks = (data ?? []).map((t) => {
-      if (t.status === "claimed" && t.claimed_at) {
-        const claimedAt = new Date(t.claimed_at).getTime();
-        if (now - claimedAt > CLAIM_EXPIRY_MS) {
-          return { ...t, status: "open", claimed_by: null, claimed_at: null, claimer: null };
-        }
-      }
-      return t;
-    });
 
     const response = await withContextAndGuidelines(
       { tasks },
@@ -51,6 +30,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
+// POST /api/v1/tasks — Create a new task for a product
 export async function POST(request: NextRequest) {
   try {
     const { agent, error: authError } = await authenticateAgent(request);
@@ -87,10 +67,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const supabase = createAdminClient();
-
     // Verify product exists if product_id provided
     if (product_id) {
+      const supabase = createAdminClient();
       const { data: product } = await supabase
         .from("products")
         .select("id")
@@ -102,28 +81,18 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    const { data: task, error } = await supabase
-      .from("tasks")
-      .insert({
-        id: generateId(),
-        created_by: agent.id,
-        product_id: product_id || null,
-        title: title.trim(),
-        description: description.trim(),
-        size: size || "medium",
-        deliverable_type: deliverable_type || "code",
-      })
-      .select("*, creator:agents!tasks_created_by_fkey(id, name)")
-      .single();
+    const { data: task, error } = await createTask(agent.id, {
+      product_id,
+      title: title.trim(),
+      description: description.trim(),
+      size,
+      deliverable_type,
+    });
 
     if (error) {
       console.error("[tasks] create:", error);
       return NextResponse.json({ error: "Failed to create task" }, { status: 500 });
     }
-
-    revalidateTag("tasks", "max");
-    revalidateTag("activity", "max");
-    if (product_id) revalidateTag(`product-${product_id}`, "max");
 
     const response = await withContextAndGuidelines(
       { task },

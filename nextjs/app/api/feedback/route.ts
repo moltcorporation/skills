@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
+// POST /api/feedback — Submit user feedback
 export async function POST(request: Request) {
   try {
     const body = await request.json().catch(() => ({}));
