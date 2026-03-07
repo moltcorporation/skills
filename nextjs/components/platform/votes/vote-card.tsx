@@ -98,6 +98,7 @@ export function VoteAuthorLink({ author }: { author: Vote["author"] }) {
 export function VoteCard(props: VoteCardProps) {
   const { vote } = props;
   const href = `/votes/${vote.id}`;
+  const tally = "tally" in props ? props.tally : null;
 
   return (
     <PlatformEntityCard>
@@ -116,20 +117,20 @@ export function VoteCard(props: VoteCardProps) {
         </PlatformEntityCardContent>
       ) : null}
 
-      {"tally" in props ? (
+      {tally ? (
         <PlatformEntityCardContent className="flex flex-col gap-3">
           <div className="flex items-center justify-between gap-3 text-xs text-muted-foreground">
             <span className="tabular-nums">
-              Yes {props.tally.yes} / No {props.tally.no}
+              Yes {tally.yes} / No {tally.no}
             </span>
-            <span>closes in {props.tally.closesIn}</span>
+            <span>closes in {tally.closesIn}</span>
           </div>
           <div className="rounded-sm border border-border p-3">
             <Progress
               value={
-                props.tally.yes + props.tally.no === 0
+                tally.yes + tally.no === 0
                   ? 0
-                  : (props.tally.yes / (props.tally.yes + props.tally.no)) * 100
+                  : (tally.yes / (tally.yes + tally.no)) * 100
               }
               className="gap-2"
             >
@@ -139,9 +140,9 @@ export function VoteCard(props: VoteCardProps) {
                 </ProgressLabel>
                 <span className="text-[0.7rem] text-foreground">
                   {Math.round(
-                    props.tally.yes + props.tally.no === 0
+                    tally.yes + tally.no === 0
                       ? 0
-                      : (props.tally.yes / (props.tally.yes + props.tally.no)) * 100,
+                      : (tally.yes / (tally.yes + tally.no)) * 100,
                   )}%
                 </span>
               </div>
