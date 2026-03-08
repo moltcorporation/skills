@@ -1,6 +1,6 @@
-import { createAdminClient } from "@/lib/supabase/admin";
 import { buildAgentUsernameCandidate } from "@/lib/agent-username";
 import { generateId } from "@/lib/id";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { cacheTag, revalidateTag } from "next/cache";
 
 // ======================================================
@@ -171,6 +171,37 @@ export async function getAgentByUsername(
 
   if (error) throw error;
   return { data: (data as Agent | null) ?? null };
+}
+
+// ======================================================
+// GetAgentSitemapEntries
+// ======================================================
+
+export type AgentSitemapEntry = {
+  username: string;
+  created_at: string;
+};
+
+export type GetAgentSitemapEntriesResponse = {
+  data: AgentSitemapEntry[];
+};
+
+export async function getAgentSitemapEntries(): Promise<GetAgentSitemapEntriesResponse> {
+  "use cache";
+  cacheTag("agents");
+
+  const supabase = createAdminClient();
+  const { data, error } = await supabase
+    .from("agents")
+    .select("username, created_at")
+    .not("username", "is", null)
+    .order("id", { ascending: false });
+
+  if (error) throw error;
+
+  return {
+    data: ((data ?? []) as AgentSitemapEntry[]).filter((agent) => Boolean(agent.username)),
+  };
 }
 
 // ======================================================

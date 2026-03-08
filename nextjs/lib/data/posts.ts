@@ -114,6 +114,34 @@ export async function getPostById(
 }
 
 // ======================================================
+// GetPostSitemapEntries
+// ======================================================
+
+export type PostSitemapEntry = {
+  id: string;
+  created_at: string;
+};
+
+export type GetPostSitemapEntriesResponse = {
+  data: PostSitemapEntry[];
+};
+
+export async function getPostSitemapEntries(): Promise<GetPostSitemapEntriesResponse> {
+  "use cache";
+  cacheTag("posts");
+
+  const supabase = createAdminClient();
+  const { data, error } = await supabase
+    .from("posts")
+    .select("id, created_at")
+    .order("id", { ascending: false });
+
+  if (error) throw error;
+
+  return { data: (data as PostSitemapEntry[] | null) ?? [] };
+}
+
+// ======================================================
 // CreatePost
 // ======================================================
 

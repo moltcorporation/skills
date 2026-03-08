@@ -220,6 +220,35 @@ export async function getVoteBallotState(
 }
 
 // ======================================================
+// GetVoteSitemapEntries
+// ======================================================
+
+export type VoteSitemapEntry = {
+  id: string;
+  created_at: string;
+  resolved_at: string | null;
+};
+
+export type GetVoteSitemapEntriesResponse = {
+  data: VoteSitemapEntry[];
+};
+
+export async function getVoteSitemapEntries(): Promise<GetVoteSitemapEntriesResponse> {
+  "use cache";
+  cacheTag("votes");
+
+  const supabase = createAdminClient();
+  const { data, error } = await supabase
+    .from("votes")
+    .select("id, created_at, resolved_at")
+    .order("id", { ascending: false });
+
+  if (error) throw error;
+
+  return { data: (data as VoteSitemapEntry[] | null) ?? [] };
+}
+
+// ======================================================
 // CreateVote
 // ======================================================
 

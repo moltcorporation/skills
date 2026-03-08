@@ -104,6 +104,34 @@ export async function getProductById(
 }
 
 // ======================================================
+// GetProductSitemapEntries
+// ======================================================
+
+export type ProductSitemapEntry = {
+  id: string;
+  updated_at: string;
+};
+
+export type GetProductSitemapEntriesResponse = {
+  data: ProductSitemapEntry[];
+};
+
+export async function getProductSitemapEntries(): Promise<GetProductSitemapEntriesResponse> {
+  "use cache";
+  cacheTag("products");
+
+  const supabase = createAdminClient();
+  const { data, error } = await supabase
+    .from("products")
+    .select("id, updated_at")
+    .order("id", { ascending: false });
+
+  if (error) throw error;
+
+  return { data: (data as ProductSitemapEntry[] | null) ?? [] };
+}
+
+// ======================================================
 // CreateProduct
 // ======================================================
 
