@@ -1,7 +1,7 @@
-import { Timer } from "@phosphor-icons/react";
+import { Timer } from "@phosphor-icons/react/dist/ssr";
 import Link from "next/link";
 
-import { AgentAvatar } from "@/components/platform/agent-avatar";
+import { AgentAvatar } from "@/components/platform/agents/agent-avatar";
 import { CardLinkOverlay } from "@/components/platform/card-link-overlay";
 import {
   PlatformEntityCard,
@@ -15,16 +15,20 @@ import { Progress, ProgressLabel } from "@/components/ui/progress";
 import { VOTE_STATUS_CONFIG } from "@/lib/constants";
 import type { Vote, VoteStatus } from "@/lib/data/votes";
 
-type VoteTallySummary = {
-  yes: number;
-  no: number;
-  closesIn: string;
+type VoteCardSummaryOption = {
+  label: string;
+  value: number;
+};
+
+type VoteCardSummary = {
+  meta: string;
+  options: VoteCardSummaryOption[];
 };
 
 type VoteCardProps =
   | {
       vote: Vote;
-      tally?: never;
+      summary?: never;
     }
   | {
       vote: {
@@ -35,7 +39,7 @@ type VoteCardProps =
         author?: Vote["author"];
         deadline?: string;
       };
-      tally: VoteTallySummary;
+      summary: VoteCardSummary;
     };
 
 export function VoteStatusBadge({
@@ -97,18 +101,21 @@ export function VoteAuthorLink({ author }: { author: Vote["author"] }) {
 export function VoteCard(props: VoteCardProps) {
   const { vote } = props;
   const href = `/votes/${vote.id}`;
-  const tally = "tally" in props ? props.tally : null;
+  const summary = "summary" in props ? props.summary : null;
+  const totalVotes = summary
+    ? summary.options.reduce((sum, option) => sum + option.value, 0)
+    : 0;
 
   return (
     <PlatformEntityCard>
       <PlatformEntityCardHeader>
         <CardTitle className="line-clamp-2">{vote.title}</CardTitle>
 
-        {tally ? (
+        {summary ? (
           <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
             <VoteStatusBadge status={vote.status} />
             <CardDescription>
-              closes in {tally.closesIn}
+              {summary.meta}
             </CardDescription>
           </div>
         ) : null}
@@ -122,52 +129,27 @@ export function VoteCard(props: VoteCardProps) {
         </PlatformEntityCardContent>
       ) : null}
 
-      {tally ? (
+      {summary ? (
         <PlatformEntityCardContent className="flex flex-col gap-3">
           <div className="grid grid-cols-1 gap-3">
-            <Progress
-              value={
-                tally.yes + tally.no === 0
-                  ? 0
-                  : (tally.yes / (tally.yes + tally.no)) * 100
-              }
-              className="gap-2"
-            >
-              <div className="flex items-center justify-between gap-3">
-                <ProgressLabel className="text-[0.625rem] text-muted-foreground">
-                  Yes
-                </ProgressLabel>
-                <span className="text-[0.7rem] text-foreground">
-                  {Math.round(
-                    tally.yes + tally.no === 0
-                      ? 0
-                      : (tally.yes / (tally.yes + tally.no)) * 100,
-                  )}%
-                </span>
-              </div>
-            </Progress>
+            {summary.options.map((option) => {
+              const percent = totalVotes === 0
+                ? 0
+                : (option.value / totalVotes) * 100;
 
-            <Progress
-              value={
-                tally.yes + tally.no === 0
-                  ? 0
-                  : (tally.no / (tally.yes + tally.no)) * 100
-              }
-              className="gap-2"
-            >
-              <div className="flex items-center justify-between gap-3">
-                <ProgressLabel className="text-[0.625rem] text-muted-foreground">
-                  No
-                </ProgressLabel>
-                <span className="text-[0.7rem] text-foreground">
-                  {Math.round(
-                    tally.yes + tally.no === 0
-                      ? 0
-                      : (tally.no / (tally.yes + tally.no)) * 100,
-                  )}%
-                </span>
-              </div>
-            </Progress>
+              return (
+                <Progress key={option.label} value={percent} className="gap-2">
+                  <div className="flex items-center justify-between gap-3">
+                    <ProgressLabel className="text-[0.625rem] text-muted-foreground">
+                      {option.label}
+                    </ProgressLabel>
+                    <span className="text-[0.7rem] text-foreground">
+                      {Math.round(percent)}%
+                    </span>
+                  </div>
+                </Progress>
+              );
+            })}
           </div>
         </PlatformEntityCardContent>
       ) : (

@@ -1,4 +1,4 @@
-import { GlobePageContent, GlobePageSkeleton } from "@/components/platform/globe-page-content";
+import { GlobePageContent, GlobePageSkeleton } from "@/components/platform/map/globe-page-content";
 import { PlatformPageHeader } from "@/components/platform/platform-page-shell";
 import type { Metadata } from "next";
 import { Suspense } from "react";

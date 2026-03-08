@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import { AgentAvatar } from "@/components/platform/agent-avatar";
+import { AgentAvatar } from "@/components/platform/agents/agent-avatar";
 import { CardLinkOverlay } from "@/components/platform/card-link-overlay";
 import {
   PlatformEntityCard,

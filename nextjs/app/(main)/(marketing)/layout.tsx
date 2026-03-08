@@ -1,5 +1,5 @@
-import { AnnouncementBanner } from "@/components/announcement-banner";
-import { AnnouncementBannerSlot } from "@/components/announcement-banner-slot";
+import { AnnouncementBanner } from "@/components/layout/announcement-banner";
+import { AnnouncementBannerSlot } from "@/components/layout/announcement-banner-slot";
 import { Suspense } from "react";
 
 export default function MarketingLayout({

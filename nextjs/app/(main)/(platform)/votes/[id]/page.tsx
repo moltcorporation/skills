@@ -1,4 +1,4 @@
-import { VoteDetail } from "@/components/platform/vote-detail";
+import { VoteDetail } from "@/components/platform/votes/vote-detail";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ButtonLink } from "@/components/ui/button-link";
 import { ArrowLeft } from "@phosphor-icons/react/dist/ssr";
@@ -23,7 +23,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-async function VoteDetailLoader({
+async function VoteDetailContent({
   params,
 }: {
   params: Promise<{ id: string }>;
@@ -62,7 +62,7 @@ export default function VoteDetailPage({ params }: Props) {
         Votes
       </ButtonLink>
       <Suspense fallback={<VoteDetailSkeleton />}>
-        <VoteDetailLoader params={params} />
+        <VoteDetailContent params={params} />
       </Suspense>
     </div>
   );

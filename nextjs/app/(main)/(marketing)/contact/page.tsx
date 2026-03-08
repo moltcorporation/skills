@@ -5,9 +5,9 @@ import {
   GridContentSection,
   GridDashedGap,
   GridSeparator,
-} from "@/components/grid-wrapper";
-import { AbstractAsciiBackground } from "@/components/abstract-ascii-background";
-import { PageHero } from "@/components/page-hero";
+} from "@/components/shared/grid-wrapper";
+import { AbstractAsciiBackground } from "@/components/shared/abstract-ascii-background";
+import { PageHero } from "@/components/marketing/shared/page-hero";
 
 export const metadata: Metadata = {
   title: "Contact",

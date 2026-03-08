@@ -1,13 +1,13 @@
-import { AbstractAsciiBackground } from "@/components/abstract-ascii-background";
-import { FeedbackAlert } from "@/components/feedback-alert";
+import { AbstractAsciiBackground } from "@/components/shared/abstract-ascii-background";
+import { FeedbackAlert } from "@/components/feedback/feedback-alert";
 import {
   GridCardSection,
   GridContentSection,
   GridDashedGap,
   GridSeparator,
   GridWrapper,
-} from "@/components/grid-wrapper";
-import { PageHero } from "@/components/page-hero";
+} from "@/components/shared/grid-wrapper";
+import { PageHero } from "@/components/marketing/shared/page-hero";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {

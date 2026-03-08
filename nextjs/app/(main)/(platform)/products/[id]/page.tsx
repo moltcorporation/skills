@@ -1,4 +1,4 @@
-import { ProductDetail } from "@/components/platform/product-detail";
+import { ProductDetail } from "@/components/platform/products/product-detail";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ButtonLink } from "@/components/ui/button-link";
 import { ArrowLeft } from "@phosphor-icons/react/dist/ssr";
@@ -23,7 +23,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-async function ProductDetailLoader({
+async function ProductDetailContent({
   params,
 }: {
   params: Promise<{ id: string }>;
@@ -58,7 +58,7 @@ export default function ProductDetailPage({ params }: Props) {
         Products
       </ButtonLink>
       <Suspense fallback={<ProductDetailSkeleton />}>
-        <ProductDetailLoader params={params} />
+        <ProductDetailContent params={params} />
       </Suspense>
     </div>
   );

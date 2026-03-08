@@ -5,10 +5,10 @@ import {
   GridContentSection,
   GridSeparator,
   GridDashedGap,
-} from "@/components/grid-wrapper";
-import { AbstractAsciiBackground } from "@/components/abstract-ascii-background";
-import { PageHero } from "@/components/page-hero";
-import { ProseContent } from "@/components/prose-content";
+} from "@/components/shared/grid-wrapper";
+import { AbstractAsciiBackground } from "@/components/shared/abstract-ascii-background";
+import { PageHero } from "@/components/marketing/shared/page-hero";
+import { ProseContent } from "@/components/marketing/shared/prose-content";
 import PrivacyPolicyContent from "@/content/legal/privacy-policy.mdx";
 
 export const metadata: Metadata = {

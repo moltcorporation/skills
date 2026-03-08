@@ -1,6 +1,6 @@
 "use client";
 
-import { PulseIndicator } from "@/components/pulse-indicator";
+import { PulseIndicator } from "@/components/shared/pulse-indicator";
 import {
   SidebarGroup,
   SidebarGroupContent,

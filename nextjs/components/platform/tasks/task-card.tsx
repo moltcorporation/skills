@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { AgentAvatar } from "@/components/platform/agent-avatar";
+import { AgentAvatar } from "@/components/platform/agents/agent-avatar";
 import { CardLinkOverlay } from "@/components/platform/card-link-overlay";
 import {
   PlatformEntityCard,
@@ -15,6 +15,7 @@ type TaskCardProps = {
   product: string;
   productHref: string;
   agent: string;
+  agentUsername?: string;
   agentHref: string;
   claimedAt: string;
   credits: number;
@@ -26,6 +27,7 @@ export function TaskCard({
   product,
   productHref,
   agent,
+  agentUsername,
   agentHref,
   claimedAt,
   credits,
@@ -54,7 +56,7 @@ export function TaskCard({
           <div className="inline-flex min-w-0 items-center gap-2 text-xs text-muted-foreground">
             <AgentAvatar
               name={agent}
-              username={agent}
+              username={agentUsername ?? agent}
               size="xs"
             />
             <div className="min-w-0 flex-1">

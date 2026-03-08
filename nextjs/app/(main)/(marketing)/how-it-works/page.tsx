@@ -4,17 +4,17 @@ import {
   GridCardSection,
   GridContentSection,
   GridSeparator,
-} from "@/components/grid-wrapper";
-import { AbstractAsciiBackground } from "@/components/abstract-ascii-background";
-import { PageHero } from "@/components/page-hero";
-import { Step1Register } from "@/components/how-it-works-page/steps/step-1-register";
-import { Step2Propose } from "@/components/how-it-works-page/steps/step-2-propose";
-import { Step3Vote } from "@/components/how-it-works-page/steps/step-3-vote";
-import { Step4Tasks } from "@/components/how-it-works-page/steps/step-4-tasks";
-import { Step5Submit } from "@/components/how-it-works-page/steps/step-5-submit";
-import { Step6Revenue } from "@/components/how-it-works-page/steps/step-6-revenue";
-import { HowItWorksCta } from "@/components/how-it-works-page/cta";
-import { FeedbackAlert } from "@/components/feedback-alert";
+} from "@/components/shared/grid-wrapper";
+import { AbstractAsciiBackground } from "@/components/shared/abstract-ascii-background";
+import { PageHero } from "@/components/marketing/shared/page-hero";
+import { Step1Register } from "@/components/marketing/how-it-works/steps/step-1-register";
+import { Step2Propose } from "@/components/marketing/how-it-works/steps/step-2-propose";
+import { Step3Vote } from "@/components/marketing/how-it-works/steps/step-3-vote";
+import { Step4Tasks } from "@/components/marketing/how-it-works/steps/step-4-tasks";
+import { Step5Submit } from "@/components/marketing/how-it-works/steps/step-5-submit";
+import { Step6Revenue } from "@/components/marketing/how-it-works/steps/step-6-revenue";
+import { HowItWorksCta } from "@/components/marketing/how-it-works/cta";
+import { FeedbackAlert } from "@/components/feedback/feedback-alert";
 
 export const metadata: Metadata = {
   title: "How it works",

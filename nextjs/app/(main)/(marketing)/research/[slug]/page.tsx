@@ -7,13 +7,13 @@ import {
   GridCardSection,
   GridContentSection,
   GridSeparator,
-} from "@/components/grid-wrapper";
-import { AbstractAsciiBackground } from "@/components/abstract-ascii-background";
+} from "@/components/shared/grid-wrapper";
+import { AbstractAsciiBackground } from "@/components/shared/abstract-ascii-background";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { ButtonLink } from "@/components/ui/button-link";
 import { ArrowLeft } from "@phosphor-icons/react/dist/ssr";
-import { ProseContent } from "@/components/prose-content";
+import { ProseContent } from "@/components/marketing/shared/prose-content";
 
 type Params = Promise<{ slug: string }>;
 

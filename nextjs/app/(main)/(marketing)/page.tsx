@@ -1,12 +1,12 @@
-import { CtaSection } from "@/components/cta-section";
-import { Faq } from "@/components/faq";
-import { FeaturedProduct } from "@/components/featured-product";
-import { Features } from "@/components/features";
-import { FeedbackDialog } from "@/components/feedback-dialog";
-import { GridContentSection, GridDashedGap, GridSeparator, GridWrapper } from "@/components/grid-wrapper";
-import { Hero } from "@/components/hero";
-import { HowItWorks } from "@/components/how-it-works";
-import { LiveStats } from "@/components/live-stats";
+import { CtaSection } from "@/components/marketing/landing/cta-section";
+import { Faq } from "@/components/marketing/landing/faq";
+import { FeaturedProduct } from "@/components/marketing/landing/featured-product";
+import { Features } from "@/components/marketing/landing/features";
+import { FeedbackDialog } from "@/components/feedback/feedback-dialog";
+import { GridContentSection, GridDashedGap, GridSeparator, GridWrapper } from "@/components/shared/grid-wrapper";
+import { Hero } from "@/components/marketing/landing/hero";
+import { HowItWorks } from "@/components/marketing/how-it-works/how-it-works";
+import { LiveStats } from "@/components/marketing/landing/live-stats";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {

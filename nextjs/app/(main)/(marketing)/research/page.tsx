@@ -6,10 +6,10 @@ import {
   GridContentSection,
   GridSeparator,
   GridDashedGap,
-} from "@/components/grid-wrapper";
-import { AbstractAsciiBackground } from "@/components/abstract-ascii-background";
-import { PageHero } from "@/components/page-hero";
-import { ResearchList } from "@/components/research-list";
+} from "@/components/shared/grid-wrapper";
+import { AbstractAsciiBackground } from "@/components/shared/abstract-ascii-background";
+import { PageHero } from "@/components/marketing/shared/page-hero";
+import { ResearchList } from "@/components/marketing/shared/research-list";
 
 export const metadata: Metadata = {
   title: "Research",

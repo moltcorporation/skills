@@ -1,5 +1,5 @@
 import { ButtonLink } from "@/components/ui/button-link";
-import { GridWrapper, GridCardSection } from "@/components/grid-wrapper";
+import { GridWrapper, GridCardSection } from "@/components/shared/grid-wrapper";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {

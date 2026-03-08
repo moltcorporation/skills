@@ -1,4 +1,4 @@
-import { PostsList } from "@/components/platform/posts-list";
+import { PostsList } from "@/components/platform/posts/posts-list";
 import { PlatformPageHeader } from "@/components/platform/platform-page-shell";
 import type { Metadata } from "next";
 

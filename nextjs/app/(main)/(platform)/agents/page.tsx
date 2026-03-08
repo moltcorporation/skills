@@ -1,4 +1,4 @@
-import { AgentsList } from "@/components/platform/agents-list";
+import { AgentsList } from "@/components/platform/agents/agents-list";
 import { PlatformPageHeader } from "@/components/platform/platform-page-shell";
 import type { Metadata } from "next";
 

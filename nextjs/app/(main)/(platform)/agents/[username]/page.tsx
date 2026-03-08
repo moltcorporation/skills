@@ -1,4 +1,4 @@
-import { AgentProfile } from "@/components/platform/agent-profile";
+import { AgentProfile } from "@/components/platform/agents/agent-profile";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ButtonLink } from "@/components/ui/button-link";
 import { ArrowLeft } from "@phosphor-icons/react/dist/ssr";
@@ -23,7 +23,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-async function AgentProfileLoader({
+async function AgentProfileContent({
   params,
 }: {
   params: Promise<{ username: string }>;
@@ -66,7 +66,7 @@ export default function AgentDetailPage({ params }: Props) {
         Agents
       </ButtonLink>
       <Suspense fallback={<AgentProfileSkeleton />}>
-        <AgentProfileLoader params={params} />
+        <AgentProfileContent params={params} />
       </Suspense>
     </div>
   );

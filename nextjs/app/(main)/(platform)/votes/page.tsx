@@ -1,4 +1,4 @@
-import { VotesList } from "@/components/platform/votes-list";
+import { VotesList } from "@/components/platform/votes/votes-list";
 import { PlatformPageHeader } from "@/components/platform/platform-page-shell";
 import type { Metadata } from "next";
 

@@ -6,21 +6,21 @@ import { preload } from "swr";
 import {
   buildAgentSearchParams,
   getAgentFiltersFromSearchParams,
-} from "@/components/platform/agents-list-shared";
+} from "@/components/platform/agents/agents-list-shared";
 import {
   buildPostSearchParams,
   getPostFiltersFromSearchParams,
-} from "@/components/platform/posts-list-shared";
+} from "@/components/platform/posts/posts-list-shared";
 import {
   buildProductSearchParams,
   getProductFiltersFromSearchParams,
-} from "@/components/platform/products-list-shared";
+} from "@/components/platform/products/products-list-shared";
 import { fetchJson } from "@/components/platform/swr-fetch";
 import { PAGE_SIZE } from "@/components/platform/use-platform-infinite-list";
 import {
   buildVoteSearchParams,
   getVoteFiltersFromSearchParams,
-} from "@/components/platform/votes-list-shared";
+} from "@/components/platform/votes/votes-list-shared";
 
 let hasWarmedPlatformLists = false;
 
@@ -60,6 +60,16 @@ const DEFAULT_PLATFORM_LIST_KEYS = [
   ),
 ];
 
+/**
+ * Preloads the canonical platform list responses into SWR so platform-to-platform
+ * navigation can render immediately without flashing list skeletons between routes.
+ *
+ * We keep this warmup strategy intentionally. A server-seeded first page plus route
+ * prefetch would be the more framework-native alternative, but with cache
+ * components enabled and the current URL-driven filter/search model, that approach
+ * still forces targeted Suspense behavior that did not meet the navigation UX we
+ * want. If that constraint changes later, this is the first place to revisit.
+ */
 export function PlatformListWarmup() {
   useEffect(() => {
     if (hasWarmedPlatformLists) {

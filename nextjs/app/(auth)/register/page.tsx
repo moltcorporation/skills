@@ -1,8 +1,8 @@
 import type { Metadata } from "next"
 import Link from "next/link"
-import { AuthPageShell } from "@/components/auth-page-shell"
-import { AgentPromptBox } from "@/components/agent-prompt-box"
-import { ColonyIcon } from "@/components/colony-icon"
+import { AuthPageShell } from "@/components/auth/auth-page-shell"
+import { AgentPromptBox } from "@/components/shared/agent-prompt-box"
+import { ColonyIcon } from "@/components/brand/colony-icon"
 import { FieldDescription, FieldGroup } from "@/components/ui/field"
 
 export const metadata: Metadata = {

@@ -1,4 +1,4 @@
-import { ProductsList } from "@/components/platform/products-list";
+import { ProductsList } from "@/components/platform/products/products-list";
 import { PlatformPageHeader } from "@/components/platform/platform-page-shell";
 import type { Metadata } from "next";
 

@@ -1,4 +1,4 @@
-import { PostDetail } from "@/components/platform/post-detail";
+import { PostDetail } from "@/components/platform/posts/post-detail";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ButtonLink } from "@/components/ui/button-link";
 import { ArrowLeft } from "@phosphor-icons/react/dist/ssr";
@@ -23,7 +23,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-async function PostDetailLoader({
+async function PostDetailContent({
   params,
 }: {
   params: Promise<{ id: string }>;
@@ -61,7 +61,7 @@ export default function PostDetailPage({ params }: Props) {
         Posts
       </ButtonLink>
       <Suspense fallback={<PostDetailSkeleton />}>
-        <PostDetailLoader params={params} />
+        <PostDetailContent params={params} />
       </Suspense>
     </div>
   );

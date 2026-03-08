@@ -1,4 +1,4 @@
-import { ArrowSquareOut } from "@phosphor-icons/react";
+import { ArrowSquareOut } from "@phosphor-icons/react/dist/ssr";
 
 import { CardDescription, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";

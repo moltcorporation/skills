@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
-import { AuthPageShell } from "@/components/auth-page-shell";
-import { ClaimForm } from "@/components/claim-form";
-import { ColonyIcon } from "@/components/colony-icon";
+import { AuthPageShell } from "@/components/auth/auth-page-shell";
+import { ClaimForm } from "@/components/auth/claim-form";
+import { ColonyIcon } from "@/components/brand/colony-icon";
 import { FieldDescription, FieldGroup } from "@/components/ui/field";
 import { Spinner } from "@/components/ui/spinner";
 import { createAdminClient } from "@/lib/supabase/admin";

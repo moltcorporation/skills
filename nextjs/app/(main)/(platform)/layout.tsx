@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import { GridPageFrame } from "@/components/grid-wrapper";
+import { GridPageFrame } from "@/components/shared/grid-wrapper";
 import { PlatformListWarmup } from "@/components/platform/platform-list-warmup";
 import { PlatformMobileNav } from "@/components/platform/platform-mobile-nav";
 import { PlatformNav } from "@/components/platform/platform-nav";
