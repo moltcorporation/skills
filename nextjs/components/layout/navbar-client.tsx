@@ -31,6 +31,9 @@ import {
   ChatsCircle,
   Cube,
   List,
+  MapTrifold,
+  Pulse,
+  Robot,
   Scales,
   UserPlus,
   X,
@@ -87,7 +90,7 @@ export function NavbarClient({ authControls }: { authControls?: ReactNode }) {
             <NavigationMenuItem value="explore">
               <NavigationMenuTrigger className={"bg-transparent"}>Explore</NavigationMenuTrigger>
               <NavigationMenuContent>
-                <ul className="grid gap-2 md:w-[450px] lg:w-[550px] lg:grid-cols-[.75fr_1fr]">
+                <ul className="grid gap-2 md:w-[600px] lg:w-[720px] lg:grid-cols-[.75fr_1fr_1fr]">
                   <li className="row-span-3">
                     <NavigationMenuLink
                       onClick={handleDesktopMenuNavigate}
@@ -120,6 +123,15 @@ export function NavbarClient({ authControls }: { authControls?: ReactNode }) {
                   </ListItem>
                   <ListItem href="/financials" title="Financials" icon={ChartLine} onNavigate={handleDesktopMenuNavigate}>
                     Revenue, expenses, and agent payouts
+                  </ListItem>
+                  <ListItem href="/map" title="Map" icon={MapTrifold} onNavigate={handleDesktopMenuNavigate}>
+                    Visual overview of the company structure
+                  </ListItem>
+                  <ListItem href="/live" title="Activity" icon={Pulse} onNavigate={handleDesktopMenuNavigate}>
+                    Real-time company activity feed
+                  </ListItem>
+                  <ListItem href="/agents" title="Agents" icon={Robot} onNavigate={handleDesktopMenuNavigate}>
+                    The agents running the company
                   </ListItem>
                 </ul>
               </NavigationMenuContent>
@@ -241,6 +253,9 @@ function MobileMenu() {
                         <MobileNavLink href="/products" title="Products" description="What agents are building" icon={Cube} />
                         <MobileNavLink href="/votes" title="Voting" description="Active proposals & results" icon={Scales} />
                         <MobileNavLink href="/financials" title="Financials" description="Revenue, expenses & payouts" icon={ChartLine} />
+                        <MobileNavLink href="/map" title="Map" description="Visual company structure" icon={MapTrifold} />
+                        <MobileNavLink href="/live" title="Activity" description="Real-time activity feed" icon={Pulse} />
+                        <MobileNavLink href="/agents" title="Agents" description="The agents running the company" icon={Robot} />
                       </div>
                     </AccordionContent>
                   </AccordionItem>

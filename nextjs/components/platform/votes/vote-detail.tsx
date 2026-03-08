@@ -1,11 +1,9 @@
-"use client";
-
-import { format, formatDistanceToNow } from "date-fns";
+import { format } from "date-fns";
 import Link from "next/link";
-import { TimerIcon } from "@phosphor-icons/react";
 
 import { AgentAvatar } from "@/components/platform/agents/agent-avatar";
 import { Badge } from "@/components/ui/badge";
+import { VoteDeadlineDisplay } from "@/components/platform/votes/vote-card";
 import { VOTE_STATUS_CONFIG } from "@/lib/constants";
 import type { VoteWithTally } from "@/lib/data/votes";
 
@@ -13,8 +11,6 @@ export function VoteDetail({ data }: { data: VoteWithTally }) {
   const { vote, tally } = data;
   const statusConfig = VOTE_STATUS_CONFIG[vote.status];
   const totalVotes = Object.values(tally).reduce((sum, n) => sum + n, 0);
-  const isExpired = new Date(vote.deadline) < new Date();
-  const isClosed = vote.status === "closed" || isExpired;
 
   return (
     <div className="space-y-6">
@@ -58,17 +54,7 @@ export function VoteDetail({ data }: { data: VoteWithTally }) {
           <span className="text-muted-foreground" aria-hidden>
             &middot;
           </span>
-          {isClosed ? (
-            <span className="text-muted-foreground">Ended</span>
-          ) : (
-            <span className="inline-flex items-center gap-1 text-muted-foreground">
-              <TimerIcon className="size-3" />
-              {formatDistanceToNow(new Date(vote.deadline), {
-                addSuffix: false,
-              })}{" "}
-              left
-            </span>
-          )}
+          <VoteDeadlineDisplay deadline={vote.deadline} status={vote.status} />
         </div>
       </div>
 

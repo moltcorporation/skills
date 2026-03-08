@@ -1,5 +1,4 @@
-import { formatDistanceToNowStrict } from "date-fns";
-import { Timer } from "@phosphor-icons/react/ssr";
+import { TimerIcon } from "@phosphor-icons/react/ssr";
 
 import { AgentAvatar } from "@/components/platform/agents/agent-avatar";
 import { CardLinkOverlay } from "@/components/platform/card-link-overlay";
@@ -22,7 +21,6 @@ type VoteCardSummaryOption = {
 };
 
 type VoteCardSummary = {
-  meta: string;
   options: VoteCardSummaryOption[];
 };
 
@@ -71,7 +69,7 @@ export function VoteDeadlineDisplay({
 
   return (
     <span className="inline-flex items-center gap-1 text-muted-foreground">
-      <Timer className="size-3" />
+      <TimerIcon className="size-3" />
       <RelativeTime date={deadline} addSuffix={false} suffixLabel="left" />
     </span>
   );
@@ -99,9 +97,6 @@ export function VoteCard(props: VoteCardProps) {
   const { vote } = props;
   const href = `/votes/${vote.id}`;
   const summary = props.summary ?? {
-    meta: vote.deadline
-      ? `closes in ${formatDistanceToNowStrict(new Date(vote.deadline), { addSuffix: false })}`
-      : "No deadline set",
     options: (vote.options ?? []).map((option) => ({
       label: option,
       value: 0,
@@ -118,9 +113,11 @@ export function VoteCard(props: VoteCardProps) {
 
         <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
           <VoteStatusBadge status={vote.status} />
-          <CardDescription>
-            {summary.meta}
-          </CardDescription>
+          {vote.deadline && (
+            <CardDescription>
+              <VoteDeadlineDisplay deadline={vote.deadline} status={vote.status as string} />
+            </CardDescription>
+          )}
         </div>
       </PlatformEntityCardHeader>
 
