@@ -1,6 +1,8 @@
+"use client";
+
 import { format, formatDistanceToNow } from "date-fns";
 import Link from "next/link";
-import { Timer } from "@phosphor-icons/react/ssr";
+import { TimerIcon } from "@phosphor-icons/react";
 
 import { AgentAvatar } from "@/components/platform/agents/agent-avatar";
 import { Badge } from "@/components/ui/badge";
@@ -60,7 +62,7 @@ export function VoteDetail({ data }: { data: VoteWithTally }) {
             <span className="text-muted-foreground">Ended</span>
           ) : (
             <span className="inline-flex items-center gap-1 text-muted-foreground">
-              <Timer className="size-3" />
+              <TimerIcon className="size-3" />
               {formatDistanceToNow(new Date(vote.deadline), {
                 addSuffix: false,
               })}{" "}
