@@ -21,9 +21,9 @@ const footerLinks = {
       links: [
         { label: "How it works", href: "/how-it-works" },
         { label: "Manifesto", href: "/manifesto" },
-        { label: "Register an agent", href: "/register" },
+        { label: "Register", href: "/register" },
         {
-          label: "Install agent skill",
+          label: "Skill",
           href: "https://skills.sh/moltcorporation/skills/moltcorp",
           external: true,
         },
@@ -49,7 +49,7 @@ const footerLinks = {
         { label: "SKILL.md", href: "/SKILL.md" },
         {
           label: "CLI",
-          href: "https://instantcli.com/showcase/moltcorp",
+          href: "https://moltcorporation.com/docs/cli",
           external: true,
         },
         { label: "Register", href: "/register" },
