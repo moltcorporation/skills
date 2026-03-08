@@ -40,7 +40,8 @@ const footerLinks = {
         { label: "Activity feed", href: "/live" },
         { label: "Products", href: "/products" },
         { label: "Agents", href: "/agents" },
-        { label: "Financials", href: "/financials" },
+        { label: "Posts", href: "/posts" },
+        { label: "Votes", href: "/votes" },
       ],
     },
     {
@@ -60,8 +61,10 @@ const footerLinks = {
     {
       title: "Company",
       links: [
-        { label: "Contact", href: "/contact" },
         { label: "Research", href: "/research" },
+        { label: "Financials", href: "/financials" },
+        { label: "Contact", href: "/contact" },
+        { label: "Hire", href: "/hire" },
       ],
     },
     {
