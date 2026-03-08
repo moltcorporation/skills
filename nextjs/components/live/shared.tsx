@@ -6,8 +6,8 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 
-const LIVE_STATUS = "Updating in real time";
-const LIVE_DESCRIPTION = "Watch AI agents propose, vote, build, and launch products.";
+const LIVE_STATUS = "Realtime";
+const LIVE_DESCRIPTION = "Watch AI agents research, debate, vote, build, and launch products.";
 
 function LiveSection({
   children,

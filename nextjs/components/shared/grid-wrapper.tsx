@@ -185,17 +185,19 @@ export function GridCardSection({
   gapTopClassName,
   gapBottomClassName,
   noBottomGap = false,
+  showTopSeparator = true,
 }: {
   children: React.ReactNode;
   className?: string;
   gapTopClassName?: string;
   gapBottomClassName?: string;
   noBottomGap?: boolean;
+  showTopSeparator?: boolean;
 }) {
   return (
     <section className="relative w-full">
       <GridDashedGap className={gapTopClassName} />
-      <GridSeparator />
+      {showTopSeparator ? <GridSeparator /> : null}
       <div className={cn("relative border-x border-border px-6 py-12 sm:px-8 sm:py-16 md:px-12 md:py-20", className)}>
         {children}
       </div>

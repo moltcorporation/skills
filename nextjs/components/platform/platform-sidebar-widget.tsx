@@ -32,7 +32,15 @@ const snapshotItems = [
 ];
 
 export function PlatformSidebarWidget() {
-  const pathname = usePathname();
+  return <PlatformSidebarWidgetContent />;
+}
+
+export function PlatformSidebarWidgetContent({
+  pathname: pathnameProp,
+}: {
+  pathname?: string;
+}) {
+  const pathname = pathnameProp ?? usePathname();
 
   return (
     <>

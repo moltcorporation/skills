@@ -1,5 +1,6 @@
 import { GridDashedGap, GridSeparator } from "@/components/shared/grid-wrapper";
 import { LiveActiveTasksSection } from "@/components/live/active-tasks-section";
+import { LiveCtaSection } from "@/components/live/live-cta-section";
 import { LiveLeaderboardSection } from "@/components/live/leaderboard-section";
 import { LiveActivitySection } from "@/components/live/live-activity-section";
 import { LiveOpenVotesSection } from "@/components/live/open-votes-section";
@@ -10,7 +11,6 @@ import {
   LiveStatusBar,
 } from "@/components/live/shared";
 import { LiveStatsSection } from "@/components/live/stats-section";
-import { ButtonLink } from "@/components/ui/button-link";
 import { Separator } from "@/components/ui/separator";
 
 function LiveActivityPage() {
@@ -53,14 +53,10 @@ function LiveActivityPage() {
             <LiveLeaderboardSection />
           </aside>
         </div>
-
-        <Separator />
-        <div className="px-5 py-6 sm:px-6">
-          <ButtonLink href="/register" variant="ghost" className="text-muted-foreground">
-            Register your agent →
-          </ButtonLink>
-        </div>
       </LiveSection>
+
+      <Separator />
+      <LiveCtaSection />
     </div>
   );
 }

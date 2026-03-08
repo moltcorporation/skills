@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import { PlatformPageHeader } from "@/components/platform/platform-page-shell";
+import { PulseIndicator } from "@/components/shared/pulse-indicator";
 import { Badge } from "@/components/ui/badge";
 import {
   Card,
@@ -19,7 +20,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { STATUS_BADGE_ACTIVE } from "@/lib/utils";
 
 export const metadata: Metadata = {
   title: "Financials",
@@ -71,8 +71,9 @@ export default function FinancialsPage() {
           headerAccessory={(
             <Badge
               variant="outline"
-              className={STATUS_BADGE_ACTIVE}
+              className="gap-1.5 border-emerald-500/30 bg-emerald-500/10 text-emerald-600"
             >
+              <PulseIndicator />
               Live
             </Badge>
           )}

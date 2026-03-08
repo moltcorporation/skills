@@ -225,58 +225,60 @@ export function AgentGlobe({
       className={cn("relative mx-auto aspect-square w-full max-w-[40rem] overflow-hidden", className)}
     >
       {size > 0 ? (
-        <ReactGlobe
-          ref={globeRef}
-          width={size}
-          height={size}
-          backgroundColor="rgba(0,0,0,0)"
-          globeImageUrl={globeImageUrl}
-          showAtmosphere={false}
-          onGlobeReady={() => {
-            const globe = globeRef.current;
-            const controls = globe?.controls();
-            if (!globe || !controls) return;
+        <div className="absolute inset-0 flex items-center justify-center">
+          <ReactGlobe
+            ref={globeRef}
+            width={size}
+            height={size}
+            backgroundColor="rgba(0,0,0,0)"
+            globeImageUrl={globeImageUrl}
+            showAtmosphere={false}
+            onGlobeReady={() => {
+              const globe = globeRef.current;
+              const controls = globe?.controls();
+              if (!globe || !controls) return;
 
-            globe.resumeAnimation();
-            controls.enabled = true;
-            controls.autoRotate = true;
-            controls.autoRotateSpeed = AUTO_ROTATE_SPEED;
-            controls.enablePan = false;
-            controls.enableDamping = true;
-            controls.dampingFactor = 0.08;
-            controls.minDistance = 220;
-            controls.maxDistance = 320;
-            controls.update();
-          }}
-          ringsData={pointsData}
-          ringLat="latitude"
-          ringLng="longitude"
-          ringAltitude={0.01}
-          ringColor={() => [PULSE_GREEN_FADE, PULSE_GREEN, PULSE_GREEN_FADE]}
-          ringMaxRadius={1.2}
-          ringPropagationSpeed={0.7}
-          ringRepeatPeriod={1400}
-          labelsData={pointsData}
-          labelLat="latitude"
-          labelLng="longitude"
-          labelText={() => ""}
-          labelLabel="label"
-          labelAltitude={0.01}
-          labelSize={0.01}
-          labelIncludeDot={true}
-          labelDotRadius={(point) =>
-            (point as AgentLocation).id === hoveredId ? 0.64 : 0.48
-          }
-          labelColor={() => PULSE_GREEN}
-          labelsTransitionDuration={150}
-          onLabelHover={(point) =>
-            setHoveredId(point ? (point as AgentLocation).id : null)
-          }
-          onLabelClick={(point) => {
-            setHoveredId(null);
-            router.push(`/agents/${(point as AgentLocation).username}`);
-          }}
-        />
+              globe.resumeAnimation();
+              controls.enabled = true;
+              controls.autoRotate = true;
+              controls.autoRotateSpeed = AUTO_ROTATE_SPEED;
+              controls.enablePan = false;
+              controls.enableDamping = true;
+              controls.dampingFactor = 0.08;
+              controls.minDistance = 220;
+              controls.maxDistance = 320;
+              controls.update();
+            }}
+            ringsData={pointsData}
+            ringLat="latitude"
+            ringLng="longitude"
+            ringAltitude={0.01}
+            ringColor={() => [PULSE_GREEN_FADE, PULSE_GREEN, PULSE_GREEN_FADE]}
+            ringMaxRadius={1.2}
+            ringPropagationSpeed={0.7}
+            ringRepeatPeriod={1400}
+            labelsData={pointsData}
+            labelLat="latitude"
+            labelLng="longitude"
+            labelText={() => ""}
+            labelLabel="label"
+            labelAltitude={0.01}
+            labelSize={0.01}
+            labelIncludeDot={true}
+            labelDotRadius={(point) =>
+              (point as AgentLocation).id === hoveredId ? 0.64 : 0.48
+            }
+            labelColor={() => PULSE_GREEN}
+            labelsTransitionDuration={150}
+            onLabelHover={(point) =>
+              setHoveredId(point ? (point as AgentLocation).id : null)
+            }
+            onLabelClick={(point) => {
+              setHoveredId(null);
+              router.push(`/agents/${(point as AgentLocation).username}`);
+            }}
+          />
+        </div>
       ) : null}
       <div className="pointer-events-none absolute inset-0 rounded-full border border-border/70" />
       <div className="pointer-events-none absolute inset-[12%] rounded-full border border-dashed border-border/60" />

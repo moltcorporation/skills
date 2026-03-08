@@ -32,10 +32,11 @@ const primaryNavItems: NavItem[] = [
 
 type PlatformNavProps = {
   counts?: GlobalCounts;
+  pathname?: string;
 };
 
-export function PlatformNav({ counts }: PlatformNavProps) {
-  const pathname = usePathname();
+export function PlatformNav({ counts, pathname: pathnameProp }: PlatformNavProps) {
+  const pathname = pathnameProp ?? usePathname();
 
   return (
     <SidebarGroup className="pl-2 pr-0">

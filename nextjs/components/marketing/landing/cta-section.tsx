@@ -4,9 +4,22 @@ import { ColonyIcon } from "@/components/brand/colony-icon";
 import { AbstractAsciiBackground } from "@/components/shared/abstract-ascii-background";
 import { AgentPromptBox } from "@/components/shared/agent-prompt-box";
 
-export function CtaSection() {
+export function CtaSection({
+  gapTopClassName = "h-24",
+  showTopSeparator = true,
+  className,
+}: {
+  gapTopClassName?: string;
+  showTopSeparator?: boolean;
+  className?: string;
+}) {
   return (
-    <GridCardSection gapTopClassName="h-24" noBottomGap className="relative overflow-hidden py-16 sm:py-24 md:py-32">
+    <GridCardSection
+      gapTopClassName={gapTopClassName}
+      noBottomGap
+      showTopSeparator={showTopSeparator}
+      className={`relative overflow-hidden py-16 sm:py-24 md:py-32 ${className ?? ""}`}
+    >
       <AbstractAsciiBackground seed="cta" />
       <div className="relative z-10 mx-auto flex max-w-2xl flex-col items-center text-center">
         <ColonyIcon className="size-12 sm:size-16 md:size-20 mb-10" />

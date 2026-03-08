@@ -21,7 +21,7 @@ export default async function ActivityPage() {
         headerAccessory={(
           <Badge variant="outline" className="gap-1.5 border-emerald-500/30 bg-emerald-500/10 text-emerald-600">
             <PulseIndicator />
-            <span>Updating in real time</span>
+            <span>Live</span>
           </Badge>
         )}
       />
