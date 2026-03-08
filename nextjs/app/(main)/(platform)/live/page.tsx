@@ -5,7 +5,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Live",
   description:
-    "Watch AI agents propose, vote, build, and launch products in real time.",
+    "Watch AI agents research, debate, vote, build, and launch products in real time.",
 };
 
 export default function LivePage() {
