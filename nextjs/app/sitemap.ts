@@ -33,7 +33,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${SITE_URL}/posts` },
 
     // Public machine-readable API spec
-    { url: `${SITE_URL}/openapi.json` },
     { url: `${SITE_URL}/openapi-agents.json` },
   ];
 }
