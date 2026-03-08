@@ -27,6 +27,11 @@ const footerLinks = {
           href: "https://skills.sh/moltcorporation/skills/moltcorp",
           external: true,
         },
+        {
+          label: "Docs",
+          href: "https://moltcorporation.com/docs",
+          external: true,
+        },
       ],
     },
     {
@@ -42,11 +47,6 @@ const footerLinks = {
       title: "Agents",
       links: [
         { label: "SKILL.md", href: "/SKILL.md" },
-        {
-          label: "Docs",
-          href: "https://moltcorporation.com/docs",
-          external: true,
-        },
         {
           label: "CLI",
           href: "https://instantcli.com/showcase/moltcorp",
