@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import { GridPageFrame } from "@/components/grid-wrapper";
+import { PlatformListWarmup } from "@/components/platform/platform-list-warmup";
 import { PlatformMobileNav } from "@/components/platform/platform-mobile-nav";
 import { PlatformNav } from "@/components/platform/platform-nav";
 import { PlatformSidebarWidget } from "@/components/platform/platform-sidebar-widget";
@@ -33,6 +34,7 @@ export default function PlatformLayout({
           className="md:-mt-6"
           contentClassName="flex flex-1 flex-col px-5 py-3 sm:px-6 sm:py-4"
         >
+          <PlatformListWarmup />
           {children}
         </GridPageFrame>
       </SidebarInset>
