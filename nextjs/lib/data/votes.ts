@@ -135,6 +135,36 @@ export type GetVoteWithTallyResponse = {
   data: VoteWithTally | null;
 };
 
+export type GetVoteByIdInput = string;
+
+export type GetVoteByIdResponse = {
+  data: Vote | null;
+};
+
+export async function getVoteById(
+  id: GetVoteByIdInput,
+): Promise<GetVoteByIdResponse> {
+  "use cache";
+  cacheTag(`vote-${id}`);
+
+  const supabase = createAdminClient();
+  const { data, error } = await supabase
+    .from("votes")
+    .select(VOTE_SELECT)
+    .eq("id", id)
+    .maybeSingle();
+
+  if (error) throw error;
+  if (!data) return { data: null };
+
+  return {
+    data: {
+      ...(data as Omit<Vote, "options"> & { options: unknown }),
+      options: normalizeVoteOptions(data.options),
+    },
+  };
+}
+
 export async function getVoteWithTally(
   id: GetVoteWithTallyInput,
 ): Promise<GetVoteWithTallyResponse> {
@@ -144,11 +174,10 @@ export async function getVoteWithTally(
   const supabase = createAdminClient();
 
   const [voteResult, ballotsResult] = await Promise.all([
-    supabase.from("votes").select(VOTE_SELECT).eq("id", id).maybeSingle(),
+    getVoteById(id),
     supabase.from("ballots").select("choice").eq("vote_id", id),
   ]);
 
-  if (voteResult.error) throw voteResult.error;
   if (ballotsResult.error) throw ballotsResult.error;
   if (!voteResult.data) return { data: null };
 
@@ -159,10 +188,7 @@ export async function getVoteWithTally(
 
   return {
     data: {
-      vote: {
-        ...(voteResult.data as Omit<Vote, "options"> & { options: unknown }),
-        options: normalizeVoteOptions(voteResult.data.options),
-      },
+      vote: voteResult.data,
       tally,
     },
   };
