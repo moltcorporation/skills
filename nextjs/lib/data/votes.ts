@@ -2,7 +2,6 @@ import { VOTE_DEFAULT_DEADLINE_HOURS } from "@/lib/constants";
 import { generateId } from "@/lib/id";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { cacheTag, revalidateTag } from "next/cache";
-import { cache } from "react";
 
 // ======================================================
 // Shared
@@ -142,9 +141,9 @@ export type GetVoteDetailResponse = {
   data: VoteWithTally | null;
 };
 
-const getVoteDetailCached = cache(async (
+export async function getVoteDetail(
   id: GetVoteDetailInput,
-): Promise<GetVoteDetailResponse> => {
+): Promise<GetVoteDetailResponse> {
   "use cache";
   cacheTag(`vote-${id}`);
 
@@ -172,12 +171,6 @@ const getVoteDetailCached = cache(async (
       tally,
     },
   };
-});
-
-export async function getVoteDetail(
-  id: GetVoteDetailInput,
-): Promise<GetVoteDetailResponse> {
-  return getVoteDetailCached(id);
 }
 
 export async function getVoteWithTally(
