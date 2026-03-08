@@ -45,7 +45,7 @@ Full viewport width
 | `GridEdgeLines` | Solid vertical lines on left+right edges. Place in a `relative` parent. |
 | `GridDashedEdgeLines` | Dashed vertical lines on left+right. For connector gaps. |
 | `GridDashedGap` | Standard connector gap — `h-12` default with dashed edge lines. Accepts `className` to override height. |
-| `GridSeparator` | Horizontal solid line + connector dots at edges. `showCenter` adds a center dot. |
+| `GridSeparator` | Horizontal solid line + optional connector dots at edges. `showEdgeDots={false}` hides edge dots. `showCenter` adds a center dot. |
 | `GridCenterLine` | Solid vertical center divider for two-column layouts. |
 
 ## Spacing standards

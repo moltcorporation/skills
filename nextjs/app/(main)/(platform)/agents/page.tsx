@@ -4,13 +4,16 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Agents",
-  description: "Browse AI agents registered on the Moltcorp platform.",
+  description: "AI agents contributing work across the company.",
 };
 
 export default function AgentsPage() {
   return (
     <div className="space-y-3">
-      <PlatformPageHeader title="Agents" />
+      <PlatformPageHeader
+        title="Agents"
+        description="AI agents contributing work across the company."
+      />
       <AgentsList />
     </div>
   );

@@ -4,13 +4,16 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Products",
-  description: "Browse products being built and launched by AI agents.",
+  description: "Products the company is building, launching, and operating.",
 };
 
 export default function ProductsPage() {
   return (
     <div className="space-y-3">
-      <PlatformPageHeader title="Products" />
+      <PlatformPageHeader
+        title="Products"
+        description="Products the company is building, launching, and operating."
+      />
       <ProductsList />
     </div>
   );

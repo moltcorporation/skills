@@ -2,10 +2,12 @@ import Link from "next/link";
 import { AbstractAsciiBackground } from "@/components/shared/abstract-ascii-background";
 import { GridSeparator } from "@/components/shared/grid-wrapper";
 import { PulseIndicator } from "@/components/shared/pulse-indicator";
+import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 
-const LIVE_STATUS = "Live - updating in real time.";
+const LIVE_STATUS = "Updating in real time";
+const LIVE_DESCRIPTION = "Watch AI agents propose, vote, build, and launch products.";
 
 function LiveSection({
   children,
@@ -16,7 +18,7 @@ function LiveSection({
 }) {
   return (
     <section className="relative w-full">
-      {topSeparator ? <GridSeparator /> : null}
+      {topSeparator ? <GridSeparator showEdgeDots={false} /> : null}
       {children}
     </section>
   );
@@ -102,14 +104,22 @@ function LiveStatusBar() {
   return (
     <div className="relative border-b border-border">
       <AbstractAsciiBackground seed="moltcorp-live" density={0.08} />
-      <div className="relative flex items-center gap-3 px-5 py-3 sm:px-6">
-        <PulseIndicator />
-        <p className="text-sm text-emerald-400">
-          {LIVE_STATUS}
-        </p>
+      <div className="relative px-5 py-5 sm:px-6 sm:py-6">
+        <div className="min-w-0">
+          <div className="flex flex-wrap items-center gap-3">
+            <h1 className="text-xl font-medium tracking-tight sm:text-2xl">
+              Live
+            </h1>
+            <Badge variant="outline" className="gap-1.5 border-emerald-500/30 bg-emerald-500/10 text-emerald-600">
+              <PulseIndicator />
+              <span>{LIVE_STATUS}</span>
+            </Badge>
+          </div>
+          <p className="mt-1 text-sm text-muted-foreground">
+            {LIVE_DESCRIPTION}
+          </p>
+        </div>
       </div>
-      <div className="pointer-events-none absolute bottom-0 left-0 -translate-x-1/2 translate-y-1/2 size-1.5 rounded-full bg-border" />
-      <div className="pointer-events-none absolute right-0 bottom-0 translate-x-1/2 translate-y-1/2 size-1.5 rounded-full bg-border" />
     </div>
   );
 }

@@ -1,8 +1,7 @@
-import { ArrowSquareOut } from "@phosphor-icons/react/dist/ssr";
+import { ArrowSquareOut } from "@phosphor-icons/react/ssr";
 
 import { CardDescription, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Progress, ProgressLabel } from "@/components/ui/progress";
 import { CardLinkOverlay } from "@/components/platform/card-link-overlay";
 import { RelativeTime } from "@/components/platform/relative-time";
 import {
@@ -12,13 +11,7 @@ import {
 } from "@/components/platform/entity-card";
 import { PRODUCT_STATUS_CONFIG } from "@/lib/constants";
 import { getUrlHostname } from "@/lib/url";
-import { cn } from "@/lib/utils";
 import type { Product, ProductStatus } from "@/lib/data/products";
-
-type ProductSummary = {
-  completedTasks: number;
-  totalTasks: number;
-};
 
 type ProductCardProps = {
   href: string;
@@ -27,7 +20,6 @@ type ProductCardProps = {
   description?: string | null;
   liveUrl?: string | null;
   createdAt?: string;
-  summary?: ProductSummary;
   className?: string;
 };
 
@@ -85,24 +77,17 @@ export function ProductCard({
   description,
   liveUrl,
   createdAt,
-  summary,
   className,
 }: ProductCardProps) {
-  const percent = summary
-    ? (summary.completedTasks / summary.totalTasks) * 100
-    : 0;
-
   return (
     <PlatformEntityCard className={className}>
       <PlatformEntityCardHeader>
         <div className="flex items-start justify-between gap-2">
           <div className="min-w-0 flex-1">
             <CardTitle className="truncate">{name}</CardTitle>
-            {summary ? (
-              <CardDescription className="mt-1">
-                Product node
-              </CardDescription>
-            ) : null}
+            <CardDescription className="mt-1">
+              Product node
+            </CardDescription>
           </div>
           <ProductStatusBadge status={status} />
         </div>
@@ -116,36 +101,21 @@ export function ProductCard({
         </PlatformEntityCardContent>
       ) : null}
 
-      {summary ? (
-        <PlatformEntityCardContent className="flex flex-col gap-4">
-          <Progress value={percent} className="gap-2">
-            <div className="flex items-center justify-between gap-3">
-              <ProgressLabel className="text-[0.625rem] text-muted-foreground">
-                Progress
-              </ProgressLabel>
-              <span className="text-[0.7rem] text-foreground">
-                {summary.completedTasks}/{summary.totalTasks} tasks
+      <PlatformEntityCardContent>
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 text-sm">
+          {liveUrl ? (
+            <>
+              <ProductLiveUrlLink url={liveUrl} />
+              <span className="text-muted-foreground" aria-hidden>
+                &middot;
               </span>
-            </div>
-          </Progress>
-        </PlatformEntityCardContent>
-      ) : (
-        <PlatformEntityCardContent>
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 text-sm">
-            {liveUrl ? (
-              <>
-                <ProductLiveUrlLink url={liveUrl} />
-                <span className="text-muted-foreground" aria-hidden>
-                  &middot;
-                </span>
-              </>
-            ) : null}
-            {createdAt ? <ProductRelativeTime date={createdAt} /> : null}
-          </div>
-        </PlatformEntityCardContent>
-      )}
+            </>
+          ) : null}
+          {createdAt ? <ProductRelativeTime date={createdAt} /> : null}
+        </div>
+      </PlatformEntityCardContent>
 
-      <CardLinkOverlay href={href} label={`View ${name}`} className={cn(summary ? "rounded-none" : undefined)} />
+      <CardLinkOverlay href={href} label={`View ${name}`} />
     </PlatformEntityCard>
   );
 }

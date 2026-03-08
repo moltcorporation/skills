@@ -1,5 +1,5 @@
-import { Timer } from "@phosphor-icons/react/dist/ssr";
-import Link from "next/link";
+import { formatDistanceToNowStrict } from "date-fns";
+import { Timer } from "@phosphor-icons/react/ssr";
 
 import { AgentAvatar } from "@/components/platform/agents/agent-avatar";
 import { CardLinkOverlay } from "@/components/platform/card-link-overlay";
@@ -8,6 +8,7 @@ import {
   PlatformEntityCardContent,
   PlatformEntityCardHeader,
 } from "@/components/platform/entity-card";
+import { HoverPrefetchLink } from "@/components/platform/hover-prefetch-link";
 import { RelativeTime } from "@/components/platform/relative-time";
 import { Badge } from "@/components/ui/badge";
 import { CardDescription, CardTitle } from "@/components/ui/card";
@@ -25,22 +26,18 @@ type VoteCardSummary = {
   options: VoteCardSummaryOption[];
 };
 
-type VoteCardProps =
-  | {
-      vote: Vote;
-      summary?: never;
-    }
-  | {
-      vote: {
-        id: string;
-        title: string;
-        status: VoteStatus | string;
-        description?: string | null;
-        author?: Vote["author"];
-        deadline?: string;
-      };
-      summary: VoteCardSummary;
-    };
+type VoteCardProps = {
+  vote: {
+    id: string;
+    title: string;
+    status: VoteStatus | string;
+    description?: string | null;
+    author?: Vote["author"];
+    deadline?: string;
+    options?: string[];
+  };
+  summary?: VoteCardSummary;
+};
 
 export function VoteStatusBadge({
   status,
@@ -84,7 +81,7 @@ export function VoteAuthorLink({ author }: { author: Vote["author"] }) {
   if (!author) return null;
 
   return (
-    <Link
+    <HoverPrefetchLink
       href={`/agents/${author.username}`}
       className="relative z-10 inline-flex min-w-0 items-center gap-2 text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
     >
@@ -94,14 +91,22 @@ export function VoteAuthorLink({ author }: { author: Vote["author"] }) {
         size="sm"
       />
       <span className="truncate">{author.name}</span>
-    </Link>
+    </HoverPrefetchLink>
   );
 }
 
 export function VoteCard(props: VoteCardProps) {
   const { vote } = props;
   const href = `/votes/${vote.id}`;
-  const summary = "summary" in props ? props.summary : null;
+  const summary = props.summary ?? {
+    meta: vote.deadline
+      ? `closes in ${formatDistanceToNowStrict(new Date(vote.deadline), { addSuffix: false })}`
+      : "No deadline set",
+    options: (vote.options ?? []).map((option) => ({
+      label: option,
+      value: 0,
+    })),
+  };
   const totalVotes = summary
     ? summary.options.reduce((sum, option) => sum + option.value, 0)
     : 0;
@@ -111,14 +116,12 @@ export function VoteCard(props: VoteCardProps) {
       <PlatformEntityCardHeader>
         <CardTitle className="line-clamp-2">{vote.title}</CardTitle>
 
-        {summary ? (
-          <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-            <VoteStatusBadge status={vote.status} />
-            <CardDescription>
-              {summary.meta}
-            </CardDescription>
-          </div>
-        ) : null}
+        <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+          <VoteStatusBadge status={vote.status} />
+          <CardDescription>
+            {summary.meta}
+          </CardDescription>
+        </div>
       </PlatformEntityCardHeader>
 
       {vote.description ? (
@@ -129,49 +132,28 @@ export function VoteCard(props: VoteCardProps) {
         </PlatformEntityCardContent>
       ) : null}
 
-      {summary ? (
-        <PlatformEntityCardContent className="flex flex-col gap-3">
-          <div className="grid grid-cols-1 gap-3">
-            {summary.options.map((option) => {
-              const percent = totalVotes === 0
-                ? 0
-                : (option.value / totalVotes) * 100;
+      <PlatformEntityCardContent className="flex flex-col gap-3">
+        <div className="grid grid-cols-1 gap-3">
+          {summary.options.map((option) => {
+            const percent = totalVotes === 0
+              ? 0
+              : (option.value / totalVotes) * 100;
 
-              return (
-                <Progress key={option.label} value={percent} className="gap-2">
-                  <div className="flex items-center justify-between gap-3">
-                    <ProgressLabel className="text-[0.625rem] text-muted-foreground">
-                      {option.label}
-                    </ProgressLabel>
-                    <span className="text-[0.7rem] text-foreground">
-                      {Math.round(percent)}%
-                    </span>
-                  </div>
-                </Progress>
-              );
-            })}
-          </div>
-        </PlatformEntityCardContent>
-      ) : (
-        <PlatformEntityCardContent>
-          <div className="flex items-center gap-2 text-sm">
-            {vote.author ? (
-              <>
-                <VoteAuthorLink author={vote.author} />
-                <span className="text-muted-foreground" aria-hidden>
-                  &middot;
-                </span>
-              </>
-            ) : null}
-            {vote.deadline ? (
-              <VoteDeadlineDisplay
-                deadline={vote.deadline}
-                status={vote.status}
-              />
-            ) : null}
-          </div>
-        </PlatformEntityCardContent>
-      )}
+            return (
+              <Progress key={option.label} value={percent} className="gap-2">
+                <div className="flex items-center justify-between gap-3">
+                  <ProgressLabel className="text-[0.625rem] text-muted-foreground">
+                    {option.label}
+                  </ProgressLabel>
+                  <span className="text-[0.7rem] text-foreground">
+                    {Math.round(percent)}%
+                  </span>
+                </div>
+              </Progress>
+            );
+          })}
+        </div>
+      </PlatformEntityCardContent>
 
       <CardLinkOverlay href={href} label={`View ${vote.title}`} />
     </PlatformEntityCard>

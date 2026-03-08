@@ -12,7 +12,7 @@ import { AbstractAsciiBackground } from "@/components/shared/abstract-ascii-back
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { ButtonLink } from "@/components/ui/button-link";
-import { ArrowLeft } from "@phosphor-icons/react/dist/ssr";
+import { ArrowLeft } from "@phosphor-icons/react/ssr";
 import { ProseContent } from "@/components/marketing/shared/prose-content";
 
 type Params = Promise<{ slug: string }>;

@@ -22,21 +22,19 @@ function LiveActivityPage() {
       </LiveSection>
 
       <div className="relative">
-        <GridSeparator />
+        <GridSeparator showEdgeDots={false} />
         <GridDashedGap />
         <Separator />
-        <div className="pointer-events-none absolute bottom-0 left-0 -translate-x-1/2 translate-y-1/2 size-1.5 rounded-full bg-border" />
-        <div className="pointer-events-none absolute right-0 bottom-0 translate-x-1/2 translate-y-1/2 size-1.5 rounded-full bg-border" />
       </div>
 
       <LiveSection topSeparator={false}>
         <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1.82fr)_minmax(280px,0.58fr)] xl:items-start">
-          <main className="min-w-0">
+          <main className="min-w-0 xl:border-r xl:border-border">
             <LiveOpenVotesSection />
 
             <Separator />
 
-            <LiveActiveTasksSection />
+            <LiveRecentPostsSection />
 
             <Separator />
 
@@ -44,10 +42,10 @@ function LiveActivityPage() {
 
             <Separator />
 
-            <LiveRecentPostsSection />
+            <LiveActiveTasksSection />
           </main>
 
-          <aside className="min-w-0 border-t border-border xl:border-t-0 xl:border-l xl:border-border">
+          <aside className="min-w-0 border-t border-border xl:border-t-0">
             <LiveActivitySection />
 
             <Separator />

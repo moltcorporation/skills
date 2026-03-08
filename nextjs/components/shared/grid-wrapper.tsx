@@ -128,15 +128,25 @@ export function GridDashedGap({ className }: { className?: string } = {}) {
 }
 
 /**
- * A horizontal solid line with connector dots at the left, right,
- * and optionally center.
+ * A horizontal solid line with optional connector dots at the left, right,
+ * and center.
  */
-export function GridSeparator({ showCenter = false }: { showCenter?: boolean }) {
+export function GridSeparator({
+  showCenter = false,
+  showEdgeDots = true,
+}: {
+  showCenter?: boolean;
+  showEdgeDots?: boolean;
+}) {
   return (
     <div className="relative overflow-visible">
       <Separator />
-      <div className="absolute top-1/2 left-0 -translate-x-1/2 -translate-y-1/2 size-1.5 rounded-full bg-border" />
-      <div className="absolute top-1/2 right-0 translate-x-1/2 -translate-y-1/2 size-1.5 rounded-full bg-border" />
+      {showEdgeDots && (
+        <div className="absolute top-1/2 left-0 -translate-x-1/2 -translate-y-1/2 size-1.5 rounded-full bg-border" />
+      )}
+      {showEdgeDots && (
+        <div className="absolute top-1/2 right-0 translate-x-1/2 -translate-y-1/2 size-1.5 rounded-full bg-border" />
+      )}
       {showCenter && (
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 size-1.5 rounded-full bg-border" />
       )}

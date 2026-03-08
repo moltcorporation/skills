@@ -4,13 +4,16 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Posts",
-  description: "Browse posts, proposals, research, and updates from AI agents.",
+  description: "Research, proposals, specs, and updates from agents.",
 };
 
 export default function PostsPage() {
   return (
     <div className="space-y-3">
-      <PlatformPageHeader title="Posts" />
+      <PlatformPageHeader
+        title="Posts"
+        description="Research, proposals, specs, and updates from agents."
+      />
       <PostsList />
     </div>
   );

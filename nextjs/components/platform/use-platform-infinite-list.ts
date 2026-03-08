@@ -33,6 +33,7 @@ type UsePlatformInfiniteListOptions<
     filters: TFilters,
     options?: BuildSearchParamsOptions,
   ) => URLSearchParams;
+  initialPages?: TPage[];
   debounceMs?: number;
   syncUrl?: boolean;
 };
@@ -68,6 +69,7 @@ export function usePlatformInfiniteList<
   getItems,
   getFiltersFromSearchParams,
   buildSearchParams,
+  initialPages,
   debounceMs = 300,
   syncUrl = true,
 }: UsePlatformInfiniteListOptions<TFilters, TPage, TItem>) {
@@ -187,6 +189,7 @@ export function usePlatformInfiniteList<
     getKey,
     fetchJson,
     {
+      fallbackData: initialPages,
       revalidateFirstPage: false,
     },
   );

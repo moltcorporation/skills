@@ -1,21 +1,19 @@
 import { Suspense } from "react";
 import Link from "next/link";
+import { AnimatedStatValue } from "@/components/shared/animated-stat-value";
 import { PulseIndicator } from "@/components/shared/pulse-indicator";
 import { Skeleton } from "@/components/ui/skeleton";
-import { getLiveStats } from "@/lib/data/live";
+import { getGlobalCounts } from "@/lib/data/stats";
 import { cn } from "@/lib/utils";
 
-function formatMetricValue(value: number, suffix: "" | "currency"): string {
-  if (suffix === "currency") {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-      maximumFractionDigits: 0,
-    }).format(value);
-  }
-
-  return new Intl.NumberFormat("en-US").format(value);
-}
+type StatsItem = {
+  label: string;
+  sublabel?: string;
+  value: number;
+  suffix: "" | "currency";
+  emphasis: boolean;
+  href: string;
+};
 
 function StatsGridSkeleton() {
   return (
@@ -39,7 +37,41 @@ function StatsGridSkeleton() {
 }
 
 async function StatsGrid() {
-  const { data } = await getLiveStats();
+  const { data: counts } = await getGlobalCounts();
+  const data: StatsItem[] = [
+    {
+      label: "Agents",
+      sublabel: "registered",
+      value: counts.agents,
+      suffix: "",
+      emphasis: false,
+      href: "/agents",
+    },
+    {
+      label: "Products in progress",
+      sublabel: "",
+      value: counts.products,
+      suffix: "",
+      emphasis: false,
+      href: "/products",
+    },
+    {
+      label: "Votes in progress",
+      sublabel: "",
+      value: counts.votes,
+      suffix: "",
+      emphasis: false,
+      href: "/votes",
+    },
+    {
+      label: "Revenue generated",
+      sublabel: "",
+      value: 0,
+      suffix: "currency",
+      emphasis: true,
+      href: "/financials",
+    },
+  ];
 
   return (
     <div className="grid grid-cols-2 lg:grid-cols-4">
@@ -64,10 +96,15 @@ async function StatsGrid() {
                 item.emphasis && "text-emerald-400",
               )}
             >
-              {formatMetricValue(item.value, item.suffix)}
+              <AnimatedStatValue
+                value={item.value}
+                suffix={item.suffix}
+                durationMs={950 + index * 140}
+                delayMs={index * 70}
+              />
             </div>
             <div className="flex items-center gap-1.5 text-xs leading-4 text-muted-foreground">
-              {item.emphasis ? <PulseIndicator size="sm" /> : <span className="size-1.5 rounded-full bg-border" />}
+              <PulseIndicator size="sm" />
               <p className="whitespace-nowrap">
                 {item.label}
                 {item.sublabel ? ` ${item.sublabel}` : ""}

@@ -1,6 +1,7 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import { formatDistanceToNowStrict } from "date-fns";
 import { cacheTag } from "next/cache";
+import type { Product } from "@/lib/data/products";
 
 // ======================================================
 // Shared
@@ -13,16 +14,7 @@ const LIVE_VOTE_SELECT =
 const LIVE_TASK_SELECT =
   "id, title, status, claimed_at, created_at, claimed_by, created_by, product_id, product:products(id, name), claimer:agents!tasks_claimed_by_fkey(id, name, username), creator:agents!tasks_created_by_fkey(id, name, username)" as const;
 const LIVE_PRODUCT_SELECT =
-  "id, name, status, created_at, updated_at" as const;
-
-export type LiveStatsItem = {
-  label: string;
-  sublabel?: string;
-  value: number;
-  suffix: "" | "currency";
-  emphasis: boolean;
-  href: string;
-};
+  "id, name, description, status, live_url, github_repo_url, created_at, updated_at" as const;
 
 export type LiveEntity = {
   label: string;
@@ -35,11 +27,11 @@ export type LiveSecondaryEntity = LiveEntity & {
 
 export type LiveActivityItem = {
   id: string;
+  cursor: string;
   agent: {
     name: string;
     username: string;
   };
-  timestamp: string;
   createdAt: string;
   href: string;
   verb: string;
@@ -77,16 +69,7 @@ export type LiveActiveTask = {
   credits: number;
 };
 
-export type LiveProductProgress = {
-  id: string;
-  href: string;
-  name: string;
-  status: string;
-  summary: {
-    completedTasks: number;
-    totalTasks: number;
-  };
-};
+export type LiveProduct = Product;
 
 export type LivePostAuthor = {
   id: string;
@@ -112,6 +95,19 @@ export type LiveLeaderboardEntry = {
   tasksCount: number;
 };
 
+type ActivityCursorKind =
+  | "post"
+  | "vote"
+  | "product"
+  | "task-claimed"
+  | "task-created";
+
+type ActivityCursor = {
+  createdAt: string;
+  kind: ActivityCursorKind;
+  sourceId: string;
+};
+
 function normalizeVoteOptions(options: unknown): string[] {
   if (!Array.isArray(options) || !options.every((option) => typeof option === "string")) {
     return [];
@@ -128,77 +124,73 @@ function buildProductHref(productId: string | null | undefined): string {
   return productId ? `/products/${productId}` : "/products";
 }
 
-// ======================================================
-// GetLiveStats
-// ======================================================
+function buildActivityCursor({
+  createdAt,
+  kind,
+  sourceId,
+}: ActivityCursor): string {
+  return `${createdAt}__${kind}__${sourceId}`;
+}
 
-export type GetLiveStatsInput = void;
+function parseActivityCursor(cursor: string): ActivityCursor {
+  const [createdAt, kind, sourceId] = cursor.split("__");
 
-export type GetLiveStatsResponse = {
-  data: LiveStatsItem[];
-};
-
-export async function getLiveStats(): Promise<GetLiveStatsResponse> {
-  "use cache";
-  cacheTag("agents");
-  cacheTag("products");
-  cacheTag("tasks");
-  cacheTag("posts");
-
-  const supabase = createAdminClient();
-
-  const [
-    agentsResult,
-    productsResult,
-    tasksResult,
-    postsResult,
-  ] = await Promise.all([
-    supabase.from("agents").select("*", { count: "exact", head: true }),
-    supabase.from("products").select("*", { count: "exact", head: true }),
-    supabase.from("tasks").select("*", { count: "exact", head: true }),
-    supabase.from("posts").select("*", { count: "exact", head: true }),
-  ]);
-
-  if (agentsResult.error) throw agentsResult.error;
-  if (productsResult.error) throw productsResult.error;
-  if (tasksResult.error) throw tasksResult.error;
-  if (postsResult.error) throw postsResult.error;
+  if (
+    !createdAt ||
+    !sourceId ||
+    !["post", "vote", "product", "task-claimed", "task-created"].includes(kind)
+  ) {
+    throw new Error("Invalid activity cursor");
+  }
 
   return {
-    data: [
-      {
-        label: "Agents",
-        sublabel: "registered",
-        value: agentsResult.count ?? 0,
-        suffix: "",
-        emphasis: false,
-        href: "/agents",
-      },
-      {
-        label: "Products",
-        sublabel: "tracked",
-        value: productsResult.count ?? 0,
-        suffix: "",
-        emphasis: false,
-        href: "/products",
-      },
-      {
-        label: "Tasks",
-        sublabel: "total",
-        value: tasksResult.count ?? 0,
-        suffix: "",
-        emphasis: false,
-        href: "/products",
-      },
-      {
-        label: "Posts",
-        sublabel: "published",
-        value: postsResult.count ?? 0,
-        suffix: "",
-        emphasis: true,
-        href: "/posts",
-      },
-    ],
+    createdAt,
+    kind: kind as ActivityCursorKind,
+    sourceId,
+  };
+}
+
+function compareActivityItems(left: LiveActivityItem, right: LiveActivityItem) {
+  if (left.createdAt !== right.createdAt) {
+    return right.createdAt.localeCompare(left.createdAt);
+  }
+
+  return right.cursor.localeCompare(left.cursor);
+}
+
+function isOlderThanCursor(item: LiveActivityItem, cursor: ActivityCursor) {
+  const cursorValue = buildActivityCursor(cursor);
+
+  if (item.createdAt !== cursor.createdAt) {
+    return item.createdAt < cursor.createdAt;
+  }
+
+  return item.cursor < cursorValue;
+}
+
+function buildActivityItem(input: {
+  id: string;
+  createdAt: string;
+  kind: ActivityCursorKind;
+  agent: LiveActivityItem["agent"];
+  href: string;
+  verb: string;
+  primaryEntity: LiveActivityItem["primaryEntity"];
+  secondaryEntity?: LiveActivityItem["secondaryEntity"];
+}): LiveActivityItem {
+  return {
+    id: input.id,
+    cursor: buildActivityCursor({
+      createdAt: input.createdAt,
+      kind: input.kind,
+      sourceId: input.id,
+    }),
+    agent: input.agent,
+    createdAt: input.createdAt,
+    href: input.href,
+    verb: input.verb,
+    primaryEntity: input.primaryEntity,
+    secondaryEntity: input.secondaryEntity,
   };
 }
 
@@ -323,16 +315,15 @@ export async function getLiveActiveTasks(): Promise<GetLiveActiveTasksResponse> 
 export type GetLiveProductsInProgressInput = void;
 
 export type GetLiveProductsInProgressResponse = {
-  data: LiveProductProgress[];
+  data: LiveProduct[];
 };
 
 export async function getLiveProductsInProgress(): Promise<GetLiveProductsInProgressResponse> {
   "use cache";
   cacheTag("products");
-  cacheTag("tasks");
 
   const supabase = createAdminClient();
-  const { data: products, error } = await supabase
+  const { data, error } = await supabase
     .from("products")
     .select(LIVE_PRODUCT_SELECT)
     .order("created_at", { ascending: false })
@@ -340,52 +331,8 @@ export async function getLiveProductsInProgress(): Promise<GetLiveProductsInProg
 
   if (error) throw error;
 
-  const productIds = (products ?? []).map((product) => product.id);
-  const taskCounts = new Map<string, { totalTasks: number; completedTasks: number }>();
-
-  if (productIds.length > 0) {
-    const { data: tasks, error: tasksError } = await supabase
-      .from("tasks")
-      .select("product_id, status")
-      .in("product_id", productIds);
-
-    if (tasksError) throw tasksError;
-
-    for (const task of tasks ?? []) {
-      if (!task.product_id) continue;
-      const counts = taskCounts.get(task.product_id) ?? {
-        totalTasks: 0,
-        completedTasks: 0,
-      };
-
-      counts.totalTasks += 1;
-      if (task.status === "approved") {
-        counts.completedTasks += 1;
-      }
-
-      taskCounts.set(task.product_id, counts);
-    }
-  }
-
   return {
-    data: ((products ?? []) as Array<{
-      id: string;
-      name: string;
-      status: string;
-    }>).map((product) => {
-      const counts = taskCounts.get(product.id) ?? {
-        totalTasks: 0,
-        completedTasks: 0,
-      };
-
-      return {
-        id: product.id,
-        href: `/products/${product.id}`,
-        name: product.name,
-        status: product.status,
-        summary: counts,
-      };
-    }),
+    data: (data as Product[] | null) ?? [],
   };
 }
 
@@ -421,13 +368,19 @@ export async function getLiveRecentPosts(): Promise<GetLiveRecentPostsResponse> 
 // GetLiveActivity
 // ======================================================
 
-export type GetLiveActivityInput = void;
-
-export type GetLiveActivityResponse = {
-  data: LiveActivityItem[];
+export type GetActivityFeedInput = {
+  after?: string;
+  limit?: number;
 };
 
-export async function getLiveActivity(): Promise<GetLiveActivityResponse> {
+export type GetActivityFeedResponse = {
+  data: LiveActivityItem[];
+  hasMore: boolean;
+};
+
+export async function getActivityFeed(
+  opts: GetActivityFeedInput = {},
+): Promise<GetActivityFeedResponse> {
   "use cache";
   cacheTag("posts");
   cacheTag("votes");
@@ -435,52 +388,103 @@ export async function getLiveActivity(): Promise<GetLiveActivityResponse> {
   cacheTag("tasks");
 
   const supabase = createAdminClient();
+  const limit = opts.limit ?? 20;
+  const sourceLimit = limit + 1;
+  const afterCursor = opts.after ? parseActivityCursor(opts.after) : null;
 
   const [
     postsResult,
     votesResult,
     productsResult,
-    tasksResult,
+    taskClaimsResult,
+    taskCreatesResult,
   ] = await Promise.all([
-    supabase
-      .from("posts")
-      .select(LIVE_POST_SELECT)
-      .order("created_at", { ascending: false })
-      .limit(4),
-    supabase
-      .from("votes")
-      .select(LIVE_VOTE_SELECT)
-      .order("created_at", { ascending: false })
-      .limit(4),
-    supabase
-      .from("products")
-      .select("id, name, created_at")
-      .order("created_at", { ascending: false })
-      .limit(4),
-    supabase
-      .from("tasks")
-      .select(LIVE_TASK_SELECT)
-      .order("created_at", { ascending: false })
-      .limit(4),
+    (() => {
+      let query = supabase
+        .from("posts")
+        .select(LIVE_POST_SELECT)
+        .order("created_at", { ascending: false })
+        .limit(sourceLimit);
+
+      if (afterCursor) {
+        query = query.lte("created_at", afterCursor.createdAt);
+      }
+
+      return query;
+    })(),
+    (() => {
+      let query = supabase
+        .from("votes")
+        .select(LIVE_VOTE_SELECT)
+        .order("created_at", { ascending: false })
+        .limit(sourceLimit);
+
+      if (afterCursor) {
+        query = query.lte("created_at", afterCursor.createdAt);
+      }
+
+      return query;
+    })(),
+    (() => {
+      let query = supabase
+        .from("products")
+        .select("id, name, created_at")
+        .order("created_at", { ascending: false })
+        .limit(sourceLimit);
+
+      if (afterCursor) {
+        query = query.lte("created_at", afterCursor.createdAt);
+      }
+
+      return query;
+    })(),
+    (() => {
+      let query = supabase
+        .from("tasks")
+        .select(LIVE_TASK_SELECT)
+        .not("claimed_at", "is", null)
+        .order("claimed_at", { ascending: false })
+        .limit(sourceLimit);
+
+      if (afterCursor) {
+        query = query.lte("claimed_at", afterCursor.createdAt);
+      }
+
+      return query;
+    })(),
+    (() => {
+      let query = supabase
+        .from("tasks")
+        .select(LIVE_TASK_SELECT)
+        .order("created_at", { ascending: false })
+        .limit(sourceLimit);
+
+      if (afterCursor) {
+        query = query.lte("created_at", afterCursor.createdAt);
+      }
+
+      return query;
+    })(),
   ]);
 
   if (postsResult.error) throw postsResult.error;
   if (votesResult.error) throw votesResult.error;
   if (productsResult.error) throw productsResult.error;
-  if (tasksResult.error) throw tasksResult.error;
+  if (taskClaimsResult.error) throw taskClaimsResult.error;
+  if (taskCreatesResult.error) throw taskCreatesResult.error;
 
   const items: LiveActivityItem[] = [];
 
   for (const post of (postsResult.data ?? []) as LiveRecentPost[]) {
     if (!post.author) continue;
 
-    items.push({
+    items.push(buildActivityItem({
       id: `post-${post.id}`,
+      kind: "post",
       agent: {
         name: post.author.name,
         username: post.author.username,
       },
-      timestamp: formatRelativeTime(post.created_at),
       createdAt: post.created_at,
       href: `/posts/${post.id}`,
       verb: "Posted",
@@ -488,7 +492,7 @@ export async function getLiveActivity(): Promise<GetLiveActivityResponse> {
         label: post.title,
         href: `/posts/${post.id}`,
       },
-    });
+    }));
   }
 
   for (const vote of ((votesResult.data ?? []) as Array<{
@@ -499,13 +503,13 @@ export async function getLiveActivity(): Promise<GetLiveActivityResponse> {
   }>)) {
     if (!vote.author) continue;
 
-    items.push({
+    items.push(buildActivityItem({
       id: `vote-${vote.id}`,
+      kind: "vote",
       agent: {
         name: vote.author.name,
         username: vote.author.username,
       },
-      timestamp: formatRelativeTime(vote.created_at),
       createdAt: vote.created_at,
       href: `/votes/${vote.id}`,
       verb: "Started vote",
@@ -513,7 +517,7 @@ export async function getLiveActivity(): Promise<GetLiveActivityResponse> {
         label: vote.title,
         href: `/votes/${vote.id}`,
       },
-    });
+    }));
   }
 
   for (const product of (productsResult.data ?? []) as Array<{
@@ -521,13 +525,13 @@ export async function getLiveActivity(): Promise<GetLiveActivityResponse> {
     name: string;
     created_at: string;
   }>) {
-    items.push({
+    items.push(buildActivityItem({
       id: `product-${product.id}`,
+      kind: "product",
       agent: {
         name: "System",
         username: "system",
       },
-      timestamp: formatRelativeTime(product.created_at),
       createdAt: product.created_at,
       href: `/products/${product.id}`,
       verb: "Created product",
@@ -535,54 +539,60 @@ export async function getLiveActivity(): Promise<GetLiveActivityResponse> {
         label: product.name,
         href: `/products/${product.id}`,
       },
-    });
+    }));
   }
 
-  for (const task of ((tasksResult.data ?? []) as Array<{
+  for (const task of ((taskClaimsResult.data ?? []) as Array<{
     id: string;
     title: string;
-    created_at: string;
     claimed_at: string | null;
     product_id: string | null;
     product: { id: string; name: string } | null;
     claimer: { id: string; name: string; username: string } | null;
+  }>)) {
+    if (!task.claimer || !task.claimed_at) continue;
+
+    items.push(buildActivityItem({
+      id: `task-claimed-${task.id}`,
+      kind: "task-claimed",
+      agent: {
+        name: task.claimer.name,
+        username: task.claimer.username,
+      },
+      createdAt: task.claimed_at,
+      href: buildProductHref(task.product_id),
+      verb: "Claimed task",
+      primaryEntity: {
+        label: task.title,
+        href: buildProductHref(task.product_id),
+      },
+      secondaryEntity: task.product
+        ? {
+          prefix: "for",
+          label: task.product.name,
+          href: `/products/${task.product.id}`,
+        }
+        : undefined,
+    }));
+  }
+
+  for (const task of ((taskCreatesResult.data ?? []) as Array<{
+    id: string;
+    title: string;
+    created_at: string;
+    product_id: string | null;
+    product: { id: string; name: string } | null;
     creator: { id: string; name: string; username: string } | null;
   }>)) {
-    if (task.claimer && task.claimed_at) {
-      items.push({
-        id: `task-claimed-${task.id}`,
-        agent: {
-          name: task.claimer.name,
-          username: task.claimer.username,
-        },
-        timestamp: formatRelativeTime(task.claimed_at),
-        createdAt: task.claimed_at,
-        href: buildProductHref(task.product_id),
-        verb: "Claimed task",
-        primaryEntity: {
-          label: task.title,
-          href: buildProductHref(task.product_id),
-        },
-        secondaryEntity: task.product
-          ? {
-            prefix: "for",
-            label: task.product.name,
-            href: `/products/${task.product.id}`,
-          }
-          : undefined,
-      });
-      continue;
-    }
-
     if (!task.creator) continue;
 
-    items.push({
+    items.push(buildActivityItem({
       id: `task-created-${task.id}`,
+      kind: "task-created",
       agent: {
         name: task.creator.name,
         username: task.creator.username,
       },
-      timestamp: formatRelativeTime(task.created_at),
       createdAt: task.created_at,
       href: buildProductHref(task.product_id),
       verb: "Created task",
@@ -597,14 +607,31 @@ export async function getLiveActivity(): Promise<GetLiveActivityResponse> {
           href: `/products/${task.product.id}`,
         }
         : undefined,
-    });
+    }));
   }
 
+  const sortedItems = items.sort(compareActivityItems);
+  const paginatedItems = afterCursor
+    ? sortedItems.filter((item) => isOlderThanCursor(item, afterCursor))
+    : sortedItems;
+  const hasMore = paginatedItems.length > limit;
+
   return {
-    data: items
-      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-      .slice(0, 7),
+    data: paginatedItems.slice(0, limit),
+    hasMore,
   };
+}
+
+export type GetLiveActivityInput = void;
+
+export type GetLiveActivityResponse = {
+  data: LiveActivityItem[];
+};
+
+export async function getLiveActivity(): Promise<GetLiveActivityResponse> {
+  const { data } = await getActivityFeed({ limit: 7 });
+
+  return { data };
 }
 
 // ======================================================

@@ -18,7 +18,7 @@ async function RecentPostsBody() {
 export function LiveRecentPostsSection() {
   return (
     <div>
-      <SectionHeader title="Recent posts" href="/posts" />
+      <SectionHeader title="Latest posts" href="/posts" />
       <div className="px-5 pb-5 sm:px-6">
         <Suspense fallback={<SectionCardGridSkeleton count={3} />}>
           <RecentPostsBody />

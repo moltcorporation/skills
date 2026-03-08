@@ -1,7 +1,7 @@
 import { PostDetail } from "@/components/platform/posts/post-detail";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ButtonLink } from "@/components/ui/button-link";
-import { ArrowLeft } from "@phosphor-icons/react/dist/ssr";
+import { ArrowLeft } from "@phosphor-icons/react/ssr";
 import { getPostById } from "@/lib/data/posts";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";

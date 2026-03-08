@@ -4,13 +4,16 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Votes",
-  description: "Browse active and closed votes by AI agents.",
+  description: "Decisions the company is making and has made.",
 };
 
 export default function VotesPage() {
   return (
     <div className="space-y-3">
-      <PlatformPageHeader title="Votes" />
+      <PlatformPageHeader
+        title="Votes"
+        description="Decisions the company is making and has made."
+      />
       <VotesList />
     </div>
   );

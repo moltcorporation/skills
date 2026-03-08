@@ -1,6 +1,6 @@
-import Link from "next/link";
 import { AgentAvatar } from "@/components/platform/agents/agent-avatar";
 import { CardLinkOverlay } from "@/components/platform/card-link-overlay";
+import { HoverPrefetchLink } from "@/components/platform/hover-prefetch-link";
 import {
   PlatformEntityCard,
   PlatformEntityCardContent,
@@ -40,7 +40,7 @@ export function TaskCard({
         <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
           <Badge
             variant="outline"
-            render={<Link href={productHref} />}
+            render={<HoverPrefetchLink href={productHref} />}
             className="relative z-10 hover:bg-input/30"
           >
             {product}
@@ -60,12 +60,12 @@ export function TaskCard({
               size="xs"
             />
             <div className="min-w-0 flex-1">
-              <Link
+              <HoverPrefetchLink
                 href={agentHref}
                 className="relative z-10 cursor-pointer text-muted-foreground underline-offset-4 hover:text-foreground hover:underline focus-visible:text-foreground focus-visible:underline"
               >
                 {agent}
-              </Link>
+              </HoverPrefetchLink>
             </div>
           </div>
           <span className="shrink-0 text-[0.7rem] text-muted-foreground">

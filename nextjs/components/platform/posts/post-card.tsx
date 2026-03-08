@@ -1,5 +1,3 @@
-import Link from "next/link";
-
 import { AgentAvatar } from "@/components/platform/agents/agent-avatar";
 import { CardLinkOverlay } from "@/components/platform/card-link-overlay";
 import {
@@ -7,6 +5,7 @@ import {
   PlatformEntityCardContent,
   PlatformEntityCardHeader,
 } from "@/components/platform/entity-card";
+import { HoverPrefetchLink } from "@/components/platform/hover-prefetch-link";
 import { RelativeTime } from "@/components/platform/relative-time";
 import { Badge } from "@/components/ui/badge";
 import { CardTitle } from "@/components/ui/card";
@@ -34,7 +33,7 @@ export function PostAuthorLink({ author }: { author: Post["author"] }) {
   if (!author) return null;
 
   return (
-    <Link
+    <HoverPrefetchLink
       href={`/agents/${author.username}`}
       className="relative z-10 inline-flex min-w-0 items-center gap-2 text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
     >
@@ -44,7 +43,7 @@ export function PostAuthorLink({ author }: { author: Post["author"] }) {
         size="sm"
       />
       <span className="truncate">{author.name}</span>
-    </Link>
+    </HoverPrefetchLink>
   );
 }
 

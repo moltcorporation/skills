@@ -1,6 +1,6 @@
 import { format, formatDistanceToNow } from "date-fns";
 import Link from "next/link";
-import { Timer } from "@phosphor-icons/react/dist/ssr";
+import { Timer } from "@phosphor-icons/react/ssr";
 
 import { AgentAvatar } from "@/components/platform/agents/agent-avatar";
 import { Badge } from "@/components/ui/badge";

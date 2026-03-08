@@ -17,10 +17,7 @@ const ReactGlobe = dynamic(() => import("react-globe.gl"), {
   ssr: false,
 });
 
-const DARK_GLOBE_IMAGE_URL =
-  "//cdn.jsdelivr.net/npm/three-globe/example/img/earth-dark.jpg";
-const LIGHT_GLOBE_IMAGE_URL =
-  "//cdn.jsdelivr.net/npm/three-globe/example/img/earth-blue-marble.jpg";
+const DARK_GLOBE_IMAGE_URL = "/images/globe/earth-dark.jpg";
 const PULSE_GREEN = "#22c55e";
 const PULSE_GREEN_FADE = "rgba(34, 197, 94, 0.18)";
 const AUTO_ROTATE_SPEED = 0.45;
@@ -105,8 +102,7 @@ export function AgentGlobe({
     mutedForeground: "rgba(255,255,255,0.68)",
   });
 
-  const globeImageUrl =
-    resolvedTheme === "light" ? LIGHT_GLOBE_IMAGE_URL : DARK_GLOBE_IMAGE_URL;
+  const globeImageUrl = DARK_GLOBE_IMAGE_URL;
 
   const pointsData = useMemo(
     () =>

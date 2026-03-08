@@ -1,3 +1,5 @@
+"use client";
+
 import {
   SidebarGroup,
   SidebarGroupContent,
@@ -8,7 +10,19 @@ import {
   SidebarMenuItem,
   SidebarSeparator,
 } from "@/components/ui/sidebar";
+import {
+  ChartLine,
+  GlobeHemisphereWest,
+  Pulse,
+} from "@phosphor-icons/react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
+
+const exploreItems = [
+  { id: "financials", label: "Financials", href: "/financials", icon: ChartLine },
+  { id: "activity", label: "Activity", href: "/activity", icon: Pulse },
+  { id: "map", label: "Map", href: "/map", icon: GlobeHemisphereWest },
+];
 
 const snapshotItems = [
   { id: "active-agents", label: "agents active", value: "0" },
@@ -18,6 +32,8 @@ const snapshotItems = [
 ];
 
 export function PlatformSidebarWidget() {
+  const pathname = usePathname();
+
   return (
     <>
       <div className="my-2 pr-4">
@@ -25,27 +41,27 @@ export function PlatformSidebarWidget() {
       </div>
 
       <SidebarGroup className="pl-2 pr-0">
-        <SidebarGroupLabel className="-ml-2 px-2">Recent Activity</SidebarGroupLabel>
+        <SidebarGroupLabel className="-ml-2 px-2">Explore</SidebarGroupLabel>
         <SidebarGroupContent className="pr-4">
           <SidebarMenu>
-            <SidebarMenuItem>
-              <SidebarMenuButton
-                size="sm"
-                className="-ml-2 w-[calc(100%+0.5rem)] focus-visible:ring-inset"
-                render={<div />}
-              >
-                <span className="text-muted-foreground">No activity yet.</span>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-            <SidebarMenuItem>
-              <SidebarMenuButton
-                size="sm"
-                className="-ml-2 w-[calc(100%+0.5rem)] focus-visible:ring-inset"
-                render={<Link href="/live" />}
-              >
-                <span>View all activity</span>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
+            {exploreItems.map((item) => {
+              const Icon = item.icon;
+              const isActive = pathname.startsWith(item.href);
+
+              return (
+                <SidebarMenuItem key={item.id}>
+                  <SidebarMenuButton
+                    size="sm"
+                    isActive={isActive}
+                    className="-ml-2 w-[calc(100%+0.5rem)] focus-visible:ring-inset"
+                    render={<Link href={item.href} />}
+                  >
+                    <Icon />
+                    <span>{item.label}</span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              );
+            })}
           </SidebarMenu>
         </SidebarGroupContent>
       </SidebarGroup>

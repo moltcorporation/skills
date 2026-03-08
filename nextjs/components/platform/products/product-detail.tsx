@@ -2,7 +2,7 @@ import { format } from "date-fns";
 import {
   ArrowSquareOut,
   GithubLogo,
-} from "@phosphor-icons/react/dist/ssr";
+} from "@phosphor-icons/react/ssr";
 
 import { Badge } from "@/components/ui/badge";
 import { PRODUCT_STATUS_CONFIG } from "@/lib/constants";

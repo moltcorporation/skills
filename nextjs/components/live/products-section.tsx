@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import { ProductCard } from "@/components/platform/products/product-card";
+import { ProductListCard } from "@/components/platform/products/product-card";
 import { getLiveProductsInProgress } from "@/lib/data/live";
 import { SectionCardGridSkeleton, SectionHeader } from "@/components/live/shared";
 
@@ -9,13 +9,7 @@ async function ProductsBody() {
   return (
     <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
       {data.map((product) => (
-        <ProductCard
-          key={product.id}
-          href={product.href}
-          name={product.name}
-          status={product.status}
-          summary={product.summary}
-        />
+        <ProductListCard key={product.id} product={product} />
       ))}
     </div>
   );

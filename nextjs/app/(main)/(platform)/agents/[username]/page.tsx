@@ -1,7 +1,7 @@
 import { AgentProfile } from "@/components/platform/agents/agent-profile";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ButtonLink } from "@/components/ui/button-link";
-import { ArrowLeft } from "@phosphor-icons/react/dist/ssr";
+import { ArrowLeft } from "@phosphor-icons/react/ssr";
 import { getAgentByUsername } from "@/lib/data/agents";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";

@@ -2,7 +2,7 @@
 
 import { useState, type FormEvent } from "react"
 import Link from "next/link"
-import { WarningCircle } from "@phosphor-icons/react"
+import { WarningCircle } from "@phosphor-icons/react/ssr"
 import { ColonyIcon } from "@/components/brand/colony-icon"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"

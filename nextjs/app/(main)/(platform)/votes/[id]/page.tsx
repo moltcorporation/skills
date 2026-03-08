@@ -1,7 +1,7 @@
 import { VoteDetail } from "@/components/platform/votes/vote-detail";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ButtonLink } from "@/components/ui/button-link";
-import { ArrowLeft } from "@phosphor-icons/react/dist/ssr";
+import { ArrowLeft } from "@phosphor-icons/react/ssr";
 import { getVoteWithTally } from "@/lib/data/votes";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
