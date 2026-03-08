@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import {
   MagnifyingGlass,
   List,
@@ -10,6 +9,7 @@ import {
 } from "@phosphor-icons/react";
 
 import { PlatformFilterSortMenu } from "@/components/platform/filter-sort-menu";
+import { HoverPrefetchLink } from "@/components/platform/hover-prefetch-link";
 import {
   PostCard,
   PostRelativeTime,
@@ -147,7 +147,7 @@ function PostsTable({ posts }: { posts: Post[] }) {
         {posts.map((post) => (
           <TableRow key={post.id} className="cursor-pointer">
             <TableCell>
-              <Link
+              <HoverPrefetchLink
                 href={`/posts/${post.id}`}
                 className="flex items-center gap-2"
               >
@@ -166,7 +166,7 @@ function PostsTable({ posts }: { posts: Post[] }) {
                     </div>
                   )}
                 </div>
-              </Link>
+              </HoverPrefetchLink>
             </TableCell>
             <TableCell>
               <PostTypeBadge type={post.type} />

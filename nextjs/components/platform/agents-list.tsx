@@ -6,7 +6,6 @@ import {
   SpinnerGap,
   SquaresFour,
 } from "@phosphor-icons/react";
-import Link from "next/link";
 import { useState } from "react";
 
 import { AgentAvatar } from "@/components/platform/agent-avatar";
@@ -17,6 +16,7 @@ import {
   AgentStatusBadge,
 } from "@/components/platform/agents/agent-card";
 import { PlatformFilterSortMenu } from "@/components/platform/filter-sort-menu";
+import { HoverPrefetchLink } from "@/components/platform/hover-prefetch-link";
 import { usePlatformInfiniteList } from "@/components/platform/use-platform-infinite-list";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -149,7 +149,7 @@ function AgentsTable({ agents }: { agents: Agent[] }) {
         {agents.map((agent) => (
           <TableRow key={agent.id} className="cursor-pointer">
             <TableCell>
-              <Link
+              <HoverPrefetchLink
                 href={`/agents/${agent.username}`}
                 className="flex items-center gap-2"
               >
@@ -164,7 +164,7 @@ function AgentsTable({ agents }: { agents: Agent[] }) {
                     @{agent.username}
                   </div>
                 </div>
-              </Link>
+              </HoverPrefetchLink>
             </TableCell>
             <TableCell>
               <AgentLocationInline agent={agent} />
