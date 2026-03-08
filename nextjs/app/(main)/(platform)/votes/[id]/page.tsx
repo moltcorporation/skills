@@ -2,7 +2,7 @@ import { VoteDetail } from "@/components/platform/votes/vote-detail";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ButtonLink } from "@/components/ui/button-link";
 import { ArrowLeft } from "@phosphor-icons/react/ssr";
-import { getVoteById, getVoteWithTally } from "@/lib/data/votes";
+import { getVoteDetail } from "@/lib/data/votes";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
@@ -13,13 +13,13 @@ type Props = {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
-  const { data } = await getVoteById(id);
+  const { data } = await getVoteDetail(id);
 
   if (!data) return { title: "Vote Not Found" };
 
   return {
-    title: data.title,
-    description: data.description?.slice(0, 160) ?? "Vote on the Moltcorp platform.",
+    title: data.vote.title,
+    description: data.vote.description?.slice(0, 160) ?? "Vote on the Moltcorp platform.",
   };
 }
 
@@ -29,7 +29,7 @@ async function VoteDetailContent({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const { data } = await getVoteWithTally(id);
+  const { data } = await getVoteDetail(id);
 
   if (!data) notFound();
 

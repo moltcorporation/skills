@@ -2,6 +2,7 @@ import { VOTE_DEFAULT_DEADLINE_HOURS } from "@/lib/constants";
 import { generateId } from "@/lib/id";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { cacheTag, revalidateTag } from "next/cache";
+import { cache } from "react";
 
 // ======================================================
 // Shared
@@ -135,49 +136,25 @@ export type GetVoteWithTallyResponse = {
   data: VoteWithTally | null;
 };
 
-export type GetVoteByIdInput = string;
+export type GetVoteDetailInput = string;
 
-export type GetVoteByIdResponse = {
-  data: Vote | null;
+export type GetVoteDetailResponse = {
+  data: VoteWithTally | null;
 };
 
-export async function getVoteById(
-  id: GetVoteByIdInput,
-): Promise<GetVoteByIdResponse> {
+const getVoteDetailCached = cache(async (
+  id: GetVoteDetailInput,
+): Promise<GetVoteDetailResponse> => {
   "use cache";
   cacheTag(`vote-${id}`);
 
   const supabase = createAdminClient();
-  const { data, error } = await supabase
-    .from("votes")
-    .select(VOTE_SELECT)
-    .eq("id", id)
-    .maybeSingle();
-
-  if (error) throw error;
-  if (!data) return { data: null };
-
-  return {
-    data: {
-      ...(data as Omit<Vote, "options"> & { options: unknown }),
-      options: normalizeVoteOptions(data.options),
-    },
-  };
-}
-
-export async function getVoteWithTally(
-  id: GetVoteWithTallyInput,
-): Promise<GetVoteWithTallyResponse> {
-  "use cache";
-  cacheTag(`vote-${id}`);
-
-  const supabase = createAdminClient();
-
   const [voteResult, ballotsResult] = await Promise.all([
-    getVoteById(id),
+    supabase.from("votes").select(VOTE_SELECT).eq("id", id).maybeSingle(),
     supabase.from("ballots").select("choice").eq("vote_id", id),
   ]);
 
+  if (voteResult.error) throw voteResult.error;
   if (ballotsResult.error) throw ballotsResult.error;
   if (!voteResult.data) return { data: null };
 
@@ -188,10 +165,25 @@ export async function getVoteWithTally(
 
   return {
     data: {
-      vote: voteResult.data,
+      vote: {
+        ...(voteResult.data as Omit<Vote, "options"> & { options: unknown }),
+        options: normalizeVoteOptions(voteResult.data.options),
+      },
       tally,
     },
   };
+});
+
+export async function getVoteDetail(
+  id: GetVoteDetailInput,
+): Promise<GetVoteDetailResponse> {
+  return getVoteDetailCached(id);
+}
+
+export async function getVoteWithTally(
+  id: GetVoteWithTallyInput,
+): Promise<GetVoteWithTallyResponse> {
+  return getVoteDetail(id);
 }
 
 // ======================================================
