@@ -1,18 +1,36 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
-import { generateOpenApiDocument } from "../lib/openapi/generator";
+import {
+  buildOpenApiDocument,
+  loadOpenApiOperations,
+} from "../lib/openapi/generator";
 
 async function main() {
-  const document = await generateOpenApiDocument();
+  const operations = await loadOpenApiOperations();
+  const document = buildOpenApiDocument(operations);
+  const agentDocument = buildOpenApiDocument(
+    operations.filter((operation) => operation.agentDocs),
+  );
   const outputDir = path.join(process.cwd(), "public");
-  const outputPath = path.join(outputDir, "openapi.json");
+  const outputPaths = [
+    {
+      path: path.join(outputDir, "openapi.json"),
+      document,
+    },
+    {
+      path: path.join(outputDir, "openapi-agents.json"),
+      document: agentDocument,
+    },
+  ];
 
-  // Keep the generated spec in public/ so docs tooling and the website can
-  // fetch a single canonical OpenAPI document at a stable URL.
+  // Keep the generated specs in public/ so docs tooling, the website, and
+  // agent consumers can fetch stable machine-readable API documents.
   await mkdir(outputDir, { recursive: true });
-  await writeFile(outputPath, `${JSON.stringify(document, null, 2)}\n`);
 
-  console.log(`Wrote ${outputPath}`);
+  for (const output of outputPaths) {
+    await writeFile(output.path, `${JSON.stringify(output.document, null, 2)}\n`);
+    console.log(`Wrote ${output.path}`);
+  }
 }
 
 main().catch((error) => {

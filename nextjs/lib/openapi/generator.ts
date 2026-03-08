@@ -32,6 +32,18 @@ type OperationSchemas = {
   errorResponses?: RouteConfig["responses"];
 };
 
+export type OpenApiOperation = {
+  agentDocs: boolean;
+  method: Lowercase<RouteMethod>;
+  path: string;
+  operationId: string;
+  summary: string;
+  description: string;
+  tags: string[];
+  request: RouteConfig["request"] | undefined;
+  responses: RouteConfig["responses"];
+};
+
 type RequestConfig = NonNullable<RouteConfig["request"]>;
 type OpenApiSchema = NonNullable<
   NonNullable<NonNullable<RequestConfig["body"]>["content"]["application/json"]>["schema"]
@@ -225,13 +237,12 @@ function buildResponses(schemas: OperationSchemas): RouteConfig["responses"] {
 }
 
 async function registerRouteDirectory(
-  registry: OpenAPIRegistry,
   routeDirectory: string,
-) {
+): Promise<OpenApiOperation[]> {
   const routeFilePath = path.join(routeDirectory, "route.ts");
   const schemaFilePath = path.join(routeDirectory, "schema.ts");
 
-  if (!existsSync(schemaFilePath)) return;
+  if (!existsSync(schemaFilePath)) return [];
 
   const sourceFile = ts.createSourceFile(
     routeFilePath,
@@ -242,47 +253,60 @@ async function registerRouteDirectory(
   );
   const schemaModule = (await import(schemaFilePath)) as Record<string, unknown>;
   const exportedMethods = getExportedRouteMethods(sourceFile);
+  const operations: OpenApiOperation[] = [];
 
   for (const methodName of exportedMethods) {
     const metadata = readRouteCommentMetadata(routeFilePath, methodName);
     const schemas = getOperationSchemas(schemaModule, metadata.operationId);
 
-    // Runtime route handlers remain untouched. This only assembles an OpenAPI
-    // document from the colocated route comments and schema exports.
-    registry.registerPath({
+    operations.push({
+      agentDocs: metadata.agentDocs,
       method: metadata.method,
       path: metadata.path,
       operationId: metadata.operationId,
       summary: metadata.summary,
       description: metadata.description,
       tags: metadata.tags,
-      "x-agent-docs": metadata.agentDocs,
       request: buildRequest(schemas),
       responses: buildResponses(schemas),
     });
   }
+
+  return operations;
 }
 
-export async function generateOpenApiDocument() {
-  const registry = new OpenAPIRegistry();
-  const apiRoot = path.join(process.cwd(), "app", "api", "v1");
-
-  // Next.js route handlers already live under app/api/v1, so the generator
-  // discovers route folders instead of keeping a manual registry file.
-  const routeDirectories = findRouteDirectories(apiRoot)
-    .filter((dirPath) => statSync(dirPath).isDirectory())
-    .sort();
-
-  for (const routeDirectory of routeDirectories) {
-    await registerRouteDirectory(registry, routeDirectory);
+function registerOperations(
+  registry: OpenAPIRegistry,
+  operations: OpenApiOperation[],
+) {
+  for (const operation of operations) {
+    // Runtime route handlers remain untouched. This only assembles an OpenAPI
+    // document from the colocated route comments and schema exports.
+    registry.registerPath({
+      method: operation.method,
+      path: operation.path,
+      operationId: operation.operationId,
+      summary: operation.summary,
+      description: operation.description,
+      tags: operation.tags,
+      "x-agent-docs": operation.agentDocs,
+      request: operation.request,
+      responses: operation.responses,
+    });
   }
+}
+
+export function buildOpenApiDocument(operations: OpenApiOperation[]) {
+  const registry = new OpenAPIRegistry();
+  registerOperations(registry, operations);
+
+  const routeDefinitions = registry.definitions.filter(
+    (definition): definition is Extract<typeof definition, { type: "route" }> =>
+      definition.type === "route",
+  );
 
   const usedTags = Array.from(
-    new Set(
-      registry.definitions
-        .filter((definition): definition is Extract<typeof definition, { type: "route" }> => definition.type === "route")
-        .flatMap((definition) => definition.route.tags ?? []),
-    ),
+    new Set(routeDefinitions.flatMap((definition) => definition.route.tags ?? [])),
   )
     .filter((tag): tag is OpenApiTagName => tag in tagDescriptions)
     .map((tag) => ({
@@ -299,4 +323,32 @@ export async function generateOpenApiDocument() {
     },
     tags: usedTags,
   });
+}
+
+export async function loadOpenApiOperations() {
+  const apiRoot = path.join(process.cwd(), "app", "api", "v1");
+
+  // Next.js route handlers already live under app/api/v1, so the generator
+  // discovers route folders instead of keeping a manual registry file.
+  const routeDirectories = findRouteDirectories(apiRoot)
+    .filter((dirPath) => statSync(dirPath).isDirectory())
+    .sort();
+
+  const operations: OpenApiOperation[] = [];
+
+  for (const routeDirectory of routeDirectories) {
+    operations.push(...(await registerRouteDirectory(routeDirectory)));
+  }
+
+  return operations;
+}
+
+export async function generateOpenApiDocument() {
+  return buildOpenApiDocument(await loadOpenApiOperations());
+}
+
+export async function generateAgentOpenApiDocument() {
+  return buildOpenApiDocument(
+    (await loadOpenApiOperations()).filter((operation) => operation.agentDocs),
+  );
 }

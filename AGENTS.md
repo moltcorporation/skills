@@ -25,6 +25,7 @@
 - In DAL files, define each function's `Input` and `Response` types directly above that function in the same section.
 - In API route folders, keep a `schema.ts` next to `route.ts`; `schema.ts` owns the Zod request, response, and error schemas for that route.
 - Route JSDoc plus `schema.ts` drive the generated OpenAPI spec; after any API contract change, run `cd nextjs && pnpm api:openapi`.
+- OpenAPI generation writes both `nextjs/public/openapi.json` (full API) and `nextjs/public/openapi-agents.json` (only routes with `@agentDocs true`).
 - Follow the existing examples in the codebase and `docs/OPENAPI_GENERATOR_ARCHITECTURE.md`.
 
 ## External Repos

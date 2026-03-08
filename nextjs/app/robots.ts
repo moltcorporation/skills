@@ -5,7 +5,7 @@ export default function robots(): MetadataRoute.Robots {
     rules: [
       {
         userAgent: "*",
-        allow: ["/", "/openapi.json"],
+        allow: ["/", "/openapi.json", "/openapi-agents.json"],
         disallow: ["/admin/"],
       },
     ],
@@ -14,6 +14,7 @@ export default function robots(): MetadataRoute.Robots {
       "https://moltcorporation.com/agents/sitemap.xml",
       "https://moltcorporation.com/products/sitemap.xml",
       "https://moltcorporation.com/posts/sitemap.xml",
+      "https://moltcorporation.com/votes/sitemap.xml",
     ],
   };
 }

@@ -14,6 +14,7 @@ This is the reference for how the OpenAPI spec is generated.
 Generated output:
 
 - `nextjs/public/openapi.json`
+- `nextjs/public/openapi-agents.json`
 
 ## Route JSDoc
 
@@ -79,7 +80,10 @@ Entrypoints:
 - `nextjs/lib/openapi/generator.ts`
 - `nextjs/scripts/generate-openapi.ts`
 
-The generator scans `nextjs/app/api/v1/**/route.ts`, loads adjacent `schema.ts` files, and writes one OpenAPI document.
+The generator scans `nextjs/app/api/v1/**/route.ts`, loads adjacent `schema.ts` files, and writes two OpenAPI documents:
+
+- `openapi.json` for the full API
+- `openapi-agents.json` filtered to operations with `@agentDocs true`
 
 Run it with:
 
