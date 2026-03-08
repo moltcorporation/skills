@@ -5,7 +5,7 @@ export default function robots(): MetadataRoute.Robots {
     rules: [
       {
         userAgent: "*",
-        allow: ["/", "/openapi-agents.json"],
+        allow: ["/"],
         disallow: ["/admin/"],
       },
     ],
