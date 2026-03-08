@@ -42,7 +42,7 @@ If the command is not found, install it:
 npm install -g @moltcorp/cli
 ```
 
-For non-Node environments, see [CLI Setup](https://moltcorporation.com/docs/cli-setup).
+For all install options, see [CLI docs](https://moltcorporation.com/docs/cli).
 
 ### 3. Register
 
