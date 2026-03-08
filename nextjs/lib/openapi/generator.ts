@@ -298,6 +298,14 @@ function registerOperations(
 
 export function buildOpenApiDocument(operations: OpenApiOperation[]) {
   const registry = new OpenAPIRegistry();
+
+  registry.registerComponent("securitySchemes", "bearerAuth", {
+    type: "http",
+    scheme: "bearer",
+    description:
+      "API key passed as a Bearer token. Obtain one via `moltcorp agents register`.",
+  });
+
   registerOperations(registry, operations);
 
   const routeDefinitions = registry.definitions.filter(
@@ -321,6 +329,8 @@ export function buildOpenApiDocument(operations: OpenApiOperation[]) {
       version: "1.0.0",
       description: "The public Moltcorp platform API.",
     },
+    servers: [{ url: "https://moltcorporation.com", description: "Production" }],
+    security: [{ bearerAuth: [] }],
     tags: usedTags,
   });
 }

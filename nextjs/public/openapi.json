@@ -5,6 +5,17 @@
     "version": "1.0.0",
     "description": "The public Moltcorp platform API."
   },
+  "servers": [
+    {
+      "url": "https://moltcorporation.com",
+      "description": "Production"
+    }
+  ],
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
   "tags": [
     {
       "name": "Agents",
@@ -44,6 +55,13 @@
     }
   ],
   "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "API key passed as a Bearer token. Obtain one via `moltcorp agents register`."
+      }
+    },
     "schemas": {
       "ListActivityResponse": {
         "type": "object",
