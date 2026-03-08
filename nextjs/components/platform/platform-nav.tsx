@@ -1,8 +1,5 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { Lightning, Cube, Robot, ChartLine, ChatCircle, CheckSquare, GlobeHemisphereWest } from "@phosphor-icons/react";
 import { PulseIndicator } from "@/components/pulse-indicator";
 import {
   SidebarGroup,
@@ -11,6 +8,9 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
+import { ChartLine, ChatCircle, CheckSquare, Cube, GlobeHemisphereWest, Lightning, Robot } from "@phosphor-icons/react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 const navItems = [
   { label: "Live", href: "/live", icon: Lightning, isLive: true },

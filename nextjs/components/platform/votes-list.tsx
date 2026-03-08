@@ -33,45 +33,17 @@ import {
   PLATFORM_SORT_OPTIONS,
   VOTE_STATUS_FILTER_OPTIONS,
 } from "@/lib/constants";
+import {
+  buildVoteSearchParams,
+  getVoteFiltersFromSearchParams,
+  type VoteFilters,
+} from "@/components/platform/votes-list-shared";
 import type { ListVotesResponse } from "@/app/api/v1/votes/schema";
 import type { Vote } from "@/lib/data/votes";
 
 type ApiResponse = Pick<ListVotesResponse, "votes" | "hasMore">;
 
-type StatusFilterValue =
-  (typeof VOTE_STATUS_FILTER_OPTIONS)[number]["value"];
-type VoteSortValue = (typeof PLATFORM_SORT_OPTIONS)[number]["value"];
-
-type VoteFilters = {
-  search: string;
-  status: StatusFilterValue;
-  sort: VoteSortValue;
-};
-
-function buildSearchParams(
-  filters: VoteFilters,
-  options?: { after?: string; limit?: number },
-) {
-  const params = new URLSearchParams();
-
-  if (filters.search) params.set("search", filters.search);
-  if (filters.status !== "all") params.set("status", filters.status);
-  if (filters.sort !== "newest") params.set("sort", filters.sort);
-  if (options?.after) params.set("after", options.after);
-  if (options?.limit) params.set("limit", String(options.limit));
-
-  return params;
-}
-
-export function VotesList({
-  initialData,
-  initialHasMore,
-  initialFilters,
-}: {
-  initialData: Vote[];
-  initialHasMore: boolean;
-  initialFilters: VoteFilters;
-}) {
+export function VotesList() {
   const [viewMode, setViewMode] = useState<"table" | "cards">("table");
   const {
     filters,
@@ -79,19 +51,20 @@ export function VotesList({
     searchInput,
     setFilter,
     setSearchInput,
+    error,
     hasMore,
+    isLoading,
     isLoadingMore,
-    isValidating,
     loadMore,
   } = usePlatformInfiniteList<VoteFilters, ApiResponse, Vote>({
     apiPath: "/api/v1/votes",
     pathname: "/votes",
-    initialFilters,
-    initialPage: { votes: initialData, hasMore: initialHasMore },
+    defaultFilters: getVoteFiltersFromSearchParams(new URLSearchParams()),
     getCursor: (vote) => vote.id,
     getHasMore: (page) => page.hasMore,
     getItems: (page) => page.votes,
-    buildSearchParams,
+    getFiltersFromSearchParams: getVoteFiltersFromSearchParams,
+    buildSearchParams: buildVoteSearchParams,
   });
 
   return (
@@ -118,8 +91,8 @@ export function VotesList({
           sortValue={filters.sort}
           filterOptions={VOTE_STATUS_FILTER_OPTIONS}
           sortOptions={PLATFORM_SORT_OPTIONS}
-          onFilterChange={(value) => setFilter("status", value as StatusFilterValue)}
-          onSortChange={(value) => setFilter("sort", value as VoteSortValue)}
+          onFilterChange={(value) => setFilter("status", value as VoteFilters["status"])}
+          onSortChange={(value) => setFilter("sort", value as VoteFilters["sort"])}
         />
         <div className="relative min-w-48 flex-1">
           <MagnifyingGlass className="absolute left-2 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
@@ -132,7 +105,13 @@ export function VotesList({
         </div>
       </div>
 
-      {votes.length === 0 && !isValidating ? (
+      {error && votes.length === 0 ? (
+        <p className="py-12 text-center text-sm text-muted-foreground">
+          Unable to load votes right now.
+        </p>
+      ) : isLoading && votes.length === 0 ? (
+        <VotesResultsSkeleton viewMode={viewMode} />
+      ) : votes.length === 0 ? (
         <p className="py-12 text-center text-sm text-muted-foreground">
           No votes found
         </p>
@@ -218,13 +197,28 @@ function VotesCards({ votes }: { votes: Vote[] }) {
   );
 }
 
-export function VotesListSkeleton() {
+function VotesResultsSkeleton({
+  viewMode,
+}: {
+  viewMode: "table" | "cards";
+}) {
+  if (viewMode === "cards") {
+    return (
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3">
+        {Array.from({ length: 6 }).map((_, i) => (
+          <Skeleton key={i} className="h-40 w-full" />
+        ))}
+      </div>
+    );
+  }
+
   return (
-    <div className="space-y-4">
-      <div className="flex flex-wrap items-center gap-2">
-        <Skeleton className="h-7 flex-1 min-w-48" />
-        <Skeleton className="h-7 w-20" />
-        <Skeleton className="h-6 w-16" />
+    <div className="space-y-2">
+      <div className="grid grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)] gap-2">
+        <Skeleton className="h-4 w-16" />
+        <Skeleton className="h-4 w-16" />
+        <Skeleton className="h-4 w-16" />
+        <Skeleton className="h-4 w-12" />
       </div>
       <div className="space-y-2">
         {Array.from({ length: 5 }).map((_, i) => (

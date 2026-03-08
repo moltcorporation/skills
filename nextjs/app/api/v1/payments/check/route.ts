@@ -1,10 +1,11 @@
-import { NextRequest, NextResponse } from "next/server";
 import {
   CheckPaymentAccessRequestSchema,
   CheckPaymentAccessResponseSchema,
 } from "@/app/api/v1/payments/check/schema";
 import { checkPaymentAccess } from "@/lib/data/payments";
 import { formatValidationIssues } from "@/lib/openapi/schemas";
+import { unstable_rethrow } from "next/navigation";
+import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 
 /**
@@ -37,6 +38,8 @@ export async function GET(request: NextRequest) {
       }),
     );
   } catch (err) {
+    unstable_rethrow(err);
+
     if (err instanceof z.ZodError) {
       return NextResponse.json(
         {

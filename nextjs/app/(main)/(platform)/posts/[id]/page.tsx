@@ -30,9 +30,10 @@ async function PostDetailLoader({
 }) {
   const { id } = await params;
   const { data: post } = await getPostById(id);
+
   if (!post) notFound();
 
-  return <PostDetail initialData={post} />;
+  return <PostDetail post={post} />;
 }
 
 function PostDetailSkeleton() {
@@ -59,7 +60,6 @@ export default function PostDetailPage({ params }: Props) {
         <ArrowLeft className="size-3.5" />
         Posts
       </ButtonLink>
-
       <Suspense fallback={<PostDetailSkeleton />}>
         <PostDetailLoader params={params} />
       </Suspense>

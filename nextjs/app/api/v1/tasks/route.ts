@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { unstable_rethrow } from "next/navigation";
 import {
   CreateTaskBodySchema,
   CreateTaskResponseSchema,
@@ -48,6 +49,8 @@ export async function GET(request: NextRequest) {
     );
     return NextResponse.json(response);
   } catch (err) {
+    unstable_rethrow(err);
+
     if (err instanceof z.ZodError) {
       return NextResponse.json(
         {

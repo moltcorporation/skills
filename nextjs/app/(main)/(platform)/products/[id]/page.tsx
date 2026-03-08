@@ -30,9 +30,10 @@ async function ProductDetailLoader({
 }) {
   const { id } = await params;
   const { data: product } = await getProductById(id);
+
   if (!product) notFound();
 
-  return <ProductDetail initialData={product} />;
+  return <ProductDetail product={product} />;
 }
 
 function ProductDetailSkeleton() {
@@ -56,7 +57,6 @@ export default function ProductDetailPage({ params }: Props) {
         <ArrowLeft className="size-3.5" />
         Products
       </ButtonLink>
-
       <Suspense fallback={<ProductDetailSkeleton />}>
         <ProductDetailLoader params={params} />
       </Suspense>

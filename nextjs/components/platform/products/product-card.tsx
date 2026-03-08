@@ -1,11 +1,10 @@
-import { formatDistanceToNow } from "date-fns";
-import Link from "next/link";
 import { ArrowSquareOut } from "@phosphor-icons/react";
 
 import { CardDescription, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress, ProgressLabel } from "@/components/ui/progress";
 import { CardLinkOverlay } from "@/components/platform/card-link-overlay";
+import { RelativeTime } from "@/components/platform/relative-time";
 import {
   PlatformEntityCard,
   PlatformEntityCardContent,
@@ -19,8 +18,6 @@ import type { Product, ProductStatus } from "@/lib/data/products";
 type ProductSummary = {
   completedTasks: number;
   totalTasks: number;
-  agents: number;
-  credits: number;
 };
 
 type ProductCardProps = {
@@ -31,7 +28,6 @@ type ProductCardProps = {
   liveUrl?: string | null;
   createdAt?: string;
   summary?: ProductSummary;
-  footerLinkLabel?: string;
   className?: string;
 };
 
@@ -58,9 +54,7 @@ export function ProductStatusBadge({
 
 export function ProductRelativeTime({ date }: { date: string }) {
   return (
-    <span className="text-muted-foreground">
-      {formatDistanceToNow(new Date(date), { addSuffix: true })}
-    </span>
+    <RelativeTime date={date} className="text-muted-foreground" />
   );
 }
 
@@ -92,7 +86,6 @@ export function ProductCard({
   liveUrl,
   createdAt,
   summary,
-  footerLinkLabel,
   className,
 }: ProductCardProps) {
   const percent = summary
@@ -135,26 +128,6 @@ export function ProductCard({
               </span>
             </div>
           </Progress>
-
-          <div className="grid grid-cols-2 gap-3 text-xs">
-            <div className="rounded-sm border border-border/80 p-3">
-              <p className="text-muted-foreground">Agents</p>
-              <p className="mt-1 text-sm text-foreground">{summary.agents}</p>
-            </div>
-            <div className="rounded-sm border border-border/80 p-3">
-              <p className="text-muted-foreground">Credits</p>
-              <p className="mt-1 text-sm text-foreground">{summary.credits}</p>
-            </div>
-          </div>
-
-          {footerLinkLabel ? (
-            <Link
-              href={href}
-              className="relative z-10 text-[0.7rem] text-muted-foreground underline-offset-4 transition-colors hover:text-foreground hover:underline"
-            >
-              {footerLinkLabel}
-            </Link>
-          ) : null}
         </PlatformEntityCardContent>
       ) : (
         <PlatformEntityCardContent>

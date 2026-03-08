@@ -33,44 +33,17 @@ import {
   PLATFORM_SORT_OPTIONS,
   POST_TYPE_FILTER_OPTIONS,
 } from "@/lib/constants";
+import {
+  buildPostSearchParams,
+  getPostFiltersFromSearchParams,
+  type PostFilters,
+} from "@/components/platform/posts-list-shared";
 import type { ListPostsResponse } from "@/app/api/v1/posts/schema";
 import type { Post } from "@/lib/data/posts";
 
 type ApiResponse = Pick<ListPostsResponse, "posts" | "hasMore">;
 
-type TypeFilterValue = (typeof POST_TYPE_FILTER_OPTIONS)[number]["value"];
-type PostSortValue = (typeof PLATFORM_SORT_OPTIONS)[number]["value"];
-
-type PostFilters = {
-  search: string;
-  type: TypeFilterValue;
-  sort: PostSortValue;
-};
-
-function buildSearchParams(
-  filters: PostFilters,
-  options?: { after?: string; limit?: number },
-) {
-  const params = new URLSearchParams();
-
-  if (filters.search) params.set("search", filters.search);
-  if (filters.type !== "all") params.set("type", filters.type);
-  if (filters.sort !== "newest") params.set("sort", filters.sort);
-  if (options?.after) params.set("after", options.after);
-  if (options?.limit) params.set("limit", String(options.limit));
-
-  return params;
-}
-
-export function PostsList({
-  initialData,
-  initialHasMore,
-  initialFilters,
-}: {
-  initialData: Post[];
-  initialHasMore: boolean;
-  initialFilters: PostFilters;
-}) {
+export function PostsList() {
   const [viewMode, setViewMode] = useState<"table" | "cards">("table");
   const {
     filters,
@@ -78,19 +51,20 @@ export function PostsList({
     searchInput,
     setFilter,
     setSearchInput,
+    error,
     hasMore,
+    isLoading,
     isLoadingMore,
-    isValidating,
     loadMore,
   } = usePlatformInfiniteList<PostFilters, ApiResponse, Post>({
     apiPath: "/api/v1/posts",
     pathname: "/posts",
-    initialFilters,
-    initialPage: { posts: initialData, hasMore: initialHasMore },
+    defaultFilters: getPostFiltersFromSearchParams(new URLSearchParams()),
     getCursor: (post) => post.id,
     getHasMore: (page) => page.hasMore,
     getItems: (page) => page.posts,
-    buildSearchParams,
+    getFiltersFromSearchParams: getPostFiltersFromSearchParams,
+    buildSearchParams: buildPostSearchParams,
   });
 
   return (
@@ -117,8 +91,8 @@ export function PostsList({
           sortValue={filters.sort}
           filterOptions={POST_TYPE_FILTER_OPTIONS}
           sortOptions={PLATFORM_SORT_OPTIONS}
-          onFilterChange={(value) => setFilter("type", value as TypeFilterValue)}
-          onSortChange={(value) => setFilter("sort", value as PostSortValue)}
+          onFilterChange={(value) => setFilter("type", value as PostFilters["type"])}
+          onSortChange={(value) => setFilter("sort", value as PostFilters["sort"])}
         />
         <div className="relative min-w-48 flex-1">
           <MagnifyingGlass className="absolute left-2 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
@@ -131,7 +105,13 @@ export function PostsList({
         </div>
       </div>
 
-      {posts.length === 0 && !isValidating ? (
+      {error && posts.length === 0 ? (
+        <p className="py-12 text-center text-sm text-muted-foreground">
+          Unable to load posts right now.
+        </p>
+      ) : isLoading && posts.length === 0 ? (
+        <PostsResultsSkeleton viewMode={viewMode} />
+      ) : posts.length === 0 ? (
         <p className="py-12 text-center text-sm text-muted-foreground">
           No posts found
         </p>
@@ -211,13 +191,27 @@ function PostsCards({ posts }: { posts: Post[] }) {
   );
 }
 
-export function PostsListSkeleton() {
+function PostsResultsSkeleton({
+  viewMode,
+}: {
+  viewMode: "table" | "cards";
+}) {
+  if (viewMode === "cards") {
+    return (
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3">
+        {Array.from({ length: 6 }).map((_, i) => (
+          <Skeleton key={i} className="h-40 w-full" />
+        ))}
+      </div>
+    );
+  }
+
   return (
-    <div className="space-y-4">
-      <div className="flex flex-wrap items-center gap-2">
-        <Skeleton className="h-7 flex-1 min-w-48" />
-        <Skeleton className="h-7 w-20" />
-        <Skeleton className="h-6 w-16" />
+    <div className="space-y-2">
+      <div className="grid grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1fr)] gap-2">
+        <Skeleton className="h-4 w-16" />
+        <Skeleton className="h-4 w-12" />
+        <Skeleton className="h-4 w-14" />
       </div>
       <div className="space-y-2">
         {Array.from({ length: 5 }).map((_, i) => (

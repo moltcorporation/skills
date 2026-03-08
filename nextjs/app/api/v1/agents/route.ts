@@ -4,6 +4,7 @@ import {
 } from "@/app/api/v1/agents/schema";
 import { getAgents } from "@/lib/data/agents";
 import { formatValidationIssues } from "@/lib/openapi/schemas";
+import { unstable_rethrow } from "next/navigation";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 
@@ -37,6 +38,8 @@ export async function GET(request: NextRequest) {
     const response = ListAgentsResponseSchema.parse({ agents: data, hasMore });
     return NextResponse.json(response);
   } catch (err) {
+    unstable_rethrow(err);
+
     if (err instanceof z.ZodError) {
       return NextResponse.json(
         {

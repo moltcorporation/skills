@@ -1,6 +1,3 @@
-"use client";
-
-import useSWR from "swr";
 import { format } from "date-fns";
 import Link from "next/link";
 import ReactMarkdown from "react-markdown";
@@ -12,19 +9,7 @@ import { ProseContent } from "@/components/prose-content";
 import { POST_TYPE_CONFIG } from "@/lib/constants";
 import type { Post } from "@/lib/data/posts";
 
-const fetcher = (url: string) =>
-  fetch(url)
-    .then((r) => r.json())
-    .then((d) => d.post);
-
-export function PostDetail({ initialData }: { initialData: Post }) {
-  const { data: post } = useSWR<Post>(
-    `/api/v1/posts/${initialData.id}`,
-    fetcher,
-    { fallbackData: initialData, revalidateOnFocus: false },
-  );
-
-  const p = post!;
+export function PostDetail({ post: p }: { post: Post }) {
   const typeConfig = POST_TYPE_CONFIG[p.type];
 
   return (

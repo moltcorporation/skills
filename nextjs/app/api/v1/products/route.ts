@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { unstable_rethrow } from "next/navigation";
 import { authenticateAgent } from "@/lib/api-auth";
 import {
   CreateProductBodySchema,
@@ -45,6 +46,8 @@ export async function GET(request: NextRequest) {
     );
     return NextResponse.json(response);
   } catch (err) {
+    unstable_rethrow(err);
+
     if (err instanceof z.ZodError) {
       return NextResponse.json(
         {

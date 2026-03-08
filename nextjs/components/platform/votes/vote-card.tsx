@@ -1,4 +1,3 @@
-import { formatDistanceToNow } from "date-fns";
 import { Timer } from "@phosphor-icons/react";
 import Link from "next/link";
 
@@ -9,8 +8,9 @@ import {
   PlatformEntityCardContent,
   PlatformEntityCardHeader,
 } from "@/components/platform/entity-card";
+import { RelativeTime } from "@/components/platform/relative-time";
 import { Badge } from "@/components/ui/badge";
-import { CardTitle } from "@/components/ui/card";
+import { CardDescription, CardTitle } from "@/components/ui/card";
 import { Progress, ProgressLabel } from "@/components/ui/progress";
 import { VOTE_STATUS_CONFIG } from "@/lib/constants";
 import type { Vote, VoteStatus } from "@/lib/data/votes";
@@ -64,15 +64,14 @@ export function VoteDeadlineDisplay({
   deadline: string;
   status: string;
 }) {
-  const isExpired = new Date(deadline) < new Date();
-  if (status === "closed" || isExpired) {
+  if (status === "closed") {
     return <span className="text-muted-foreground">Ended</span>;
   }
 
   return (
     <span className="inline-flex items-center gap-1 text-muted-foreground">
       <Timer className="size-3" />
-      {formatDistanceToNow(new Date(deadline), { addSuffix: false })} left
+      <RelativeTime date={deadline} addSuffix={false} suffixLabel="left" />
     </span>
   );
 }
@@ -103,10 +102,16 @@ export function VoteCard(props: VoteCardProps) {
   return (
     <PlatformEntityCard>
       <PlatformEntityCardHeader>
-        <div className="flex items-start justify-between gap-2">
-          <CardTitle className="truncate">{vote.title}</CardTitle>
-          <VoteStatusBadge status={vote.status} />
-        </div>
+        <CardTitle className="line-clamp-2">{vote.title}</CardTitle>
+
+        {tally ? (
+          <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+            <VoteStatusBadge status={vote.status} />
+            <CardDescription>
+              closes in {tally.closesIn}
+            </CardDescription>
+          </div>
+        ) : null}
       </PlatformEntityCardHeader>
 
       {vote.description ? (
@@ -119,13 +124,7 @@ export function VoteCard(props: VoteCardProps) {
 
       {tally ? (
         <PlatformEntityCardContent className="flex flex-col gap-3">
-          <div className="flex items-center justify-between gap-3 text-xs text-muted-foreground">
-            <span className="tabular-nums">
-              Yes {tally.yes} / No {tally.no}
-            </span>
-            <span>closes in {tally.closesIn}</span>
-          </div>
-          <div className="rounded-sm border border-border p-3">
+          <div className="grid grid-cols-1 gap-3">
             <Progress
               value={
                 tally.yes + tally.no === 0
@@ -136,13 +135,35 @@ export function VoteCard(props: VoteCardProps) {
             >
               <div className="flex items-center justify-between gap-3">
                 <ProgressLabel className="text-[0.625rem] text-muted-foreground">
-                  Approval
+                  Yes
                 </ProgressLabel>
                 <span className="text-[0.7rem] text-foreground">
                   {Math.round(
                     tally.yes + tally.no === 0
                       ? 0
                       : (tally.yes / (tally.yes + tally.no)) * 100,
+                  )}%
+                </span>
+              </div>
+            </Progress>
+
+            <Progress
+              value={
+                tally.yes + tally.no === 0
+                  ? 0
+                  : (tally.no / (tally.yes + tally.no)) * 100
+              }
+              className="gap-2"
+            >
+              <div className="flex items-center justify-between gap-3">
+                <ProgressLabel className="text-[0.625rem] text-muted-foreground">
+                  No
+                </ProgressLabel>
+                <span className="text-[0.7rem] text-foreground">
+                  {Math.round(
+                    tally.yes + tally.no === 0
+                      ? 0
+                      : (tally.no / (tally.yes + tally.no)) * 100,
                   )}%
                 </span>
               </div>

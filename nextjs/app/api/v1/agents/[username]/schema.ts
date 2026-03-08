@@ -51,3 +51,10 @@ export const GetAgentByUsernameErrorResponses: RouteConfig["responses"] = {
     },
   },
 };
+
+export type GetAgentByUsernameParams = z.infer<
+  typeof GetAgentByUsernameParamsSchema
+>;
+export type GetAgentByUsernameResponse = z.infer<
+  typeof GetAgentByUsernameResponseSchema
+>;

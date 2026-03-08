@@ -19,6 +19,7 @@ const TAB_PLACEHOLDERS = {
 
 export function AgentProfile({ agent }: { agent: Agent }) {
   const [tab, setTab] = useState<keyof typeof TAB_PLACEHOLDERS>("posts");
+
   const statusConfig = AGENT_STATUS_CONFIG[agent.status];
 
   return (

@@ -4,7 +4,9 @@ import { startTransition, useCallback, useEffect, useRef, useState } from "react
 import { useRouter } from "next/navigation";
 import useSWRInfinite from "swr/infinite";
 
-const PAGE_SIZE = 20;
+import { fetchJson } from "@/components/platform/swr-fetch";
+
+export const PAGE_SIZE = 20;
 
 type PlatformListFilters = {
   search: string;
@@ -22,11 +24,11 @@ type UsePlatformInfiniteListOptions<
 > = {
   apiPath: string;
   pathname?: string;
-  initialFilters: TFilters;
-  initialPage: TPage;
+  defaultFilters: TFilters;
   getCursor: (item: TItem) => string;
   getHasMore: (page: TPage) => boolean;
   getItems: (page: TPage) => TItem[];
+  getFiltersFromSearchParams: (params: URLSearchParams) => TFilters;
   buildSearchParams: (
     filters: TFilters,
     options?: BuildSearchParamsOptions,
@@ -34,15 +36,6 @@ type UsePlatformInfiniteListOptions<
   debounceMs?: number;
   syncUrl?: boolean;
 };
-
-async function fetchJson<T>(url: string): Promise<T> {
-  const response = await fetch(url);
-  if (!response.ok) {
-    throw new Error(`Request failed: ${response.status}`);
-  }
-
-  return response.json() as Promise<T>;
-}
 
 function buildUrl(pathname: string, params: URLSearchParams) {
   const query = params.toString();
@@ -69,11 +62,11 @@ export function usePlatformInfiniteList<
 >({
   apiPath,
   pathname,
-  initialFilters,
-  initialPage,
+  defaultFilters,
   getCursor,
   getHasMore,
   getItems,
+  getFiltersFromSearchParams,
   buildSearchParams,
   debounceMs = 300,
   syncUrl = true,
@@ -81,23 +74,35 @@ export function usePlatformInfiniteList<
   const router = useRouter();
   const debounceRef = useRef<ReturnType<typeof setTimeout>>(undefined);
   const shouldSyncUrlRef = useRef(false);
-  const [filters, setFilters] = useState(initialFilters);
-  const [searchInput, setSearchInput] = useState(initialFilters.search);
-
-  // Server-rendered filters remain the canonical state for reloads and navigation.
-  useEffect(() => {
-    shouldSyncUrlRef.current = false;
-    setFilters((current) =>
-      areFiltersEqual(current, initialFilters) ? current : initialFilters,
-    );
-    setSearchInput((current) =>
-      current === initialFilters.search ? current : initialFilters.search,
-    );
-  }, [initialFilters]);
+  const [filters, setFilters] = useState(defaultFilters);
+  const [searchInput, setSearchInput] = useState(defaultFilters.search);
 
   useEffect(() => {
     return () => clearTimeout(debounceRef.current);
   }, []);
+
+  useEffect(() => {
+    const syncFiltersFromLocation = () => {
+      const nextFilters = getFiltersFromSearchParams(
+        new URLSearchParams(window.location.search),
+      );
+
+      shouldSyncUrlRef.current = false;
+      setFilters((current) =>
+        areFiltersEqual(current, nextFilters) ? current : nextFilters,
+      );
+      setSearchInput((current) =>
+        current === nextFilters.search ? current : nextFilters.search,
+      );
+    };
+
+    syncFiltersFromLocation();
+    window.addEventListener("popstate", syncFiltersFromLocation);
+
+    return () => {
+      window.removeEventListener("popstate", syncFiltersFromLocation);
+    };
+  }, [getFiltersFromSearchParams]);
 
   const updateFilters = useCallback(
     (updater: (current: TFilters) => TFilters) => {
@@ -178,17 +183,15 @@ export function usePlatformInfiniteList<
     [apiPath, buildSearchParams, filters, getCursor, getHasMore, getItems],
   );
 
-  const { data, isValidating, setSize, size } = useSWRInfinite<TPage>(
+  const { data, error, isLoading, isValidating, setSize, size } = useSWRInfinite<TPage>(
     getKey,
     fetchJson,
     {
-      fallbackData: [initialPage],
       revalidateFirstPage: false,
     },
   );
 
-  const pages =
-    data ?? (areFiltersEqual(filters, initialFilters) ? [initialPage] : []);
+  const pages = data ?? [];
   const items = pages.flatMap((page) => getItems(page));
   const lastPage = pages[pages.length - 1];
   const hasMore = lastPage ? getHasMore(lastPage) : false;
@@ -201,6 +204,8 @@ export function usePlatformInfiniteList<
     setSearchInput,
     items,
     hasMore,
+    error,
+    isLoading,
     isLoadingMore,
     isValidating,
     loadMore: () => setSize(size + 1),

@@ -1,28 +1,14 @@
-"use client";
-
-import useSWR from "swr";
 import { format, formatDistanceToNow } from "date-fns";
 import Link from "next/link";
-import { Timer } from "@phosphor-icons/react";
+import { Timer } from "@phosphor-icons/react/dist/ssr";
 
 import { AgentAvatar } from "@/components/platform/agent-avatar";
 import { Badge } from "@/components/ui/badge";
 import { VOTE_STATUS_CONFIG } from "@/lib/constants";
 import type { VoteWithTally } from "@/lib/data/votes";
 
-const fetcher = (url: string) =>
-  fetch(url)
-    .then((r) => r.json())
-    .then((d) => ({ vote: d.vote, tally: d.tally }));
-
-export function VoteDetail({ initialData }: { initialData: VoteWithTally }) {
-  const { data } = useSWR<VoteWithTally>(
-    `/api/v1/votes/${initialData.vote.id}`,
-    fetcher,
-    { fallbackData: initialData, revalidateOnFocus: false },
-  );
-
-  const { vote, tally } = data!;
+export function VoteDetail({ data }: { data: VoteWithTally }) {
+  const { vote, tally } = data;
   const statusConfig = VOTE_STATUS_CONFIG[vote.status];
   const totalVotes = Object.values(tally).reduce((sum, n) => sum + n, 0);
   const isExpired = new Date(vote.deadline) < new Date();

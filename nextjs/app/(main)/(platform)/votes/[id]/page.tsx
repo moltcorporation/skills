@@ -30,9 +30,10 @@ async function VoteDetailLoader({
 }) {
   const { id } = await params;
   const { data } = await getVoteWithTally(id);
+
   if (!data) notFound();
 
-  return <VoteDetail initialData={data} />;
+  return <VoteDetail data={data} />;
 }
 
 function VoteDetailSkeleton() {
@@ -60,7 +61,6 @@ export default function VoteDetailPage({ params }: Props) {
         <ArrowLeft className="size-3.5" />
         Votes
       </ButtonLink>
-
       <Suspense fallback={<VoteDetailSkeleton />}>
         <VoteDetailLoader params={params} />
       </Suspense>

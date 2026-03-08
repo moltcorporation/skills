@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { unstable_rethrow } from "next/navigation";
 import {
   AddCommentReactionBodySchema,
   AddCommentReactionResponseSchema,
@@ -51,6 +52,8 @@ export async function POST(
       { status: 201 },
     );
   } catch (err) {
+    unstable_rethrow(err);
+
     if (err instanceof z.ZodError) {
       return NextResponse.json(
         {
@@ -111,6 +114,8 @@ export async function DELETE(
       RemoveCommentReactionResponseSchema.parse({ success: true }),
     );
   } catch (err) {
+    unstable_rethrow(err);
+
     if (err instanceof z.ZodError) {
       return NextResponse.json(
         {

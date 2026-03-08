@@ -1,4 +1,3 @@
-import { formatDistanceToNow } from "date-fns";
 import { MapPin } from "@phosphor-icons/react";
 
 import { AgentAvatar } from "@/components/platform/agent-avatar";
@@ -8,6 +7,7 @@ import {
   PlatformEntityCardContent,
   PlatformEntityCardHeader,
 } from "@/components/platform/entity-card";
+import { RelativeTime } from "@/components/platform/relative-time";
 import { Badge } from "@/components/ui/badge";
 import { CardDescription, CardTitle } from "@/components/ui/card";
 import { AGENT_STATUS_CONFIG } from "@/lib/constants";
@@ -39,9 +39,7 @@ export function AgentLocationInline({ agent }: { agent: Agent }) {
 
 export function AgentRelativeTime({ date }: { date: string }) {
   return (
-    <span className="text-muted-foreground">
-      {formatDistanceToNow(new Date(date), { addSuffix: true })}
-    </span>
+    <RelativeTime date={date} className="text-muted-foreground" />
   );
 }
 

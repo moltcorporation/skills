@@ -34,44 +34,17 @@ import {
   AGENT_FILTER_OPTIONS,
   PLATFORM_SORT_OPTIONS,
 } from "@/lib/constants";
+import {
+  buildAgentSearchParams,
+  getAgentFiltersFromSearchParams,
+  type AgentFilters,
+} from "@/components/platform/agents-list-shared";
 import type { ListAgentsResponse } from "@/app/api/v1/agents/schema";
 import type { Agent } from "@/lib/data/agents";
 
 type ApiResponse = ListAgentsResponse;
 
-type AgentFilterValue = (typeof AGENT_FILTER_OPTIONS)[number]["value"];
-type AgentSortValue = (typeof PLATFORM_SORT_OPTIONS)[number]["value"];
-
-type AgentFilters = {
-  search: string;
-  status: AgentFilterValue;
-  sort: AgentSortValue;
-};
-
-function buildSearchParams(
-  filters: AgentFilters,
-  options?: { after?: string; limit?: number },
-) {
-  const params = new URLSearchParams();
-
-  if (filters.search) params.set("search", filters.search);
-  if (filters.status !== "all") params.set("status", filters.status);
-  if (filters.sort !== "newest") params.set("sort", filters.sort);
-  if (options?.after) params.set("after", options.after);
-  if (options?.limit) params.set("limit", String(options.limit));
-
-  return params;
-}
-
-export function AgentsList({
-  initialData,
-  initialHasMore,
-  initialFilters,
-}: {
-  initialData: Agent[];
-  initialHasMore: boolean;
-  initialFilters: AgentFilters;
-}) {
+export function AgentsList() {
   const [viewMode, setViewMode] = useState<"table" | "cards">("table");
   const {
     filters,
@@ -79,19 +52,20 @@ export function AgentsList({
     searchInput,
     setFilter,
     setSearchInput,
+    error,
     hasMore,
+    isLoading,
     isLoadingMore,
-    isValidating,
     loadMore,
   } = usePlatformInfiniteList<AgentFilters, ApiResponse, Agent>({
     apiPath: "/api/v1/agents",
     pathname: "/agents",
-    initialFilters,
-    initialPage: { agents: initialData, hasMore: initialHasMore },
+    defaultFilters: getAgentFiltersFromSearchParams(new URLSearchParams()),
     getCursor: (agent) => agent.id,
     getHasMore: (page) => page.hasMore,
     getItems: (page) => page.agents,
-    buildSearchParams,
+    getFiltersFromSearchParams: getAgentFiltersFromSearchParams,
+    buildSearchParams: buildAgentSearchParams,
   });
 
   return (
@@ -118,8 +92,8 @@ export function AgentsList({
           sortValue={filters.sort}
           filterOptions={AGENT_FILTER_OPTIONS}
           sortOptions={PLATFORM_SORT_OPTIONS}
-          onFilterChange={(value) => setFilter("status", value as AgentFilterValue)}
-          onSortChange={(value) => setFilter("sort", value as AgentSortValue)}
+          onFilterChange={(value) => setFilter("status", value as AgentFilters["status"])}
+          onSortChange={(value) => setFilter("sort", value as AgentFilters["sort"])}
         />
         <div className="relative min-w-48 flex-1">
           <MagnifyingGlass className="absolute left-2 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
@@ -132,7 +106,13 @@ export function AgentsList({
         </div>
       </div>
 
-      {agents.length === 0 && !isValidating ? (
+      {error && agents.length === 0 ? (
+        <p className="py-12 text-center text-sm text-muted-foreground">
+          Unable to load agents right now.
+        </p>
+      ) : isLoading && agents.length === 0 ? (
+        <AgentsResultsSkeleton viewMode={viewMode} />
+      ) : agents.length === 0 ? (
         <p className="py-12 text-center text-sm text-muted-foreground">
           No agents found
         </p>
@@ -212,13 +192,28 @@ function AgentsCards({ agents }: { agents: Agent[] }) {
   );
 }
 
-export function AgentsListSkeleton() {
+function AgentsResultsSkeleton({
+  viewMode,
+}: {
+  viewMode: "table" | "cards";
+}) {
+  if (viewMode === "cards") {
+    return (
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3">
+        {Array.from({ length: 6 }).map((_, i) => (
+          <Skeleton key={i} className="h-40 w-full" />
+        ))}
+      </div>
+    );
+  }
+
   return (
-    <div className="space-y-4">
-      <div className="flex flex-wrap items-center gap-2">
-        <Skeleton className="h-7 flex-1 min-w-48" />
-        <Skeleton className="h-7 w-20" />
-        <Skeleton className="h-6 w-16" />
+    <div className="space-y-2">
+      <div className="grid grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)] gap-2">
+        <Skeleton className="h-4 w-16" />
+        <Skeleton className="h-4 w-16" />
+        <Skeleton className="h-4 w-14" />
+        <Skeleton className="h-4 w-12" />
       </div>
       <div className="space-y-2">
         {Array.from({ length: 5 }).map((_, i) => (

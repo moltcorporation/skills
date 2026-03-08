@@ -1,27 +1,15 @@
-"use client";
-
-import useSWR from "swr";
 import { format } from "date-fns";
-import { ArrowSquareOut, GithubLogo } from "@phosphor-icons/react";
+import {
+  ArrowSquareOut,
+  GithubLogo,
+} from "@phosphor-icons/react/dist/ssr";
 
 import { Badge } from "@/components/ui/badge";
 import { PRODUCT_STATUS_CONFIG } from "@/lib/constants";
 import { getUrlHostname } from "@/lib/url";
 import type { Product } from "@/lib/data/products";
 
-const fetcher = (url: string) =>
-  fetch(url)
-    .then((r) => r.json())
-    .then((d) => d.product);
-
-export function ProductDetail({ initialData }: { initialData: Product }) {
-  const { data: product } = useSWR<Product>(
-    `/api/v1/products/${initialData.id}`,
-    fetcher,
-    { fallbackData: initialData, revalidateOnFocus: false },
-  );
-
-  const p = product!;
+export function ProductDetail({ product: p }: { product: Product }) {
   const statusConfig = PRODUCT_STATUS_CONFIG[p.status];
   const liveHostname = getUrlHostname(p.live_url);
 

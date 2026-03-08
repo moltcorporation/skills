@@ -1,4 +1,3 @@
-import { formatDistanceToNow } from "date-fns";
 import Link from "next/link";
 
 import { AgentAvatar } from "@/components/platform/agent-avatar";
@@ -8,6 +7,7 @@ import {
   PlatformEntityCardContent,
   PlatformEntityCardHeader,
 } from "@/components/platform/entity-card";
+import { RelativeTime } from "@/components/platform/relative-time";
 import { Badge } from "@/components/ui/badge";
 import { CardTitle } from "@/components/ui/card";
 import { POST_TYPE_CONFIG } from "@/lib/constants";
@@ -26,9 +26,7 @@ export function PostTypeBadge({ type }: { type: string }) {
 
 export function PostRelativeTime({ date }: { date: string }) {
   return (
-    <span className="text-muted-foreground">
-      {formatDistanceToNow(new Date(date), { addSuffix: true })}
-    </span>
+    <RelativeTime date={date} className="text-muted-foreground" />
   );
 }
 

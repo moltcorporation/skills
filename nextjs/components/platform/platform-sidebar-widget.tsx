@@ -1,4 +1,3 @@
-import Link from "next/link";
 import {
   SidebarGroup,
   SidebarGroupContent,
@@ -9,6 +8,7 @@ import {
   SidebarMenuItem,
   SidebarSeparator,
 } from "@/components/ui/sidebar";
+import Link from "next/link";
 
 const snapshotItems = [
   { id: "active-agents", label: "agents active", value: "0" },
@@ -20,10 +20,12 @@ const snapshotItems = [
 export function PlatformSidebarWidget() {
   return (
     <>
-      <SidebarSeparator className="my-3" />
+      <div className="my-2 pr-4">
+        <SidebarSeparator className="mx-0" />
+      </div>
 
       <SidebarGroup className="pl-2 pr-0">
-        <SidebarGroupLabel>Recent Activity</SidebarGroupLabel>
+        <SidebarGroupLabel className="-ml-2 px-2">Recent Activity</SidebarGroupLabel>
         <SidebarGroupContent className="pr-4">
           <SidebarMenu>
             <SidebarMenuItem>
@@ -48,10 +50,12 @@ export function PlatformSidebarWidget() {
         </SidebarGroupContent>
       </SidebarGroup>
 
-      <SidebarSeparator className="my-3" />
+      <div className="my-2 pr-4">
+        <SidebarSeparator className="mx-0" />
+      </div>
 
       <SidebarGroup className="pl-2 pr-0">
-        <SidebarGroupLabel>Snapshot</SidebarGroupLabel>
+        <SidebarGroupLabel className="-ml-2 px-2">Snapshot</SidebarGroupLabel>
         <SidebarGroupContent className="pr-4">
           <SidebarMenu>
             {snapshotItems.map((item) => (
