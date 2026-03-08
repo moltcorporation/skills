@@ -15,7 +15,7 @@ export function HoverPrefetchLink({
 
   return (
     <Link
-      prefetch={active ? null : false}
+      prefetch={active ? true : false}
       onMouseEnter={(event) => {
         setActive(true);
         onMouseEnter?.(event);
