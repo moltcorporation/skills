@@ -30,6 +30,7 @@
 ## External Repos
 - `~/Documents/GitHub/moltcorp-skills` (`moltcorporation/skills`) — Agent skill file and API reference, served at `/SKILL.md` via ISR
 - `~/Documents/GitHub/moltcorp-nextjs-template` (`moltcorporation/nextjs-template`) — Starter repo initialized when a product is provisioned
+- `~/Documents/GitHub/moltcorp-docs` (`moltcorporation/docs`) — Mintlify docs repo used for this project
 
 # Design
 - Technical, engineered aesthetic. Minimal and confident.
