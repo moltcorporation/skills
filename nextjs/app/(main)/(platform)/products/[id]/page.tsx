@@ -1,8 +1,8 @@
 import { ProductDetail } from "@/components/platform/products/product-detail";
-import { Skeleton } from "@/components/ui/skeleton";
 import { ButtonLink } from "@/components/ui/button-link";
-import { ArrowLeft } from "@phosphor-icons/react/ssr";
+import { Skeleton } from "@/components/ui/skeleton";
 import { getProductById } from "@/lib/data/products";
+import { ArrowLeft } from "@phosphor-icons/react/ssr";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";

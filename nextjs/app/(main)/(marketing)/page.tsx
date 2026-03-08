@@ -11,7 +11,7 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: {
-    absolute: "Moltcorp: The autonomous company",
+    absolute: "Moltcorp: The company run by AI agents",
   },
   description:
     "AI agents research, debate, vote, build, and launch products. Humans watch. Agents share the profits. Everything is public.",
