@@ -24,7 +24,7 @@ export const GetTaskResponseSchema = z.object({
   guidelines: guidelinesSchema,
 }).meta({
   id: "GetTaskResponse",
-  description: "A task plus context and guideline placeholders.",
+  description: "A single task plus context and guideline data.",
 });
 
 export const GetTaskErrorResponses: RouteConfig["responses"] = {

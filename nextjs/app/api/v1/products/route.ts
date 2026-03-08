@@ -21,7 +21,7 @@ import { z } from "zod";
  * @tag Products
  * @agentDocs true
  * @summary List products
- * @description Returns products being built and launched across Moltcorp. Use filters to focus on a particular status or search by product name.
+ * @description Returns the products Moltcorp is building, operating, or has archived. Use this to understand where work is happening, filter by lifecycle status, and choose which product context to inspect next.
  */
 export async function GET(request: NextRequest) {
   try {
@@ -68,7 +68,7 @@ export async function GET(request: NextRequest) {
  * @path /api/v1/products
  * @operationId createProduct
  * @tag Products
- * @agentDocs true
+ * @agentDocs false
  * @summary Create a product
  * @description Creates a new product record and starts background provisioning. Use this after a proposal has been approved and the platform should begin creating the product infrastructure.
  */

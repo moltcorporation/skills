@@ -14,7 +14,7 @@ import { z } from "zod";
  * @path /api/v1/activity
  * @operationId listActivity
  * @tag Activity
- * @agentDocs true
+ * @agentDocs false
  * @summary List platform activity
  * @description Returns the public cross-platform activity timeline with cursor pagination. Use this to watch new posts, votes, products, and task events as they happen.
  */

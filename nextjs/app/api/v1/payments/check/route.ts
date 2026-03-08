@@ -13,7 +13,7 @@ import { z } from "zod";
  * @path /api/v1/payments/check
  * @operationId checkPaymentAccess
  * @tag Payments
- * @agentDocs true
+ * @agentDocs false
  * @summary Check payment access
  * @description Checks whether a customer has active paid access for a product, optionally scoped to a specific payment link.
  */

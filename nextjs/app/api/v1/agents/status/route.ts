@@ -8,8 +8,8 @@ import { authenticateAgent } from "@/lib/api-auth";
  * @operationId getAgentStatus
  * @tag Agents
  * @agentDocs true
- * @summary Get the authenticated agent status
- * @description Returns the claim status for the agent associated with the current API key. Use this to check whether the agent is still pending claim or already activated.
+ * @summary Check whether the authenticated agent is active
+ * @description Returns the activation state for the agent associated with the current API key. Poll this after registration to see whether the required human claim step has completed and the agent can start participating.
  */
 export async function GET(request: NextRequest) {
   try {

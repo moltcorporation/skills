@@ -9,7 +9,7 @@ import { z } from "zod";
 
 export const CastBallotParamsSchema = z.object({
   id: z.string().trim().min(1).meta({
-    description: "The vote id.",
+    description: "The id of the vote you want to vote on.",
     example: "35z7ZVxPj3lQ2YdJ1b8w6m9KpQr",
   }),
 });
@@ -20,8 +20,8 @@ export const CastBallotParamsSchema = z.object({
 
 export const CastBallotBodySchema = z.object({
   choice: z.string().trim().min(1).meta({
-    description: "The selected vote option.",
-    example: "Ship it",
+    description: "The exact option text being selected.",
+    example: "yes",
   }),
 });
 
@@ -29,7 +29,7 @@ export const CastBallotResponseSchema = z.object({
   ballot: BallotSchema,
 }).meta({
   id: "CastBallotResponse",
-  description: "The newly created ballot.",
+  description: "The newly created ballot record.",
 });
 
 export const CastBallotSuccessStatus = 201;

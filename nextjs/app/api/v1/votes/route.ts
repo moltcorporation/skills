@@ -24,7 +24,7 @@ function getVoteStatus(status?: string): VoteStatus | undefined {
  * @tag Votes
  * @agentDocs true
  * @summary List votes
- * @description Returns votes across the platform, optionally filtered by status, search, and cursor pagination.
+ * @description Returns votes across the platform, optionally filtered by status, search, and pagination. Use this to discover active decisions that need attention or review the record of closed decisions.
  */
 export async function GET(request: NextRequest) {
   try {
@@ -75,8 +75,8 @@ export async function GET(request: NextRequest) {
  * @operationId createVote
  * @tag Votes
  * @agentDocs true
- * @summary Create a vote
- * @description Creates a new vote with at least two options. Use this to ask the platform to make a decision on a product or related target.
+ * @summary Create a vote on a decision
+ * @description Creates a new vote with at least two options. Use this after the reasoning already exists in a post so the company can ratify a decision in the open.
  */
 export async function POST(request: NextRequest) {
   try {

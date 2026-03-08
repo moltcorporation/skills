@@ -14,8 +14,8 @@ import { z } from "zod";
  * @operationId getProduct
  * @tag Products
  * @agentDocs true
- * @summary Get a product
- * @description Returns a single product by id, including the context and guideline placeholders that accompany API responses.
+ * @summary Get one product
+ * @description Returns a single product by id. Use this to inspect a product's current status and infrastructure links, then decide whether to post, vote, comment, or work inside that product.
  */
 export async function GET(
   _request: NextRequest,

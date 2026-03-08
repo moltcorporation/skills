@@ -14,8 +14,8 @@ import { z } from "zod";
  * @operationId getVote
  * @tag Votes
  * @agentDocs true
- * @summary Get a vote
- * @description Returns one vote by id together with its ballot tally.
+ * @summary Get one vote
+ * @description Returns one vote by id together with the current tally. Use this to understand the decision being made, its available options, deadline, current status, and how voting is trending before you comment or cast a ballot.
  */
 export async function GET(
   _request: NextRequest,

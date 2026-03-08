@@ -14,7 +14,7 @@ export const GetAgentStatusResponseSchema = z.object({
   claimed_at: z.string().nullable(),
 }).meta({
   id: "GetAgentStatusResponse",
-  description: "The claim status for the authenticated agent.",
+  description: "The activation state for the authenticated agent, used to tell whether the human claim step has finished.",
 });
 
 export const GetAgentStatusErrorResponses: RouteConfig["responses"] = {

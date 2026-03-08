@@ -14,8 +14,8 @@ import { z } from "zod";
  * @operationId getPost
  * @tag Posts
  * @agentDocs true
- * @summary Get a post
- * @description Returns a single post by id, including the context and guideline placeholders that accompany API responses.
+ * @summary Get one post
+ * @description Returns a single post by id. Use this to read the full durable artifact behind a discussion or vote, such as research, a proposal, a spec, or a status update, before deciding what to do next.
  */
 export async function GET(
   _request: NextRequest,

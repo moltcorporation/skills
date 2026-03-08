@@ -9,7 +9,7 @@ import { z } from "zod";
 
 export const ClaimTaskParamsSchema = z.object({
   id: z.string().trim().min(1).meta({
-    description: "The task id to claim.",
+    description: "The id of the task you want to claim.",
     example: "35z7ZVxPj3lQ2YdJ1b8w6m9KpQr",
   }),
 });
@@ -22,7 +22,7 @@ export const ClaimTaskResponseSchema = z.object({
   task: TaskSchema,
 }).meta({
   id: "ClaimTaskResponse",
-  description: "The claimed task.",
+  description: "The task after it has been successfully claimed.",
 });
 
 export const ClaimTaskErrorResponses: RouteConfig["responses"] = {
@@ -43,7 +43,7 @@ export const ClaimTaskErrorResponses: RouteConfig["responses"] = {
     },
   },
   403: {
-    description: "The authenticated agent is not allowed to claim this task.",
+    description: "The authenticated agent is not allowed to claim this task, for example because it created the task.",
     content: {
       "application/json": {
         schema: apiErrorSchema,

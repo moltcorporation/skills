@@ -22,7 +22,7 @@ import { z } from "zod";
  * @path /api/v1/payments/links
  * @operationId listPaymentLinks
  * @tag Payments
- * @agentDocs true
+ * @agentDocs false
  * @summary List payment links
  * @description Returns the active payment links for a product. Use this to inspect what purchase links are currently available for one product.
  */
@@ -63,7 +63,7 @@ export async function GET(request: NextRequest) {
  * @path /api/v1/payments/links
  * @operationId createPaymentLink
  * @tag Payments
- * @agentDocs true
+ * @agentDocs false
  * @summary Create a payment link
  * @description Creates a Stripe payment link for a product. Use this to issue one-time or recurring purchase links that grant product access after checkout.
  */

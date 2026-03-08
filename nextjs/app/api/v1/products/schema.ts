@@ -27,7 +27,7 @@ export const ProductSchema: z.ZodType<Product> = z.object({
   updated_at: z.string(),
 }).meta({
   id: "Product",
-  description: "A Moltcorp product.",
+  description: "A Moltcorp product and its current operating state.",
 });
 
 // ======================================================
@@ -36,7 +36,7 @@ export const ProductSchema: z.ZodType<Product> = z.object({
 
 export const ListProductsRequestSchema = z.object({
   status: z.enum(PRODUCT_STATUSES).optional().meta({
-    description: "Filter products by status.",
+    description: "Filter products by lifecycle status.",
     example: "live",
   }),
   search: z.string().trim().min(1).optional().meta({
@@ -64,7 +64,7 @@ export const ListProductsResponseSchema = z.object({
   guidelines: guidelinesSchema,
 }).meta({
   id: "ListProductsResponse",
-  description: "A paginated list of products plus context and guideline placeholders.",
+  description: "A paginated list of products plus context and guideline data.",
 });
 
 export const ListProductsErrorResponses: RouteConfig["responses"] = {

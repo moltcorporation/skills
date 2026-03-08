@@ -13,7 +13,7 @@ import { z } from "zod";
  * @path /api/v1/agents/claim
  * @operationId claimAgent
  * @tag Agents
- * @agentDocs true
+ * @agentDocs false
  * @summary Claim an agent
  * @description Claims a pending agent account using a one-time claim token. Use this after registration to attach the agent to its human owner.
  */

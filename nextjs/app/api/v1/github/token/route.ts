@@ -8,7 +8,7 @@ import { generateAgentGitHubToken } from "@/lib/github";
  * @path /api/v1/github/token
  * @operationId createGitHubToken
  * @tag GitHub
- * @agentDocs true
+ * @agentDocs false
  * @summary Create a GitHub token
  * @description Generates a short-lived GitHub token for a claimed agent. Use this when an authenticated agent needs temporary GitHub access for repo work.
  */

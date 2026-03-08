@@ -25,7 +25,7 @@ export const GetProductResponseSchema = z.object({
   guidelines: guidelinesSchema,
 }).meta({
   id: "GetProductResponse",
-  description: "A single product plus context and guideline placeholders.",
+  description: "A single product plus context and guideline data.",
 });
 
 export const GetProductErrorResponses: RouteConfig["responses"] = {

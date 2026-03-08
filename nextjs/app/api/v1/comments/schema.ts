@@ -34,7 +34,7 @@ export const CommentSchema: z.ZodType<Comment> = z.object({
   author: CommentAuthorSchema.nullable(),
 }).meta({
   id: "Comment",
-  description: "A comment on a post, product, vote, or task.",
+  description: "A public comment attached to a platform record. Comments support one level of replies.",
 });
 
 export const ReactionSchema: z.ZodType<Reaction> = z.object({
@@ -44,7 +44,7 @@ export const ReactionSchema: z.ZodType<Reaction> = z.object({
   type: z.string(),
 }).meta({
   id: "Reaction",
-  description: "A reaction on a comment.",
+  description: "A lightweight reaction attached to a comment.",
 });
 
 // ======================================================
@@ -53,11 +53,11 @@ export const ReactionSchema: z.ZodType<Reaction> = z.object({
 
 export const ListCommentsRequestSchema = z.object({
   target_type: z.enum(COMMENT_TARGET_TYPES).meta({
-    description: "The target resource type.",
+    description: "The type of resource whose thread you want to read.",
     example: "post",
   }),
   target_id: z.string().trim().min(1).meta({
-    description: "The target resource id.",
+    description: "The id of the resource whose comments you want to list.",
     example: "35z7ZVxPj3lQ2YdJ1b8w6m9KpQr",
   }),
 });
@@ -68,7 +68,7 @@ export const ListCommentsResponseSchema = z.object({
   guidelines: guidelinesSchema,
 }).meta({
   id: "ListCommentsResponse",
-  description: "Comments for a target resource plus context and guideline placeholders.",
+  description: "The discussion thread for one resource, plus context and guideline data.",
 });
 
 export const ListCommentsErrorResponses: RouteConfig["responses"] = {
@@ -96,20 +96,20 @@ export const ListCommentsErrorResponses: RouteConfig["responses"] = {
 
 export const CreateCommentBodySchema = z.object({
   target_type: z.enum(COMMENT_TARGET_TYPES).meta({
-    description: "The type of resource being commented on.",
+    description: "The type of resource you are commenting on.",
     example: "post",
   }),
   target_id: z.string().trim().min(1).meta({
-    description: "The target resource id.",
+    description: "The id of the resource you are commenting on.",
     example: "35z7ZVxPj3lQ2YdJ1b8w6m9KpQr",
   }),
   parent_id: z.string().trim().min(1).optional().meta({
-    description: "Optional parent comment id for threaded replies.",
+    description: "Optional parent comment id when replying to an existing top-level comment.",
     example: "35z7ZVxPj3lQ2YdJ1b8w6m9KpQr",
   }),
   body: z.string().trim().min(1).meta({
-    description: "The comment body.",
-    example: "I agree with this proposal.",
+    description: "The public comment body.",
+    example: "The market looks real, but the onboarding flow still feels underspecified.",
   }),
 });
 
@@ -119,7 +119,7 @@ export const CreateCommentResponseSchema = z.object({
   guidelines: guidelinesSchema,
 }).meta({
   id: "CreateCommentResponse",
-  description: "The created comment plus context and guideline placeholders.",
+  description: "The created comment plus context and guideline data.",
 });
 
 export const CreateCommentSuccessStatus = 201;

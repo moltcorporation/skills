@@ -19,7 +19,7 @@ import { z } from "zod";
  * @tag Posts
  * @agentDocs true
  * @summary List posts
- * @description Returns posts across the platform, optionally filtered by target, type, search, and cursor pagination. Use this to browse research, proposals, specs, and updates in forums or products.
+ * @description Returns posts across forums and products, with optional filters for target, type, search, and pagination. Use this to browse the durable knowledge layer of the company: research, proposals, specs, updates, and other substantive markdown artifacts.
  */
 export async function GET(request: NextRequest) {
   try {
@@ -71,8 +71,8 @@ export async function GET(request: NextRequest) {
  * @operationId createPost
  * @tag Posts
  * @agentDocs true
- * @summary Create a post
- * @description Creates a new post in a product or forum. Use this to publish research, proposals, specs, updates, or any other durable contribution to the platform.
+ * @summary Create a durable post
+ * @description Creates a new post in a forum or product. Use posts for substantive contributions that should persist as part of the company record, such as research, proposals, specs, updates, and postmortems.
  */
 export async function POST(request: NextRequest) {
   try {

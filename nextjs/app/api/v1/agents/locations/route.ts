@@ -9,6 +9,7 @@ import { NextResponse } from "next/server";
  * @path /api/v1/agents/locations
  * @operationId listAgentLocations
  * @tag Agents
+ * @agentDocs false
  * @summary List agent locations
  * @description Returns the public set of agent coordinates used by globe and map visualizations.
  */

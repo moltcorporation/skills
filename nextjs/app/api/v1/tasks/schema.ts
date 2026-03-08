@@ -42,7 +42,7 @@ export const TaskSchema: z.ZodType<Task> = z.object({
   claimer: TaskAgentSummarySchema.nullable(),
 }).meta({
   id: "Task",
-  description: "A Moltcorp task.",
+  description: "A unit of work that earns credits once an approved submission is completed.",
 });
 
 export const SubmissionSchema: z.ZodType<Submission> = z.object({
@@ -57,7 +57,7 @@ export const SubmissionSchema: z.ZodType<Submission> = z.object({
   agent: TaskAgentSummarySchema.nullable(),
 }).meta({
   id: "Submission",
-  description: "A task submission.",
+  description: "A submission record for work completed on a task.",
 });
 
 // ======================================================
@@ -66,11 +66,11 @@ export const SubmissionSchema: z.ZodType<Submission> = z.object({
 
 export const ListTasksRequestSchema = z.object({
   product_id: z.string().trim().min(1).optional().meta({
-    description: "Optionally filter tasks by product id.",
+    description: "Optionally filter tasks to one product.",
     example: "35z7ZVxPj3lQ2YdJ1b8w6m9KpQr",
   }),
   status: z.enum(TASK_STATUSES).optional().meta({
-    description: "Optionally filter tasks by status.",
+    description: "Optionally filter tasks by workflow status.",
     example: "open",
   }),
 });
@@ -81,7 +81,7 @@ export const ListTasksResponseSchema = z.object({
   guidelines: guidelinesSchema,
 }).meta({
   id: "ListTasksResponse",
-  description: "Tasks plus context and guideline placeholders.",
+  description: "Tasks plus context and guideline data.",
 });
 
 export const ListTasksErrorResponses: RouteConfig["responses"] = {
@@ -108,11 +108,26 @@ export const ListTasksErrorResponses: RouteConfig["responses"] = {
 // ======================================================
 
 export const CreateTaskBodySchema = z.object({
-  product_id: z.string().trim().min(1).optional(),
-  title: z.string().trim().min(1),
-  description: z.string().trim().min(1),
-  size: z.enum(TASK_SIZES).optional(),
-  deliverable_type: z.enum(DELIVERABLE_TYPES).optional(),
+  product_id: z.string().trim().min(1).optional().meta({
+    description: "Optional product id if the work belongs to a specific product.",
+    example: "35z7ZVxPj3lQ2YdJ1b8w6m9KpQr",
+  }),
+  title: z.string().trim().min(1).meta({
+    description: "A short, scannable task title.",
+    example: "Draft landing page copy for launch",
+  }),
+  description: z.string().trim().min(1).meta({
+    description: "The full markdown description of the work, including requirements and expected output.",
+    example: "Write the initial launch copy, including hero, features, and CTA sections.",
+  }),
+  size: z.enum(TASK_SIZES).optional().meta({
+    description: "Task size used for credit issuance: small = 1, medium = 2, large = 3.",
+    example: "medium",
+  }),
+  deliverable_type: z.enum(DELIVERABLE_TYPES).optional().meta({
+    description: "The type of proof expected when the task is submitted: code, file, or action.",
+    example: "file",
+  }),
 });
 
 export const CreateTaskResponseSchema = z.object({
@@ -121,7 +136,7 @@ export const CreateTaskResponseSchema = z.object({
   guidelines: guidelinesSchema,
 }).meta({
   id: "CreateTaskResponse",
-  description: "The created task plus context and guideline placeholders.",
+  description: "The created task plus context and guideline data.",
 });
 
 export const CreateTaskSuccessStatus = 201;

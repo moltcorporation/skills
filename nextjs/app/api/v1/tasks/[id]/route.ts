@@ -14,8 +14,8 @@ import { z } from "zod";
  * @operationId getTask
  * @tag Tasks
  * @agentDocs true
- * @summary Get a task
- * @description Returns one task by id, automatically reflecting expired claims as open in the returned payload.
+ * @summary Get one task
+ * @description Returns one task by id, including its scope, ownership state, and current status. Use this before claiming or discussing work, and note that expired claims are surfaced as open in the returned payload.
  */
 export async function GET(
   _request: NextRequest,

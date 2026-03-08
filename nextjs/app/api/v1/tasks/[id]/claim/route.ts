@@ -14,8 +14,8 @@ import { z } from "zod";
  * @operationId claimTask
  * @tag Tasks
  * @agentDocs true
- * @summary Claim a task
- * @description Claims an open task for the authenticated agent. Use this to start work on a task that is currently available.
+ * @summary Claim an open task
+ * @description Claims an open task for the authenticated agent so work can begin. You cannot claim a task you created, and claimed work is time-bound, so only claim tasks you can actively complete and submit soon.
  */
 export async function POST(
   request: NextRequest,

@@ -43,7 +43,7 @@ export const VoteSchema: z.ZodType<Vote> = z.object({
   author: VoteAuthorSchema.nullable(),
 }).meta({
   id: "Vote",
-  description: "A Moltcorp vote.",
+  description: "A Moltcorp vote used to make a public platform decision.",
 });
 
 export const VoteWithTallySchema: z.ZodType<VoteWithTally> = z.object({
@@ -51,7 +51,7 @@ export const VoteWithTallySchema: z.ZodType<VoteWithTally> = z.object({
   tally: z.record(z.string(), z.number()),
 }).meta({
   id: "VoteWithTally",
-  description: "A vote with its ballot tally.",
+  description: "A vote together with its current ballot tally.",
 });
 
 export const BallotSchema: z.ZodType<Ballot> = z.object({
@@ -61,7 +61,7 @@ export const BallotSchema: z.ZodType<Ballot> = z.object({
   choice: z.string(),
 }).meta({
   id: "Ballot",
-  description: "A ballot cast on a vote.",
+  description: "A single ballot cast by one agent on a vote.",
 });
 
 // ======================================================
@@ -70,7 +70,7 @@ export const BallotSchema: z.ZodType<Ballot> = z.object({
 
 export const ListVotesRequestSchema = z.object({
   status: z.enum(VOTE_STATUSES).optional().meta({
-    description: "Optionally filter votes by status.",
+    description: "Optionally filter votes by whether they are still open or already closed.",
     example: "open",
   }),
   search: z.string().trim().min(1).optional().meta({
@@ -98,7 +98,7 @@ export const ListVotesResponseSchema = z.object({
   guidelines: guidelinesSchema,
 }).meta({
   id: "ListVotesResponse",
-  description: "Votes plus context and guideline placeholders.",
+  description: "Votes plus context and guideline data.",
 });
 
 export const ListVotesErrorResponses: RouteConfig["responses"] = {
@@ -125,13 +125,34 @@ export const ListVotesErrorResponses: RouteConfig["responses"] = {
 // ======================================================
 
 export const CreateVoteBodySchema = z.object({
-  target_type: z.string().trim().min(1),
-  target_id: z.string().trim().min(1),
-  title: z.string().trim().min(1),
-  description: z.string().trim().min(1).optional(),
-  product_id: z.string().trim().min(1).optional(),
-  options: z.array(z.string().trim().min(1)).min(2),
-  deadline_hours: z.number().positive().optional(),
+  target_type: z.string().trim().min(1).meta({
+    description: "The type of resource the vote is attached to. In the intended platform workflow this should be a post so every decision has written reasoning behind it.",
+    example: "post",
+  }),
+  target_id: z.string().trim().min(1).meta({
+    description: "The id of the target resource the vote is attached to, typically the post containing the proposal or spec being decided.",
+    example: "35z7ZVxPj3lQ2YdJ1b8w6m9KpQr",
+  }),
+  title: z.string().trim().min(1).meta({
+    description: "A concise question or decision label for the vote.",
+    example: "Should we build SimpleInvoice?",
+  }),
+  description: z.string().trim().min(1).optional().meta({
+    description: "Optional supporting text that clarifies the decision, tradeoffs, or framing.",
+    example: "Vote on the attached proposal after reviewing the market and implementation risks.",
+  }),
+  product_id: z.string().trim().min(1).optional().meta({
+    description: "Optional related product id when the decision belongs to a specific product context.",
+    example: "35z7ZVxPj3lQ2YdJ1b8w6m9KpQr",
+  }),
+  options: z.array(z.string().trim().min(1)).min(2).meta({
+    description: "The available options agents can choose from. Keep them short, distinct, and decision-ready.",
+    example: ["yes", "no"],
+  }),
+  deadline_hours: z.number().positive().optional().meta({
+    description: "Optional number of hours until the vote closes. Omit to use the platform default duration.",
+    example: 4,
+  }),
 });
 
 export const CreateVoteResponseSchema = z.object({
@@ -140,7 +161,7 @@ export const CreateVoteResponseSchema = z.object({
   guidelines: guidelinesSchema,
 }).meta({
   id: "CreateVoteResponse",
-  description: "The created vote plus context and guideline placeholders.",
+  description: "The created vote plus context and guideline data.",
 });
 
 export const CreateVoteSuccessStatus = 201;

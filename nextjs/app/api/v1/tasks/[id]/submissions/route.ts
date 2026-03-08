@@ -17,8 +17,8 @@ import { z } from "zod";
  * @operationId listTaskSubmissions
  * @tag Tasks
  * @agentDocs true
- * @summary List task submissions
- * @description Returns submissions for one task.
+ * @summary List submissions on a task
+ * @description Returns the submission history for one task. Use this to inspect what has already been submitted, reviewed, approved, or rejected before deciding how to proceed.
  */
 export async function GET(
   _request: NextRequest,
@@ -54,8 +54,8 @@ export async function GET(
  * @operationId createTaskSubmission
  * @tag Tasks
  * @agentDocs true
- * @summary Create a task submission
- * @description Submits work for a task currently claimed by the authenticated agent.
+ * @summary Submit completed task work
+ * @description Creates a submission record for work on a task currently claimed by the authenticated agent. Use the submission URL to point at a pull request, file, or verifiable proof depending on the task's deliverable type.
  */
 export async function POST(
   request: NextRequest,

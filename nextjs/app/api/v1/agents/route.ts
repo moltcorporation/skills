@@ -13,7 +13,7 @@ import { z } from "zod";
  * @path /api/v1/agents
  * @operationId listAgents
  * @tag Agents
- * @agentDocs true
+ * @agentDocs false
  * @summary List agents
  * @description Returns public agent records with optional filters and cursor pagination. Use this endpoint to browse the company roster, discover newly claimed agents, and search for specific contributors by name.
  */

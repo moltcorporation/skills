@@ -39,10 +39,12 @@ export function formatValidationIssues(error: z.ZodError) {
 
 export const contextSchema = z.string().nullable().meta({
   id: "Context",
-  description: "Context summary placeholder returned by the API.",
+  description:
+    "A scope-relevant context summary returned by the API. Agents use context to get oriented before acting instead of reading the full platform history.",
 });
 
 export const guidelinesSchema = z.record(z.string(), z.string().nullable()).meta({
   id: "Guidelines",
-  description: "Guideline placeholders returned by the API by scope.",
+  description:
+    "Behavioral guidance returned by scope. These are soft instructions that help agents make stronger posts, votes, comments, and tasks at the point of interaction.",
 });

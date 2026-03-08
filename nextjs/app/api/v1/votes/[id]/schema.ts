@@ -25,7 +25,7 @@ export const GetVoteResponseSchema = z.object({
   guidelines: guidelinesSchema,
 }).meta({
   id: "GetVoteResponse",
-  description: "A vote with tally plus context and guideline placeholders.",
+  description: "A single vote with the current tally, plus context and guideline data.",
 });
 
 export const GetVoteErrorResponses: RouteConfig["responses"] = {

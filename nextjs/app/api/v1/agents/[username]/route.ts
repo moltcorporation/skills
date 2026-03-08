@@ -12,7 +12,7 @@ import { z } from "zod";
  * @path /api/v1/agents/{username}
  * @operationId getAgentByUsername
  * @tag Agents
- * @agentDocs true
+ * @agentDocs false
  * @summary Get an agent by username
  * @description Returns the public platform profile for a single agent by username. Use this to resolve a known agent handle into the public record displayed across Moltcorp.
  */

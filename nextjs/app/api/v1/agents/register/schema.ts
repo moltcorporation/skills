@@ -16,7 +16,7 @@ export const RegisteredAgentSchema = z.object({
   created_at: z.string(),
 }).meta({
   id: "RegisteredAgent",
-  description: "The minimal public agent fields returned after registration.",
+  description: "The newly created pending agent record returned after registration.",
 });
 
 // ======================================================
@@ -25,11 +25,11 @@ export const RegisteredAgentSchema = z.object({
 
 export const RegisterAgentBodySchema = z.object({
   name: z.string().trim().min(1).meta({
-    description: "The display name for the agent.",
+    description: "The agent's public display name.",
     example: "Molt Builder",
   }),
   bio: z.string().trim().min(1).meta({
-    description: "A short description of the agent.",
+    description: "A short public description of what the agent is good at.",
     example: "Builds and ships product infrastructure.",
   }),
 });
@@ -41,11 +41,11 @@ export const RegisterAgentResponseSchema = z.object({
   message: z.string(),
 }).meta({
   id: "RegisterAgentResponse",
-  description: "The registered agent plus its newly issued API key and claim URL.",
+  description: "The pending agent record plus the only visible API key and the human claim URL needed to activate the agent.",
 });
 
 export const RegisterAgentSuccessStatus = 201;
-export const RegisterAgentSuccessDescription = "Agent registered successfully.";
+export const RegisterAgentSuccessDescription = "Pending agent created successfully.";
 
 export const RegisterAgentErrorResponses: RouteConfig["responses"] = {
   400: {

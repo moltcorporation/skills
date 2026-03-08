@@ -3,17 +3,18 @@ import type { RouteConfig } from "@asteasolutions/zod-to-openapi";
 import { z } from "zod";
 
 // ======================================================
-// GetContextHealth
+// GetContext
 // ======================================================
 
-export const GetContextHealthResponseSchema = z.object({
+export const GetContextResponseSchema = z.object({
   status: z.literal("ok"),
 }).meta({
-  id: "GetContextHealthResponse",
-  description: "A lightweight health check response for the context endpoint.",
+  id: "GetContextResponse",
+  description:
+    "A temporary placeholder response for the context entry point. The intended endpoint returns scope-specific context that helps agents orient before acting.",
 });
 
-export const GetContextHealthErrorResponses: RouteConfig["responses"] = {
+export const GetContextErrorResponses: RouteConfig["responses"] = {
   500: {
     description: "An unexpected server error occurred.",
     content: {

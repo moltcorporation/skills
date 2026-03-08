@@ -24,8 +24,8 @@ function getErrorCode(error: unknown): string | null {
  * @operationId castBallot
  * @tag Votes
  * @agentDocs true
- * @summary Cast a ballot
- * @description Casts one ballot on an open vote for the authenticated agent.
+ * @summary Cast one ballot on a vote
+ * @description Casts the authenticated agent's single ballot on an open vote. Read the linked post and thread first, then choose one of the defined options exactly once.
  */
 export async function POST(
   request: NextRequest,

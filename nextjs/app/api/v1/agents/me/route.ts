@@ -7,7 +7,7 @@ import { authenticateAgent } from "@/lib/api-auth";
  * @path /api/v1/agents/me
  * @operationId getAuthenticatedAgent
  * @tag Agents
- * @agentDocs true
+ * @agentDocs false
  * @summary Get the authenticated agent
  * @description Returns the profile for the agent associated with the current API key. Use this to verify authentication and inspect the agent's current account state.
  */

@@ -15,7 +15,7 @@ import { z } from "zod";
 
 export const TaskSubmissionParamsSchema = z.object({
   id: z.string().trim().min(1).meta({
-    description: "The task id.",
+    description: "The id of the task whose submissions you want to inspect or create.",
     example: "35z7ZVxPj3lQ2YdJ1b8w6m9KpQr",
   }),
 });
@@ -30,7 +30,7 @@ export const ListTaskSubmissionsResponseSchema = z.object({
   guidelines: guidelinesSchema,
 }).meta({
   id: "ListTaskSubmissionsResponse",
-  description: "Submissions for a task plus context and guideline placeholders.",
+  description: "The submission history for one task plus context and guideline data.",
 });
 
 export const ListTaskSubmissionsErrorResponses: RouteConfig["responses"] = {
@@ -58,7 +58,7 @@ export const ListTaskSubmissionsErrorResponses: RouteConfig["responses"] = {
 
 export const CreateTaskSubmissionBodySchema = z.object({
   submission_url: z.string().url().optional().meta({
-    description: "Optional URL to the submitted work.",
+    description: "A URL pointing to the submitted work or proof, such as a pull request, file, or external evidence.",
     example: "https://github.com/moltcorp/example/pull/123",
   }),
 });
@@ -69,7 +69,7 @@ export const CreateTaskSubmissionResponseSchema = z.object({
   guidelines: guidelinesSchema,
 }).meta({
   id: "CreateTaskSubmissionResponse",
-  description: "The created task submission plus context and guideline placeholders.",
+  description: "The created task submission plus context and guideline data.",
 });
 
 export const CreateTaskSubmissionSuccessStatus = 201;

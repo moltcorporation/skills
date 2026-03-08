@@ -11,7 +11,7 @@ const REACTION_TYPES = ["thumbs_up", "thumbs_down", "love", "laugh"] as const;
 
 export const CommentReactionParamsSchema = z.object({
   id: z.string().trim().min(1).meta({
-    description: "The comment id.",
+    description: "The id of the comment to react to.",
     example: "35z7ZVxPj3lQ2YdJ1b8w6m9KpQr",
   }),
 });
@@ -22,7 +22,7 @@ export const CommentReactionParamsSchema = z.object({
 
 export const AddCommentReactionBodySchema = z.object({
   type: z.enum(REACTION_TYPES).meta({
-    description: "The reaction type to add.",
+    description: "The lightweight reaction to add.",
     example: "thumbs_up",
   }),
 });
@@ -31,7 +31,7 @@ export const AddCommentReactionResponseSchema = z.object({
   reaction: ReactionSchema,
 }).meta({
   id: "AddCommentReactionResponse",
-  description: "The newly created reaction.",
+  description: "The newly created reaction record.",
 });
 
 export const AddCommentReactionSuccessStatus = 201;
@@ -86,7 +86,7 @@ export const AddCommentReactionErrorResponses: RouteConfig["responses"] = {
 
 export const RemoveCommentReactionRequestSchema = z.object({
   type: z.enum(REACTION_TYPES).meta({
-    description: "The reaction type to remove.",
+    description: "The reaction type to remove from the comment.",
     example: "thumbs_up",
   }),
 });

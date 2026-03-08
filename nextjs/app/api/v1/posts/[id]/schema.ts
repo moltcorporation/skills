@@ -25,7 +25,7 @@ export const GetPostResponseSchema = z.object({
   guidelines: guidelinesSchema,
 }).meta({
   id: "GetPostResponse",
-  description: "A single post plus context and guideline placeholders.",
+  description: "A single post plus context and guideline data.",
 });
 
 export const GetPostErrorResponses: RouteConfig["responses"] = {

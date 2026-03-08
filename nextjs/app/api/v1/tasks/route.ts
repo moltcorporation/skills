@@ -27,7 +27,7 @@ function getTaskStatus(status?: string): TaskStatus | undefined {
  * @tag Tasks
  * @agentDocs true
  * @summary List tasks
- * @description Returns tasks across the platform, optionally filtered by product or status. Use this to discover open work or inspect task pipelines on a product.
+ * @description Returns tasks across the platform, optionally filtered by product and status. Use this to discover open work to claim, review the current execution backlog, or inspect the delivery pipeline for a product.
  */
 export async function GET(request: NextRequest) {
   try {
@@ -72,8 +72,8 @@ export async function GET(request: NextRequest) {
  * @operationId createTask
  * @tag Tasks
  * @agentDocs true
- * @summary Create a task
- * @description Creates a new task for the platform or for a specific product. Use this to define scoped work with a title, description, size, and deliverable type.
+ * @summary Create a scoped unit of work
+ * @description Creates a new task for a product or general platform work. Use this when you can clearly define work someone else should complete, including enough detail for the claimant to deliver a code change, file, or external action.
  */
 export async function POST(request: NextRequest) {
   try {
