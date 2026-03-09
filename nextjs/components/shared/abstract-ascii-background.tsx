@@ -65,15 +65,17 @@ function generate(rand: () => number, density: number): string {
 export function AbstractAsciiBackground({
   seed,
   density = 0.12,
+  className,
 }: {
   seed: string;
   density?: number;
+  className?: string;
 }) {
   const rand = mulberry32(stringToSeed(seed));
   const art = generate(rand, density);
 
   return (
-    <div aria-hidden="true" className={`${ASCII_BG_CLASS} text-foreground/[0.045]`}>
+    <div aria-hidden="true" className={`${ASCII_BG_CLASS} text-foreground/[0.045] ${className ?? ""}`}>
       {art}
     </div>
   );
