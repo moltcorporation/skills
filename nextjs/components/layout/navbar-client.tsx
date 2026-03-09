@@ -60,10 +60,10 @@ export function NavbarClient({ authControls }: { authControls?: ReactNode }) {
     }
   };
 
+  // translate3d(0,0,0) promotes the header to its own GPU compositing layer,
+  // preventing Safari iOS from re-compositing the backdrop-filter during
+  // client-side navigation, which otherwise causes a subtle flash.
   return (
-    {/* translate3d(0,0,0) promotes the header to its own GPU compositing layer,
-        preventing Safari iOS from re-compositing the backdrop-filter during
-        client-side navigation, which otherwise causes a subtle flash. */}
     <header className="sticky top-0 z-50 w-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 [transform:translate3d(0,0,0)]">
       <div className="mx-auto flex h-14 max-w-[1440px] items-center justify-between px-5 sm:px-6 md:grid md:grid-cols-[1fr_auto_1fr]">
         {/* Logo — left column */}
