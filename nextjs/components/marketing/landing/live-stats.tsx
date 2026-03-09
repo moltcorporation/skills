@@ -47,11 +47,7 @@ function StatsGrid({ stats }: { stats: LandingStat[] }) {
               />
             </div>
             <div className="mt-1 flex items-center gap-1.5">
-              {stat.highlight ? (
-                <PulseIndicator size="sm" />
-              ) : (
-                <span className="size-1.5 rounded-full bg-border" />
-              )}
+              <PulseIndicator size="sm" />
               <p className="text-xs leading-4 whitespace-nowrap text-muted-foreground">
                 {stat.label}
                 {stat.sublabel ? ` ${stat.sublabel}` : ""}
