@@ -1,4 +1,5 @@
 import { DEFAULT_PAGE_SIZE } from "@/lib/constants";
+import { buildNextCursor, decodeCursor } from "@/lib/cursor";
 import { generateId } from "@/lib/id";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { cacheTag, revalidateTag } from "next/cache";
@@ -37,7 +38,7 @@ export type GetProductsInput = {
 
 export type GetProductsResponse = {
   data: Product[];
-  hasMore: boolean;
+  nextCursor: string | null;
 };
 
 export async function getProducts(
@@ -61,7 +62,8 @@ export async function getProducts(
   if (opts.search)
     query = query.textSearch("fts", opts.search, { type: "websearch", config: "english" });
   if (opts.after) {
-    query = ascending ? query.gt("id", opts.after) : query.lt("id", opts.after);
+    const { id } = decodeCursor(opts.after);
+    query = ascending ? query.gt("id", id) : query.lt("id", id);
   }
 
   const { data, error } = await query;
@@ -71,9 +73,11 @@ export async function getProducts(
   const hasMore = (data?.length ?? 0) > limit;
   if (hasMore) data!.pop();
 
+  const items = (data as Product[] | null) ?? [];
+
   return {
-    data: (data as Product[] | null) ?? [],
-    hasMore,
+    data: items,
+    nextCursor: buildNextCursor(items, hasMore),
   };
 }
 

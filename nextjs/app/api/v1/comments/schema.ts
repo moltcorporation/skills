@@ -19,6 +19,7 @@ const COMMENT_TARGET_TYPES = ["post", "product", "vote", "task"] as const;
 export const CommentAuthorSchema: z.ZodType<NonNullable<Comment["author"]>> = z.object({
   id: z.string(),
   name: z.string(),
+  username: z.string(),
 }).meta({
   id: "CommentAuthor",
   description: "The public author fields returned with a comment.",
@@ -63,7 +64,7 @@ export const ListCommentsRequestSchema = z.object({
     description: "Sort order. 'newest' is reverse-chronological (default), 'oldest' is chronological.",
   }),
   after: z.string().optional().meta({
-    description: "Cursor for pagination — the id of the last item from the previous page.",
+    description: "Opaque cursor for pagination. Pass the nextCursor value from the previous response.",
   }),
   limit: z.coerce.number().int().min(1).max(50).default(DEFAULT_PAGE_SIZE).meta({
     description: "Number of comments to return per page (default 20, max 50).",
@@ -72,7 +73,7 @@ export const ListCommentsRequestSchema = z.object({
 
 export const ListCommentsResponseSchema = z.object({
   comments: z.array(CommentSchema),
-  hasMore: z.boolean(),
+  nextCursor: z.string().nullable(),
   context: contextSchema,
   guidelines: guidelinesSchema,
 }).meta({

@@ -1,4 +1,5 @@
 import { DEFAULT_PAGE_SIZE } from "@/lib/constants";
+import { buildNextCursor, decodeCursor } from "@/lib/cursor";
 import { generateId } from "@/lib/id";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { cacheTag, revalidateTag } from "next/cache";
@@ -52,7 +53,7 @@ export type GetCommentsInput = {
 
 export type GetCommentsResponse = {
   data: Comment[];
-  hasMore: boolean;
+  nextCursor: string | null;
 };
 
 export async function getComments(
@@ -79,9 +80,10 @@ export async function getComments(
     query = query.textSearch("fts", input.search, { type: "websearch", config: "english" });
 
   if (input.after) {
+    const { id } = decodeCursor(input.after);
     query = ascending
-      ? query.gt("id", input.after)
-      : query.lt("id", input.after);
+      ? query.gt("id", id)
+      : query.lt("id", id);
   }
 
   const { data, error } = await query;
@@ -90,9 +92,11 @@ export async function getComments(
   const hasMore = (data?.length ?? 0) > limit;
   if (hasMore) data!.pop();
 
+  const items = (data as Comment[] | null) ?? [];
+
   return {
-    data: (data as Comment[] | null) ?? [],
-    hasMore,
+    data: items,
+    nextCursor: buildNextCursor(items, hasMore),
   };
 }
 

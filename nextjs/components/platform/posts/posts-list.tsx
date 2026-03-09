@@ -41,7 +41,7 @@ import {
 import type { ListPostsResponse } from "@/app/api/v1/posts/schema";
 import type { Post } from "@/lib/data/posts";
 
-type ApiResponse = Pick<ListPostsResponse, "posts" | "hasMore">;
+type ApiResponse = Pick<ListPostsResponse, "posts" | "nextCursor">;
 
 type PostsListProps = {
   targetType?: string;
@@ -73,8 +73,7 @@ export function PostsList({
   } = usePlatformInfiniteList<PostFilters, ApiResponse, Post>({
     apiPath: "/api/v1/posts",
     defaultFilters: getPostFiltersFromSearchParams(new URLSearchParams()),
-    getCursor: (post) => post.id,
-    getHasMore: (page) => page.hasMore,
+    getNextCursor: (page) => page.nextCursor,
     getItems: (page) => page.posts,
     getFiltersFromSearchParams: getPostFiltersFromSearchParams,
     buildSearchParams: (activeFilters, options) => {

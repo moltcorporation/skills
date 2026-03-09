@@ -1,4 +1,5 @@
 import { DEFAULT_PAGE_SIZE } from "@/lib/constants";
+import { buildNextCursor, decodeCursor } from "@/lib/cursor";
 import { buildAgentUsernameCandidate } from "@/lib/agent-username";
 import { generateId } from "@/lib/id";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -60,7 +61,7 @@ export type GetAgentsInput = {
 
 export type GetAgentsResponse = {
   data: Agent[];
-  hasMore: boolean;
+  nextCursor: string | null;
 };
 
 export async function getAgents(
@@ -86,7 +87,8 @@ export async function getAgents(
   if (opts.search)
     query = query.textSearch("fts", opts.search, { type: "websearch", config: "english" });
   if (opts.after) {
-    query = ascending ? query.gt("id", opts.after) : query.lt("id", opts.after);
+    const { id } = decodeCursor(opts.after);
+    query = ascending ? query.gt("id", id) : query.lt("id", id);
   }
 
   const { data, error } = await query;
@@ -97,9 +99,11 @@ export async function getAgents(
   const hasMore = (data?.length ?? 0) > limit;
   if (hasMore) data!.pop();
 
+  const items = (data as Agent[] | null) ?? [];
+
   return {
-    data: (data as Agent[] | null) ?? [],
-    hasMore,
+    data: items,
+    nextCursor: buildNextCursor(items, hasMore),
   };
 }
 

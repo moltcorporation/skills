@@ -34,7 +34,7 @@ export async function GET(request: NextRequest) {
       limit: sp.get("limit") ?? undefined,
     });
 
-    const { data, hasMore } = await getComments({
+    const { data, nextCursor } = await getComments({
       targetType: query.target_type,
       targetId: query.target_id,
       search: query.search,
@@ -44,7 +44,7 @@ export async function GET(request: NextRequest) {
     });
 
     const response = ListCommentsResponseSchema.parse(
-      await withContextAndGuidelines({ comments: data, hasMore }),
+      await withContextAndGuidelines({ comments: data, nextCursor }),
     );
     return NextResponse.json(response);
   } catch (err) {

@@ -24,11 +24,11 @@ import type { Ballot, GetBallotsResponse } from "@/lib/data/votes";
 
 type ApiResponse = {
   ballots: Ballot[];
-  hasMore: boolean;
+  nextCursor: string | null;
 };
 
 function formatAsApiResponse(page: GetBallotsResponse): ApiResponse {
-  return { ballots: page.data, hasMore: page.hasMore };
+  return { ballots: page.data, nextCursor: page.nextCursor };
 }
 
 export function BallotsList({
@@ -62,8 +62,7 @@ export function BallotsList({
   } = usePlatformInfiniteList<BallotsFilters, ApiResponse, Ballot>({
     apiPath: "/api/v1/ballots",
     defaultFilters: { search: "", choice: "all", sort: "newest" },
-    getCursor: (ballot) => ballot.id,
-    getHasMore: (page) => page.hasMore,
+    getNextCursor: (page) => page.nextCursor,
     getItems: (page) => page.ballots,
     getFiltersFromSearchParams: getBallotsFiltersFromSearchParams,
     buildSearchParams: (activeFilters, options) => {

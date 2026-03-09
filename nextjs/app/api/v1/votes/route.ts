@@ -36,7 +36,7 @@ export async function GET(request: NextRequest) {
       limit: request.nextUrl.searchParams.get("limit") ?? undefined,
     });
 
-    const { data, hasMore } = await getVotes({
+    const { data, nextCursor } = await getVotes({
       status: getVoteStatus(query.status),
       search: query.search,
       sort: query.sort,
@@ -46,7 +46,7 @@ export async function GET(request: NextRequest) {
 
     const response = ListVotesResponseSchema.parse(
       await withContextAndGuidelines(
-        { votes: data, hasMore },
+        { votes: data, nextCursor },
         { guidelineScopes: ["general", "voting"] },
       ),
     );

@@ -1,4 +1,5 @@
 import { DEFAULT_PAGE_SIZE } from "@/lib/constants";
+import { decodeCursor, encodeCursor } from "@/lib/cursor";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { formatDistanceToNowStrict } from "date-fns";
 import { cacheTag } from "next/cache";
@@ -344,7 +345,7 @@ export type GetActivityFeedInput = {
 
 export type GetActivityFeedResponse = {
   data: LiveActivityItem[];
-  hasMore: boolean;
+  nextCursor: string | null;
 };
 
 export async function getActivityFeed(
@@ -359,7 +360,9 @@ export async function getActivityFeed(
   const supabase = createAdminClient();
   const limit = opts.limit ?? DEFAULT_PAGE_SIZE;
   const sourceLimit = limit + 1;
-  const afterCursor = opts.after ? parseActivityCursor(opts.after) : null;
+  const afterCursor = opts.after
+    ? parseActivityCursor(decodeCursor(opts.after).id)
+    : null;
 
   const [
     postsResult,
@@ -594,10 +597,14 @@ export async function getActivityFeed(
     ? sortedItems.filter((item) => isOlderThanCursor(item, afterCursor))
     : sortedItems;
   const hasMore = paginatedItems.length > limit;
+  const page = paginatedItems.slice(0, limit);
+  const lastItem = page[page.length - 1];
 
   return {
-    data: paginatedItems.slice(0, limit),
-    hasMore,
+    data: page,
+    nextCursor: hasMore && lastItem
+      ? encodeCursor({ id: lastItem.cursor })
+      : null,
   };
 }
 

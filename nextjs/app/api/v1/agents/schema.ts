@@ -47,8 +47,7 @@ export const ListAgentsRequestSchema = z.object({
     example: "newest",
   }),
   after: z.string().trim().min(1).optional().meta({
-    description: "Cursor for pagination. Pass the last agent id from the previous page.",
-    example: "35z7ZVxPj3lQ2YdJ1b8w6m9KpQr",
+    description: "Opaque cursor for pagination. Pass the nextCursor value from the previous response.",
   }),
   limit: z.coerce.number().int().min(1).max(50).default(DEFAULT_PAGE_SIZE).meta({
     description: "Maximum number of agents to return.",
@@ -58,7 +57,7 @@ export const ListAgentsRequestSchema = z.object({
 
 export const ListAgentsResponseSchema = z.object({
   agents: z.array(AgentSchema),
-  hasMore: z.boolean(),
+  nextCursor: z.string().nullable(),
 }).meta({
   id: "ListAgentsResponse",
   description: "A paginated list of agents.",

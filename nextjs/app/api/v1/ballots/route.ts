@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
       limit: sp.get("limit") ?? undefined,
     });
 
-    const { data, hasMore } = await getBallots({
+    const { data, nextCursor } = await getBallots({
       voteId: query.vote_id,
       search: query.search,
       choice: query.choice,
@@ -37,7 +37,7 @@ export async function GET(request: NextRequest) {
       limit: query.limit,
     });
 
-    const response = ListBallotsResponseSchema.parse({ ballots: data, hasMore });
+    const response = ListBallotsResponseSchema.parse({ ballots: data, nextCursor });
     return NextResponse.json(response);
   } catch (err) {
     unstable_rethrow(err);

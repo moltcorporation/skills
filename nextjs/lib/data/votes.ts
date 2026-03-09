@@ -1,4 +1,5 @@
 import { DEFAULT_PAGE_SIZE, VOTE_DEFAULT_DEADLINE_HOURS } from "@/lib/constants";
+import { buildNextCursor, decodeCursor } from "@/lib/cursor";
 import { generateId } from "@/lib/id";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { cacheTag, revalidateTag } from "next/cache";
@@ -100,7 +101,7 @@ export type GetVotesInput = {
 
 export type GetVotesResponse = {
   data: Vote[];
-  hasMore: boolean;
+  nextCursor: string | null;
 };
 
 export async function getVotes(
@@ -125,7 +126,8 @@ export async function getVotes(
   if (opts.search)
     query = query.textSearch("fts", opts.search, { type: "websearch", config: "english" });
   if (opts.after) {
-    query = ascending ? query.gt("id", opts.after) : query.lt("id", opts.after);
+    const { id } = decodeCursor(opts.after);
+    query = ascending ? query.gt("id", id) : query.lt("id", id);
   }
 
   const { data, error } = await query;
@@ -134,14 +136,16 @@ export async function getVotes(
   const hasMore = (data?.length ?? 0) > limit;
   if (hasMore) data!.pop();
 
+  const items = ((data as Array<Omit<Vote, "options"> & { options: unknown }> | null) ?? []).map(
+    (vote) => ({
+      ...vote,
+      options: normalizeVoteOptions(vote.options),
+    }),
+  );
+
   return {
-    data: ((data as Array<Omit<Vote, "options"> & { options: unknown }> | null) ?? []).map(
-      (vote) => ({
-        ...vote,
-        options: normalizeVoteOptions(vote.options),
-      }),
-    ),
-    hasMore,
+    data: items,
+    nextCursor: buildNextCursor(items, hasMore),
   };
 }
 
@@ -413,7 +417,7 @@ export type GetBallotsInput = {
 
 export type GetBallotsResponse = {
   data: Ballot[];
-  hasMore: boolean;
+  nextCursor: string | null;
 };
 
 export async function getBallots(
@@ -439,9 +443,10 @@ export async function getBallots(
   if (input.choice) query = query.eq("choice", input.choice);
 
   if (input.after) {
+    const { id } = decodeCursor(input.after);
     query = ascending
-      ? query.gt("id", input.after)
-      : query.lt("id", input.after);
+      ? query.gt("id", id)
+      : query.lt("id", id);
   }
 
   const { data, error } = await query;
@@ -450,9 +455,11 @@ export async function getBallots(
   const hasMore = (data?.length ?? 0) > limit;
   if (hasMore) data!.pop();
 
+  const items = (data as Ballot[] | null) ?? [];
+
   return {
-    data: (data as Ballot[] | null) ?? [],
-    hasMore,
+    data: items,
+    nextCursor: buildNextCursor(items, hasMore),
   };
 }
 

@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
       limit: request.nextUrl.searchParams.get("limit") ?? undefined,
     });
 
-    const { data, hasMore } = await getForums({
+    const { data, nextCursor } = await getForums({
       search: query.search,
       sort: query.sort,
       after: query.after,
@@ -36,7 +36,7 @@ export async function GET(request: NextRequest) {
     });
 
     const response = ListForumsResponseSchema.parse(
-      await withContextAndGuidelines({ forums: data, hasMore }),
+      await withContextAndGuidelines({ forums: data, nextCursor }),
     );
     return NextResponse.json(response);
   } catch (err) {

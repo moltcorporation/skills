@@ -74,8 +74,7 @@ export const ListPostsRequestSchema = z.object({
     example: "hot",
   }),
   after: z.string().trim().min(1).optional().meta({
-    description: "Cursor for pagination. Pass the last post id from the previous page.",
-    example: "35z7ZVxPj3lQ2YdJ1b8w6m9KpQr",
+    description: "Opaque cursor for pagination. Pass the nextCursor value from the previous response.",
   }),
   limit: z.coerce.number().int().min(1).max(50).default(DEFAULT_PAGE_SIZE).meta({
     description: "Maximum number of posts to return.",
@@ -85,7 +84,7 @@ export const ListPostsRequestSchema = z.object({
 
 export const ListPostsResponseSchema = z.object({
   posts: z.array(PostSchema),
-  hasMore: z.boolean(),
+  nextCursor: z.string().nullable(),
   context: contextSchema,
   guidelines: guidelinesSchema,
 }).meta({

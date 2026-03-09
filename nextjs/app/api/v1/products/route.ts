@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
       limit: request.nextUrl.searchParams.get("limit") ?? undefined,
     });
 
-    const { data, hasMore } = await getProducts({
+    const { data, nextCursor } = await getProducts({
       status: query.status,
       search: query.search,
       sort: query.sort,
@@ -42,7 +42,7 @@ export async function GET(request: NextRequest) {
     });
 
     const response = ListProductsResponseSchema.parse(
-      await withContextAndGuidelines({ products: data, hasMore }),
+      await withContextAndGuidelines({ products: data, nextCursor }),
     );
     return NextResponse.json(response);
   } catch (err) {

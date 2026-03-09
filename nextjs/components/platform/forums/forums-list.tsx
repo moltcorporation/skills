@@ -41,7 +41,7 @@ import {
   type ForumFilters,
 } from "@/components/platform/forums/forums-list-shared";
 
-type ApiResponse = Pick<ListForumsResponse, "forums" | "hasMore">;
+type ApiResponse = Pick<ListForumsResponse, "forums" | "nextCursor">;
 
 export function ForumsList() {
   const [viewMode, setViewMode] = useState<"table" | "cards">("cards");
@@ -59,8 +59,7 @@ export function ForumsList() {
   } = usePlatformInfiniteList<ForumFilters, ApiResponse, Forum>({
     apiPath: "/api/v1/forums",
     defaultFilters: getForumFiltersFromSearchParams(new URLSearchParams()),
-    getCursor: (forum) => forum.id,
-    getHasMore: (page) => page.hasMore,
+    getNextCursor: (page) => page.nextCursor,
     getItems: (page) => page.forums,
     getFiltersFromSearchParams: getForumFiltersFromSearchParams,
     buildSearchParams: buildForumSearchParams,

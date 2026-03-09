@@ -1,4 +1,5 @@
 import { DEFAULT_PAGE_SIZE } from "@/lib/constants";
+import { buildNextCursor, decodeCursor } from "@/lib/cursor";
 import { generateId } from "@/lib/id";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { cacheTag, revalidateTag } from "next/cache";
@@ -60,7 +61,7 @@ export type GetPostsInput = {
 
 export type GetPostsResponse = {
   data: Post[];
-  hasMore: boolean;
+  nextCursor: string | null;
 };
 
 export async function getPosts(
@@ -108,11 +109,22 @@ export async function getPosts(
   if (opts.search)
     query = query.textSearch("fts", opts.search, { type: "websearch", config: "english" });
 
-  // Cursor pagination — only reliable for id-based sorts (new/newest/oldest).
-  // For engagement sorts (hot/top), all results typically fit in one page.
   if (opts.after) {
-    const isAscending = sort === "oldest";
-    query = isAscending ? query.gt("id", opts.after) : query.lt("id", opts.after);
+    const { id, v } = decodeCursor(opts.after);
+
+    if (sort === "hot" && v?.[0] != null) {
+      query = query.or(
+        `comment_count.lt.${v[0]},and(comment_count.eq.${v[0]},id.lt.${id})`,
+      );
+    } else if (sort === "top" && v?.[0] != null) {
+      query = query.or(
+        `reaction_thumbs_up_count.lt.${v[0]},and(reaction_thumbs_up_count.eq.${v[0]},id.lt.${id})`,
+      );
+    } else if (sort === "oldest") {
+      query = query.gt("id", id);
+    } else {
+      query = query.lt("id", id);
+    }
   }
 
   const { data, error } = await query;
@@ -122,9 +134,17 @@ export async function getPosts(
   const hasMore = (data?.length ?? 0) > limit;
   if (hasMore) data!.pop();
 
+  const items = (data as Post[] | null) ?? [];
+  const sortValues =
+    sort === "hot"
+      ? (p: Post) => [p.comment_count]
+      : sort === "top"
+        ? (p: Post) => [p.reaction_thumbs_up_count]
+        : undefined;
+
   return {
-    data: (data as Post[] | null) ?? [],
-    hasMore,
+    data: items,
+    nextCursor: buildNextCursor(items, hasMore, sortValues),
   };
 }
 

@@ -86,8 +86,7 @@ export const ListVotesRequestSchema = z.object({
     example: "newest",
   }),
   after: z.string().trim().min(1).optional().meta({
-    description: "Cursor for pagination. Pass the last vote id from the previous page.",
-    example: "35z7ZVxPj3lQ2YdJ1b8w6m9KpQr",
+    description: "Opaque cursor for pagination. Pass the nextCursor value from the previous response.",
   }),
   limit: z.coerce.number().int().min(1).max(50).default(DEFAULT_PAGE_SIZE).meta({
     description: "Maximum number of votes to return.",
@@ -97,7 +96,7 @@ export const ListVotesRequestSchema = z.object({
 
 export const ListVotesResponseSchema = z.object({
   votes: z.array(VoteSchema),
-  hasMore: z.boolean(),
+  nextCursor: z.string().nullable(),
   context: contextSchema,
   guidelines: guidelinesSchema,
 }).meta({

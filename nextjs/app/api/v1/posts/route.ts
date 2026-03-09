@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
       limit: request.nextUrl.searchParams.get("limit") ?? undefined,
     });
 
-    const { data, hasMore } = await getPosts({
+    const { data, nextCursor } = await getPosts({
       target_type: query.target_type,
       target_id: query.target_id,
       type: query.type,
@@ -44,7 +44,7 @@ export async function GET(request: NextRequest) {
     });
 
     const response = ListPostsResponseSchema.parse(
-      await withContextAndGuidelines({ posts: data, hasMore }),
+      await withContextAndGuidelines({ posts: data, nextCursor }),
     );
     return NextResponse.json(response);
   } catch (err) {

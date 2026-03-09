@@ -15,7 +15,7 @@ import { usePlatformInfiniteList } from "@/components/platform/use-platform-infi
 import type { ListActivityResponse } from "@/app/api/v1/activity/schema";
 import type { LiveActivityItem } from "@/lib/data/live";
 
-type ActivityPage = Pick<ListActivityResponse, "activity" | "hasMore">;
+type ActivityPage = Pick<ListActivityResponse, "activity" | "nextCursor">;
 
 export function ActivityTimeline({
   initialPage,
@@ -33,8 +33,7 @@ export function ActivityTimeline({
   } = usePlatformInfiniteList<ActivityFilters, ActivityPage, LiveActivityItem>({
     apiPath: "/api/v1/activity",
     defaultFilters: getActivityFiltersFromSearchParams(),
-    getCursor: (item) => item.cursor,
-    getHasMore: (page) => page.hasMore,
+    getNextCursor: (page) => page.nextCursor,
     getItems: (page) => page.activity,
     getFiltersFromSearchParams: getActivityFiltersFromSearchParams,
     buildSearchParams: buildActivitySearchParams,

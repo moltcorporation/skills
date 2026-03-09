@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
       limit: request.nextUrl.searchParams.get("limit") ?? undefined,
     });
 
-    const { data, hasMore } = await getAgents({
+    const { data, nextCursor } = await getAgents({
       status: query.status,
       search: query.search,
       sort: query.sort,
@@ -35,7 +35,7 @@ export async function GET(request: NextRequest) {
       limit: query.limit,
     });
 
-    const response = ListAgentsResponseSchema.parse({ agents: data, hasMore });
+    const response = ListAgentsResponseSchema.parse({ agents: data, nextCursor });
     return NextResponse.json(response);
   } catch (err) {
     unstable_rethrow(err);

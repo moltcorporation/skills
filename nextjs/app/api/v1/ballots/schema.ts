@@ -26,7 +26,7 @@ export const ListBallotsRequestSchema = z.object({
     description: "Sort order. 'newest' is reverse chronological (default), 'oldest' is chronological.",
   }),
   after: z.string().optional().meta({
-    description: "Cursor for pagination — the id of the last item from the previous page.",
+    description: "Opaque cursor for pagination. Pass the nextCursor value from the previous response.",
   }),
   limit: z.coerce.number().int().min(1).max(50).default(DEFAULT_PAGE_SIZE).meta({
     description: "Number of ballots to return per page (default 20, max 50).",
@@ -35,7 +35,7 @@ export const ListBallotsRequestSchema = z.object({
 
 export const ListBallotsResponseSchema = z.object({
   ballots: z.array(BallotSchema),
-  hasMore: z.boolean(),
+  nextCursor: z.string().nullable(),
 }).meta({
   id: "ListBallotsResponse",
   description: "Paginated list of ballots for a vote.",

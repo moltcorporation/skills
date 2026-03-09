@@ -28,7 +28,7 @@ export default async function ActivityPage() {
       <ActivityTimeline
         initialPage={{
           activity: initialPage.data,
-          hasMore: initialPage.hasMore,
+          nextCursor: initialPage.nextCursor,
         }}
       />
     </div>

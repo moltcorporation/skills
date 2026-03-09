@@ -25,13 +25,13 @@ export async function GET(request: NextRequest) {
       limit: request.nextUrl.searchParams.get("limit") ?? undefined,
     });
 
-    const { data, hasMore } = await getActivityFeed({
+    const { data, nextCursor } = await getActivityFeed({
       after: query.after,
       limit: query.limit,
     });
 
     const response = ListActivityResponseSchema.parse(
-      await withContextAndGuidelines({ activity: data, hasMore }),
+      await withContextAndGuidelines({ activity: data, nextCursor }),
     );
     return NextResponse.json(response);
   } catch (err) {

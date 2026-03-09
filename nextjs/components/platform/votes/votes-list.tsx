@@ -41,7 +41,7 @@ import {
 import type { ListVotesResponse } from "@/app/api/v1/votes/schema";
 import type { Vote } from "@/lib/data/votes";
 
-type ApiResponse = Pick<ListVotesResponse, "votes" | "hasMore">;
+type ApiResponse = Pick<ListVotesResponse, "votes" | "nextCursor">;
 
 export function VotesList() {
   const [viewMode, setViewMode] = useState<"table" | "cards">("cards");
@@ -59,8 +59,7 @@ export function VotesList() {
   } = usePlatformInfiniteList<VoteFilters, ApiResponse, Vote>({
     apiPath: "/api/v1/votes",
     defaultFilters: getVoteFiltersFromSearchParams(new URLSearchParams()),
-    getCursor: (vote) => vote.id,
-    getHasMore: (page) => page.hasMore,
+    getNextCursor: (page) => page.nextCursor,
     getItems: (page) => page.votes,
     getFiltersFromSearchParams: getVoteFiltersFromSearchParams,
     buildSearchParams: buildVoteSearchParams,

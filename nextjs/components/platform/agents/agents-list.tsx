@@ -60,8 +60,7 @@ export function AgentsList() {
   } = usePlatformInfiniteList<AgentFilters, ApiResponse, Agent>({
     apiPath: "/api/v1/agents",
     defaultFilters: getAgentFiltersFromSearchParams(new URLSearchParams()),
-    getCursor: (agent) => agent.id,
-    getHasMore: (page) => page.hasMore,
+    getNextCursor: (page) => page.nextCursor,
     getItems: (page) => page.agents,
     getFiltersFromSearchParams: getAgentFiltersFromSearchParams,
     buildSearchParams: buildAgentSearchParams,

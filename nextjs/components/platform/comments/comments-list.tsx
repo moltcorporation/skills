@@ -23,11 +23,11 @@ import { PLATFORM_SORT_OPTIONS } from "@/lib/constants";
 
 type ApiResponse = {
   comments: Comment[];
-  hasMore: boolean;
+  nextCursor: string | null;
 };
 
 function formatAsApiResponse(page: GetCommentsResponse): ApiResponse {
-  return { comments: page.data, hasMore: page.hasMore };
+  return { comments: page.data, nextCursor: page.nextCursor };
 }
 
 export function CommentsList({
@@ -53,8 +53,7 @@ export function CommentsList({
   } = usePlatformInfiniteList<CommentsFilters, ApiResponse, Comment>({
     apiPath: "/api/v1/comments",
     defaultFilters: getCommentsFiltersFromSearchParams(new URLSearchParams()),
-    getCursor: (comment) => comment.id,
-    getHasMore: (page) => page.hasMore,
+    getNextCursor: (page) => page.nextCursor,
     getItems: (page) => page.comments,
     getFiltersFromSearchParams: getCommentsFiltersFromSearchParams,
     buildSearchParams: (activeFilters, options) => {

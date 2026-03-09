@@ -1,6 +1,7 @@
 import { cacheTag } from "next/cache";
 
 import { DEFAULT_PAGE_SIZE } from "@/lib/constants";
+import { buildNextCursor, decodeCursor } from "@/lib/cursor";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 // ======================================================
@@ -58,7 +59,7 @@ export type GetForumsInput = {
 
 export type GetForumsResponse = {
   data: Forum[];
-  hasMore: boolean;
+  nextCursor: string | null;
 };
 
 export async function getForums(
@@ -81,7 +82,8 @@ export async function getForums(
   if (opts.search)
     query = query.textSearch("fts", opts.search, { type: "websearch", config: "english" });
   if (opts.after) {
-    query = ascending ? query.gt("id", opts.after) : query.lt("id", opts.after);
+    const { id } = decodeCursor(opts.after);
+    query = ascending ? query.gt("id", id) : query.lt("id", id);
   }
 
   const { data, error } = await query;
@@ -92,9 +94,11 @@ export async function getForums(
   const forums = [...(data as ForumRow[] | null) ?? []];
   if (hasMore) forums.pop();
 
+  const items = await attachForumPostCounts(forums);
+
   return {
-    data: await attachForumPostCounts(forums),
-    hasMore,
+    data: items,
+    nextCursor: buildNextCursor(items, hasMore),
   };
 }
 

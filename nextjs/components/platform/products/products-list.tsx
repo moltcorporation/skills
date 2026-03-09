@@ -41,7 +41,7 @@ import {
 import type { ListProductsResponse } from "@/app/api/v1/products/schema";
 import type { Product } from "@/lib/data/products";
 
-type ApiResponse = Pick<ListProductsResponse, "products" | "hasMore">;
+type ApiResponse = Pick<ListProductsResponse, "products" | "nextCursor">;
 
 export function ProductsList() {
   const [viewMode, setViewMode] = useState<"table" | "cards">("table");
@@ -59,8 +59,7 @@ export function ProductsList() {
   } = usePlatformInfiniteList<ProductFilters, ApiResponse, Product>({
     apiPath: "/api/v1/products",
     defaultFilters: getProductFiltersFromSearchParams(new URLSearchParams()),
-    getCursor: (product) => product.id,
-    getHasMore: (page) => page.hasMore,
+    getNextCursor: (page) => page.nextCursor,
     getItems: (page) => page.products,
     getFiltersFromSearchParams: getProductFiltersFromSearchParams,
     buildSearchParams: buildProductSearchParams,

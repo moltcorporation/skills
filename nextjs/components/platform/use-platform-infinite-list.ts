@@ -23,8 +23,7 @@ type UsePlatformInfiniteListOptions<
 > = {
   apiPath: string;
   defaultFilters: TFilters;
-  getCursor: (item: TItem) => string;
-  getHasMore: (page: TPage) => boolean;
+  getNextCursor: (page: TPage) => string | null;
   getItems: (page: TPage) => TItem[];
   getFiltersFromSearchParams: (params: URLSearchParams) => TFilters;
   buildSearchParams: (
@@ -60,8 +59,7 @@ export function usePlatformInfiniteList<
 >({
   apiPath,
   defaultFilters,
-  getCursor,
-  getHasMore,
+  getNextCursor,
   getItems,
   getFiltersFromSearchParams,
   buildSearchParams,
@@ -161,24 +159,23 @@ export function usePlatformInfiniteList<
 
   const getKey = useCallback(
     (pageIndex: number, previousPageData: TPage | null) => {
-      if (previousPageData && !getHasMore(previousPageData)) {
+      if (previousPageData && getNextCursor(previousPageData) === null) {
         return null;
       }
 
       const params = buildSearchParams(filters, { limit: DEFAULT_PAGE_SIZE });
 
       if (pageIndex > 0) {
-        const previousItems = getItems(previousPageData as TPage);
-        const lastItem = previousItems[previousItems.length - 1];
+        const cursor = getNextCursor(previousPageData as TPage);
 
-        if (lastItem) {
-          params.set("after", getCursor(lastItem));
+        if (cursor) {
+          params.set("after", cursor);
         }
       }
 
       return buildUrl(apiPath, params);
     },
-    [apiPath, buildSearchParams, filters, getCursor, getHasMore, getItems],
+    [apiPath, buildSearchParams, filters, getNextCursor],
   );
 
   const { data, error, isLoading, isValidating, setSize, size } = useSWRInfinite<TPage>(
@@ -192,19 +189,9 @@ export function usePlatformInfiniteList<
 
   const pages = data ?? [];
 
-  // Engagement-based sorts (hot, top) order by a non-unique column (e.g.
-  // comment_count) with id as tiebreaker, but our cursor only filters on id.
-  // This means items near page boundaries can appear in both the current and
-  // next page. We deduplicate here so React never sees duplicate keys.
-  //
-  // Long-term fix: add a computed monotonic score column (or composite cursor)
-  // so the cursor itself guarantees no overlap between pages.
-  const items = pages.flatMap((page) => getItems(page)).filter((item, index, arr) => {
-    const id = getCursor(item);
-    return arr.findIndex((i) => getCursor(i) === id) === index;
-  });
+  const items = pages.flatMap((page) => getItems(page));
   const lastPage = pages[pages.length - 1];
-  const hasMore = lastPage ? getHasMore(lastPage) : false;
+  const hasMore = lastPage ? getNextCursor(lastPage) !== null : false;
   const isLoadingMore = isValidating && size > 1 && pages.length < size;
 
   return {
