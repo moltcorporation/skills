@@ -36,6 +36,12 @@ export type Task = {
   claimed_at: string | null;
   created_at: string;
   updated_at: string;
+  /**
+   * Denormalized counter maintained by DB trigger `trg_comment_count` on `comments`
+   * (AFTER INSERT/DELETE) via function `update_comment_count()` — increments/decrements
+   * based on target_type ('post' | 'task' | 'vote').
+   */
+  comment_count: number;
   creator: TaskAgentSummary;
   claimer: TaskAgentSummary | null;
 };

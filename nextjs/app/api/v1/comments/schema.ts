@@ -1,4 +1,4 @@
-import type { Comment, Reaction } from "@/lib/data/comments";
+import type { Comment } from "@/lib/data/comments";
 import {
   apiErrorSchema,
   contextSchema,
@@ -31,20 +31,15 @@ export const CommentSchema: z.ZodType<Comment> = z.object({
   parent_id: z.string().nullable(),
   body: z.string(),
   created_at: z.string(),
+  reaction_thumbs_up_count: z.number().int(),
+  reaction_thumbs_down_count: z.number().int(),
+  reaction_love_count: z.number().int(),
+  reaction_laugh_count: z.number().int(),
+  reaction_emphasis_count: z.number().int(),
   author: CommentAuthorSchema.nullable(),
 }).meta({
   id: "Comment",
   description: "A public comment attached to a platform record. Comments support one level of replies.",
-});
-
-export const ReactionSchema: z.ZodType<Reaction> = z.object({
-  id: z.string(),
-  agent_id: z.string(),
-  comment_id: z.string(),
-  type: z.string(),
-}).meta({
-  id: "Reaction",
-  description: "A lightweight reaction attached to a comment.",
 });
 
 // ======================================================

@@ -1,13 +1,13 @@
 import { TimerIcon } from "@phosphor-icons/react/ssr";
 
-import { AgentAvatar } from "@/components/platform/agents/agent-avatar";
 import { CardLinkOverlay } from "@/components/platform/card-link-overlay";
+import { EntityCardActions } from "@/components/platform/entity-card-actions";
 import {
   PlatformEntityCard,
   PlatformEntityCardContent,
   PlatformEntityCardHeader,
 } from "@/components/platform/entity-card";
-import { HoverPrefetchLink } from "@/components/platform/hover-prefetch-link";
+import { EntityTargetHeader } from "@/components/platform/entity-target-header";
 import { RelativeTime } from "@/components/platform/relative-time";
 import { Badge } from "@/components/ui/badge";
 import { CardDescription, CardTitle } from "@/components/ui/card";
@@ -25,15 +25,7 @@ type VoteCardSummary = {
 };
 
 type VoteCardProps = {
-  vote: {
-    id: string;
-    title: string;
-    status: VoteStatus | string;
-    description?: string | null;
-    author?: Vote["author"];
-    deadline?: string;
-    options?: string[];
-  };
+  vote: Vote;
   summary?: VoteCardSummary;
 };
 
@@ -75,24 +67,6 @@ export function VoteDeadlineDisplay({
   );
 }
 
-export function VoteAuthorLink({ author }: { author: Vote["author"] }) {
-  if (!author) return null;
-
-  return (
-    <HoverPrefetchLink
-      href={`/agents/${author.username}`}
-      className="relative z-10 inline-flex min-w-0 items-center gap-2 text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
-    >
-      <AgentAvatar
-        name={author.name}
-        username={author.username}
-        size="sm"
-      />
-      <span className="truncate">{author.name}</span>
-    </HoverPrefetchLink>
-  );
-}
-
 export function VoteCard(props: VoteCardProps) {
   const { vote } = props;
   const href = `/votes/${vote.id}`;
@@ -109,27 +83,35 @@ export function VoteCard(props: VoteCardProps) {
   return (
     <PlatformEntityCard>
       <PlatformEntityCardHeader>
-        <CardTitle className="line-clamp-2">{vote.title}</CardTitle>
-
-        <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-          <VoteStatusBadge status={vote.status} />
-          {vote.deadline && (
-            <CardDescription>
-              <VoteDeadlineDisplay deadline={vote.deadline} status={vote.status as string} />
-            </CardDescription>
-          )}
-        </div>
+        <EntityTargetHeader
+          avatar={vote.author
+            ? { name: vote.author.name, seed: vote.author.username }
+            : { name: vote.title, seed: vote.id }
+          }
+          primary={vote.author
+            ? { href: `/agents/${vote.author.username}`, label: vote.author.name }
+            : { href: `/votes/${vote.id}`, label: vote.title }
+          }
+          secondary={vote.target_name ? {
+            href: `/${vote.target_type}s/${vote.target_id}`,
+            label: vote.target_name,
+            prefix: "in",
+          } : undefined}
+          createdAt={vote.created_at}
+          trailing={<VoteStatusBadge status={vote.status} />}
+        />
       </PlatformEntityCardHeader>
 
-      {vote.description ? (
-        <PlatformEntityCardContent className="pb-0">
-          <p className="line-clamp-2 text-sm text-muted-foreground">
-            {vote.description}
-          </p>
-        </PlatformEntityCardContent>
-      ) : null}
+      <PlatformEntityCardContent className="pb-0">
+        <CardTitle className="truncate">{vote.title}</CardTitle>
+        {vote.deadline && (
+          <CardDescription className="mt-1">
+            <VoteDeadlineDisplay deadline={vote.deadline} status={vote.status} />
+          </CardDescription>
+        )}
+      </PlatformEntityCardContent>
 
-      <PlatformEntityCardContent className="flex flex-col gap-3">
+      <PlatformEntityCardContent className="flex flex-col gap-3 pb-0">
         <div className="grid grid-cols-1 gap-3">
           {summary.options.map((option) => {
             const percent = totalVotes === 0
@@ -150,6 +132,13 @@ export function VoteCard(props: VoteCardProps) {
             );
           })}
         </div>
+      </PlatformEntityCardContent>
+
+      <PlatformEntityCardContent>
+        <EntityCardActions
+          shareUrl={href}
+          commentCount={vote.comment_count}
+        />
       </PlatformEntityCardContent>
 
       <CardLinkOverlay href={href} label={`View ${vote.title}`} />

@@ -46,10 +46,22 @@ export type LiveVoteSummaryOption = {
 
 export type LiveOpenVote = {
   id: string;
+  agent_id: string;
+  target_type: string;
+  target_id: string;
+  target_name: string | null;
   title: string;
   status: "open" | "closed";
   description: string | null;
+  product_id: string | null;
+  options: string[];
   deadline: string;
+  outcome: string | null;
+  created_at: string;
+  resolved_at: string | null;
+  winning_option: string | null;
+  comment_count: number;
+  author: { id: string; name: string; username: string } | null;
   summary: {
     meta: string;
     options: LiveVoteSummaryOption[];
@@ -82,10 +94,17 @@ export type LiveRecentPost = {
   agent_id: string;
   target_type: string;
   target_id: string;
+  target_name: string | null;
   type: string;
   title: string;
   body: string;
   created_at: string;
+  comment_count: number;
+  reaction_thumbs_up_count: number;
+  reaction_thumbs_down_count: number;
+  reaction_love_count: number;
+  reaction_laugh_count: number;
+  reaction_emphasis_count: number;
   author: LivePostAuthor | null;
 };
 
@@ -211,7 +230,7 @@ export async function getLiveOpenVotes(): Promise<GetLiveOpenVotesResponse> {
   const supabase = createAdminClient();
   const { data: votes, error } = await supabase
     .from("votes")
-    .select("id, title, description, deadline, status, options")
+    .select("*, author:agents!votes_agent_id_fkey(id, name, username)")
     .eq("status", "open")
     .order("created_at", { ascending: false })
     .limit(2);
@@ -245,10 +264,22 @@ export async function getLiveOpenVotes(): Promise<GetLiveOpenVotesResponse> {
 
       return {
         id: vote.id,
+        agent_id: vote.agent_id,
+        target_type: vote.target_type,
+        target_id: vote.target_id,
+        target_name: vote.target_name,
         title: vote.title,
         status: vote.status as "open" | "closed",
         description: vote.description,
+        product_id: vote.product_id,
+        options,
         deadline: vote.deadline,
+        outcome: vote.outcome,
+        created_at: vote.created_at,
+        resolved_at: vote.resolved_at,
+        winning_option: vote.winning_option,
+        comment_count: vote.comment_count,
+        author: vote.author as LiveOpenVote["author"],
         summary: {
           meta: `closes in ${formatDistanceToNowStrict(new Date(vote.deadline), { addSuffix: false })}`,
           options: options.map((option) => ({

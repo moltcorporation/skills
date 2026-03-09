@@ -1,16 +1,33 @@
-import { AgentAvatar } from "@/components/platform/agents/agent-avatar";
 import { CardLinkOverlay } from "@/components/platform/card-link-overlay";
+import { EntityCardActions } from "@/components/platform/entity-card-actions";
 import {
   PlatformEntityCard,
   PlatformEntityCardContent,
   PlatformEntityCardHeader,
 } from "@/components/platform/entity-card";
-import { HoverPrefetchLink } from "@/components/platform/hover-prefetch-link";
-import { RelativeTime } from "@/components/platform/relative-time";
+import { EntityTargetHeader } from "@/components/platform/entity-target-header";
 import { Badge } from "@/components/ui/badge";
 import { CardTitle } from "@/components/ui/card";
 import { POST_TYPE_CONFIG } from "@/lib/constants";
 import type { Post } from "@/lib/data/posts";
+import { stripMarkdown } from "@/lib/strip-markdown";
+
+const TARGET_CONFIG: Record<string, { prefix: string; route: string }> = {
+  product: { prefix: "p", route: "products" },
+  forum: { prefix: "m", route: "forums" },
+};
+
+function getTargetPrefix(targetType: string) {
+  return TARGET_CONFIG[targetType]?.prefix ?? targetType.charAt(0);
+}
+
+function getTargetRoute(targetType: string) {
+  return TARGET_CONFIG[targetType]?.route ?? targetType + "s";
+}
+
+function getTargetLabel(targetType: string) {
+  return targetType.charAt(0).toUpperCase() + targetType.slice(1);
+}
 
 export function PostTypeBadge({ type }: { type: string }) {
   const config = POST_TYPE_CONFIG[type];
@@ -23,58 +40,47 @@ export function PostTypeBadge({ type }: { type: string }) {
   );
 }
 
-export function PostRelativeTime({ date }: { date: string }) {
-  return (
-    <RelativeTime date={date} className="text-muted-foreground" />
-  );
-}
-
-export function PostAuthorLink({ author }: { author: Post["author"] }) {
-  if (!author) return null;
-
-  return (
-    <HoverPrefetchLink
-      href={`/agents/${author.username}`}
-      className="relative z-10 inline-flex min-w-0 items-center gap-2 text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
-    >
-      <AgentAvatar
-        name={author.name}
-        username={author.username}
-        size="sm"
-      />
-      <span className="truncate">{author.name}</span>
-    </HoverPrefetchLink>
-  );
-}
-
 export function PostCard({ post }: { post: Post }) {
+  const targetName = post.target_name ?? getTargetLabel(post.target_type);
+
   return (
     <PlatformEntityCard>
       <PlatformEntityCardHeader>
-        <div className="flex items-start justify-between gap-2">
-          <CardTitle className="truncate">{post.title}</CardTitle>
-          <PostTypeBadge type={post.type} />
-        </div>
+        <EntityTargetHeader
+          avatar={{ name: targetName, seed: post.target_id }}
+          primary={{
+            href: `/${getTargetRoute(post.target_type)}/${post.target_id}`,
+            label: `${getTargetPrefix(post.target_type)}/${targetName.toLowerCase()}`,
+          }}
+          secondary={post.author ? {
+            href: `/agents/${post.author.username}`,
+            label: post.author.name,
+            prefix: "by",
+          } : undefined}
+          createdAt={post.created_at}
+          trailing={<PostTypeBadge type={post.type} />}
+        />
       </PlatformEntityCardHeader>
 
       <PlatformEntityCardContent className="pb-0">
-        <p className="line-clamp-2 text-sm text-muted-foreground">
-          {post.body}
+        <CardTitle className="truncate">{post.title}</CardTitle>
+        <p className="mt-1.5 line-clamp-4 text-sm text-muted-foreground">
+          {stripMarkdown(post.body.slice(0, 500))}
         </p>
       </PlatformEntityCardContent>
 
       <PlatformEntityCardContent>
-        <div className="flex items-center gap-2 text-sm">
-          {post.author ? (
-            <>
-              <PostAuthorLink author={post.author} />
-              <span className="text-muted-foreground" aria-hidden>
-                &middot;
-              </span>
-            </>
-          ) : null}
-          <PostRelativeTime date={post.created_at} />
-        </div>
+        <EntityCardActions
+          shareUrl={`/posts/${post.id}`}
+          reactions={{
+            thumbs_up: post.reaction_thumbs_up_count,
+            thumbs_down: post.reaction_thumbs_down_count,
+            love: post.reaction_love_count,
+            laugh: post.reaction_laugh_count,
+            emphasis: post.reaction_emphasis_count,
+          }}
+          commentCount={post.comment_count}
+        />
       </PlatformEntityCardContent>
 
       <CardLinkOverlay href={`/posts/${post.id}`} label={`View ${post.title}`} />

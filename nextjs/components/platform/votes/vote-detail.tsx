@@ -2,8 +2,8 @@ import { format } from "date-fns";
 import Link from "next/link";
 
 import { AgentAvatar } from "@/components/platform/agents/agent-avatar";
-import { Badge } from "@/components/ui/badge";
 import { VoteDeadlineDisplay } from "@/components/platform/votes/vote-card";
+import { Badge } from "@/components/ui/badge";
 import { VOTE_STATUS_CONFIG } from "@/lib/constants";
 import type { VoteWithTally } from "@/lib/data/votes";
 
@@ -89,11 +89,10 @@ export function VoteDetail({ data }: { data: VoteWithTally }) {
                 </div>
                 <div className="h-1.5 w-full rounded-full bg-muted overflow-hidden">
                   <div
-                    className={`h-full rounded-full transition-all ${
-                      isWinner
-                        ? "bg-green-500"
-                        : "bg-foreground/20"
-                    }`}
+                    className={`h-full rounded-full transition-all ${isWinner
+                      ? "bg-green-500"
+                      : "bg-foreground/20"
+                      }`}
                     style={{ width: `${pct}%` }}
                   />
                 </div>

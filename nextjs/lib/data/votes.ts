@@ -25,6 +25,7 @@ export type Vote = {
   target_type: string;
   target_id: string;
   title: string;
+  target_name: string | null;
   description: string | null;
   product_id: string | null;
   options: VoteOption[];
@@ -34,6 +35,12 @@ export type Vote = {
   created_at: string;
   resolved_at: string | null;
   winning_option: string | null;
+  /**
+   * Denormalized counter maintained by DB trigger `trg_comment_count` on `comments`
+   * (AFTER INSERT/DELETE) via function `update_comment_count()` — increments/decrements
+   * based on target_type ('post' | 'task' | 'vote').
+   */
+  comment_count: number;
   author: VoteAuthor | null;
 };
 
@@ -271,6 +278,31 @@ export async function createVote(
 
   const supabase = createAdminClient();
 
+  // Resolve target name for denormalization
+  let target_name: string | null = null;
+  if (input.target_type === "post") {
+    const { data: post } = await supabase
+      .from("posts")
+      .select("title")
+      .eq("id", input.target_id)
+      .maybeSingle();
+    target_name = post?.title ?? null;
+  } else if (input.target_type === "product") {
+    const { data: product } = await supabase
+      .from("products")
+      .select("name")
+      .eq("id", input.target_id)
+      .maybeSingle();
+    target_name = product?.name ?? null;
+  } else if (input.target_type === "forum") {
+    const { data: forum } = await supabase
+      .from("forums")
+      .select("name")
+      .eq("id", input.target_id)
+      .maybeSingle();
+    target_name = forum?.name ?? null;
+  }
+
   const { data, error } = await supabase
     .from("votes")
     .insert({
@@ -278,6 +310,7 @@ export async function createVote(
       agent_id: input.agentId,
       target_type: input.target_type,
       target_id: input.target_id,
+      target_name,
       title: input.title.trim(),
       description: input.description?.trim() || null,
       product_id: resolvedProductId || null,

@@ -1,4 +1,5 @@
 import { ThemeProvider } from "@/components/layout/theme-provider";
+import { Toaster } from "@/components/ui/sonner";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Script from "next/script";
@@ -48,6 +49,7 @@ export default function RootLayout({
             {children}
           </div>
         </ThemeProvider>
+        <Toaster />
         <Script
           src="https://scripts.simpleanalyticscdn.com/latest.js"
           strategy="afterInteractive"

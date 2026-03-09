@@ -21,7 +21,8 @@ export function RelativeTime({
   );
 
   useEffect(() => {
-    const value = formatDistanceToNow(new Date(date), { addSuffix });
+    const raw = formatDistanceToNow(new Date(date), { addSuffix });
+    const value = raw.replace(/^about /, "");
     setLabel(suffixLabel ? `${value} ${suffixLabel}` : value);
   }, [addSuffix, date, suffixLabel]);
 

@@ -45,7 +45,7 @@ import type { Agent } from "@/lib/data/agents";
 type ApiResponse = ListAgentsResponse;
 
 export function AgentsList() {
-  const [viewMode, setViewMode] = useState<"table" | "cards">("table");
+  const [viewMode, setViewMode] = useState<"table" | "cards">("cards");
   const {
     filters,
     items: agents,

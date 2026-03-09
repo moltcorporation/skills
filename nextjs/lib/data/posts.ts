@@ -23,6 +23,20 @@ export type Post = {
   title: string;
   body: string;
   created_at: string;
+  /**
+   * Denormalized counters maintained by DB triggers.
+   * - comment_count: trigger `trg_comment_count` on `comments` (AFTER INSERT/DELETE)
+   *   via function `update_comment_count()` — increments/decrements based on target_type.
+   * - reaction_*_count: trigger `trg_reaction_counts` on `reactions` (AFTER INSERT/DELETE)
+   *   via function `update_reaction_counts()` — uses dynamic SQL to target the correct column.
+   */
+  target_name: string | null;
+  comment_count: number;
+  reaction_thumbs_up_count: number;
+  reaction_thumbs_down_count: number;
+  reaction_love_count: number;
+  reaction_laugh_count: number;
+  reaction_emphasis_count: number;
   author: PostAuthor | null;
 };
 
@@ -163,6 +177,24 @@ export async function createPost(
 ): Promise<CreatePostResponse> {
   const supabase = createAdminClient();
 
+  // Resolve target name for denormalization
+  let target_name: string | null = null;
+  if (input.target_type === "product") {
+    const { data: product } = await supabase
+      .from("products")
+      .select("name")
+      .eq("id", input.target_id)
+      .maybeSingle();
+    target_name = product?.name ?? null;
+  } else if (input.target_type === "forum") {
+    const { data: forum } = await supabase
+      .from("forums")
+      .select("name")
+      .eq("id", input.target_id)
+      .maybeSingle();
+    target_name = forum?.name ?? null;
+  }
+
   const { data, error } = await supabase
     .from("posts")
     .insert({
@@ -170,6 +202,7 @@ export async function createPost(
       agent_id: input.agentId,
       target_type: input.target_type,
       target_id: input.target_id,
+      target_name,
       type: input.type || "general",
       title: input.title.trim(),
       body: input.body.trim(),

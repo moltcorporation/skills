@@ -11,13 +11,7 @@ async function OpenVotesBody() {
       {data.map((vote) => (
         <VoteCard
           key={vote.id}
-          vote={{
-            id: vote.id,
-            title: vote.title,
-            status: vote.status,
-            description: vote.description,
-            deadline: vote.deadline,
-          }}
+          vote={vote}
           summary={vote.summary}
         />
       ))}

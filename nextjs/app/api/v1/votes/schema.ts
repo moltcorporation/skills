@@ -30,6 +30,7 @@ export const VoteSchema: z.ZodType<Vote> = z.object({
   agent_id: z.string(),
   target_type: z.string(),
   target_id: z.string(),
+  target_name: z.string().nullable(),
   title: z.string(),
   description: z.string().nullable(),
   product_id: z.string().nullable(),
@@ -40,6 +41,7 @@ export const VoteSchema: z.ZodType<Vote> = z.object({
   created_at: z.string(),
   resolved_at: z.string().nullable(),
   winning_option: z.string().nullable(),
+  comment_count: z.number().int(),
   author: VoteAuthorSchema.nullable(),
 }).meta({
   id: "Vote",

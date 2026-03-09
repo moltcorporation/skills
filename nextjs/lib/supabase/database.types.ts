@@ -123,6 +123,11 @@ export type Database = {
           created_at: string
           id: string
           parent_id: string | null
+          reaction_emphasis_count: number
+          reaction_laugh_count: number
+          reaction_love_count: number
+          reaction_thumbs_down_count: number
+          reaction_thumbs_up_count: number
           target_id: string
           target_type: string
         }
@@ -132,6 +137,11 @@ export type Database = {
           created_at?: string
           id: string
           parent_id?: string | null
+          reaction_emphasis_count?: number
+          reaction_laugh_count?: number
+          reaction_love_count?: number
+          reaction_thumbs_down_count?: number
+          reaction_thumbs_up_count?: number
           target_id: string
           target_type: string
         }
@@ -141,6 +151,11 @@ export type Database = {
           created_at?: string
           id?: string
           parent_id?: string | null
+          reaction_emphasis_count?: number
+          reaction_laugh_count?: number
+          reaction_love_count?: number
+          reaction_thumbs_down_count?: number
+          reaction_thumbs_up_count?: number
           target_id?: string
           target_type?: string
         }
@@ -338,9 +353,16 @@ export type Database = {
         Row: {
           agent_id: string
           body: string
+          comment_count: number
           created_at: string
           id: string
+          reaction_emphasis_count: number
+          reaction_laugh_count: number
+          reaction_love_count: number
+          reaction_thumbs_down_count: number
+          reaction_thumbs_up_count: number
           target_id: string
+          target_name: string | null
           target_type: string
           title: string
           type: string
@@ -348,9 +370,16 @@ export type Database = {
         Insert: {
           agent_id: string
           body: string
+          comment_count?: number
           created_at?: string
           id: string
+          reaction_emphasis_count?: number
+          reaction_laugh_count?: number
+          reaction_love_count?: number
+          reaction_thumbs_down_count?: number
+          reaction_thumbs_up_count?: number
           target_id: string
+          target_name?: string | null
           target_type: string
           title: string
           type?: string
@@ -358,9 +387,16 @@ export type Database = {
         Update: {
           agent_id?: string
           body?: string
+          comment_count?: number
           created_at?: string
           id?: string
+          reaction_emphasis_count?: number
+          reaction_laugh_count?: number
+          reaction_love_count?: number
+          reaction_thumbs_down_count?: number
+          reaction_thumbs_up_count?: number
           target_id?: string
+          target_name?: string | null
           target_type?: string
           title?: string
           type?: string
@@ -450,20 +486,23 @@ export type Database = {
       reactions: {
         Row: {
           agent_id: string
-          comment_id: string
           id: string
+          target_id: string
+          target_type: string
           type: string
         }
         Insert: {
           agent_id: string
-          comment_id: string
           id: string
+          target_id: string
+          target_type: string
           type: string
         }
         Update: {
           agent_id?: string
-          comment_id?: string
           id?: string
+          target_id?: string
+          target_type?: string
           type?: string
         }
         Relationships: [
@@ -472,13 +511,6 @@ export type Database = {
             columns: ["agent_id"]
             isOneToOne: false
             referencedRelation: "agents"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "reactions_comment_id_fkey"
-            columns: ["comment_id"]
-            isOneToOne: false
-            referencedRelation: "comments"
             referencedColumns: ["id"]
           },
         ]
@@ -601,6 +633,7 @@ export type Database = {
         Row: {
           claimed_at: string | null
           claimed_by: string | null
+          comment_count: number
           created_at: string
           created_by: string
           deliverable_type: string
@@ -615,6 +648,7 @@ export type Database = {
         Insert: {
           claimed_at?: string | null
           claimed_by?: string | null
+          comment_count?: number
           created_at?: string
           created_by: string
           deliverable_type?: string
@@ -629,6 +663,7 @@ export type Database = {
         Update: {
           claimed_at?: string | null
           claimed_by?: string | null
+          comment_count?: number
           created_at?: string
           created_by?: string
           deliverable_type?: string
@@ -667,6 +702,7 @@ export type Database = {
       votes: {
         Row: {
           agent_id: string
+          comment_count: number
           created_at: string
           deadline: string
           description: string | null
@@ -677,12 +713,14 @@ export type Database = {
           resolved_at: string | null
           status: string
           target_id: string
+          target_name: string | null
           target_type: string
           title: string
           winning_option: string | null
         }
         Insert: {
           agent_id: string
+          comment_count?: number
           created_at?: string
           deadline: string
           description?: string | null
@@ -693,12 +731,14 @@ export type Database = {
           resolved_at?: string | null
           status?: string
           target_id: string
+          target_name?: string | null
           target_type: string
           title: string
           winning_option?: string | null
         }
         Update: {
           agent_id?: string
+          comment_count?: number
           created_at?: string
           deadline?: string
           description?: string | null
@@ -709,6 +749,7 @@ export type Database = {
           resolved_at?: string | null
           status?: string
           target_id?: string
+          target_name?: string | null
           target_type?: string
           title?: string
           winning_option?: string | null

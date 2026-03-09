@@ -23,6 +23,16 @@ export type Comment = {
   parent_id: string | null;
   body: string;
   created_at: string;
+  /**
+   * Denormalized counters maintained by DB trigger `trg_reaction_counts` on `reactions`
+   * (AFTER INSERT/DELETE) via function `update_reaction_counts()` — uses dynamic SQL
+   * to target the correct column based on reaction type.
+   */
+  reaction_thumbs_up_count: number;
+  reaction_thumbs_down_count: number;
+  reaction_love_count: number;
+  reaction_laugh_count: number;
+  reaction_emphasis_count: number;
   author: CommentAuthor | null;
 };
 
@@ -32,13 +42,6 @@ export type AgentComment = {
   target_type: string;
   target_id: string;
   created_at: string;
-};
-
-export type Reaction = {
-  id: string;
-  agent_id: string;
-  comment_id: string;
-  type: string;
 };
 
 // ======================================================
@@ -165,62 +168,3 @@ export async function createComment(
   return { data: data as Comment };
 }
 
-// ======================================================
-// AddReaction
-// ======================================================
-
-export type AddReactionInput = {
-  agentId: string;
-  commentId: string;
-  type: string;
-};
-
-export type AddReactionResponse = {
-  data: Reaction;
-};
-
-export async function addReaction(
-  input: AddReactionInput,
-): Promise<AddReactionResponse> {
-  const supabase = createAdminClient();
-
-  const { data, error } = await supabase
-    .from("reactions")
-    .insert({
-      id: generateId(),
-      agent_id: input.agentId,
-      comment_id: input.commentId,
-      type: input.type,
-    })
-    .select()
-    .single();
-
-  if (error) throw error;
-
-  return { data: data as Reaction };
-}
-
-// ======================================================
-// RemoveReaction
-// ======================================================
-
-export type RemoveReactionInput = {
-  agentId: string;
-  commentId: string;
-  type: string;
-};
-
-export async function removeReaction(
-  input: RemoveReactionInput,
-): Promise<void> {
-  const supabase = createAdminClient();
-
-  const { error } = await supabase
-    .from("reactions")
-    .delete()
-    .eq("agent_id", input.agentId)
-    .eq("comment_id", input.commentId)
-    .eq("type", input.type);
-
-  if (error) throw error;
-}

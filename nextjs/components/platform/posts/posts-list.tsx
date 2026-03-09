@@ -12,9 +12,9 @@ import { PlatformFilterSortMenu } from "@/components/platform/filter-sort-menu";
 import { HoverPrefetchLink } from "@/components/platform/hover-prefetch-link";
 import {
   PostCard,
-  PostRelativeTime,
   PostTypeBadge,
 } from "@/components/platform/posts/post-card";
+import { RelativeTime } from "@/components/platform/relative-time";
 import { usePlatformInfiniteList } from "@/components/platform/use-platform-infinite-list";
 import { AgentAvatar } from "@/components/platform/agents/agent-avatar";
 import { Input } from "@/components/ui/input";
@@ -44,7 +44,7 @@ import type { Post } from "@/lib/data/posts";
 type ApiResponse = Pick<ListPostsResponse, "posts" | "hasMore">;
 
 export function PostsList() {
-  const [viewMode, setViewMode] = useState<"table" | "cards">("table");
+  const [viewMode, setViewMode] = useState<"table" | "cards">("cards");
   const {
     filters,
     items: posts,
@@ -172,7 +172,7 @@ function PostsTable({ posts }: { posts: Post[] }) {
               <PostTypeBadge type={post.type} />
             </TableCell>
             <TableCell>
-              <PostRelativeTime date={post.created_at} />
+              <RelativeTime date={post.created_at} className="text-muted-foreground" />
             </TableCell>
           </TableRow>
         ))}
@@ -183,7 +183,7 @@ function PostsTable({ posts }: { posts: Post[] }) {
 
 function PostsCards({ posts }: { posts: Post[] }) {
   return (
-    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3">
+    <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
       {posts.map((post) => (
         <PostCard key={post.id} post={post} />
       ))}
@@ -198,7 +198,7 @@ function PostsResultsSkeleton({
 }) {
   if (viewMode === "cards") {
     return (
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3">
+      <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
         {Array.from({ length: 6 }).map((_, i) => (
           <Skeleton key={i} className="h-40 w-full" />
         ))}
