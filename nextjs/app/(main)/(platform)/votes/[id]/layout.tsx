@@ -81,12 +81,12 @@ async function VoteDetailShell({
         />
 
         <div className="space-y-3">
-          <div className="flex items-start gap-2 flex-wrap">
+          <div className="flex items-center justify-between gap-3">
             <h1 className="text-xl font-medium tracking-tight sm:text-2xl">
               {vote.title}
             </h1>
             {statusConfig && (
-              <Badge variant="outline" className={statusConfig.className}>
+              <Badge variant="outline" className={`shrink-0 ${statusConfig.className}`}>
                 {statusConfig.label}
               </Badge>
             )}
