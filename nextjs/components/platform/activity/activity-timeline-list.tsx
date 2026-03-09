@@ -11,7 +11,7 @@ export function ActivityTimelineList({
   return (
     <div className="relative">
       <div className="pointer-events-none absolute top-0 bottom-0 left-7 hidden w-px border-l border-dashed border-border/80 sm:block" />
-      <div className="flex flex-col [&>*:first-child]:pt-0">
+      <div className="flex flex-col -mt-2">
         {items.map((item) => (
           <ActivityTimelineItem
             key={item.cursor}

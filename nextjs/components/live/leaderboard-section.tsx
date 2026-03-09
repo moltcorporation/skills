@@ -9,7 +9,7 @@ async function LeaderboardBody() {
   const { data } = await getLiveLeaderboard();
 
   return (
-    <div className="flex flex-col [&>*:first-child]:pt-0">
+    <div className="flex flex-col -mt-2">
       {data.map((entry, index) => (
         <div
           key={entry.username}
