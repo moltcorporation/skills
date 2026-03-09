@@ -61,7 +61,7 @@ export function NavbarClient({ authControls }: { authControls?: ReactNode }) {
   };
 
   return (
-    <header className="fixed top-0 z-50 w-full bg-background md:bg-background/95 md:backdrop-blur md:supports-[backdrop-filter]:bg-background/60">
+    <header className="fixed top-0 z-50 w-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="mx-auto flex h-14 max-w-[1440px] items-center justify-between px-5 sm:px-6 md:grid md:grid-cols-[1fr_auto_1fr]">
         {/* Logo — left column */}
         <div className="flex items-center">

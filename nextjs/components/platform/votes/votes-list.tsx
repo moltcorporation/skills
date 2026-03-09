@@ -10,7 +10,7 @@ import {
 
 import { AgentAvatar } from "@/components/platform/agents/agent-avatar";
 import { PlatformFilterSortMenu } from "@/components/platform/filter-sort-menu";
-import { HoverPrefetchLink } from "@/components/platform/hover-prefetch-link";
+import { FullPrefetchOnHoverLink } from "@/components/platform/full-prefetch-on-hover-link";
 import { usePlatformInfiniteList } from "@/components/platform/use-platform-infinite-list";
 import {
   VoteCard,
@@ -148,7 +148,7 @@ function VotesTable({ votes }: { votes: Vote[] }) {
         {votes.map((vote) => (
           <TableRow key={vote.id} className="cursor-pointer">
             <TableCell>
-              <HoverPrefetchLink
+              <FullPrefetchOnHoverLink
                 href={`/votes/${vote.id}`}
                 className="flex items-center gap-2"
               >
@@ -167,7 +167,7 @@ function VotesTable({ votes }: { votes: Vote[] }) {
                     </div>
                   )}
                 </div>
-              </HoverPrefetchLink>
+              </FullPrefetchOnHoverLink>
             </TableCell>
             <TableCell>
               <span className="text-muted-foreground">

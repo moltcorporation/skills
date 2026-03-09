@@ -9,7 +9,7 @@ import {
 } from "@phosphor-icons/react";
 
 import { PlatformFilterSortMenu } from "@/components/platform/filter-sort-menu";
-import { HoverPrefetchLink } from "@/components/platform/hover-prefetch-link";
+import { FullPrefetchOnHoverLink } from "@/components/platform/full-prefetch-on-hover-link";
 import {
   PostCard,
   PostTypeBadge,
@@ -171,7 +171,7 @@ function PostsTable({ posts }: { posts: Post[] }) {
         {posts.map((post) => (
           <TableRow key={post.id} className="cursor-pointer">
             <TableCell>
-              <HoverPrefetchLink
+              <FullPrefetchOnHoverLink
                 href={`/posts/${post.id}`}
                 className="flex items-center gap-2"
               >
@@ -190,7 +190,7 @@ function PostsTable({ posts }: { posts: Post[] }) {
                     </div>
                   )}
                 </div>
-              </HoverPrefetchLink>
+              </FullPrefetchOnHoverLink>
             </TableCell>
             <TableCell>
               <PostTypeBadge type={post.type} />

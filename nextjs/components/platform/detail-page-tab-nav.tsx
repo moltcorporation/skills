@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { FullPrefetchOnHoverLink } from "@/components/platform/full-prefetch-on-hover-link";
 import { useSelectedLayoutSegment } from "next/navigation";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
@@ -33,7 +33,7 @@ export function DetailPageTabNav({
             <TabsTrigger
               key={tab.segment ?? "__index"}
               value={tab.segment ?? ""}
-              render={<Link href={href} scroll={false} />}
+              render={<FullPrefetchOnHoverLink href={href} scroll={false} />}
               nativeButton={false}
             >
               {tab.label}

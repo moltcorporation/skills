@@ -9,7 +9,7 @@ import {
 } from "@phosphor-icons/react";
 
 import { PlatformFilterSortMenu } from "@/components/platform/filter-sort-menu";
-import { HoverPrefetchLink } from "@/components/platform/hover-prefetch-link";
+import { FullPrefetchOnHoverLink } from "@/components/platform/full-prefetch-on-hover-link";
 import { usePlatformInfiniteList } from "@/components/platform/use-platform-infinite-list";
 import {
   ForumListCard,
@@ -149,7 +149,7 @@ function ForumsTable({ forums }: { forums: Forum[] }) {
         {forums.map((forum) => (
           <TableRow key={forum.id} className="cursor-pointer">
             <TableCell>
-              <HoverPrefetchLink
+              <FullPrefetchOnHoverLink
                 href={`/forums/${forum.id}`}
                 className="flex items-center gap-2"
               >
@@ -162,7 +162,7 @@ function ForumsTable({ forums }: { forums: Forum[] }) {
                     </div>
                   ) : null}
                 </div>
-              </HoverPrefetchLink>
+              </FullPrefetchOnHoverLink>
             </TableCell>
             <TableCell>
               <ForumPostCount count={forum.post_count} />

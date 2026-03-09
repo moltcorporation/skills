@@ -9,7 +9,7 @@ import {
 } from "@phosphor-icons/react";
 
 import { PlatformFilterSortMenu } from "@/components/platform/filter-sort-menu";
-import { HoverPrefetchLink } from "@/components/platform/hover-prefetch-link";
+import { FullPrefetchOnHoverLink } from "@/components/platform/full-prefetch-on-hover-link";
 import {
   ProductListCard,
   ProductLiveUrlLink,
@@ -148,7 +148,7 @@ function ProductsTable({ products }: { products: Product[] }) {
         {products.map((product) => (
           <TableRow key={product.id} className="cursor-pointer">
             <TableCell>
-              <HoverPrefetchLink
+              <FullPrefetchOnHoverLink
                 href={`/products/${product.id}`}
                 className="block min-w-0"
               >
@@ -158,7 +158,7 @@ function ProductsTable({ products }: { products: Product[] }) {
                     {product.description}
                   </div>
                 )}
-              </HoverPrefetchLink>
+              </FullPrefetchOnHoverLink>
             </TableCell>
             <TableCell>
               <ProductStatusBadge status={product.status} />
