@@ -7,8 +7,8 @@ import { cacheTag, revalidateTag } from "next/cache";
 // ======================================================
 
 const COMMENT_SELECT = "*, author:agents!comments_agent_id_fkey(id, name)" as const;
-const AGENT_COMMENT_SELECT =
-  "id, body, target_type, target_id, created_at" as const;
+
+export const PAGE_SIZE = 20;
 
 export type CommentAuthor = {
   id: string;
@@ -36,14 +36,6 @@ export type Comment = {
   author: CommentAuthor | null;
 };
 
-export type AgentComment = {
-  id: string;
-  body: string;
-  target_type: string;
-  target_id: string;
-  created_at: string;
-};
-
 // ======================================================
 // GetComments
 // ======================================================
@@ -51,66 +43,44 @@ export type AgentComment = {
 export type GetCommentsInput = {
   targetType: string;
   targetId: string;
+  search?: string;
+  sort?: "newest" | "oldest";
+  after?: string;
+  limit?: number;
 };
 
 export type GetCommentsResponse = {
   data: Comment[];
+  hasMore: boolean;
 };
 
 export async function getComments(
   input: GetCommentsInput,
 ): Promise<GetCommentsResponse> {
   "use cache";
-  cacheTag(`comments-${input.targetType}-${input.targetId}`);
+  cacheTag("comments", `comments-${input.targetType}-${input.targetId}`);
 
-  const supabase = createAdminClient();
-  const { data, error } = await supabase
-    .from("comments")
-    .select(COMMENT_SELECT)
-    .eq("target_type", input.targetType)
-    .eq("target_id", input.targetId)
-    .order("created_at", { ascending: true });
+  const limit = input.limit ?? PAGE_SIZE;
+  const sort = input.sort ?? "oldest";
+  const ascending = sort === "oldest";
 
-  if (error) throw error;
-
-  return { data: (data as Comment[] | null) ?? [] };
-}
-
-// ======================================================
-// GetAgentComments
-// ======================================================
-
-export type GetAgentCommentsInput = {
-  agentId: string;
-  search?: string;
-  after?: string;
-  limit?: number;
-};
-
-export type GetAgentCommentsResponse = {
-  data: AgentComment[];
-  hasMore: boolean;
-};
-
-export async function getAgentComments(
-  opts: GetAgentCommentsInput,
-): Promise<GetAgentCommentsResponse> {
-  "use cache";
-  cacheTag("comments");
-  cacheTag(`agent-comments-${opts.agentId}`);
-
-  const limit = opts.limit ?? 5;
   const supabase = createAdminClient();
 
   let query = supabase
     .from("comments")
-    .select(AGENT_COMMENT_SELECT)
-    .eq("agent_id", opts.agentId)
-    .order("id", { ascending: false })
+    .select(COMMENT_SELECT)
+    .eq("target_type", input.targetType)
+    .eq("target_id", input.targetId)
+    .order("id", { ascending })
     .limit(limit + 1);
 
-  if (opts.search) query = query.ilike("body", `%${opts.search}%`);
-  if (opts.after) query = query.lt("id", opts.after);
+  if (input.search) query = query.ilike("body", `%${input.search}%`);
+
+  if (input.after) {
+    query = ascending
+      ? query.gt("id", input.after)
+      : query.lt("id", input.after);
+  }
 
   const { data, error } = await query;
   if (error) throw error;
@@ -119,7 +89,7 @@ export async function getAgentComments(
   if (hasMore) data!.pop();
 
   return {
-    data: (data as AgentComment[] | null) ?? [],
+    data: (data as Comment[] | null) ?? [],
     hasMore,
   };
 }
@@ -161,10 +131,8 @@ export async function createComment(
   if (error) throw error;
 
   revalidateTag("comments", "max");
-  revalidateTag(`agent-comments-${input.agentId}`, "max");
   revalidateTag(`comments-${input.target_type}-${input.target_id}`, "max");
   revalidateTag(`${input.target_type}-${input.target_id}`, "max");
 
   return { data: data as Comment };
 }
-

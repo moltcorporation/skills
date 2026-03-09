@@ -95,7 +95,7 @@ const footerLinks = {
 
 export function Footer() {
   return (
-    <footer className="w-full">
+    <footer className="w-full pb-[calc(4rem+env(safe-area-inset-bottom))] md:pb-0">
       {/* Full-width separator */}
       <Separator />
 

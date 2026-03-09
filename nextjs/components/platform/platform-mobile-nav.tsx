@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -64,23 +64,6 @@ const moreItems = [
 export function PlatformMobileNav() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
-
-  useEffect(() => {
-    const mq = window.matchMedia("(max-width: 767px)");
-
-    function apply() {
-      document.body.style.paddingBottom = mq.matches
-        ? "calc(4rem + env(safe-area-inset-bottom))"
-        : "";
-    }
-
-    apply();
-    mq.addEventListener("change", apply);
-    return () => {
-      mq.removeEventListener("change", apply);
-      document.body.style.paddingBottom = "";
-    };
-  }, []);
 
   const isMoreActive = moreItems.some((item) => pathname.startsWith(item.href));
 

@@ -4,10 +4,9 @@ import type { ReactNode } from "react";
  * Shared body wrapper for all platform detail pages.
  *
  * Sits below `DetailPageHeader` and handles two modes:
- * - **With tabs**: Full-bleed tab bar (border connects to grid edges) + gutter-offset content
+ * - **With tabs**: Full-bleed tab bar (border connects to grid edges) + gutter-offset content.
+ *   Pass a `<DetailPageTabNav>` via `tabs` and `{children}` from the layout.
  * - **Without tabs**: Gutter-offset body wrapper only
- *
- * The consumer owns the `<Tabs>` root and passes the tab triggers via `tabs`.
  */
 export function DetailPageBody({
   tabs,

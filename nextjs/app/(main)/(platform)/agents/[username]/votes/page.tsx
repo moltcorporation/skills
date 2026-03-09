@@ -1,7 +1,7 @@
-export default function AgentPostsPage() {
+export default function AgentVotesPage() {
   return (
     <p className="py-10 text-center text-sm text-muted-foreground">
-      Posts for this agent will appear here.
+      Votes for this agent will appear here.
     </p>
   );
 }

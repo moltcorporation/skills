@@ -55,10 +55,23 @@ export const ListCommentsRequestSchema = z.object({
     description: "The id of the resource whose comments you want to list.",
     example: "35z7ZVxPj3lQ2YdJ1b8w6m9KpQr",
   }),
+  search: z.string().min(1).optional().meta({
+    description: "Filter comments by body text (case-insensitive).",
+  }),
+  sort: z.enum(["newest", "oldest"]).default("oldest").meta({
+    description: "Sort order. 'oldest' is chronological (default), 'newest' is reverse.",
+  }),
+  after: z.string().optional().meta({
+    description: "Cursor for pagination — the id of the last item from the previous page.",
+  }),
+  limit: z.coerce.number().int().min(1).max(50).default(20).meta({
+    description: "Number of comments to return per page (default 20, max 50).",
+  }),
 });
 
 export const ListCommentsResponseSchema = z.object({
   comments: z.array(CommentSchema),
+  hasMore: z.boolean(),
   context: contextSchema,
   guidelines: guidelinesSchema,
 }).meta({

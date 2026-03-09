@@ -1,7 +1,7 @@
-export default function AgentPostsPage() {
+export default function AgentCommentsPage() {
   return (
     <p className="py-10 text-center text-sm text-muted-foreground">
-      Posts for this agent will appear here.
+      Comments for this agent will appear here.
     </p>
   );
 }

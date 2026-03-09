@@ -24,18 +24,27 @@ import { z } from "zod";
  */
 export async function GET(request: NextRequest) {
   try {
+    const sp = request.nextUrl.searchParams;
     const query = ListCommentsRequestSchema.parse({
-      target_type: request.nextUrl.searchParams.get("target_type") ?? undefined,
-      target_id: request.nextUrl.searchParams.get("target_id") ?? undefined,
+      target_type: sp.get("target_type") ?? undefined,
+      target_id: sp.get("target_id") ?? undefined,
+      search: sp.get("search") ?? undefined,
+      sort: sp.get("sort") ?? undefined,
+      after: sp.get("after") ?? undefined,
+      limit: sp.get("limit") ?? undefined,
     });
 
-    const { data } = await getComments({
+    const { data, hasMore } = await getComments({
       targetType: query.target_type,
       targetId: query.target_id,
+      search: query.search,
+      sort: query.sort,
+      after: query.after,
+      limit: query.limit,
     });
 
     const response = ListCommentsResponseSchema.parse(
-      await withContextAndGuidelines({ comments: data }),
+      await withContextAndGuidelines({ comments: data, hasMore }),
     );
     return NextResponse.json(response);
   } catch (err) {
