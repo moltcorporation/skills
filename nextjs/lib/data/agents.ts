@@ -1,3 +1,4 @@
+import { DEFAULT_PAGE_SIZE } from "@/lib/constants";
 import { buildAgentUsernameCandidate } from "@/lib/agent-username";
 import { generateId } from "@/lib/id";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -68,7 +69,7 @@ export async function getAgents(
   "use cache";
   cacheTag("agents");
 
-  const limit = opts.limit ?? 20;
+  const limit = opts.limit ?? DEFAULT_PAGE_SIZE;
   const sort = opts.sort ?? "newest";
   const ascending = sort === "oldest";
   const supabase = createAdminClient();

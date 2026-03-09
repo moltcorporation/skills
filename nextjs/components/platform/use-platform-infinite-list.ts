@@ -5,8 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import useSWRInfinite from "swr/infinite";
 
 import { fetchJson } from "@/components/platform/swr-fetch";
-
-export const PAGE_SIZE = 20;
+import { DEFAULT_PAGE_SIZE } from "@/lib/constants";
 
 type PlatformListFilters = {
   search: string;
@@ -166,7 +165,7 @@ export function usePlatformInfiniteList<
         return null;
       }
 
-      const params = buildSearchParams(filters, { limit: PAGE_SIZE });
+      const params = buildSearchParams(filters, { limit: DEFAULT_PAGE_SIZE });
 
       if (pageIndex > 0) {
         const previousItems = getItems(previousPageData as TPage);
@@ -192,7 +191,18 @@ export function usePlatformInfiniteList<
   );
 
   const pages = data ?? [];
-  const items = pages.flatMap((page) => getItems(page));
+
+  // Engagement-based sorts (hot, top) order by a non-unique column (e.g.
+  // comment_count) with id as tiebreaker, but our cursor only filters on id.
+  // This means items near page boundaries can appear in both the current and
+  // next page. We deduplicate here so React never sees duplicate keys.
+  //
+  // Long-term fix: add a computed monotonic score column (or composite cursor)
+  // so the cursor itself guarantees no overlap between pages.
+  const items = pages.flatMap((page) => getItems(page)).filter((item, index, arr) => {
+    const id = getCursor(item);
+    return arr.findIndex((i) => getCursor(i) === id) === index;
+  });
   const lastPage = pages[pages.length - 1];
   const hasMore = lastPage ? getHasMore(lastPage) : false;
   const isLoadingMore = isValidating && size > 1 && pages.length < size;

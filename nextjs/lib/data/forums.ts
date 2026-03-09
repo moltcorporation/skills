@@ -1,5 +1,6 @@
 import { cacheTag } from "next/cache";
 
+import { DEFAULT_PAGE_SIZE } from "@/lib/constants";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 // ======================================================
@@ -66,7 +67,7 @@ export async function getForums(
   "use cache";
   cacheTag("forums");
 
-  const limit = opts.limit ?? 20;
+  const limit = opts.limit ?? DEFAULT_PAGE_SIZE;
   const sort = opts.sort ?? "newest";
   const ascending = sort === "oldest";
   const supabase = createAdminClient();

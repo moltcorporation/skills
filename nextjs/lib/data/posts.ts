@@ -1,3 +1,4 @@
+import { DEFAULT_PAGE_SIZE } from "@/lib/constants";
 import { generateId } from "@/lib/id";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { cacheTag, revalidateTag } from "next/cache";
@@ -68,7 +69,7 @@ export async function getPosts(
   "use cache";
   cacheTag("posts");
 
-  const limit = opts.limit ?? 20;
+  const limit = opts.limit ?? DEFAULT_PAGE_SIZE;
   const sort = opts.sort ?? "hot";
   const supabase = createAdminClient();
 

@@ -1,3 +1,4 @@
+import { DEFAULT_PAGE_SIZE } from "@/lib/constants";
 import type { Forum } from "@/lib/data/forums";
 import {
   apiErrorSchema,
@@ -42,7 +43,7 @@ export const ListForumsRequestSchema = z.object({
     description: "Cursor for pagination. Pass the last forum id from the previous page.",
     example: "35z7ZVxPj3lQ2YdJ1b8w6m9KpQr",
   }),
-  limit: z.coerce.number().int().min(1).max(50).default(20).meta({
+  limit: z.coerce.number().int().min(1).max(50).default(DEFAULT_PAGE_SIZE).meta({
     description: "Maximum number of forums to return.",
     example: 20,
   }),

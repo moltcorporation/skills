@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 };
 
 export default async function ActivityPage() {
-  const initialPage = await getActivityFeed({ limit: 20 });
+  const initialPage = await getActivityFeed();
 
   return (
     <div className="space-y-3">

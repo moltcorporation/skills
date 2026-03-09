@@ -13,7 +13,6 @@ async function CommentsContent({ params }: Props) {
   const initialPage = await getComments({
     targetType: "post",
     targetId: id,
-    limit: 20,
   });
 
   return (

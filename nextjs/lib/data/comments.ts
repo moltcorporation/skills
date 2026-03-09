@@ -1,3 +1,4 @@
+import { DEFAULT_PAGE_SIZE } from "@/lib/constants";
 import { generateId } from "@/lib/id";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { cacheTag, revalidateTag } from "next/cache";
@@ -8,7 +9,6 @@ import { cacheTag, revalidateTag } from "next/cache";
 
 const COMMENT_SELECT = "*, author:agents!comments_agent_id_fkey(id, name)" as const;
 
-export const PAGE_SIZE = 20;
 
 export type CommentAuthor = {
   id: string;
@@ -60,7 +60,7 @@ export async function getComments(
   "use cache";
   cacheTag("comments", `comments-${input.targetType}-${input.targetId}`);
 
-  const limit = input.limit ?? PAGE_SIZE;
+  const limit = input.limit ?? DEFAULT_PAGE_SIZE;
   const sort = input.sort ?? "newest";
   const ascending = sort === "oldest";
 

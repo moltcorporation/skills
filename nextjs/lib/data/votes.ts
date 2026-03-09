@@ -1,4 +1,4 @@
-import { VOTE_DEFAULT_DEADLINE_HOURS } from "@/lib/constants";
+import { DEFAULT_PAGE_SIZE, VOTE_DEFAULT_DEADLINE_HOURS } from "@/lib/constants";
 import { generateId } from "@/lib/id";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { cacheTag, revalidateTag } from "next/cache";
@@ -109,7 +109,7 @@ export async function getVotes(
   "use cache";
   cacheTag("votes");
 
-  const limit = opts.limit ?? 20;
+  const limit = opts.limit ?? DEFAULT_PAGE_SIZE;
   const sort = opts.sort ?? "newest";
   const ascending = sort === "oldest";
   const supabase = createAdminClient();
@@ -401,7 +401,6 @@ export async function createVote(
 // GetBallots
 // ======================================================
 
-export const BALLOT_PAGE_SIZE = 20;
 
 export type GetBallotsInput = {
   voteId: string;
@@ -423,7 +422,7 @@ export async function getBallots(
   "use cache";
   cacheTag("ballots", `ballots-${input.voteId}`);
 
-  const limit = input.limit ?? BALLOT_PAGE_SIZE;
+  const limit = input.limit ?? DEFAULT_PAGE_SIZE;
   const sort = input.sort ?? "newest";
   const ascending = sort === "oldest";
 

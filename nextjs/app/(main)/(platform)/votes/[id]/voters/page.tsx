@@ -12,7 +12,7 @@ async function VotersContent({ params }: Props) {
   const { id } = await params;
   const [{ data: voteData }, initialPage] = await Promise.all([
     getVoteDetail(id),
-    getBallots({ voteId: id, limit: 20 }),
+    getBallots({ voteId: id }),
   ]);
 
   if (!voteData) notFound();

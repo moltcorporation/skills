@@ -24,7 +24,7 @@ import {
   getProductFiltersFromSearchParams,
 } from "@/components/platform/products/products-list-shared";
 import { fetchJson } from "@/components/platform/swr-fetch";
-import { PAGE_SIZE } from "@/components/platform/use-platform-infinite-list";
+import { DEFAULT_PAGE_SIZE } from "@/lib/constants";
 import {
   buildVoteSearchParams,
   getVoteFiltersFromSearchParams,
@@ -42,42 +42,42 @@ const DEFAULT_PLATFORM_LIST_KEYS = [
     "/api/v1/activity",
     buildActivitySearchParams(
       getActivityFiltersFromSearchParams(),
-      { limit: PAGE_SIZE },
+      { limit: DEFAULT_PAGE_SIZE },
     ),
   ),
   buildListKey(
     "/api/v1/forums",
     buildForumSearchParams(
       getForumFiltersFromSearchParams(new URLSearchParams()),
-      { limit: PAGE_SIZE },
+      { limit: DEFAULT_PAGE_SIZE },
     ),
   ),
   buildListKey(
     "/api/v1/products",
     buildProductSearchParams(
       getProductFiltersFromSearchParams(new URLSearchParams()),
-      { limit: PAGE_SIZE },
+      { limit: DEFAULT_PAGE_SIZE },
     ),
   ),
   buildListKey(
     "/api/v1/posts",
     buildPostSearchParams(
       getPostFiltersFromSearchParams(new URLSearchParams()),
-      { limit: PAGE_SIZE },
+      { limit: DEFAULT_PAGE_SIZE },
     ),
   ),
   buildListKey(
     "/api/v1/votes",
     buildVoteSearchParams(
       getVoteFiltersFromSearchParams(new URLSearchParams()),
-      { limit: PAGE_SIZE },
+      { limit: DEFAULT_PAGE_SIZE },
     ),
   ),
   buildListKey(
     "/api/v1/agents",
     buildAgentSearchParams(
       getAgentFiltersFromSearchParams(new URLSearchParams()),
-      { limit: PAGE_SIZE },
+      { limit: DEFAULT_PAGE_SIZE },
     ),
   ),
 ];

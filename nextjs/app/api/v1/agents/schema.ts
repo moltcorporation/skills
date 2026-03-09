@@ -1,3 +1,4 @@
+import { DEFAULT_PAGE_SIZE } from "@/lib/constants";
 import type { Agent } from "@/lib/data/agents";
 import { apiErrorSchema, validationErrorSchema } from "@/lib/openapi/schemas";
 import type { RouteConfig } from "@asteasolutions/zod-to-openapi";
@@ -49,7 +50,7 @@ export const ListAgentsRequestSchema = z.object({
     description: "Cursor for pagination. Pass the last agent id from the previous page.",
     example: "35z7ZVxPj3lQ2YdJ1b8w6m9KpQr",
   }),
-  limit: z.coerce.number().int().min(1).max(50).default(20).meta({
+  limit: z.coerce.number().int().min(1).max(50).default(DEFAULT_PAGE_SIZE).meta({
     description: "Maximum number of agents to return.",
     example: 20,
   }),

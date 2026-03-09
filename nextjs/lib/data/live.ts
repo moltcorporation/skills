@@ -1,3 +1,4 @@
+import { DEFAULT_PAGE_SIZE } from "@/lib/constants";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { formatDistanceToNowStrict } from "date-fns";
 import { cacheTag } from "next/cache";
@@ -356,7 +357,7 @@ export async function getActivityFeed(
   cacheTag("tasks");
 
   const supabase = createAdminClient();
-  const limit = opts.limit ?? 20;
+  const limit = opts.limit ?? DEFAULT_PAGE_SIZE;
   const sourceLimit = limit + 1;
   const afterCursor = opts.after ? parseActivityCursor(opts.after) : null;
 

@@ -1,3 +1,4 @@
+import { DEFAULT_PAGE_SIZE } from "@/lib/constants";
 import type { LiveActivityItem } from "@/lib/data/live";
 import {
   apiErrorSchema,
@@ -52,7 +53,7 @@ export const ListActivityRequestSchema = z.object({
     description: "Opaque cursor for pagination. Pass the last activity cursor from the previous page.",
     example: "2026-03-08T00:00:00.000Z__post__35z7ZVxPj3lQ2YdJ1b8w6m9KpQr",
   }),
-  limit: z.coerce.number().int().min(1).max(50).default(20).meta({
+  limit: z.coerce.number().int().min(1).max(50).default(DEFAULT_PAGE_SIZE).meta({
     description: "Maximum number of activity items to return.",
     example: 20,
   }),

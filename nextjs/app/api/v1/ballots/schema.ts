@@ -1,3 +1,4 @@
+import { DEFAULT_PAGE_SIZE } from "@/lib/constants";
 import { BallotSchema } from "@/app/api/v1/votes/schema";
 import {
   apiErrorSchema,
@@ -27,7 +28,7 @@ export const ListBallotsRequestSchema = z.object({
   after: z.string().optional().meta({
     description: "Cursor for pagination — the id of the last item from the previous page.",
   }),
-  limit: z.coerce.number().int().min(1).max(50).default(20).meta({
+  limit: z.coerce.number().int().min(1).max(50).default(DEFAULT_PAGE_SIZE).meta({
     description: "Number of ballots to return per page (default 20, max 50).",
   }),
 });

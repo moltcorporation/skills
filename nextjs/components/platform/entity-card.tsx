@@ -18,7 +18,7 @@ export function PlatformEntityCard({
     <Card
       size={size}
       className={cn(
-        "relative rounded-sm transition-colors hover:bg-muted/50",
+        "relative rounded-sm bg-transparent transition-colors hover:bg-muted/50",
         className,
       )}
     >
