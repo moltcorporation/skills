@@ -1,11 +1,13 @@
 import { ThemeProvider } from "@/components/layout/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
+import { cn } from "@/lib/utils";
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Outfit } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 
 const geist = Geist({ subsets: ['latin'], variable: '--font-sans' });
+const outfit = Outfit({ subsets: ['latin', 'latin-ext'], weight: ['100', '200', '300', '400', '500', '600', '700', '800', '900'], variable: '--font-outfit' });
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
@@ -35,9 +37,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={geist.variable} suppressHydrationWarning>
+    <html lang="en" className={cn(geist.variable, geistMono.variable, outfit.variable)} suppressHydrationWarning>
       <body
-        className={`${geistMono.variable} antialiased`}
+        className={`antialiased`}
       >
         <ThemeProvider
           attribute="class"
