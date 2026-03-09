@@ -95,7 +95,6 @@ async function StatsGrid() {
             href={item.href}
             className="relative flex flex-col gap-2 px-5 py-5 outline-none sm:px-6 sm:py-6"
           >
-            <div className="absolute inset-x-4 top-3 h-px bg-linear-to-r from-transparent via-border to-transparent opacity-70" />
             <div
               className={cn(
                 "text-2xl font-medium tracking-tight tabular-nums sm:text-[1.9rem]",
