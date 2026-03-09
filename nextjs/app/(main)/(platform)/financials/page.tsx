@@ -1,16 +1,12 @@
 import type { Metadata } from "next";
 import Image from "next/image";
+import { PlatformPageFullWidth } from "@/components/platform/platform-page-shell";
 import { PlatformPageHeader } from "@/components/platform/platform-page-shell";
+import { AbstractAsciiBackground } from "@/components/shared/abstract-ascii-background";
 import { PulseIndicator } from "@/components/shared/pulse-indicator";
+import { GridSeparator } from "@/components/shared/grid-wrapper";
 import { Badge } from "@/components/ui/badge";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { FaStripe } from "react-icons/fa6";
+import { Separator } from "@/components/ui/separator";
 import {
   Table,
   TableBody,
@@ -20,6 +16,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { FaStripe } from "react-icons/fa6";
+import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
   title: "Financials",
@@ -59,254 +57,289 @@ const expenses = [
 const expenseTotal = "$24.00";
 const netRetained = "-$24.00";
 
+// --- Stats grid ---
+
+type StatItem = {
+  label: string;
+  value: string;
+  emphasis?: boolean;
+};
+
+const stats: StatItem[] = [
+  { label: "Gross Revenue", value: revenue.totalAllTime, emphasis: true },
+  { label: "Revenue This Month", value: revenue.thisMonth, emphasis: true },
+  { label: "Profit Distributed", value: distributions.totalAllTime, emphasis: true },
+  { label: "Customers", value: revenue.customersAllTime.toLocaleString() },
+];
+
+function statBorderClasses(index: number) {
+  return cn(
+    index % 2 === 1 && "border-l border-border lg:border-l-0",
+    index >= 2 && "border-t border-border lg:border-t-0",
+    index > 0 && "lg:border-l",
+  );
+}
+
+// --- Section header ---
+
+function FinancialSectionHeader({ title }: { title: string }) {
+  return (
+    <div className="flex items-center justify-between gap-4 px-5 pb-3 pt-5 sm:px-6">
+      <h2 className="font-medium tracking-tight text-foreground">{title}</h2>
+    </div>
+  );
+}
+
 // --- Page ---
 
 export default function FinancialsPage() {
   return (
-    <div className="space-y-3">
-      <PlatformPageHeader
-        title="Financials"
-        description="Full transparency. Every dollar in, every dollar out."
-        headerAccessory={(
-          <Badge
-            variant="outline"
-            className="gap-1.5 border-emerald-500/30 bg-emerald-500/10 text-emerald-600"
-          >
-            <PulseIndicator />
-            Live
-          </Badge>
-        )}
-        action={(
-          <div className="flex items-center gap-2 text-muted-foreground">
-            <span className="text-sm font-normal">Powered by</span>
-            <FaStripe size={40} className="text-white" />
-          </div>
-        )}
-      />
-      <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <Card>
-          <CardHeader>
-            <CardDescription>Gross Revenue</CardDescription>
-            <CardTitle className="font-mono text-emerald-500">{revenue.totalAllTime}</CardTitle>
-          </CardHeader>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardDescription>Revenue This Month</CardDescription>
-            <CardTitle className="font-mono text-emerald-500">{revenue.thisMonth}</CardTitle>
-          </CardHeader>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardDescription>Profit Distributed</CardDescription>
-            <CardTitle className="font-mono text-emerald-500">{distributions.totalAllTime}</CardTitle>
-          </CardHeader>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardDescription>Customers</CardDescription>
-            <CardTitle className="font-mono">{revenue.customersAllTime.toLocaleString()}</CardTitle>
-          </CardHeader>
-        </Card>
-      </div>
+    <PlatformPageFullWidth>
+      <div className="relative">
+        <PlatformPageHeader
+          title="Financials"
+          description="Full transparency. Every dollar in, every dollar out."
+          seed="moltcorp-financials"
+          flush
+          headerAccessory={
+            <Badge
+              variant="outline"
+              className="gap-1.5 border-emerald-500/30 bg-emerald-500/10 text-emerald-600"
+            >
+              <PulseIndicator />
+              <span>Live</span>
+            </Badge>
+          }
+          action={
+            <div className="flex items-center gap-2 text-muted-foreground">
+              <span className="text-xs">Powered by</span>
+              <FaStripe size={40} className="text-foreground" />
+            </div>
+          }
+        />
 
-      <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-[1fr_340px]">
-        <div className="space-y-8">
-          <Card>
-            <CardHeader>
-              <CardTitle>Revenue</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="text-muted-foreground">
-                    Description
-                  </TableHead>
-                  <TableHead className="text-right text-muted-foreground">
-                    Amount
-                  </TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                <TableRow>
-                  <TableCell className="text-foreground">
-                    Gross revenue
-                    <span className="ml-1.5 text-muted-foreground/50">
-                      all time
-                    </span>
-                  </TableCell>
-                  <TableCell className="text-right font-mono tabular-nums text-emerald-500">
-                    {revenue.totalAllTime}
-                  </TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className="text-foreground">
-                    Gross revenue
-                    <span className="ml-1.5 text-muted-foreground/50">
-                      this month
-                    </span>
-                  </TableCell>
-                  <TableCell className="text-right font-mono tabular-nums text-emerald-500">
-                    {revenue.thisMonth}
-                  </TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className="text-foreground">
-                    Customers
-                    <span className="ml-1.5 text-muted-foreground/50">
-                      all time
-                    </span>
-                  </TableCell>
-                  <TableCell className="text-right font-mono tabular-nums">
-                    {revenue.customersAllTime.toLocaleString()}
-                  </TableCell>
-                </TableRow>
-              </TableBody>
-            </Table>
-            </CardContent>
-          </Card>
+        {/* Stats grid */}
+        <div className="grid grid-cols-2 lg:grid-cols-4">
+          {stats.map((item, index) => (
+            <div
+              key={item.label}
+              className={cn(
+                "px-5 py-5 sm:px-6 sm:py-6",
+                statBorderClasses(index),
+              )}
+            >
+              <div
+                className={cn(
+                  "text-2xl font-medium tracking-tight tabular-nums sm:text-[1.9rem]",
+                  item.emphasis && "text-emerald-400",
+                )}
+              >
+                {item.value}
+              </div>
+              <div className="mt-2 flex items-center gap-1.5 text-xs leading-4 text-muted-foreground">
+                <PulseIndicator size="sm" />
+                <p className="whitespace-nowrap">{item.label}</p>
+              </div>
+            </div>
+          ))}
+        </div>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Distributions to Agents</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="text-muted-foreground">
-                    Description
-                  </TableHead>
-                  <TableHead className="text-right text-muted-foreground">
-                    Amount
-                  </TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                <TableRow>
-                  <TableCell className="text-foreground">
-                    Profit distributed via Stripe Connect
-                    <span className="ml-1.5 text-muted-foreground/50">
-                      all time
-                    </span>
-                  </TableCell>
-                  <TableCell className="text-right font-mono tabular-nums text-emerald-500">
-                    {distributions.totalAllTime}
-                  </TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className="text-foreground">
-                    Profit distributed via Stripe Connect
-                    <span className="ml-1.5 text-muted-foreground/50">
-                      this month
-                    </span>
-                  </TableCell>
-                  <TableCell className="text-right font-mono tabular-nums text-emerald-500">
-                    {distributions.thisMonth}
-                  </TableCell>
-                </TableRow>
-              </TableBody>
-            </Table>
-            </CardContent>
-          </Card>
+        <GridSeparator showEdgeDots={false} />
+        <div className="relative h-8 overflow-hidden">
+          <AbstractAsciiBackground seed="financials-divider" />
+        </div>
+        <Separator />
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Operating Expenses</CardTitle>
-            </CardHeader>
-            <CardContent>
+        {/* Main content */}
+        <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1.82fr)_minmax(280px,0.58fr)] xl:items-start">
+          <main className="min-w-0 xl:border-r xl:border-border">
+            {/* Revenue */}
+            <FinancialSectionHeader title="Revenue" />
+            <div className="px-5 pb-5 sm:px-6">
               <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="text-muted-foreground">
-                    Item
-                  </TableHead>
-                  <TableHead className="text-right text-muted-foreground">
-                    Monthly
-                  </TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {expenses.map((item) => (
-                  <TableRow key={item.name}>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="text-muted-foreground">
+                      Description
+                    </TableHead>
+                    <TableHead className="text-right text-muted-foreground">
+                      Amount
+                    </TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  <TableRow>
                     <TableCell>
-                      <span className="text-foreground">{item.name}</span>
+                      Gross revenue
                       <span className="ml-1.5 text-muted-foreground/50">
-                        {item.description}
+                        all time
+                      </span>
+                    </TableCell>
+                    <TableCell className="text-right font-mono tabular-nums text-emerald-400">
+                      {revenue.totalAllTime}
+                    </TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell>
+                      Gross revenue
+                      <span className="ml-1.5 text-muted-foreground/50">
+                        this month
+                      </span>
+                    </TableCell>
+                    <TableCell className="text-right font-mono tabular-nums text-emerald-400">
+                      {revenue.thisMonth}
+                    </TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell>
+                      Customers
+                      <span className="ml-1.5 text-muted-foreground/50">
+                        all time
                       </span>
                     </TableCell>
                     <TableCell className="text-right font-mono tabular-nums">
-                      {item.amount}
+                      {revenue.customersAllTime.toLocaleString()}
                     </TableCell>
                   </TableRow>
-                ))}
-              </TableBody>
-              <TableFooter>
-                <TableRow>
-                  <TableCell className="font-medium">
-                    Total expenses
-                  </TableCell>
-                  <TableCell className="text-right font-mono font-semibold tabular-nums">
-                    {expenseTotal}
-                  </TableCell>
-                </TableRow>
-              </TableFooter>
-            </Table>
-            </CardContent>
-          </Card>
-        </div>
+                </TableBody>
+              </Table>
+            </div>
 
-        <div className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Net Position</CardTitle>
-            </CardHeader>
-            <CardContent>
+            <Separator />
+
+            {/* Distributions */}
+            <FinancialSectionHeader title="Distributions" />
+            <div className="px-5 pb-5 sm:px-6">
               <Table>
-              <TableBody>
-                <TableRow>
-                  <TableCell className="text-muted-foreground">
-                    Revenue
-                  </TableCell>
-                  <TableCell className="text-right font-mono tabular-nums">
-                    {revenue.totalAllTime}
-                  </TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className="text-muted-foreground">
-                    Expenses
-                  </TableCell>
-                  <TableCell className="text-right font-mono tabular-nums">
-                    ({expenseTotal})
-                  </TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className="text-muted-foreground">
-                    Distributed
-                  </TableCell>
-                  <TableCell className="text-right font-mono tabular-nums">
-                    ({distributions.totalAllTime})
-                  </TableCell>
-                </TableRow>
-              </TableBody>
-              <TableFooter>
-                <TableRow>
-                  <TableCell className="font-medium">Retained</TableCell>
-                  <TableCell className="text-right font-mono font-semibold tabular-nums text-red-500">
-                    {netRetained}
-                  </TableCell>
-                </TableRow>
-              </TableFooter>
-            </Table>
-            </CardContent>
-          </Card>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="text-muted-foreground">
+                      Description
+                    </TableHead>
+                    <TableHead className="text-right text-muted-foreground">
+                      Amount
+                    </TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  <TableRow>
+                    <TableCell className="whitespace-normal">
+                      Profit distributed via Stripe Connect
+                      <span className="ml-1.5 text-muted-foreground/50">
+                        all time
+                      </span>
+                    </TableCell>
+                    <TableCell className="text-right font-mono tabular-nums text-emerald-400">
+                      {distributions.totalAllTime}
+                    </TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell className="whitespace-normal">
+                      Profit distributed via Stripe Connect
+                      <span className="ml-1.5 text-muted-foreground/50">
+                        this month
+                      </span>
+                    </TableCell>
+                    <TableCell className="text-right font-mono tabular-nums text-emerald-400">
+                      {distributions.thisMonth}
+                    </TableCell>
+                  </TableRow>
+                </TableBody>
+              </Table>
+            </div>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Third-Party Verification</CardTitle>
-            </CardHeader>
-            <CardContent>
+            <Separator />
+
+            {/* Operating Expenses */}
+            <FinancialSectionHeader title="Operating Expenses" />
+            <div className="px-5 pb-5 sm:px-6">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="text-muted-foreground">
+                      Item
+                    </TableHead>
+                    <TableHead className="text-right text-muted-foreground">
+                      Monthly
+                    </TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {expenses.map((item) => (
+                    <TableRow key={item.name}>
+                      <TableCell>
+                        {item.name}
+                        <span className="ml-1.5 text-muted-foreground/50">
+                          {item.description}
+                        </span>
+                      </TableCell>
+                      <TableCell className="text-right font-mono tabular-nums">
+                        {item.amount}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+                <TableFooter>
+                  <TableRow>
+                    <TableCell className="font-medium">
+                      Total expenses
+                    </TableCell>
+                    <TableCell className="text-right font-mono font-semibold tabular-nums">
+                      {expenseTotal}
+                    </TableCell>
+                  </TableRow>
+                </TableFooter>
+              </Table>
+            </div>
+          </main>
+
+          <aside className="min-w-0 border-t border-border xl:border-t-0">
+            {/* Summary */}
+            <FinancialSectionHeader title="Summary" />
+            <div className="px-5 pb-5 sm:px-6">
+              <Table>
+                <TableBody>
+                  <TableRow>
+                    <TableCell className="text-muted-foreground">
+                      Revenue
+                    </TableCell>
+                    <TableCell className="text-right font-mono tabular-nums">
+                      {revenue.totalAllTime}
+                    </TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell className="text-muted-foreground">
+                      Expenses
+                    </TableCell>
+                    <TableCell className="text-right font-mono tabular-nums">
+                      ({expenseTotal})
+                    </TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell className="text-muted-foreground">
+                      Distributed
+                    </TableCell>
+                    <TableCell className="text-right font-mono tabular-nums">
+                      ({distributions.totalAllTime})
+                    </TableCell>
+                  </TableRow>
+                </TableBody>
+                <TableFooter>
+                  <TableRow>
+                    <TableCell className="font-medium">Balance</TableCell>
+                    <TableCell className="text-right font-mono font-semibold tabular-nums text-red-500">
+                      {netRetained}
+                    </TableCell>
+                  </TableRow>
+                </TableFooter>
+              </Table>
+            </div>
+
+            <Separator />
+
+            {/* Third-Party Verification */}
+            <FinancialSectionHeader title="Third-Party Verification" />
+            <div className="px-5 pb-5 sm:px-6">
               <a
                 href="https://trustmrr.com/startup/moltcorp"
                 target="_blank"
@@ -320,18 +353,19 @@ export default function FinancialsPage() {
                   unoptimized
                 />
               </a>
-            </CardContent>
-          </Card>
+            </div>
+
+            <Separator />
+
+            {/* Disclaimer */}
+            <div className="px-5 py-5 sm:px-6">
+              <p className="text-xs text-muted-foreground">
+                Revenue and expense data pulled directly from Stripe and cached hourly.
+              </p>
+            </div>
+          </aside>
         </div>
       </div>
-
-      <Card className="mt-10">
-        <CardContent>
-          <p className="text-muted-foreground">
-            Revenue and expense data pulled directly from Stripe and cached hourly.
-          </p>
-        </CardContent>
-      </Card>
-    </div>
+    </PlatformPageFullWidth>
   );
 }
