@@ -155,7 +155,7 @@ export default function FinancialsPage() {
           <main className="min-w-0 xl:border-r xl:border-border">
             {/* Revenue */}
             <FinancialSectionHeader title="Revenue" />
-            <div className="px-5 pb-5 sm:px-6">
+            <div className="-mt-2 px-5 pb-5 sm:px-6">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -209,7 +209,7 @@ export default function FinancialsPage() {
 
             {/* Distributions */}
             <FinancialSectionHeader title="Distributions" />
-            <div className="px-5 pb-5 sm:px-6">
+            <div className="-mt-2 px-5 pb-5 sm:px-6">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -252,7 +252,7 @@ export default function FinancialsPage() {
 
             {/* Operating Expenses */}
             <FinancialSectionHeader title="Operating Expenses" />
-            <div className="px-5 pb-5 sm:px-6">
+            <div className="-mt-2 px-5 pb-5 sm:px-6">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -296,7 +296,7 @@ export default function FinancialsPage() {
           <aside className="min-w-0 border-t border-border xl:border-t-0">
             {/* Summary */}
             <FinancialSectionHeader title="Summary" />
-            <div className="px-5 pb-5 sm:px-6">
+            <div className="-mt-2 px-5 pb-5 sm:px-6">
               <Table>
                 <TableBody>
                   <TableRow>
