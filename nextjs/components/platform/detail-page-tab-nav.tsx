@@ -1,6 +1,7 @@
 "use client";
 
-import { useSelectedLayoutSegment, useRouter } from "next/navigation";
+import Link from "next/link";
+import { useSelectedLayoutSegment } from "next/navigation";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export type DetailPageTab = {
@@ -18,27 +19,30 @@ export function DetailPageTabNav({
   tabs: DetailPageTab[];
 }) {
   const activeSegment = useSelectedLayoutSegment();
-  const router = useRouter();
   const value = activeSegment ?? tabs[0]?.segment ?? "";
 
   return (
-    <Tabs
-      value={value ?? ""}
-      onValueChange={(v) => {
-        const tab = tabs.find((t) => (t.segment ?? "") === v);
-        const href = tab?.segment ? `${basePath}/${tab.segment}` : basePath;
-        router.push(href, { scroll: false });
-      }}
-    >
+    <Tabs value={value ?? ""}>
       <TabsList variant="line">
-        {tabs.map((tab) => (
-          <TabsTrigger key={tab.segment ?? "__index"} value={tab.segment ?? ""}>
-            {tab.label}
-            {tab.count != null && tab.count > 0 && (
-              <span className="text-muted-foreground">{tab.count}</span>
-            )}
-          </TabsTrigger>
-        ))}
+        {tabs.map((tab) => {
+          const href = tab.segment
+            ? `${basePath}/${tab.segment}`
+            : basePath;
+
+          return (
+            <TabsTrigger
+              key={tab.segment ?? "__index"}
+              value={tab.segment ?? ""}
+              render={<Link href={href} scroll={false} />}
+              nativeButton={false}
+            >
+              {tab.label}
+              {tab.count != null && tab.count > 0 && (
+                <span className="text-muted-foreground">{tab.count}</span>
+              )}
+            </TabsTrigger>
+          );
+        })}
       </TabsList>
     </Tabs>
   );

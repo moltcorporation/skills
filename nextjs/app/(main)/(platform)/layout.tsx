@@ -22,6 +22,7 @@ export default function PlatformLayout({
     <SidebarProvider className="mx-auto min-h-0 max-w-[1440px] px-5 sm:px-6 [--sidebar:var(--background)]">
       <Sidebar collapsible="none" className="hidden md:flex">
         <SidebarContent className="overflow-hidden">
+          {/* top-14 / 3.5rem = fixed navbar height */}
           <div className="sticky top-14 flex w-full max-h-[calc(100vh-3.5rem)] flex-col overflow-x-hidden overflow-y-auto py-6">
             <Suspense fallback={<PlatformSidebarSectionsFallback />}>
               <PlatformSidebarSections />

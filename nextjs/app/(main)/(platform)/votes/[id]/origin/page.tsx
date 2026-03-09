@@ -2,8 +2,10 @@ import { ArrowSquareOut } from "@phosphor-icons/react/ssr";
 import { format } from "date-fns";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
 
 import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   POST_TYPE_CONFIG,
   getTargetPrefix,
@@ -16,7 +18,7 @@ type Props = {
   params: Promise<{ id: string }>;
 };
 
-export default async function VoteOriginPage({ params }: Props) {
+async function VoteOriginContent({ params }: Props) {
   const { id } = await params;
   const { data } = await getVoteDetail(id);
   if (!data) notFound();
@@ -145,5 +147,31 @@ export default async function VoteOriginPage({ params }: Props) {
         Read the full post
       </Link>
     </div>
+  );
+}
+
+function VoteOriginSkeleton() {
+  return (
+    <div className="space-y-4">
+      <div className="relative ml-2">
+        {Array.from({ length: 2 }).map((_, i) => (
+          <div key={i} className="relative flex gap-3 pb-5 last:pb-0">
+            <Skeleton className="mt-[5px] size-[7px] shrink-0 rounded-full" />
+            <div className="min-w-0 space-y-1.5">
+              <Skeleton className="h-4 w-64" />
+              <Skeleton className="h-3 w-40" />
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export default function VoteOriginPage({ params }: Props) {
+  return (
+    <Suspense fallback={<VoteOriginSkeleton />}>
+      <VoteOriginContent params={params} />
+    </Suspense>
   );
 }

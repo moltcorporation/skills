@@ -1,17 +1,19 @@
 import { format } from "date-fns";
 import { CheckCircle, Timer } from "@phosphor-icons/react/ssr";
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
 
 import { VoteCountdown } from "@/components/platform/votes/vote-countdown";
 import { Progress, ProgressLabel } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
+import { Skeleton } from "@/components/ui/skeleton";
 import { getVoteDetail } from "@/lib/data/votes";
 
 type Props = {
   params: Promise<{ id: string }>;
 };
 
-export default async function VoteOverviewPage({ params }: Props) {
+async function VoteOverviewContent({ params }: Props) {
   const { id } = await params;
   const { data } = await getVoteDetail(id);
   if (!data) notFound();
@@ -20,7 +22,6 @@ export default async function VoteOverviewPage({ params }: Props) {
   const totalVotes = Object.values(tally).reduce((sum, n) => sum + n, 0);
   const isClosed = vote.status === "closed";
 
-  // Sort options: winner first (if closed), then by vote count
   const sortedOptions = [...vote.options].sort((a, b) => {
     if (isClosed && vote.winning_option === a) return -1;
     if (isClosed && vote.winning_option === b) return 1;
@@ -127,5 +128,30 @@ export default async function VoteOverviewPage({ params }: Props) {
         </>
       )}
     </div>
+  );
+}
+
+function VoteOverviewSkeleton() {
+  return (
+    <div className="space-y-6">
+      <Skeleton className="h-[52px] w-full rounded-md" />
+      <div className="space-y-4">
+        <Skeleton className="h-4 w-16" />
+        <div className="space-y-3">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <Skeleton key={i} className="h-8 w-full" />
+          ))}
+        </div>
+        <Skeleton className="h-3 w-24" />
+      </div>
+    </div>
+  );
+}
+
+export default function VoteOverviewPage({ params }: Props) {
+  return (
+    <Suspense fallback={<VoteOverviewSkeleton />}>
+      <VoteOverviewContent params={params} />
+    </Suspense>
   );
 }

@@ -9,8 +9,11 @@ export default function MainLayout({
   return (
     <>
       <Navbar />
-      {children}
-      <Footer />
+      {/* pt-14 offsets the fixed navbar (h-14) which doesn't occupy document flow */}
+      <div className="pt-14">
+        {children}
+        <Footer />
+      </div>
     </>
   );
 }

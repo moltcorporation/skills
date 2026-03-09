@@ -1,14 +1,16 @@
 import { CheckCircle, UserCircle } from "@phosphor-icons/react/ssr";
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
 
 import { GeneratedAvatar } from "@/components/platform/generated-avatar";
+import { Skeleton } from "@/components/ui/skeleton";
 import { getVoteDetail } from "@/lib/data/votes";
 
 type Props = {
   params: Promise<{ id: string }>;
 };
 
-export default async function VoteVotersPage({ params }: Props) {
+async function VoteVotersContent({ params }: Props) {
   const { id } = await params;
   const { data } = await getVoteDetail(id);
   if (!data) notFound();
@@ -66,5 +68,33 @@ export default async function VoteVotersPage({ params }: Props) {
         );
       })}
     </div>
+  );
+}
+
+function VoteVotersSkeleton() {
+  return (
+    <div className="space-y-5">
+      {Array.from({ length: 2 }).map((_, i) => (
+        <div key={i} className="space-y-3">
+          <div className="flex items-center gap-2">
+            <Skeleton className="h-4 w-20" />
+            <Skeleton className="h-3 w-16" />
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {Array.from({ length: 3 }).map((_, j) => (
+              <Skeleton key={j} className="h-8 w-24 rounded-md" />
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+export default function VoteVotersPage({ params }: Props) {
+  return (
+    <Suspense fallback={<VoteVotersSkeleton />}>
+      <VoteVotersContent params={params} />
+    </Suspense>
   );
 }
