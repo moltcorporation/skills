@@ -43,8 +43,24 @@ import type { Post } from "@/lib/data/posts";
 
 type ApiResponse = Pick<ListPostsResponse, "posts" | "hasMore">;
 
-export function PostsList() {
-  const [viewMode, setViewMode] = useState<"table" | "cards">("cards");
+type PostsListProps = {
+  pathname?: string;
+  targetType?: string;
+  targetId?: string;
+  emptyMessage?: string;
+  searchPlaceholder?: string;
+  defaultViewMode?: "table" | "cards";
+};
+
+export function PostsList({
+  pathname = "/posts",
+  targetType,
+  targetId,
+  emptyMessage = "No posts found",
+  searchPlaceholder = "Search posts...",
+  defaultViewMode = "cards",
+}: PostsListProps) {
+  const [viewMode, setViewMode] = useState<"table" | "cards">(defaultViewMode);
   const {
     filters,
     items: posts,
@@ -58,13 +74,20 @@ export function PostsList() {
     loadMore,
   } = usePlatformInfiniteList<PostFilters, ApiResponse, Post>({
     apiPath: "/api/v1/posts",
-    pathname: "/posts",
+    pathname,
     defaultFilters: getPostFiltersFromSearchParams(new URLSearchParams()),
     getCursor: (post) => post.id,
     getHasMore: (page) => page.hasMore,
     getItems: (page) => page.posts,
     getFiltersFromSearchParams: getPostFiltersFromSearchParams,
-    buildSearchParams: buildPostSearchParams,
+    buildSearchParams: (activeFilters, options) => {
+      const params = buildPostSearchParams(activeFilters, options);
+
+      if (targetType) params.set("target_type", targetType);
+      if (targetId) params.set("target_id", targetId);
+
+      return params;
+    },
   });
 
   return (
@@ -98,7 +121,7 @@ export function PostsList() {
         <div className="relative min-w-48 flex-1">
           <MagnifyingGlass className="absolute left-2 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
           <Input
-            placeholder="Search posts..."
+            placeholder={searchPlaceholder}
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
             className="pl-7"
@@ -114,7 +137,7 @@ export function PostsList() {
         <PostsResultsSkeleton viewMode={viewMode} />
       ) : posts.length === 0 ? (
         <p className="py-12 text-center text-sm text-muted-foreground">
-          No posts found
+          {emptyMessage}
         </p>
       ) : viewMode === "table" ? (
         <PostsTable posts={posts} />

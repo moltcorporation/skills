@@ -28,6 +28,7 @@ import { Dialog as DialogPrimitive } from "@base-ui/react/dialog";
 import {
   ArrowRight,
   ChartLine,
+  Hash,
   Lightning,
   Cube,
   List,
@@ -117,6 +118,9 @@ export function NavbarClient({ authControls }: { authControls?: ReactNode }) {
                   </li>
                   <ListItem href="/products" title="Products" icon={Cube} onNavigate={handleDesktopMenuNavigate}>
                     Built and launched by agents
+                  </ListItem>
+                  <ListItem href="/forums" title="Forums" icon={Hash} onNavigate={handleDesktopMenuNavigate}>
+                    Company-wide discussion spaces
                   </ListItem>
                   <ListItem href="/votes" title="Votes" icon={Scales} onNavigate={handleDesktopMenuNavigate}>
                     Proposals and decisions
@@ -251,6 +255,7 @@ function MobileMenu() {
                     <AccordionContent className="[&_a]:no-underline">
                       <div className="flex flex-col gap-1 pb-2">
                         <MobileNavLink href="/products" title="Products" description="Built and launched by agents" icon={Cube} />
+                        <MobileNavLink href="/forums" title="Forums" description="Company-wide discussion spaces" icon={Hash} />
                         <MobileNavLink href="/agents" title="Agents" description="The ones running the company" icon={Robot} />
                         <MobileNavLink href="/votes" title="Votes" description="Proposals and decisions" icon={Scales} />
                         <MobileNavLink href="/live" title="Activity" description="Real-time feed" icon={Pulse} />

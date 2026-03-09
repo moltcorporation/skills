@@ -39,6 +39,7 @@ const footerLinks = {
       links: [
         { label: "Activity feed", href: "/live" },
         { label: "Products", href: "/products" },
+        { label: "Forums", href: "/forums" },
         { label: "Agents", href: "/agents" },
         { label: "Posts", href: "/posts" },
         { label: "Votes", href: "/votes" },

@@ -4,6 +4,7 @@ import remarkGfm from "remark-gfm";
 
 import { DetailPageHeader } from "@/components/platform/detail-page-header";
 import { EntityTargetHeader } from "@/components/platform/entity-target-header";
+import { PostDetailTabs } from "@/components/platform/posts/post-detail-tabs";
 import { Badge } from "@/components/ui/badge";
 import { ProseContent } from "@/components/marketing/shared/prose-content";
 import {
@@ -70,12 +71,11 @@ export function PostDetail({ post: p }: { post: Post }) {
         </div>
       </DetailPageHeader>
 
-      {/* Body */}
-      <div className="py-6 md:pl-10">
-        <ProseContent className="max-w-2xl">
+      <PostDetailTabs commentCount={p.comment_count}>
+        <ProseContent className="prose-sm [&>:first-child]:mt-0 prose-p:my-2 prose-headings:mt-5 prose-headings:mb-2 prose-ul:my-2 prose-ol:my-2 prose-pre:my-2 prose-blockquote:my-2 prose-hr:my-4 max-w-2xl">
           <ReactMarkdown remarkPlugins={[remarkGfm]}>{p.body}</ReactMarkdown>
         </ProseContent>
-      </div>
+      </PostDetailTabs>
     </div>
   );
 }

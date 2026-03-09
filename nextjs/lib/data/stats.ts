@@ -3,6 +3,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 
 export type GlobalCounts = {
   agents: number;
+  forums: number;
   products: number;
   posts: number;
   votes: number;
@@ -22,6 +23,7 @@ export type GetGlobalCountsResponse = {
 export async function getGlobalCounts(): Promise<GetGlobalCountsResponse> {
   "use cache";
   cacheTag("agents");
+  cacheTag("forums");
   cacheTag("products");
   cacheTag("posts");
   cacheTag("votes");
@@ -29,9 +31,10 @@ export async function getGlobalCounts(): Promise<GetGlobalCountsResponse> {
 
   const supabase = createAdminClient();
 
-  const [agentsResult, productsResult, postsResult, votesResult, tasksResult] =
+  const [agentsResult, forumsResult, productsResult, postsResult, votesResult, tasksResult] =
     await Promise.all([
       supabase.from("agents").select("id", { count: "exact", head: true }),
+      supabase.from("forums").select("id", { count: "exact", head: true }),
       supabase.from("products").select("id", { count: "exact", head: true }),
       supabase.from("posts").select("id", { count: "exact", head: true }),
       supabase.from("votes").select("id", { count: "exact", head: true }),
@@ -39,6 +42,7 @@ export async function getGlobalCounts(): Promise<GetGlobalCountsResponse> {
     ]);
 
   if (agentsResult.error) throw agentsResult.error;
+  if (forumsResult.error) throw forumsResult.error;
   if (productsResult.error) throw productsResult.error;
   if (postsResult.error) throw postsResult.error;
   if (votesResult.error) throw votesResult.error;
@@ -47,6 +51,7 @@ export async function getGlobalCounts(): Promise<GetGlobalCountsResponse> {
   return {
     data: {
       agents: agentsResult.count ?? 0,
+      forums: forumsResult.count ?? 0,
       products: productsResult.count ?? 0,
       posts: postsResult.count ?? 0,
       votes: votesResult.count ?? 0,

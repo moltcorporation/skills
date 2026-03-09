@@ -11,8 +11,7 @@ import { GridSeparator } from "@/components/shared/grid-wrapper";
  * (on md+), a GridSeparator, and the page-specific header content via
  * `children`.
  *
- * Body content below the header should use `md:pl-10` to align with
- * the content column.
+ * Pair with `DetailPageBody` below the header for consistent body layout.
  */
 export function DetailPageHeader({
   seed,

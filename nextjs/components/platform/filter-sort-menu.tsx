@@ -44,20 +44,11 @@ export function getFilterSortLabel({
   sortValue,
   filterOptions,
   sortOptions,
-  defaultFilterValue = "all",
-  defaultSortValue = "newest",
-}: Omit<PlatformFilterSortMenuProps, "onFilterChange" | "onSortChange">) {
-  const parts: string[] = [];
+}: Omit<PlatformFilterSortMenuProps, "onFilterChange" | "onSortChange" | "defaultFilterValue" | "defaultSortValue">) {
+  const sortLabel = getSelectedLabel(sortOptions, sortValue, "Sort");
+  const filterLabel = getSelectedLabel(filterOptions, filterValue, "Filter");
 
-  if (filterValue !== defaultFilterValue) {
-    parts.push(getSelectedLabel(filterOptions, filterValue, "Filter"));
-  }
-
-  if (sortValue !== defaultSortValue) {
-    parts.push(getSelectedLabel(sortOptions, sortValue, "Sort"));
-  }
-
-  return parts.length > 0 ? parts.join(" · ") : "Filter / Sort";
+  return `${sortLabel} · ${filterLabel}`;
 }
 
 export function PlatformFilterSortMenu({
@@ -83,8 +74,6 @@ export function PlatformFilterSortMenu({
                 sortValue,
                 filterOptions,
                 sortOptions,
-                defaultFilterValue,
-                defaultSortValue,
               })}
             </span>
             <CaretDown className="size-3.5 text-muted-foreground" />
@@ -92,23 +81,6 @@ export function PlatformFilterSortMenu({
         }
       />
       <DropdownMenuContent align="start">
-        <DropdownMenuGroup>
-          <DropdownMenuLabel>Filter by</DropdownMenuLabel>
-          <DropdownMenuRadioGroup
-            value={filterValue}
-            onValueChange={(value) => {
-              onFilterChange(value);
-              setOpen(false);
-            }}
-          >
-            {filterOptions.map((option) => (
-              <DropdownMenuRadioItem key={option.value} value={option.value}>
-                {option.label}
-              </DropdownMenuRadioItem>
-            ))}
-          </DropdownMenuRadioGroup>
-        </DropdownMenuGroup>
-        <DropdownMenuSeparator />
         <DropdownMenuGroup>
           <DropdownMenuLabel>Sort by</DropdownMenuLabel>
           <DropdownMenuRadioGroup
@@ -119,6 +91,23 @@ export function PlatformFilterSortMenu({
             }}
           >
             {sortOptions.map((option) => (
+              <DropdownMenuRadioItem key={option.value} value={option.value}>
+                {option.label}
+              </DropdownMenuRadioItem>
+            ))}
+          </DropdownMenuRadioGroup>
+        </DropdownMenuGroup>
+        <DropdownMenuSeparator />
+        <DropdownMenuGroup>
+          <DropdownMenuLabel>Filter by</DropdownMenuLabel>
+          <DropdownMenuRadioGroup
+            value={filterValue}
+            onValueChange={(value) => {
+              onFilterChange(value);
+              setOpen(false);
+            }}
+          >
+            {filterOptions.map((option) => (
               <DropdownMenuRadioItem key={option.value} value={option.value}>
                 {option.label}
               </DropdownMenuRadioItem>

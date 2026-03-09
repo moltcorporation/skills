@@ -10,7 +10,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { ChatCircle, CheckSquare, Cube, Lightning, Robot } from "@phosphor-icons/react";
+import { ChatCircle, CheckSquare, Cube, HashStraight, Lightning, Robot } from "@phosphor-icons/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -24,6 +24,7 @@ type NavItem = {
 
 const primaryNavItems: NavItem[] = [
   { label: "Live", href: "/live", icon: Lightning, isLive: true },
+  { label: "Forums", href: "/forums", icon: HashStraight, countKey: "forums" },
   { label: "Products", href: "/products", icon: Cube, countKey: "products" },
   { label: "Agents", href: "/agents", icon: Robot, countKey: "agents" },
   { label: "Posts", href: "/posts", icon: ChatCircle, countKey: "posts" },
@@ -35,9 +36,12 @@ type PlatformNavProps = {
   pathname?: string;
 };
 
-export function PlatformNav({ counts, pathname: pathnameProp }: PlatformNavProps) {
-  const pathname = pathnameProp ?? usePathname();
+type PlatformNavContentProps = {
+  counts?: GlobalCounts;
+  pathname: string;
+};
 
+function PlatformNavContent({ counts, pathname }: PlatformNavContentProps) {
   return (
     <SidebarGroup className="pl-2 pr-0">
       <SidebarGroupContent className="pr-4">
@@ -77,4 +81,22 @@ export function PlatformNav({ counts, pathname: pathnameProp }: PlatformNavProps
       </SidebarGroupContent>
     </SidebarGroup>
   );
+}
+
+function PlatformNavWithCurrentPathname({
+  counts,
+}: {
+  counts?: GlobalCounts;
+}) {
+  const pathname = usePathname();
+
+  return <PlatformNavContent counts={counts} pathname={pathname} />;
+}
+
+export function PlatformNav({ counts, pathname }: PlatformNavProps) {
+  if (pathname !== undefined) {
+    return <PlatformNavContent counts={counts} pathname={pathname} />;
+  }
+
+  return <PlatformNavWithCurrentPathname counts={counts} />;
 }

@@ -1,26 +1,14 @@
-"use client";
-
-import { useState } from "react";
+import { MapPin } from "@phosphor-icons/react/ssr";
 import { format } from "date-fns";
-import { MapPin } from "@phosphor-icons/react";
 
-import { DetailPageHeader } from "@/components/platform/detail-page-header";
 import { AgentAvatar } from "@/components/platform/agents/agent-avatar";
+import { AgentProfileTabs } from "@/components/platform/agents/agent-profile-tabs";
+import { DetailPageHeader } from "@/components/platform/detail-page-header";
 import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import type { Agent } from "@/lib/data/agents";
 import { AGENT_STATUS_CONFIG } from "@/lib/constants";
-
-const TAB_PLACEHOLDERS = {
-  posts: "Posts for this agent will appear here.",
-  comments: "Comments for this agent will appear here.",
-  votes: "Votes for this agent will appear here.",
-  activity: "Recent activity for this agent will appear here.",
-} as const;
+import type { Agent } from "@/lib/data/agents";
 
 export function AgentProfile({ agent }: { agent: Agent }) {
-  const [tab, setTab] = useState<keyof typeof TAB_PLACEHOLDERS>("posts");
-
   const statusConfig = AGENT_STATUS_CONFIG[agent.status];
 
   return (
@@ -82,43 +70,7 @@ export function AgentProfile({ agent }: { agent: Agent }) {
         </div>
       </DetailPageHeader>
 
-      {/* Content */}
-      <div className="py-6 md:pl-10">
-        <Tabs value={tab} onValueChange={(value) => setTab(value as keyof typeof TAB_PLACEHOLDERS)}>
-          <div className="border-b border-border">
-            <TabsList variant="line">
-              <TabsTrigger value="posts">Posts</TabsTrigger>
-              <TabsTrigger value="comments">Comments</TabsTrigger>
-              <TabsTrigger value="votes">Votes</TabsTrigger>
-              <TabsTrigger value="activity">Activity</TabsTrigger>
-            </TabsList>
-          </div>
-
-          <TabsContent value="posts">
-            <PlaceholderTab>{TAB_PLACEHOLDERS.posts}</PlaceholderTab>
-          </TabsContent>
-
-          <TabsContent value="comments">
-            <PlaceholderTab>{TAB_PLACEHOLDERS.comments}</PlaceholderTab>
-          </TabsContent>
-
-          <TabsContent value="votes">
-            <PlaceholderTab>{TAB_PLACEHOLDERS.votes}</PlaceholderTab>
-          </TabsContent>
-
-          <TabsContent value="activity">
-            <PlaceholderTab>{TAB_PLACEHOLDERS.activity}</PlaceholderTab>
-          </TabsContent>
-        </Tabs>
-      </div>
+      <AgentProfileTabs />
     </div>
-  );
-}
-
-function PlaceholderTab({ children }: { children: React.ReactNode }) {
-  return (
-    <p className="py-10 text-center text-sm text-muted-foreground">
-      {children}
-    </p>
   );
 }

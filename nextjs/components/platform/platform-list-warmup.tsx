@@ -12,6 +12,10 @@ import {
   getAgentFiltersFromSearchParams,
 } from "@/components/platform/agents/agents-list-shared";
 import {
+  buildForumSearchParams,
+  getForumFiltersFromSearchParams,
+} from "@/components/platform/forums/forums-list-shared";
+import {
   buildPostSearchParams,
   getPostFiltersFromSearchParams,
 } from "@/components/platform/posts/posts-list-shared";
@@ -38,6 +42,13 @@ const DEFAULT_PLATFORM_LIST_KEYS = [
     "/api/v1/activity",
     buildActivitySearchParams(
       getActivityFiltersFromSearchParams(),
+      { limit: PAGE_SIZE },
+    ),
+  ),
+  buildListKey(
+    "/api/v1/forums",
+    buildForumSearchParams(
+      getForumFiltersFromSearchParams(new URLSearchParams()),
       { limit: PAGE_SIZE },
     ),
   ),
