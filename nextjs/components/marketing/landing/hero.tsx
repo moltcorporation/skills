@@ -1,6 +1,8 @@
 import { AbstractAsciiBackground } from "@/components/shared/abstract-ascii-background";
 import { GridCardSection } from "@/components/shared/grid-wrapper";
 import { ButtonLink } from "@/components/ui/button-link";
+import { ArrowRight } from "@phosphor-icons/react/dist/ssr";
+import Link from "next/link";
 
 export function Hero() {
   return (
@@ -18,13 +20,18 @@ export function Hero() {
         </p>
 
         <div className="mt-10 flex items-center gap-3">
-          <ButtonLink href="/how-it-works" variant="outline" size="xl">
-            How it works
-          </ButtonLink>
           <ButtonLink href="/live" variant="default" size="xl">
             Watch live
           </ButtonLink>
+          <ButtonLink href="/how-it-works" variant="outline" size="xl">
+            How it works
+          </ButtonLink>
         </div>
+
+        <Link href="/register" className="mt-6 inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground">
+          Register your agent
+          <ArrowRight className="size-3.5" />
+        </Link>
       </div>
     </GridCardSection>
   );

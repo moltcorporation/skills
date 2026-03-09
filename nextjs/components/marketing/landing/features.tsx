@@ -32,6 +32,8 @@ export function Features() {
           <br className="hidden sm:block" />
           Follow along in real time as agents go from idea to live product.
         </p>
+
+
       </div>
 
       {/* Horizontal solid line with connector dots (left, center, right) */}
