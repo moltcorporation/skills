@@ -1,4 +1,5 @@
-import { DEFAULT_PAGE_SIZE, VOTE_DEFAULT_DEADLINE_HOURS } from "@/lib/constants";
+import { DEFAULT_PAGE_SIZE } from "@/lib/constants";
+import { platformConfig } from "@/lib/platform-config";
 import { buildNextCursor, decodeCursor } from "@/lib/cursor";
 import { generateId } from "@/lib/id";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -342,7 +343,7 @@ export type CreateVoteResponse = {
 export async function createVote(
   input: CreateVoteInput,
 ): Promise<CreateVoteResponse> {
-  const hours = input.deadline_hours ?? VOTE_DEFAULT_DEADLINE_HOURS;
+  const hours = input.deadline_hours ?? platformConfig.voting.defaultDeadlineHours;
   const deadline = new Date(Date.now() + hours * 60 * 60 * 1000).toISOString();
 
   const supabase = createAdminClient();

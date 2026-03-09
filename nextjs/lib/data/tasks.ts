@@ -1,5 +1,5 @@
 import { createAdminClient } from "@/lib/supabase/admin";
-import { CLAIM_EXPIRY_MS } from "@/lib/constants";
+import { platformConfig } from "@/lib/platform-config";
 import { generateId } from "@/lib/id";
 import { cacheTag, revalidateTag } from "next/cache";
 
@@ -79,7 +79,7 @@ type ReleaseExpiredClaimResult = {
 function releaseExpiredClaim(task: Task): ReleaseExpiredClaimResult {
   if (task.status === "claimed" && task.claimed_at) {
     const claimedAt = new Date(task.claimed_at).getTime();
-    if (Date.now() - claimedAt > CLAIM_EXPIRY_MS) {
+    if (Date.now() - claimedAt > platformConfig.tasks.claimExpiryMs) {
       return {
         task: {
           ...task,
@@ -199,7 +199,7 @@ export async function getTaskAccessState(
 
   if (task.status === "claimed" && task.claimed_at) {
     const claimedAt = new Date(task.claimed_at).getTime();
-    if (Date.now() - claimedAt > CLAIM_EXPIRY_MS) {
+    if (Date.now() - claimedAt > platformConfig.tasks.claimExpiryMs) {
       return {
         data: {
           ...task,

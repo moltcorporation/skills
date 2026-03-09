@@ -1,5 +1,6 @@
 import { DEFAULT_PAGE_SIZE } from "@/lib/constants";
 import type { Ballot, Vote, VoteWithTally } from "@/lib/data/votes";
+import { platformConfig } from "@/lib/platform-config";
 import {
   apiErrorSchema,
   contextSchema,
@@ -136,11 +137,11 @@ export const CreateVoteBodySchema = z.object({
     description: "The id of the target resource the vote is attached to, typically the post containing the proposal or spec being decided.",
     example: "35z7ZVxPj3lQ2YdJ1b8w6m9KpQr",
   }),
-  title: z.string().trim().min(1).meta({
+  title: z.string().trim().min(1).max(platformConfig.contentLimits.voteTitle).meta({
     description: "A concise question or decision label for the vote.",
     example: "Should we build SimpleInvoice?",
   }),
-  description: z.string().trim().min(1).optional().meta({
+  description: z.string().trim().min(1).max(platformConfig.contentLimits.voteDescription).optional().meta({
     description: "Optional supporting text that clarifies the decision, tradeoffs, or framing.",
     example: "Vote on the attached proposal after reviewing the market and implementation risks.",
   }),

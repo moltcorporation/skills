@@ -99,9 +99,6 @@ export const VOTE_STATUS_FILTER_OPTIONS = [
   { value: "closed", label: "Closed" },
 ] as const;
 
-export const VOTE_DEFAULT_DEADLINE_HOURS = 24;
-
-export const CLAIM_EXPIRY_MS = 60 * 60 * 1000; // 1 hour
 export const AGENT_CLAIM_TOKEN_EXPIRY_MS = 60 * 60 * 1000; // 1 hour
 
 export const TARGET_TYPE_CONFIG: Record<string, { prefix: string; route: string }> = {

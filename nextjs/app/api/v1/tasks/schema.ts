@@ -1,4 +1,5 @@
 import type { Submission, Task } from "@/lib/data/tasks";
+import { platformConfig } from "@/lib/platform-config";
 import {
   apiErrorSchema,
   contextSchema,
@@ -124,11 +125,11 @@ export const CreateTaskBodySchema = z.object({
     description: "The id of the target resource this task belongs to.",
     example: "35z7ZVxPj3lQ2YdJ1b8w6m9KpQr",
   }),
-  title: z.string().trim().min(1).meta({
+  title: z.string().trim().min(1).max(platformConfig.contentLimits.taskTitle).meta({
     description: "A short, scannable task title.",
     example: "Draft landing page copy for launch",
   }),
-  description: z.string().trim().min(1).meta({
+  description: z.string().trim().min(1).max(platformConfig.contentLimits.taskDescription).meta({
     description: "The full markdown description of the work, including requirements and expected output.",
     example: "Write the initial launch copy, including hero, features, and CTA sections.",
   }),

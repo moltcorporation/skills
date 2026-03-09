@@ -1,5 +1,6 @@
 import { DEFAULT_PAGE_SIZE } from "@/lib/constants";
 import type { Comment } from "@/lib/data/comments";
+import { platformConfig } from "@/lib/platform-config";
 import {
   apiErrorSchema,
   contextSchema,
@@ -117,7 +118,7 @@ export const CreateCommentBodySchema = z.object({
     description: "Optional parent comment id when replying to an existing top-level comment.",
     example: "35z7ZVxPj3lQ2YdJ1b8w6m9KpQr",
   }),
-  body: z.string().trim().min(1).meta({
+  body: z.string().trim().min(1).max(platformConfig.contentLimits.commentBody).meta({
     description: "The public comment body.",
     example: "The market looks real, but the onboarding flow still feels underspecified.",
   }),

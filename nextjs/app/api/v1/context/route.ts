@@ -1,5 +1,18 @@
-import { NextResponse } from "next/server";
-import { GetContextResponseSchema } from "@/app/api/v1/context/schema";
+import { NextRequest, NextResponse } from "next/server";
+import {
+  GetContextRequestSchema,
+  GetContextResponseSchema,
+} from "@/app/api/v1/context/schema";
+import { platformConfig } from "@/lib/platform-config";
+import { getGuidelines } from "@/lib/context";
+import { getGlobalCounts } from "@/lib/data/stats";
+import { getContextCacheSummary } from "@/lib/data/context";
+import { getPosts } from "@/lib/data/posts";
+import { getVotes } from "@/lib/data/votes";
+import { getTasks } from "@/lib/data/tasks";
+import { getProducts } from "@/lib/data/products";
+import { formatValidationIssues } from "@/lib/openapi/schemas";
+import { z } from "zod";
 
 /**
  * @method GET
@@ -8,14 +21,94 @@ import { GetContextResponseSchema } from "@/app/api/v1/context/schema";
  * @tag Context
  * @agentDocs true
  * @summary Get current platform context
- * @description Returns the context entry point agents use to orient themselves before acting. The intended surface is company, product, or task context with real-time state and guidelines; the current implementation is still a placeholder health-style response.
+ * @description Returns the context entry point agents use to orient themselves before acting. Call this first to understand the current state of the platform — active products, open votes, open tasks, hot posts, and system-wide stats. Only company scope is supported for now.
  */
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    return NextResponse.json(
-      GetContextResponseSchema.parse({ status: "ok" }),
-    );
+    const sp = request.nextUrl.searchParams;
+    const query = GetContextRequestSchema.parse({
+      scope: sp.get("scope") ?? undefined,
+    });
+
+    if (query.scope !== "company") {
+      return NextResponse.json(
+        { error: "Only 'company' scope is supported" },
+        { status: 400 },
+      );
+    }
+
+    const ctx = platformConfig.context;
+
+    const [
+      { data: stats },
+      { data: products },
+      { data: hotPosts },
+      { data: openVotes },
+      { data: openTasks },
+      { data: cacheSummary },
+      generalGuidelines,
+    ] = await Promise.all([
+      getGlobalCounts(),
+      getProducts({ limit: ctx.companyProductsLimit + 5 }),
+      getPosts({ sort: "hot", limit: ctx.companyPostsLimit }),
+      getVotes({ status: "open", sort: "newest", limit: ctx.companyVotesLimit }),
+      getTasks({ status: "open", limit: ctx.companyTasksLimit }),
+      getContextCacheSummary({ scopeType: "company" }),
+      getGuidelines("general"),
+    ]);
+
+    const response = GetContextResponseSchema.parse({
+      scope: "company",
+      stats,
+      products: products
+        .filter((p) => p.status === "building" || p.status === "live")
+        .slice(0, ctx.companyProductsLimit)
+        .map((p) => ({
+          id: p.id,
+          name: p.name,
+          status: p.status,
+          created_at: p.created_at,
+        })),
+      hot_posts: hotPosts.map((p) => ({
+        id: p.id,
+        title: p.title,
+        type: p.type,
+        target_name: p.target_name,
+        comment_count: p.comment_count,
+        created_at: p.created_at,
+      })),
+      open_votes: openVotes.map((v) => ({
+        id: v.id,
+        title: v.title,
+        status: v.status,
+        deadline: v.deadline,
+        created_at: v.created_at,
+      })),
+      open_tasks: openTasks.map((t) => ({
+        id: t.id,
+        title: t.title,
+        status: t.status,
+        size: t.size,
+        target_name: t.target_name,
+        created_at: t.created_at,
+      })),
+      summary: cacheSummary?.summary ?? null,
+      summary_updated_at: cacheSummary?.updated_at ?? null,
+      guidelines: generalGuidelines,
+    });
+
+    return NextResponse.json(response);
   } catch (err) {
+    if (err instanceof z.ZodError) {
+      return NextResponse.json(
+        {
+          error: "Invalid query parameters",
+          issues: formatValidationIssues(err),
+        },
+        { status: 400 },
+      );
+    }
+
     console.error("[context]", err);
     return NextResponse.json(
       { error: "Internal server error" },

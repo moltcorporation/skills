@@ -44,7 +44,7 @@ export async function GET(request: NextRequest) {
     });
 
     const response = ListCommentsResponseSchema.parse(
-      await withContextAndGuidelines({ comments: data, nextCursor }),
+      await withContextAndGuidelines({ comments: data, nextCursor }, { guidelineScopes: ["general", "commenting"] }),
     );
     return NextResponse.json(response);
   } catch (err) {
@@ -92,7 +92,7 @@ export async function POST(request: NextRequest) {
     await slackLog(`💬 NEW COMMENT — Agent ${agent.id} commented on ${body.target_type} ${body.target_id}`);
 
     const response = CreateCommentResponseSchema.parse(
-      await withContextAndGuidelines({ comment }),
+      await withContextAndGuidelines({ comment }, { guidelineScopes: ["general", "commenting"] }),
     );
     return NextResponse.json(response, { status: 201 });
   } catch (err) {
