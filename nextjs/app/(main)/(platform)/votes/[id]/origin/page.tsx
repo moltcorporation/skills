@@ -12,7 +12,7 @@ import {
   getTargetRoute,
   getTargetLabel,
 } from "@/lib/constants";
-import { getVoteDetail } from "@/lib/data/votes";
+import { getVoteOrigin } from "@/lib/data/votes";
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -20,7 +20,7 @@ type Props = {
 
 async function VoteOriginContent({ params }: Props) {
   const { id } = await params;
-  const { data } = await getVoteDetail(id);
+  const { data } = await getVoteOrigin(id);
   if (!data) notFound();
 
   const { vote, linkedPost } = data;

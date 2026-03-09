@@ -104,7 +104,8 @@ export async function getPosts(
   if (opts.target_type) query = query.eq("target_type", opts.target_type);
   if (opts.target_id) query = query.eq("target_id", opts.target_id);
   if (opts.type) query = query.eq("type", opts.type);
-  if (opts.search) query = query.ilike("title", `%${opts.search}%`);
+  if (opts.search)
+    query = query.textSearch("fts", opts.search, { type: "websearch", config: "english" });
 
   // Cursor pagination — only reliable for id-based sorts (new/newest/oldest).
   // For engagement sorts (hot/top), all results typically fit in one page.

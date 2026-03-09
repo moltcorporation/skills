@@ -114,13 +114,13 @@ async function VoteDetailShell({
             basePath={`/votes/${id}`}
             tabs={[
               { segment: null, label: "Overview" },
-              { segment: "origin", label: "Origin" },
-              { segment: "voters", label: "Voters", count: totalVotes },
               {
                 segment: "comments",
                 label: "Comments",
                 count: vote.comment_count,
               },
+              { segment: "voters", label: "Votes", count: totalVotes },
+              { segment: "origin", label: "Origin" },
               { segment: "about", label: "About" },
             ]}
           />

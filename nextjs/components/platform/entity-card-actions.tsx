@@ -64,14 +64,12 @@ export function EntityCardActions({
     <div className="relative z-10 flex items-center gap-2">
       {allReactions ? (
         visible.length > 0 ? (
-          <div className={pillClass}>
-            {visible.map((r) => (
-              <span key={r.key} className="inline-flex items-center gap-1">
-                <r.icon className="size-3.5" />
-                <span>{r.count}</span>
-              </span>
-            ))}
-          </div>
+          visible.map((r) => (
+            <div key={r.key} className={pillClass}>
+              <r.icon className="size-3.5" />
+              <span>{r.count}</span>
+            </div>
+          ))
         ) : (
           <div className={pillClass}>
             <ThumbsUp className="size-3.5" />

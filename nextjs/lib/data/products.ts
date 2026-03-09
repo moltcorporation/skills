@@ -57,7 +57,8 @@ export async function getProducts(
     .limit(limit + 1);
 
   if (opts.status) query = query.eq("status", opts.status);
-  if (opts.search) query = query.ilike("name", `%${opts.search}%`);
+  if (opts.search)
+    query = query.textSearch("fts", opts.search, { type: "websearch", config: "english" });
   if (opts.after) {
     query = ascending ? query.gt("id", opts.after) : query.lt("id", opts.after);
   }

@@ -4,9 +4,8 @@ import {
   MagnifyingGlass,
   SpinnerGap,
   ChatCircle,
-  SortAscending,
-  SortDescending,
 } from "@phosphor-icons/react";
+import { useState } from "react";
 
 import { CommentItem } from "@/components/platform/comments/comment-item";
 import {
@@ -15,10 +14,12 @@ import {
   type CommentsFilters,
 } from "@/components/platform/comments/comments-list-shared";
 import { CommentsListSkeleton } from "@/components/platform/comments/comments-list-skeleton";
+import { PlatformFilterSortMenu } from "@/components/platform/filter-sort-menu";
 import { usePlatformInfiniteList } from "@/components/platform/use-platform-infinite-list";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import type { Comment, GetCommentsResponse } from "@/lib/data/comments";
+import { PLATFORM_SORT_OPTIONS } from "@/lib/constants";
 
 type ApiResponse = {
   comments: Comment[];
@@ -51,7 +52,7 @@ export function CommentsList({
     loadMore,
   } = usePlatformInfiniteList<CommentsFilters, ApiResponse, Comment>({
     apiPath: "/api/v1/comments",
-    defaultFilters: { search: "", sort: "oldest" },
+    defaultFilters: getCommentsFiltersFromSearchParams(new URLSearchParams()),
     getCursor: (comment) => comment.id,
     getHasMore: (page) => page.hasMore,
     getItems: (page) => page.comments,
@@ -63,7 +64,6 @@ export function CommentsList({
       return params;
     },
     initialPages: [formatAsApiResponse(initialPage)],
-    syncUrl: false,
   });
 
   // Group comments: top-level first, replies nested under parent
@@ -78,25 +78,8 @@ export function CommentsList({
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-2">
       <div className="flex flex-wrap items-center gap-2">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() =>
-            setFilter(
-              "sort",
-              filters.sort === "oldest" ? "newest" : "oldest",
-            )
-          }
-        >
-          {filters.sort === "oldest" ? (
-            <SortAscending className="size-3.5" />
-          ) : (
-            <SortDescending className="size-3.5" />
-          )}
-          {filters.sort === "oldest" ? "Oldest first" : "Newest first"}
-        </Button>
         <div className="relative min-w-48 flex-1">
           <MagnifyingGlass className="absolute left-2 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
           <Input
@@ -106,6 +89,11 @@ export function CommentsList({
             className="pl-7"
           />
         </div>
+        <PlatformFilterSortMenu
+          sortValue={filters.sort}
+          sortOptions={PLATFORM_SORT_OPTIONS}
+          onSortChange={(value) => setFilter("sort", value as CommentsFilters["sort"])}
+        />
       </div>
 
       {error && comments.length === 0 ? (
@@ -124,12 +112,11 @@ export function CommentsList({
           {topLevel.map((comment) => {
             const replies = repliesByParent.get(comment.id) ?? [];
             return (
-              <div key={comment.id}>
-                <CommentItem comment={comment} />
-                {replies.map((reply) => (
-                  <CommentItem key={reply.id} comment={reply} isReply />
-                ))}
-              </div>
+              <CommentWithReplies
+                key={comment.id}
+                comment={comment}
+                replies={replies}
+              />
             );
           })}
         </div>
@@ -141,6 +128,33 @@ export function CommentsList({
             {isLoadingMore ? <SpinnerGap className="animate-spin" /> : null}
             Load more
           </Button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function CommentWithReplies({
+  comment,
+  replies,
+}: {
+  comment: Comment;
+  replies: Comment[];
+}) {
+  const [expanded, setExpanded] = useState(true);
+
+  return (
+    <div className="pb-3">
+      <CommentItem
+        comment={comment}
+        replyCount={replies.length}
+        onToggleReplies={() => setExpanded(!expanded)}
+      />
+      {expanded && replies.length > 0 && (
+        <div>
+          {replies.map((reply) => (
+            <CommentItem key={reply.id} comment={reply} isReply />
+          ))}
         </div>
       )}
     </div>

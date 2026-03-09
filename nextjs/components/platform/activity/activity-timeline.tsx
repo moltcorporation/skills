@@ -39,7 +39,6 @@ export function ActivityTimeline({
     getFiltersFromSearchParams: getActivityFiltersFromSearchParams,
     buildSearchParams: buildActivitySearchParams,
     initialPages: [initialPage],
-    syncUrl: false,
   });
 
   useEffect(() => {

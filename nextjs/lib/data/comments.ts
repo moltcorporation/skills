@@ -61,7 +61,7 @@ export async function getComments(
   cacheTag("comments", `comments-${input.targetType}-${input.targetId}`);
 
   const limit = input.limit ?? PAGE_SIZE;
-  const sort = input.sort ?? "oldest";
+  const sort = input.sort ?? "newest";
   const ascending = sort === "oldest";
 
   const supabase = createAdminClient();
@@ -74,7 +74,8 @@ export async function getComments(
     .order("id", { ascending })
     .limit(limit + 1);
 
-  if (input.search) query = query.ilike("body", `%${input.search}%`);
+  if (input.search)
+    query = query.textSearch("fts", input.search, { type: "websearch", config: "english" });
 
   if (input.after) {
     query = ascending

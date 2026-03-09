@@ -57,7 +57,6 @@ export type VoteLinkedPost = {
 export type VoteWithTally = {
   vote: Vote;
   tally: Record<string, number>;
-  linkedPost?: VoteLinkedPost | null;
 };
 
 export type Ballot = {
@@ -65,6 +64,8 @@ export type Ballot = {
   vote_id: string;
   agent_id: string;
   choice: string;
+  agent_username: string;
+  created_at: string;
 };
 
 export type VoteBallotState = {
@@ -121,7 +122,8 @@ export async function getVotes(
 
   if (opts.agentId) query = query.eq("agent_id", opts.agentId);
   if (opts.status) query = query.eq("status", opts.status);
-  if (opts.search) query = query.ilike("title", `%${opts.search}%`);
+  if (opts.search)
+    query = query.textSearch("fts", opts.search, { type: "websearch", config: "english" });
   if (opts.after) {
     query = ascending ? query.gt("id", opts.after) : query.lt("id", opts.after);
   }
@@ -159,9 +161,6 @@ export type GetVoteDetailResponse = {
   data: VoteWithTally | null;
 };
 
-const LINKED_POST_SELECT =
-  "id, title, type, target_type, target_id, target_name, created_at, author:agents!posts_agent_id_fkey(id, name, username)" as const;
-
 export async function getVoteDetail(
   id: GetVoteDetailInput,
 ): Promise<GetVoteDetailResponse> {
@@ -178,7 +177,54 @@ export async function getVoteDetail(
   if (ballotsResult.error) throw ballotsResult.error;
   if (!voteResult.data) return { data: null };
 
-  // Fetch the linked post (votes always target a post)
+  const tally: Record<string, number> = {};
+  for (const ballot of ballotsResult.data ?? []) {
+    tally[ballot.choice] = (tally[ballot.choice] ?? 0) + 1;
+  }
+
+  return {
+    data: {
+      vote: {
+        ...(voteResult.data as Omit<Vote, "options"> & { options: unknown }),
+        options: normalizeVoteOptions(voteResult.data.options),
+      },
+      tally,
+    },
+  };
+}
+
+// ======================================================
+// GetVoteOrigin
+// ======================================================
+
+const LINKED_POST_SELECT =
+  "id, title, type, target_type, target_id, target_name, created_at, author:agents!posts_agent_id_fkey(id, name, username)" as const;
+
+export type VoteOrigin = {
+  vote: Vote;
+  linkedPost: VoteLinkedPost | null;
+};
+
+export type GetVoteOriginResponse = {
+  data: VoteOrigin | null;
+};
+
+export async function getVoteOrigin(
+  id: string,
+): Promise<GetVoteOriginResponse> {
+  "use cache";
+  cacheTag(`vote-${id}`);
+
+  const supabase = createAdminClient();
+  const voteResult = await supabase
+    .from("votes")
+    .select(VOTE_SELECT)
+    .eq("id", id)
+    .maybeSingle();
+
+  if (voteResult.error) throw voteResult.error;
+  if (!voteResult.data) return { data: null };
+
   let linkedPost: VoteLinkedPost | null = null;
   if (voteResult.data.target_type === "post" && voteResult.data.target_id) {
     const { data: postData } = await supabase
@@ -192,18 +238,12 @@ export async function getVoteDetail(
     }
   }
 
-  const tally: Record<string, number> = {};
-  for (const ballot of ballotsResult.data ?? []) {
-    tally[ballot.choice] = (tally[ballot.choice] ?? 0) + 1;
-  }
-
   return {
     data: {
       vote: {
         ...(voteResult.data as Omit<Vote, "options"> & { options: unknown }),
         options: normalizeVoteOptions(voteResult.data.options),
       },
-      tally,
       linkedPost,
     },
   };
@@ -358,11 +398,72 @@ export async function createVote(
 }
 
 // ======================================================
+// GetBallots
+// ======================================================
+
+export const BALLOT_PAGE_SIZE = 20;
+
+export type GetBallotsInput = {
+  voteId: string;
+  search?: string;
+  choice?: string;
+  sort?: "newest" | "oldest";
+  after?: string;
+  limit?: number;
+};
+
+export type GetBallotsResponse = {
+  data: Ballot[];
+  hasMore: boolean;
+};
+
+export async function getBallots(
+  input: GetBallotsInput,
+): Promise<GetBallotsResponse> {
+  "use cache";
+  cacheTag("ballots", `ballots-${input.voteId}`);
+
+  const limit = input.limit ?? BALLOT_PAGE_SIZE;
+  const sort = input.sort ?? "newest";
+  const ascending = sort === "oldest";
+
+  const supabase = createAdminClient();
+
+  let query = supabase
+    .from("ballots")
+    .select("id, vote_id, agent_id, choice, agent_username, created_at")
+    .eq("vote_id", input.voteId)
+    .order("created_at", { ascending })
+    .limit(limit + 1);
+
+  if (input.search) query = query.ilike("agent_username", `%${input.search}%`);
+  if (input.choice) query = query.eq("choice", input.choice);
+
+  if (input.after) {
+    query = ascending
+      ? query.gt("id", input.after)
+      : query.lt("id", input.after);
+  }
+
+  const { data, error } = await query;
+  if (error) throw error;
+
+  const hasMore = (data?.length ?? 0) > limit;
+  if (hasMore) data!.pop();
+
+  return {
+    data: (data as Ballot[] | null) ?? [],
+    hasMore,
+  };
+}
+
+// ======================================================
 // CastBallot
 // ======================================================
 
 export type CastBallotInput = {
   agentId: string;
+  agentUsername: string;
   voteId: string;
   choice: string;
 };
@@ -382,6 +483,7 @@ export async function castBallot(
       id: generateId(),
       vote_id: input.voteId,
       agent_id: input.agentId,
+      agent_username: input.agentUsername,
       choice: input.choice.trim(),
     })
     .select()
@@ -390,6 +492,8 @@ export async function castBallot(
   if (error) throw error;
 
   revalidateTag(`vote-${input.voteId}`, "max");
+  revalidateTag(`ballots-${input.voteId}`, "max");
+  revalidateTag("ballots", "max");
   revalidateTag("votes", "max");
 
   return { data: data as Ballot };

@@ -10,7 +10,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { ChatCircle, CheckSquare, Cube, HashStraight, Lightning, Robot } from "@phosphor-icons/react";
+import { ChatCircle, CheckSquare, Cube, Lightning, Robot } from "@phosphor-icons/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -24,7 +24,6 @@ type NavItem = {
 
 const primaryNavItems: NavItem[] = [
   { label: "Live", href: "/live", icon: Lightning, isLive: true },
-  { label: "Forums", href: "/forums", icon: HashStraight, countKey: "forums" },
   { label: "Products", href: "/products", icon: Cube, countKey: "products" },
   { label: "Agents", href: "/agents", icon: Robot, countKey: "agents" },
   { label: "Posts", href: "/posts", icon: ChatCircle, countKey: "posts" },

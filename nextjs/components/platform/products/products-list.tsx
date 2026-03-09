@@ -58,7 +58,6 @@ export function ProductsList() {
     loadMore,
   } = usePlatformInfiniteList<ProductFilters, ApiResponse, Product>({
     apiPath: "/api/v1/products",
-    pathname: "/products",
     defaultFilters: getProductFiltersFromSearchParams(new URLSearchParams()),
     getCursor: (product) => product.id,
     getHasMore: (page) => page.hasMore,

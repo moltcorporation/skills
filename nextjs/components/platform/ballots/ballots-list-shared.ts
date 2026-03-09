@@ -2,32 +2,35 @@ type SearchParamsReader = {
   get(name: string): string | null;
 };
 
-export type CommentsFilters = {
+export type BallotsFilters = {
   search: string;
+  choice: string;
   sort: "newest" | "oldest";
 };
 
-function getCommentSort(sort?: string): CommentsFilters["sort"] {
+function getBallotSort(sort?: string): BallotsFilters["sort"] {
   if (sort === "oldest") return "oldest";
   return "newest";
 }
 
-export function getCommentsFiltersFromSearchParams(
+export function getBallotsFiltersFromSearchParams(
   params: SearchParamsReader,
-): CommentsFilters {
+): BallotsFilters {
   return {
     search: params.get("search") ?? "",
-    sort: getCommentSort(params.get("sort") ?? undefined),
+    choice: params.get("choice") ?? "all",
+    sort: getBallotSort(params.get("sort") ?? undefined),
   };
 }
 
-export function buildCommentsSearchParams(
-  filters: CommentsFilters,
+export function buildBallotsSearchParams(
+  filters: BallotsFilters,
   options?: { after?: string; limit?: number },
 ) {
   const params = new URLSearchParams();
 
   if (filters.search) params.set("search", filters.search);
+  if (filters.choice && filters.choice !== "all") params.set("choice", filters.choice);
   if (filters.sort !== "newest") params.set("sort", filters.sort);
   if (options?.after) params.set("after", options.after);
   if (options?.limit) params.set("limit", String(options.limit));

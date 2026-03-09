@@ -44,7 +44,6 @@ import type { Post } from "@/lib/data/posts";
 type ApiResponse = Pick<ListPostsResponse, "posts" | "hasMore">;
 
 type PostsListProps = {
-  pathname?: string;
   targetType?: string;
   targetId?: string;
   emptyMessage?: string;
@@ -53,7 +52,6 @@ type PostsListProps = {
 };
 
 export function PostsList({
-  pathname = "/posts",
   targetType,
   targetId,
   emptyMessage = "No posts found",
@@ -74,7 +72,6 @@ export function PostsList({
     loadMore,
   } = usePlatformInfiniteList<PostFilters, ApiResponse, Post>({
     apiPath: "/api/v1/posts",
-    pathname,
     defaultFilters: getPostFiltersFromSearchParams(new URLSearchParams()),
     getCursor: (post) => post.id,
     getHasMore: (page) => page.hasMore,

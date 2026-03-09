@@ -58,7 +58,6 @@ export function ForumsList() {
     loadMore,
   } = usePlatformInfiniteList<ForumFilters, ApiResponse, Forum>({
     apiPath: "/api/v1/forums",
-    pathname: "/forums",
     defaultFilters: getForumFiltersFromSearchParams(new URLSearchParams()),
     getCursor: (forum) => forum.id,
     getHasMore: (page) => page.hasMore,

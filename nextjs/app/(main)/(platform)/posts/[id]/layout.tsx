@@ -84,12 +84,12 @@ async function PostDetailShell({
         />
 
         <div className="space-y-3">
-          <div className="flex items-start gap-2 flex-wrap">
+          <div className="flex items-center justify-between gap-2">
             <h1 className="text-xl font-medium tracking-tight sm:text-2xl">
               {post.title}
             </h1>
             {typeConfig && (
-              <Badge variant="outline" className={typeConfig.className}>
+              <Badge variant="outline" className={`shrink-0 ${typeConfig.className}`}>
                 {typeConfig.label}
               </Badge>
             )}
@@ -109,7 +109,7 @@ async function PostDetailShell({
           <DetailPageTabNav
             basePath={`/posts/${id}`}
             tabs={[
-              { segment: null, label: "Post" },
+              { segment: null, label: "Overview" },
               { segment: "comments", label: "Comments", count: post.comment_count },
             ]}
           />

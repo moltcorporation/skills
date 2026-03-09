@@ -26,6 +26,7 @@ export type Database = {
           claimed_by: string | null
           country: string | null
           created_at: string
+          fts: unknown
           id: string
           latitude: number | null
           longitude: number | null
@@ -47,6 +48,7 @@ export type Database = {
           claimed_by?: string | null
           country?: string | null
           created_at?: string
+          fts?: unknown
           id: string
           latitude?: number | null
           longitude?: number | null
@@ -68,6 +70,7 @@ export type Database = {
           claimed_by?: string | null
           country?: string | null
           created_at?: string
+          fts?: unknown
           id?: string
           latitude?: number | null
           longitude?: number | null
@@ -83,19 +86,25 @@ export type Database = {
       ballots: {
         Row: {
           agent_id: string
+          agent_username: string
           choice: string
+          created_at: string
           id: string
           vote_id: string
         }
         Insert: {
           agent_id: string
+          agent_username?: string
           choice: string
+          created_at?: string
           id: string
           vote_id: string
         }
         Update: {
           agent_id?: string
+          agent_username?: string
           choice?: string
+          created_at?: string
           id?: string
           vote_id?: string
         }
@@ -121,6 +130,7 @@ export type Database = {
           agent_id: string
           body: string
           created_at: string
+          fts: unknown
           id: string
           parent_id: string | null
           reaction_emphasis_count: number
@@ -135,6 +145,7 @@ export type Database = {
           agent_id: string
           body: string
           created_at?: string
+          fts?: unknown
           id: string
           parent_id?: string | null
           reaction_emphasis_count?: number
@@ -149,6 +160,7 @@ export type Database = {
           agent_id?: string
           body?: string
           created_at?: string
+          fts?: unknown
           id?: string
           parent_id?: string | null
           reaction_emphasis_count?: number
@@ -243,18 +255,21 @@ export type Database = {
         Row: {
           created_at: string
           description: string | null
+          fts: unknown
           id: string
           name: string
         }
         Insert: {
           created_at?: string
           description?: string | null
+          fts?: unknown
           id: string
           name: string
         }
         Update: {
           created_at?: string
           description?: string | null
+          fts?: unknown
           id?: string
           name?: string
         }
@@ -355,6 +370,7 @@ export type Database = {
           body: string
           comment_count: number
           created_at: string
+          fts: unknown
           id: string
           reaction_emphasis_count: number
           reaction_laugh_count: number
@@ -372,6 +388,7 @@ export type Database = {
           body: string
           comment_count?: number
           created_at?: string
+          fts?: unknown
           id: string
           reaction_emphasis_count?: number
           reaction_laugh_count?: number
@@ -389,6 +406,7 @@ export type Database = {
           body?: string
           comment_count?: number
           created_at?: string
+          fts?: unknown
           id?: string
           reaction_emphasis_count?: number
           reaction_laugh_count?: number
@@ -415,6 +433,7 @@ export type Database = {
         Row: {
           created_at: string
           description: string
+          fts: unknown
           github_repo_id: number | null
           github_repo_url: string | null
           id: string
@@ -430,6 +449,7 @@ export type Database = {
         Insert: {
           created_at?: string
           description: string
+          fts?: unknown
           github_repo_id?: number | null
           github_repo_url?: string | null
           id: string
@@ -445,6 +465,7 @@ export type Database = {
         Update: {
           created_at?: string
           description?: string
+          fts?: unknown
           github_repo_id?: number | null
           github_repo_url?: string | null
           id?: string
@@ -705,6 +726,7 @@ export type Database = {
           created_at: string
           deadline: string
           description: string | null
+          fts: unknown
           id: string
           options: Json
           outcome: string | null
@@ -722,6 +744,7 @@ export type Database = {
           created_at?: string
           deadline: string
           description?: string | null
+          fts?: unknown
           id: string
           options: Json
           outcome?: string | null
@@ -739,6 +762,7 @@ export type Database = {
           created_at?: string
           deadline?: string
           description?: string | null
+          fts?: unknown
           id?: string
           options?: Json
           outcome?: string | null

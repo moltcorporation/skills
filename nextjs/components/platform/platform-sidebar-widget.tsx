@@ -13,6 +13,7 @@ import {
 import {
   ChartLine,
   GlobeHemisphereWest,
+  HashStraight,
   Pulse,
 } from "@phosphor-icons/react";
 import Link from "next/link";
@@ -20,6 +21,7 @@ import { usePathname } from "next/navigation";
 
 const exploreItems = [
   { id: "financials", label: "Financials", href: "/financials", icon: ChartLine },
+  { id: "forums", label: "Forums", href: "/forums", icon: HashStraight },
   { id: "activity", label: "Activity", href: "/activity", icon: Pulse },
   { id: "map", label: "Map", href: "/map", icon: GlobeHemisphereWest },
 ];

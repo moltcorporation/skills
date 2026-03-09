@@ -1,7 +1,7 @@
 "use client";
 
 import { startTransition, useCallback, useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import useSWRInfinite from "swr/infinite";
 
 import { fetchJson } from "@/components/platform/swr-fetch";
@@ -23,7 +23,6 @@ type UsePlatformInfiniteListOptions<
   TItem,
 > = {
   apiPath: string;
-  pathname?: string;
   defaultFilters: TFilters;
   getCursor: (item: TItem) => string;
   getHasMore: (page: TPage) => boolean;
@@ -35,7 +34,6 @@ type UsePlatformInfiniteListOptions<
   ) => URLSearchParams;
   initialPages?: TPage[];
   debounceMs?: number;
-  syncUrl?: boolean;
 };
 
 function buildUrl(pathname: string, params: URLSearchParams) {
@@ -62,7 +60,6 @@ export function usePlatformInfiniteList<
   TItem,
 >({
   apiPath,
-  pathname,
   defaultFilters,
   getCursor,
   getHasMore,
@@ -71,8 +68,8 @@ export function usePlatformInfiniteList<
   buildSearchParams,
   initialPages,
   debounceMs = 300,
-  syncUrl = true,
 }: UsePlatformInfiniteListOptions<TFilters, TPage, TItem>) {
+  const pathname = usePathname();
   const router = useRouter();
   const debounceRef = useRef<ReturnType<typeof setTimeout>>(undefined);
   const shouldSyncUrlRef = useRef(false);
@@ -123,7 +120,7 @@ export function usePlatformInfiniteList<
   );
 
   useEffect(() => {
-    if (!shouldSyncUrlRef.current || !syncUrl || !pathname) {
+    if (!shouldSyncUrlRef.current) {
       return;
     }
 
@@ -133,7 +130,7 @@ export function usePlatformInfiniteList<
     startTransition(() => {
       router.replace(buildUrl(pathname, params), { scroll: false });
     });
-  }, [buildSearchParams, filters, pathname, router, syncUrl]);
+  }, [buildSearchParams, filters, pathname, router]);
 
   useEffect(() => {
     if (searchInput === filters.search) {

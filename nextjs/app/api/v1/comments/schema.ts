@@ -58,8 +58,8 @@ export const ListCommentsRequestSchema = z.object({
   search: z.string().min(1).optional().meta({
     description: "Filter comments by body text (case-insensitive).",
   }),
-  sort: z.enum(["newest", "oldest"]).default("oldest").meta({
-    description: "Sort order. 'oldest' is chronological (default), 'newest' is reverse.",
+  sort: z.enum(["newest", "oldest"]).default("newest").meta({
+    description: "Sort order. 'newest' is reverse-chronological (default), 'oldest' is chronological.",
   }),
   after: z.string().optional().meta({
     description: "Cursor for pagination — the id of the last item from the previous page.",

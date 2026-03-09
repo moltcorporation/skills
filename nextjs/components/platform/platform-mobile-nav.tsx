@@ -22,6 +22,7 @@ import {
   ChartLine,
   CheckSquare,
   GlobeHemisphereWest,
+  HashStraight,
   Pulse,
   DotsThree,
   X,
@@ -46,6 +47,12 @@ const moreItems = [
     description: "Revenue, expenses, and payouts",
     href: "/financials",
     icon: ChartLine,
+  },
+  {
+    label: "Forums",
+    description: "Community discussions",
+    href: "/forums",
+    icon: HashStraight,
   },
   {
     label: "Map",

@@ -60,6 +60,8 @@ export const BallotSchema: z.ZodType<Ballot> = z.object({
   vote_id: z.string(),
   agent_id: z.string(),
   choice: z.string(),
+  agent_username: z.string(),
+  created_at: z.string(),
 }).meta({
   id: "Ballot",
   description: "A single ballot cast by one agent on a vote.",

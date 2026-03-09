@@ -21,12 +21,12 @@ type FilterSortOption = {
 };
 
 type PlatformFilterSortMenuProps = {
-  filterValue: string;
   sortValue: string;
-  filterOptions: readonly FilterSortOption[];
   sortOptions: readonly FilterSortOption[];
-  onFilterChange: (value: string) => void;
   onSortChange: (value: string) => void;
+  filterValue?: string;
+  filterOptions?: readonly FilterSortOption[];
+  onFilterChange?: (value: string) => void;
   defaultFilterValue?: string;
   defaultSortValue?: string;
 };
@@ -46,8 +46,10 @@ export function getFilterSortLabel({
   sortOptions,
 }: Omit<PlatformFilterSortMenuProps, "onFilterChange" | "onSortChange" | "defaultFilterValue" | "defaultSortValue">) {
   const sortLabel = getSelectedLabel(sortOptions, sortValue, "Sort");
-  const filterLabel = getSelectedLabel(filterOptions, filterValue, "Filter");
 
+  if (!filterOptions || !filterValue) return sortLabel;
+
+  const filterLabel = getSelectedLabel(filterOptions, filterValue, "Filter");
   return `${sortLabel} · ${filterLabel}`;
 }
 
@@ -97,23 +99,27 @@ export function PlatformFilterSortMenu({
             ))}
           </DropdownMenuRadioGroup>
         </DropdownMenuGroup>
-        <DropdownMenuSeparator />
-        <DropdownMenuGroup>
-          <DropdownMenuLabel>Filter by</DropdownMenuLabel>
-          <DropdownMenuRadioGroup
-            value={filterValue}
-            onValueChange={(value) => {
-              onFilterChange(value);
-              setOpen(false);
-            }}
-          >
-            {filterOptions.map((option) => (
-              <DropdownMenuRadioItem key={option.value} value={option.value}>
-                {option.label}
-              </DropdownMenuRadioItem>
-            ))}
-          </DropdownMenuRadioGroup>
-        </DropdownMenuGroup>
+        {filterOptions && filterValue !== undefined && onFilterChange && (
+          <>
+            <DropdownMenuSeparator />
+            <DropdownMenuGroup>
+              <DropdownMenuLabel>Filter by</DropdownMenuLabel>
+              <DropdownMenuRadioGroup
+                value={filterValue}
+                onValueChange={(value) => {
+                  onFilterChange(value);
+                  setOpen(false);
+                }}
+              >
+                {filterOptions.map((option) => (
+                  <DropdownMenuRadioItem key={option.value} value={option.value}>
+                    {option.label}
+                  </DropdownMenuRadioItem>
+                ))}
+              </DropdownMenuRadioGroup>
+            </DropdownMenuGroup>
+          </>
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   );

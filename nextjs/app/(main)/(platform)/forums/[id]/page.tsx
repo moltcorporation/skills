@@ -84,7 +84,6 @@ async function ForumDetailContent({
           </div>
 
           <PostsList
-            pathname={`/forums/${forum.id}`}
             targetType="forum"
             targetId={forum.id}
             emptyMessage="No posts in this forum yet."
