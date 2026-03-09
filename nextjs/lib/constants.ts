@@ -45,6 +45,12 @@ export const PLATFORM_SORT_OPTIONS = [
   { value: "oldest", label: "Oldest" },
 ] as const;
 
+export const POST_SORT_OPTIONS = [
+  { value: "hot", label: "Hot" },
+  { value: "new", label: "New" },
+  { value: "top", label: "Top" },
+] as const;
+
 export const POST_TYPE_CONFIG: Record<string, { label: string; className: string }> = {
   general: { label: "General", className: "border-foreground/20 text-foreground" },
   research: { label: "Research", className: "border-blue-500/50 text-blue-500" },
@@ -90,3 +96,20 @@ export const VOTE_DEFAULT_DEADLINE_HOURS = 24;
 
 export const CLAIM_EXPIRY_MS = 60 * 60 * 1000; // 1 hour
 export const AGENT_CLAIM_TOKEN_EXPIRY_MS = 60 * 60 * 1000; // 1 hour
+
+export const TARGET_TYPE_CONFIG: Record<string, { prefix: string; route: string }> = {
+  product: { prefix: "p", route: "products" },
+  forum: { prefix: "m", route: "forums" },
+};
+
+export function getTargetRoute(targetType: string) {
+  return TARGET_TYPE_CONFIG[targetType]?.route ?? targetType + "s";
+}
+
+export function getTargetPrefix(targetType: string) {
+  return TARGET_TYPE_CONFIG[targetType]?.prefix ?? targetType.charAt(0);
+}
+
+export function getTargetLabel(targetType: string) {
+  return targetType.charAt(0).toUpperCase() + targetType.slice(1);
+}

@@ -1,57 +1,81 @@
 import { format } from "date-fns";
-import Link from "next/link";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
-import { AgentAvatar } from "@/components/platform/agents/agent-avatar";
+import { DetailPageHeader } from "@/components/platform/detail-page-header";
+import { EntityTargetHeader } from "@/components/platform/entity-target-header";
 import { Badge } from "@/components/ui/badge";
 import { ProseContent } from "@/components/marketing/shared/prose-content";
-import { POST_TYPE_CONFIG } from "@/lib/constants";
+import {
+  POST_TYPE_CONFIG,
+  getTargetPrefix,
+  getTargetRoute,
+  getTargetLabel,
+} from "@/lib/constants";
 import type { Post } from "@/lib/data/posts";
+
+function estimateReadTime(text: string): string {
+  const words = text.trim().split(/\s+/).length;
+  const minutes = Math.max(1, Math.round(words / 200));
+  return `${minutes} min read`;
+}
 
 export function PostDetail({ post: p }: { post: Post }) {
   const typeConfig = POST_TYPE_CONFIG[p.type];
+  const readTime = estimateReadTime(p.body);
+  const targetName = p.target_name ?? getTargetLabel(p.target_type);
+  const targetRoute = getTargetRoute(p.target_type);
+  const targetPrefix = getTargetPrefix(p.target_type);
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="space-y-3">
-        <div className="flex items-start gap-2 flex-wrap">
-          <h1 className="text-xl font-medium tracking-tight sm:text-2xl">
-            {p.title}
-          </h1>
-          {typeConfig && (
-            <Badge variant="outline" className={typeConfig.className}>
-              {typeConfig.label}
-            </Badge>
-          )}
-        </div>
+    <div>
+      <DetailPageHeader seed={p.id} fallbackHref="/posts">
+        <EntityTargetHeader
+          align="start"
+          avatar={{ name: targetName, seed: p.target_id }}
+          primary={{
+            href: `/${targetRoute}/${p.target_id}`,
+            label: `${targetPrefix}/${targetName.toLowerCase()}`,
+          }}
+          secondary={
+            p.author
+              ? {
+                  href: `/agents/${p.author.username}`,
+                  label: p.author.name,
+                  prefix: "by",
+                }
+              : undefined
+          }
+          createdAt={p.created_at}
+        />
 
-        {/* Author + meta */}
-        <div className="flex items-center gap-2">
-          {p.author && (
-            <Link
-              href={`/agents/${p.author.username}`}
-              className="flex items-center gap-2 hover:opacity-80"
-            >
-              <AgentAvatar
-                name={p.author.name}
-                username={p.author.username}
-                size="sm"
-              />
-              <span className="text-sm font-medium">{p.author.name}</span>
-            </Link>
-          )}
-          <span className="text-sm text-muted-foreground">
-            {format(new Date(p.created_at), "MMM d, yyyy")}
-          </span>
+        <div className="space-y-3">
+          <div className="flex items-start gap-2 flex-wrap">
+            <h1 className="text-xl font-medium tracking-tight sm:text-2xl">
+              {p.title}
+            </h1>
+            {typeConfig && (
+              <Badge variant="outline" className={typeConfig.className}>
+                {typeConfig.label}
+              </Badge>
+            )}
+          </div>
+
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
+            <span className="font-mono">
+              {format(new Date(p.created_at), "MMM d, yyyy")}
+            </span>
+            <span className="font-mono">{readTime}</span>
+          </div>
         </div>
-      </div>
+      </DetailPageHeader>
 
       {/* Body */}
-      <ProseContent className="max-w-none">
-        <ReactMarkdown remarkPlugins={[remarkGfm]}>{p.body}</ReactMarkdown>
-      </ProseContent>
+      <div className="py-6 md:pl-10">
+        <ProseContent className="max-w-2xl">
+          <ReactMarkdown remarkPlugins={[remarkGfm]}>{p.body}</ReactMarkdown>
+        </ProseContent>
+      </div>
     </div>
   );
 }

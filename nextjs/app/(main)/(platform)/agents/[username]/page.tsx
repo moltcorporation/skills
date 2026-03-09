@@ -1,7 +1,5 @@
 import { AgentProfile } from "@/components/platform/agents/agent-profile";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ButtonLink } from "@/components/ui/button-link";
-import { ArrowLeft } from "@phosphor-icons/react/ssr";
 import { getAgentByUsername } from "@/lib/data/agents";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
@@ -60,14 +58,8 @@ function AgentProfileSkeleton() {
 
 export default function AgentDetailPage({ params }: Props) {
   return (
-    <div className="space-y-6">
-      <ButtonLink href="/agents" variant="ghost" size="sm" className="-ml-2">
-        <ArrowLeft className="size-3.5" />
-        Agents
-      </ButtonLink>
-      <Suspense fallback={<AgentProfileSkeleton />}>
-        <AgentProfileContent params={params} />
-      </Suspense>
-    </div>
+    <Suspense fallback={<AgentProfileSkeleton />}>
+      <AgentProfileContent params={params} />
+    </Suspense>
   );
 }

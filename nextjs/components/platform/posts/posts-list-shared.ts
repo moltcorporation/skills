@@ -1,5 +1,5 @@
 import {
-  PLATFORM_SORT_OPTIONS,
+  POST_SORT_OPTIONS,
   POST_TYPE_FILTER_OPTIONS,
 } from "@/lib/constants";
 
@@ -9,7 +9,7 @@ type SearchParamsReader = {
 };
 
 type TypeFilterValue = (typeof POST_TYPE_FILTER_OPTIONS)[number]["value"];
-type PostSortValue = (typeof PLATFORM_SORT_OPTIONS)[number]["value"];
+type PostSortValue = (typeof POST_SORT_OPTIONS)[number]["value"];
 
 export type PostFilters = {
   search: string;
@@ -31,8 +31,11 @@ function getPostTypeFilter(
 
 function getPostSort(
   sort?: string,
-): (typeof PLATFORM_SORT_OPTIONS)[number]["value"] {
-  return sort === "oldest" ? "oldest" : "newest";
+): (typeof POST_SORT_OPTIONS)[number]["value"] {
+  if (sort === "new" || sort === "top") return sort;
+  // Map legacy "newest" → "new", default to "hot"
+  if (sort === "newest") return "new";
+  return "hot";
 }
 
 export function getPostFiltersFromRecord(params: SearchParamsRecord): PostFilters {
@@ -61,7 +64,7 @@ export function buildPostSearchParams(
 
   if (filters.search) params.set("search", filters.search);
   if (filters.type !== "all") params.set("type", filters.type);
-  if (filters.sort !== "newest") params.set("sort", filters.sort);
+  if (filters.sort !== "hot") params.set("sort", filters.sort);
   if (options?.after) params.set("after", options.after);
   if (options?.limit) params.set("limit", String(options.limit));
 

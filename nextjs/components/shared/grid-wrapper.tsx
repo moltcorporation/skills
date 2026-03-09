@@ -73,6 +73,7 @@ export function GridPageFrame({
   leftRailClassName,
   rightRailClassName,
   showTopConnector = true,
+  showTopSeparator,
   showBottomConnector = true,
   topGapClassName,
   bottomGapClassName,
@@ -83,10 +84,14 @@ export function GridPageFrame({
   leftRailClassName?: string;
   rightRailClassName?: string;
   showTopConnector?: boolean;
+  /** Show the top separator line independently of the dashed connector gap. Defaults to showTopConnector. */
+  showTopSeparator?: boolean;
   showBottomConnector?: boolean;
   topGapClassName?: string;
   bottomGapClassName?: string;
 }) {
+  const renderTopSeparator = showTopSeparator ?? showTopConnector;
+
   return (
     <GridPageRails
       className={cn("flex h-full min-h-full flex-1 flex-col", className)}
@@ -94,10 +99,10 @@ export function GridPageFrame({
       rightRailClassName={rightRailClassName}
     >
       {showTopConnector ? <GridDashedGap className={topGapClassName} /> : null}
-      {showTopConnector ? <GridSeparator /> : null}
+      {renderTopSeparator ? <GridSeparator /> : null}
       <div className={cn("relative flex-1", contentClassName)}>{children}</div>
-      {showBottomConnector ? <GridSeparator /> : null}
-      {showBottomConnector ? <GridDashedGap className={bottomGapClassName} /> : null}
+      {showBottomConnector ? <GridSeparator showEdgeDots={false} /> : null}
+      {showBottomConnector ? <div className={cn("h-8", bottomGapClassName)} /> : null}
     </GridPageRails>
   );
 }

@@ -99,14 +99,16 @@ export function PlatformMobileNav() {
                 isActive ? "text-foreground" : "text-muted-foreground"
               }`}
             >
-              <Icon
-                className="size-5"
-                weight={isActive ? "fill" : "regular"}
-              />
-              <span className="flex items-center gap-1 text-xs">
-                {item.hasDot ? <PulseIndicator size="sm" /> : null}
-                {item.label}
+              <span className="relative">
+                <Icon
+                  className="size-5"
+                  weight={isActive ? "fill" : "regular"}
+                />
+                {item.hasDot ? (
+                  <PulseIndicator size="sm" className="absolute -top-px -right-2" />
+                ) : null}
               </span>
+              <span className="text-xs">{item.label}</span>
             </Link>
           );
         })}
@@ -125,7 +127,7 @@ export function PlatformMobileNav() {
             showCloseButton={false}
             className="rounded-t-lg pb-[env(safe-area-inset-bottom)]"
           >
-            <SheetHeader className="flex h-12 flex-row items-center justify-between px-6 py-0">
+            <SheetHeader className="flex h-12 flex-row items-center justify-between px-5 py-0 sm:px-6">
               <SheetTitle>More</SheetTitle>
               <SheetClose render={<Button variant="ghost" size="icon-sm" />}>
                 <X className="size-4" />
@@ -133,7 +135,7 @@ export function PlatformMobileNav() {
               </SheetClose>
             </SheetHeader>
             <Separator />
-            <div className="flex flex-col gap-1 px-6 py-4 pb-8">
+            <div className="flex flex-col gap-1 px-5 py-4 pb-8 sm:px-6">
               {moreItems.map((item) => {
                 const Icon = item.icon;
                 const isActive = pathname.startsWith(item.href);

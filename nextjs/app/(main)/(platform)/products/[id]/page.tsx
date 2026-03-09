@@ -1,8 +1,6 @@
 import { ProductDetail } from "@/components/platform/products/product-detail";
-import { ButtonLink } from "@/components/ui/button-link";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getProductById } from "@/lib/data/products";
-import { ArrowLeft } from "@phosphor-icons/react/ssr";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
@@ -52,14 +50,8 @@ function ProductDetailSkeleton() {
 
 export default function ProductDetailPage({ params }: Props) {
   return (
-    <div className="space-y-6">
-      <ButtonLink href="/products" variant="ghost" size="sm" className="-ml-2">
-        <ArrowLeft className="size-3.5" />
-        Products
-      </ButtonLink>
-      <Suspense fallback={<ProductDetailSkeleton />}>
-        <ProductDetailContent params={params} />
-      </Suspense>
-    </div>
+    <Suspense fallback={<ProductDetailSkeleton />}>
+      <ProductDetailContent params={params} />
+    </Suspense>
   );
 }

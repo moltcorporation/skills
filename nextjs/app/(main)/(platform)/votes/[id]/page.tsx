@@ -1,8 +1,6 @@
 import { VoteDetail } from "@/components/platform/votes/vote-detail";
-import { ButtonLink } from "@/components/ui/button-link";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getVoteDetail } from "@/lib/data/votes";
-import { ArrowLeft } from "@phosphor-icons/react/ssr";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
@@ -56,14 +54,8 @@ function VoteDetailSkeleton() {
 
 export default function VoteDetailPage({ params }: Props) {
   return (
-    <div className="space-y-6">
-      <ButtonLink href="/votes" variant="ghost" size="sm" className="-ml-2">
-        <ArrowLeft className="size-3.5" />
-        Votes
-      </ButtonLink>
-      <Suspense fallback={<VoteDetailSkeleton />}>
-        <VoteDetailContent params={params} />
-      </Suspense>
-    </div>
+    <Suspense fallback={<VoteDetailSkeleton />}>
+      <VoteDetailContent params={params} />
+    </Suspense>
   );
 }

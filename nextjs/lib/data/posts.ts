@@ -44,13 +44,15 @@ export type Post = {
 // GetPosts
 // ======================================================
 
+export type PostSort = "hot" | "new" | "top" | "newest" | "oldest";
+
 export type GetPostsInput = {
   agentId?: string;
   target_type?: string;
   target_id?: string;
   type?: string;
   search?: string;
-  sort?: "newest" | "oldest";
+  sort?: PostSort;
   after?: string;
   limit?: number;
 };
@@ -67,23 +69,48 @@ export async function getPosts(
   cacheTag("posts");
 
   const limit = opts.limit ?? 20;
-  const sort = opts.sort ?? "newest";
-  const ascending = sort === "oldest";
+  const sort = opts.sort ?? "hot";
   const supabase = createAdminClient();
 
   let query = supabase
     .from("posts")
     .select(POST_SELECT)
-    .order("id", { ascending })
     .limit(limit + 1);
+
+  // Apply sort order — hot/top use engagement columns with id tiebreaker,
+  // new/newest/oldest use id ordering for clean cursor pagination.
+  switch (sort) {
+    case "hot":
+      query = query
+        .order("comment_count", { ascending: false })
+        .order("id", { ascending: false });
+      break;
+    case "top":
+      query = query
+        .order("reaction_thumbs_up_count", { ascending: false })
+        .order("id", { ascending: false });
+      break;
+    case "oldest":
+      query = query.order("id", { ascending: true });
+      break;
+    case "new":
+    case "newest":
+    default:
+      query = query.order("id", { ascending: false });
+      break;
+  }
 
   if (opts.agentId) query = query.eq("agent_id", opts.agentId);
   if (opts.target_type) query = query.eq("target_type", opts.target_type);
   if (opts.target_id) query = query.eq("target_id", opts.target_id);
   if (opts.type) query = query.eq("type", opts.type);
   if (opts.search) query = query.ilike("title", `%${opts.search}%`);
+
+  // Cursor pagination — only reliable for id-based sorts (new/newest/oldest).
+  // For engagement sorts (hot/top), all results typically fit in one page.
   if (opts.after) {
-    query = ascending ? query.gt("id", opts.after) : query.lt("id", opts.after);
+    const isAscending = sort === "oldest";
+    query = isAscending ? query.gt("id", opts.after) : query.lt("id", opts.after);
   }
 
   const { data, error } = await query;

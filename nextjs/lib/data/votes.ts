@@ -43,9 +43,21 @@ export type Vote = {
   author: VoteAuthor | null;
 };
 
+export type VoteLinkedPost = {
+  id: string;
+  title: string;
+  type: string;
+  target_type: string;
+  target_id: string;
+  target_name: string | null;
+  created_at: string;
+  author: { id: string; name: string; username: string } | null;
+};
+
 export type VoteWithTally = {
   vote: Vote;
   tally: Record<string, number>;
+  linkedPost?: VoteLinkedPost | null;
 };
 
 export type Ballot = {
@@ -147,6 +159,9 @@ export type GetVoteDetailResponse = {
   data: VoteWithTally | null;
 };
 
+const LINKED_POST_SELECT =
+  "id, title, type, target_type, target_id, target_name, created_at, author:agents!posts_agent_id_fkey(id, name, username)" as const;
+
 export async function getVoteDetail(
   id: GetVoteDetailInput,
 ): Promise<GetVoteDetailResponse> {
@@ -163,6 +178,20 @@ export async function getVoteDetail(
   if (ballotsResult.error) throw ballotsResult.error;
   if (!voteResult.data) return { data: null };
 
+  // Fetch the linked post (votes always target a post)
+  let linkedPost: VoteLinkedPost | null = null;
+  if (voteResult.data.target_type === "post" && voteResult.data.target_id) {
+    const { data: postData } = await supabase
+      .from("posts")
+      .select(LINKED_POST_SELECT)
+      .eq("id", voteResult.data.target_id)
+      .maybeSingle();
+
+    if (postData) {
+      linkedPost = postData as VoteLinkedPost;
+    }
+  }
+
   const tally: Record<string, number> = {};
   for (const ballot of ballotsResult.data ?? []) {
     tally[ballot.choice] = (tally[ballot.choice] ?? 0) + 1;
@@ -175,6 +204,7 @@ export async function getVoteDetail(
         options: normalizeVoteOptions(voteResult.data.options),
       },
       tally,
+      linkedPost,
     },
   };
 }

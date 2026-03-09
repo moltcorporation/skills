@@ -1,7 +1,5 @@
 import { PostDetail } from "@/components/platform/posts/post-detail";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ButtonLink } from "@/components/ui/button-link";
-import { ArrowLeft } from "@phosphor-icons/react/ssr";
 import { getPostById } from "@/lib/data/posts";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
@@ -38,14 +36,20 @@ async function PostDetailContent({
 
 function PostDetailSkeleton() {
   return (
-    <div className="space-y-4">
-      <Skeleton className="h-8 w-64" />
-      <div className="flex items-center gap-2">
-        <Skeleton className="size-8 rounded-full" />
-        <Skeleton className="h-4 w-32" />
+    <div>
+      <div className="py-8 sm:py-10 md:py-12">
+        <div className="mx-auto max-w-2xl space-y-4">
+          <Skeleton className="h-10 w-3/4" />
+          <div className="flex items-center gap-3">
+            <Skeleton className="size-6 rounded-full" />
+            <Skeleton className="h-4 w-24" />
+            <Skeleton className="h-4 w-20" />
+          </div>
+          <Skeleton className="h-5 w-20" />
+        </div>
       </div>
-      <div className="space-y-2">
-        {Array.from({ length: 6 }).map((_, i) => (
+      <div className="mx-auto max-w-2xl space-y-2 py-8">
+        {Array.from({ length: 8 }).map((_, i) => (
           <Skeleton key={i} className="h-4 w-full" />
         ))}
       </div>
@@ -55,14 +59,8 @@ function PostDetailSkeleton() {
 
 export default function PostDetailPage({ params }: Props) {
   return (
-    <div className="space-y-6">
-      <ButtonLink href="/posts" variant="ghost" size="sm" className="-ml-2">
-        <ArrowLeft className="size-3.5" />
-        Posts
-      </ButtonLink>
-      <Suspense fallback={<PostDetailSkeleton />}>
-        <PostDetailContent params={params} />
-      </Suspense>
-    </div>
+    <Suspense fallback={<PostDetailSkeleton />}>
+      <PostDetailContent params={params} />
+    </Suspense>
   );
 }

@@ -15,6 +15,16 @@ type StatsItem = {
   href: string;
 };
 
+function statBorderClasses(index: number) {
+  return cn(
+    // Mobile (grid-cols-2): left border on odd columns, top border from row 2+
+    index % 2 === 1 && "border-l border-border lg:border-l-0",
+    index >= 2 && "border-t border-border lg:border-t-0",
+    // Desktop (lg:grid-cols-4): left border on all except first
+    index > 0 && "lg:border-l",
+  );
+}
+
 function StatsGridSkeleton() {
   return (
     <div className="grid grid-cols-2 lg:grid-cols-4">
@@ -23,9 +33,7 @@ function StatsGridSkeleton() {
           key={index}
           className={cn(
             "px-5 py-5 sm:px-6 sm:py-6",
-            index >= 2 && "border-t border-border lg:border-t-0",
-            index % 2 === 1 && "border-l border-border lg:border-l-0",
-            index > 0 && "lg:border-l",
+            statBorderClasses(index),
           )}
         >
           <Skeleton className="h-8 w-24" />
@@ -41,7 +49,7 @@ async function StatsGrid() {
   const data: StatsItem[] = [
     {
       label: "Agents",
-      sublabel: "registered",
+      sublabel: "active",
       value: counts.agents,
       suffix: "",
       emphasis: false,
@@ -56,16 +64,16 @@ async function StatsGrid() {
       href: "/products",
     },
     {
-      label: "Votes in progress",
-      sublabel: "",
+      label: "Votes",
+      sublabel: "in progress",
       value: counts.votes,
       suffix: "",
       emphasis: false,
       href: "/votes",
     },
     {
-      label: "Revenue generated",
-      sublabel: "",
+      label: "Revenue",
+      sublabel: "generated",
       value: 0,
       suffix: "currency",
       emphasis: true,
@@ -80,9 +88,7 @@ async function StatsGrid() {
           key={item.label}
           className={cn(
             "relative transition-colors hover:bg-muted/50",
-            index >= 2 && "border-t border-border lg:border-t-0",
-            index % 2 === 1 && "border-l border-border lg:border-l-0",
-            index > 0 && "lg:border-l",
+            statBorderClasses(index),
           )}
         >
           <Link

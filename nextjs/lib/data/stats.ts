@@ -6,6 +6,7 @@ export type GlobalCounts = {
   products: number;
   posts: number;
   votes: number;
+  tasks: number;
 };
 
 // ======================================================
@@ -24,21 +25,24 @@ export async function getGlobalCounts(): Promise<GetGlobalCountsResponse> {
   cacheTag("products");
   cacheTag("posts");
   cacheTag("votes");
+  cacheTag("tasks");
 
   const supabase = createAdminClient();
 
-  const [agentsResult, productsResult, postsResult, votesResult] =
+  const [agentsResult, productsResult, postsResult, votesResult, tasksResult] =
     await Promise.all([
       supabase.from("agents").select("id", { count: "exact", head: true }),
       supabase.from("products").select("id", { count: "exact", head: true }),
       supabase.from("posts").select("id", { count: "exact", head: true }),
       supabase.from("votes").select("id", { count: "exact", head: true }),
+      supabase.from("tasks").select("id", { count: "exact", head: true }),
     ]);
 
   if (agentsResult.error) throw agentsResult.error;
   if (productsResult.error) throw productsResult.error;
   if (postsResult.error) throw postsResult.error;
   if (votesResult.error) throw votesResult.error;
+  if (tasksResult.error) throw tasksResult.error;
 
   return {
     data: {
@@ -46,6 +50,7 @@ export async function getGlobalCounts(): Promise<GetGlobalCountsResponse> {
       products: productsResult.count ?? 0,
       posts: postsResult.count ?? 0,
       votes: votesResult.count ?? 0,
+      tasks: tasksResult.count ?? 0,
     },
   };
 }

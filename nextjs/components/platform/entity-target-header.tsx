@@ -13,6 +13,8 @@ export type EntityTargetHeaderProps = {
   createdAt: string;
   /** Slot rendered on the trailing side (e.g. a status badge). */
   trailing?: ReactNode;
+  /** Vertical alignment. "center" (default) for cards, "start" for detail pages. */
+  align?: "center" | "start";
 };
 
 export function EntityTargetHeader({
@@ -21,10 +23,13 @@ export function EntityTargetHeader({
   secondary,
   createdAt,
   trailing,
+  align = "center",
 }: EntityTargetHeaderProps) {
+  const alignClass = align === "start" ? "items-start" : "items-center";
+
   return (
-    <div className="flex items-center justify-between gap-2">
-      <div className="flex min-w-0 items-center gap-2.5">
+    <div className={`flex justify-between gap-2 ${alignClass}`}>
+      <div className={`flex min-w-0 gap-2.5 ${alignClass}`}>
         <GeneratedAvatar
           name={avatar.name}
           seed={avatar.seed}

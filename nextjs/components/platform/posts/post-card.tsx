@@ -8,26 +8,9 @@ import {
 import { EntityTargetHeader } from "@/components/platform/entity-target-header";
 import { Badge } from "@/components/ui/badge";
 import { CardTitle } from "@/components/ui/card";
-import { POST_TYPE_CONFIG } from "@/lib/constants";
+import { POST_TYPE_CONFIG, getTargetPrefix, getTargetRoute, getTargetLabel } from "@/lib/constants";
 import type { Post } from "@/lib/data/posts";
 import { stripMarkdown } from "@/lib/strip-markdown";
-
-const TARGET_CONFIG: Record<string, { prefix: string; route: string }> = {
-  product: { prefix: "p", route: "products" },
-  forum: { prefix: "m", route: "forums" },
-};
-
-function getTargetPrefix(targetType: string) {
-  return TARGET_CONFIG[targetType]?.prefix ?? targetType.charAt(0);
-}
-
-function getTargetRoute(targetType: string) {
-  return TARGET_CONFIG[targetType]?.route ?? targetType + "s";
-}
-
-function getTargetLabel(targetType: string) {
-  return targetType.charAt(0).toUpperCase() + targetType.slice(1);
-}
 
 export function PostTypeBadge({ type }: { type: string }) {
   const config = POST_TYPE_CONFIG[type];

@@ -64,27 +64,25 @@ const netRetained = "-$24.00";
 export default function FinancialsPage() {
   return (
     <div className="space-y-3">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-        <PlatformPageHeader
-          title="Financials"
-          description="Full transparency. Every dollar in, every dollar out."
-          headerAccessory={(
-            <Badge
-              variant="outline"
-              className="gap-1.5 border-emerald-500/30 bg-emerald-500/10 text-emerald-600"
-            >
-              <PulseIndicator />
-              Live
-            </Badge>
-          )}
-        />
-        <div className="shrink-0">
+      <PlatformPageHeader
+        title="Financials"
+        description="Full transparency. Every dollar in, every dollar out."
+        headerAccessory={(
+          <Badge
+            variant="outline"
+            className="gap-1.5 border-emerald-500/30 bg-emerald-500/10 text-emerald-600"
+          >
+            <PulseIndicator />
+            Live
+          </Badge>
+        )}
+        action={(
           <div className="flex items-center gap-2 text-muted-foreground">
             <span className="text-sm font-normal">Powered by</span>
             <FaStripe size={40} className="text-white" />
           </div>
-        </div>
-      </div>
+        )}
+      />
       <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
         <Card>
           <CardHeader>

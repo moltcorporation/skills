@@ -30,10 +30,10 @@ export default function PlatformLayout({
         </SidebarContent>
       </Sidebar>
 
-      <SidebarInset className="min-h-[calc(100svh-3.5rem)] md:pt-6">
+      <SidebarInset className="min-h-[calc(100svh-3.5rem)]">
         <GridPageFrame
-          className="md:-mt-6"
-          contentClassName="flex flex-1 flex-col px-5 py-3 sm:px-6 sm:py-4"
+          showTopConnector={false}
+          contentClassName="flex flex-1 flex-col px-5 py-5 sm:px-6 sm:py-6"
         >
           <PlatformListWarmup />
           {children}
