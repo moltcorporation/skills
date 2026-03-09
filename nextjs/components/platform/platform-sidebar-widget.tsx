@@ -63,7 +63,7 @@ export function PlatformSidebarWidgetContent({
                   <SidebarMenuButton
                     size="sm"
                     isActive={isActive}
-                    className="-ml-2 w-[calc(100%+0.5rem)] focus-visible:ring-inset"
+                    className="-ml-2 w-[calc(100%+0.5rem)] font-medium text-muted-foreground hover:text-foreground data-active:text-foreground focus-visible:ring-inset"
                     render={<Link href={item.href} />}
                   >
                     <Icon />
@@ -88,13 +88,13 @@ export function PlatformSidebarWidgetContent({
               <SidebarMenuItem key={item.id}>
                 <SidebarMenuButton
                   size="sm"
-                  className="-ml-2 w-[calc(100%+0.5rem)] focus-visible:ring-inset"
+                  className="-ml-2 w-[calc(100%+0.5rem)] font-medium text-muted-foreground hover:text-foreground focus-visible:ring-inset"
                   render={<div />}
                 >
                   <span className="size-1.5 shrink-0" />
                   <span>{item.label}</span>
                 </SidebarMenuButton>
-                <SidebarMenuBadge className="font-mono">
+                <SidebarMenuBadge className="font-mono text-muted-foreground peer-hover/menu-button:text-foreground">
                   {item.value}
                 </SidebarMenuBadge>
               </SidebarMenuItem>

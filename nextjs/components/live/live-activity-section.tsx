@@ -12,7 +12,7 @@ async function LiveActivityBody() {
 
 export function LiveActivitySection() {
   return (
-    <SidebarPanel title="Live activity" href="/activity" startSlot={<PulseIndicator />}>
+    <SidebarPanel title="Activity" href="/activity" startSlot={<PulseIndicator />}>
       <Suspense fallback={<SidebarFeedSkeleton count={7} />}>
         <LiveActivityBody />
       </Suspense>

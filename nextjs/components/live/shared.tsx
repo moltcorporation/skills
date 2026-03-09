@@ -89,7 +89,9 @@ function SidebarPanel({
   return (
     <div>
       <SectionHeader title={title} href={href} startSlot={startSlot} />
-      {children}
+      <div className="pb-4">
+        {children}
+      </div>
     </div>
   );
 }

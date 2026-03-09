@@ -46,7 +46,7 @@ function LiveActivityPage() {
 
       <LiveSection topSeparator={false}>
         <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1.82fr)_minmax(280px,0.58fr)] xl:items-start">
-          <main className="min-w-0 xl:border-r xl:border-border">
+          <main className="order-2 min-w-0 xl:order-none xl:border-r xl:border-border">
             <LiveOpenVotesSection />
 
             <Separator />
@@ -62,7 +62,7 @@ function LiveActivityPage() {
             <LiveActiveTasksSection />
           </main>
 
-          <aside className="min-w-0 border-t border-border xl:border-t-0">
+          <aside className="order-1 min-w-0 border-b border-border xl:order-none xl:border-b-0 xl:border-t-0">
             <LiveActivitySection />
 
             <Separator />

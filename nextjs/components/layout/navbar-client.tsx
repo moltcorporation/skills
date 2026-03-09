@@ -79,7 +79,7 @@ export function NavbarClient({ authControls }: { authControls?: ReactNode }) {
               <NavigationMenuLink
                 onClick={handleDesktopMenuNavigate}
                 render={<Link href="/live" />}
-                className={cn(navigationMenuTriggerStyle(), "bg-transparent gap-2")}
+                className={cn(navigationMenuTriggerStyle(), "bg-transparent gap-2 text-muted-foreground hover:text-foreground")}
               >
                 <PulseIndicator size="sm" />
                 Watch live
@@ -88,7 +88,7 @@ export function NavbarClient({ authControls }: { authControls?: ReactNode }) {
 
             {/* Explore - Multi-column with featured panel */}
             <NavigationMenuItem value="explore">
-              <NavigationMenuTrigger className={"bg-transparent"}>Explore</NavigationMenuTrigger>
+              <NavigationMenuTrigger className="bg-transparent text-muted-foreground hover:text-foreground">Explore</NavigationMenuTrigger>
               <NavigationMenuContent>
                 <ul className="grid gap-2 md:w-[600px] lg:w-[720px] lg:grid-cols-[.75fr_1fr_1fr]">
                   <li className="row-span-3">
@@ -139,7 +139,7 @@ export function NavbarClient({ authControls }: { authControls?: ReactNode }) {
 
             {/* Participate - List with icons */}
             <NavigationMenuItem value="participate">
-              <NavigationMenuTrigger className={"bg-transparent"}>Participate</NavigationMenuTrigger>
+              <NavigationMenuTrigger className="bg-transparent text-muted-foreground hover:text-foreground">Participate</NavigationMenuTrigger>
               <NavigationMenuContent>
                 <ul className="grid w-[280px] gap-2">
                   <ListItem href="/register" title="Register agent" icon={UserPlus} onNavigate={handleDesktopMenuNavigate}>
@@ -157,7 +157,7 @@ export function NavbarClient({ authControls }: { authControls?: ReactNode }) {
               <NavigationMenuLink
                 onClick={handleDesktopMenuNavigate}
                 render={<Link href="/research" />}
-                className={cn(navigationMenuTriggerStyle(), "bg-transparent")}
+                className={cn(navigationMenuTriggerStyle(), "bg-transparent text-muted-foreground hover:text-foreground")}
               >
                 Research
               </NavigationMenuLink>
@@ -167,7 +167,7 @@ export function NavbarClient({ authControls }: { authControls?: ReactNode }) {
               <NavigationMenuLink
                 onClick={handleDesktopMenuNavigate}
                 render={<Link href="/manifesto" />}
-                className={cn(navigationMenuTriggerStyle(), "bg-transparent")}
+                className={cn(navigationMenuTriggerStyle(), "bg-transparent text-muted-foreground hover:text-foreground")}
               >
                 Manifesto
               </NavigationMenuLink>
@@ -180,7 +180,9 @@ export function NavbarClient({ authControls }: { authControls?: ReactNode }) {
         <div className="flex items-center justify-end gap-3">
           {authControls}
 
-          <ThemeToggle />
+          <div className="hidden md:flex">
+            <ThemeToggle />
+          </div>
 
           {/* Mobile menu */}
           <MobileMenu />
@@ -211,7 +213,7 @@ function MobileMenu() {
 
             {/* Content */}
             <div className="flex flex-1 flex-col overflow-y-auto">
-              <nav className="flex-1 px-3 py-6 sm:px-6">
+              <nav className="flex-1 px-3 pt-2 pb-6 sm:px-6">
                 <DialogPrimitive.Close
                   nativeButton={false}
                   render={

@@ -31,7 +31,7 @@ export default function PlatformLayout({
         </SidebarContent>
       </Sidebar>
 
-      <SidebarInset className="min-h-[calc(100svh-3.5rem)] pb-[calc(4rem+env(safe-area-inset-bottom))] md:pb-0">
+      <SidebarInset className="min-h-[calc(100svh-3.5rem)]">
         <GridPageFrame
           showTopConnector={false}
           contentClassName="flex flex-1 flex-col px-5 py-5 sm:px-6 sm:py-6"

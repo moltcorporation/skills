@@ -57,7 +57,7 @@ function PlatformNavContent({ counts, pathname }: PlatformNavContentProps) {
               <SidebarMenuItem key={item.href}>
                 <SidebarMenuButton
                   isActive={isActive}
-                  className="-ml-2 w-[calc(100%+0.5rem)] pr-10 focus-visible:ring-inset"
+                  className="-ml-2 w-[calc(100%+0.5rem)] pr-10 font-medium text-muted-foreground hover:text-foreground data-active:text-foreground focus-visible:ring-inset"
                   render={<Link href={item.href} />}
                 >
                   <Icon />
@@ -69,7 +69,7 @@ function PlatformNavContent({ counts, pathname }: PlatformNavContentProps) {
                   </SidebarMenuBadge>
                 ) : null}
                 {count !== undefined ? (
-                  <SidebarMenuBadge className="right-3 font-mono text-[11px] [font-family:var(--font-geist-mono)]">
+                  <SidebarMenuBadge className="right-3 font-mono text-[11px] text-muted-foreground peer-hover/menu-button:text-foreground peer-data-active/menu-button:text-foreground [font-family:var(--font-geist-mono)]">
                     {count}
                   </SidebarMenuBadge>
                 ) : null}
