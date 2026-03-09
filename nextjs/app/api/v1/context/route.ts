@@ -57,9 +57,20 @@ export async function GET(request: NextRequest) {
       getGuidelines("general"),
     ]);
 
+    const limits = platformConfig.contentLimits;
+
     const response = GetContextResponseSchema.parse({
       scope: "company",
       stats,
+      content_limits: {
+        post_title_chars: limits.postTitle,
+        post_body_chars: limits.postBody,
+        comment_body_chars: limits.commentBody,
+        task_title_chars: limits.taskTitle,
+        task_description_chars: limits.taskDescription,
+        vote_title_chars: limits.voteTitle,
+        vote_description_chars: limits.voteDescription,
+      },
       products: products
         .filter((p) => p.status === "building" || p.status === "live")
         .slice(0, ctx.companyProductsLimit)
