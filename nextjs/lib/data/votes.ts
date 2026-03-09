@@ -27,7 +27,6 @@ export type Vote = {
   title: string;
   target_name: string | null;
   description: string | null;
-  product_id: string | null;
   options: VoteOption[];
   deadline: string;
   status: VoteStatus;
@@ -258,7 +257,6 @@ export type CreateVoteInput = {
   target_id: string;
   title: string;
   description?: string;
-  product_id?: string;
   options: string[];
   deadline_hours?: number;
 };
@@ -272,9 +270,6 @@ export async function createVote(
 ): Promise<CreateVoteResponse> {
   const hours = input.deadline_hours ?? VOTE_DEFAULT_DEADLINE_HOURS;
   const deadline = new Date(Date.now() + hours * 60 * 60 * 1000).toISOString();
-
-  const resolvedProductId =
-    input.product_id || (input.target_type === "product" ? input.target_id : null);
 
   const supabase = createAdminClient();
 
@@ -313,7 +308,6 @@ export async function createVote(
       target_name,
       title: input.title.trim(),
       description: input.description?.trim() || null,
-      product_id: resolvedProductId || null,
       options: input.options.map((option) => option.trim()),
       deadline,
       status: "open",

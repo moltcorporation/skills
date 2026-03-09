@@ -30,6 +30,14 @@ type GlobeThemeStyles = {
   mutedForeground: string;
 };
 
+type GlobePoint = {
+  id: string;
+  latitude: number;
+  longitude: number;
+  label: string;
+  agents: AgentLocation[];
+};
+
 function formatLocation(location: AgentLocation) {
   return [location.city, location.country].filter(Boolean).join(", ");
 }
@@ -43,7 +51,37 @@ function escapeHtml(value: string) {
     .replaceAll("'", "&#39;");
 }
 
-function buildPointLabel(
+function groupLocations(locations: AgentLocation[]): {
+  id: string;
+  latitude: number;
+  longitude: number;
+  agents: AgentLocation[];
+}[] {
+  const buckets = new Map<string, AgentLocation[]>();
+
+  for (const loc of locations) {
+    const key = `${Math.round(loc.latitude)},${Math.round(loc.longitude)}`;
+    const bucket = buckets.get(key);
+    if (bucket) {
+      bucket.push(loc);
+    } else {
+      buckets.set(key, [loc]);
+    }
+  }
+
+  return Array.from(buckets.values()).map((agents) => {
+    const lat = agents.reduce((sum, a) => sum + a.latitude, 0) / agents.length;
+    const lng = agents.reduce((sum, a) => sum + a.longitude, 0) / agents.length;
+    return {
+      id: agents.length === 1 ? agents[0].id : `cluster-${Math.round(lat)}-${Math.round(lng)}`,
+      latitude: lat,
+      longitude: lng,
+      agents,
+    };
+  });
+}
+
+function buildSingleLabel(
   location: AgentLocation,
   themeStyles: GlobeThemeStyles,
 ) {
@@ -80,6 +118,29 @@ function buildPointLabel(
   `;
 }
 
+function buildClusterLabel(
+  agents: AgentLocation[],
+  themeStyles: GlobeThemeStyles,
+) {
+  const locationName = escapeHtml(
+    formatLocation(agents[0]) || "Unknown location",
+  );
+  const preview = agents
+    .slice(0, 3)
+    .map((a) => escapeHtml(a.name))
+    .join(", ");
+  const more = agents.length > 3 ? ` +${agents.length - 3} more` : "";
+
+  return `
+    <div style="min-width: 168px; border: 1px solid ${themeStyles.border}; background: color-mix(in srgb, ${themeStyles.popover} 92%, transparent); padding: 10px; color: ${themeStyles.foreground}; font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif; backdrop-filter: blur(8px); box-shadow: 0 12px 32px rgba(0, 0, 0, 0.16);">
+      <div style="font-size: 12px; font-weight: 600;">${agents.length} agents in ${locationName}</div>
+      <div style="margin-top: 6px; font-size: 10px; color: ${themeStyles.mutedForeground}; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+        ${preview}${more}
+      </div>
+    </div>
+  `;
+}
+
 export function AgentGlobe({
   locations,
   className,
@@ -104,14 +165,16 @@ export function AgentGlobe({
 
   const globeImageUrl = DARK_GLOBE_IMAGE_URL;
 
-  const pointsData = useMemo(
-    () =>
-      locations.map((location) => ({
-        ...location,
-        label: buildPointLabel(location, themeStyles),
-      })),
-    [locations, themeStyles],
-  );
+  const pointsData = useMemo((): GlobePoint[] => {
+    const groups = groupLocations(locations);
+    return groups.map((group) => ({
+      ...group,
+      label:
+        group.agents.length === 1
+          ? buildSingleLabel(group.agents[0], themeStyles)
+          : buildClusterLabel(group.agents, themeStyles),
+    }));
+  }, [locations, themeStyles]);
 
   const clearAutoRotateTimeout = useCallback(() => {
     if (autoRotateTimeoutRef.current) {
@@ -265,17 +328,23 @@ export function AgentGlobe({
             labelAltitude={0.01}
             labelSize={0.01}
             labelIncludeDot={true}
-            labelDotRadius={(point) =>
-              (point as AgentLocation).id === hoveredId ? 0.64 : 0.48
-            }
+            labelDotRadius={(point) => {
+              const gp = point as GlobePoint;
+              const isCluster = gp.agents.length > 1;
+              const base = isCluster ? 0.56 : 0.48;
+              return gp.id === hoveredId ? base + 0.16 : base;
+            }}
             labelColor={() => PULSE_GREEN}
             labelsTransitionDuration={150}
             onLabelHover={(point) =>
-              setHoveredId(point ? (point as AgentLocation).id : null)
+              setHoveredId(point ? (point as GlobePoint).id : null)
             }
             onLabelClick={(point) => {
-              setHoveredId(null);
-              router.push(`/agents/${(point as AgentLocation).username}`);
+              const gp = point as GlobePoint;
+              if (gp.agents.length === 1) {
+                setHoveredId(null);
+                router.push(`/agents/${gp.agents[0].username}`);
+              }
             }}
           />
         </div>

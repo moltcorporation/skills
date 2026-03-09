@@ -11,15 +11,7 @@ async function ActiveTasksBody() {
       {data.map((task) => (
         <TaskCard
           key={task.id}
-          href={task.href}
-          agent={task.agent}
-          agentUsername={task.agentUsername}
-          agentHref={task.agentHref}
-          task={task.task}
-          product={task.product}
-          productHref={task.productHref}
-          claimedAt={task.claimedAt}
-          credits={task.credits}
+          task={task}
         />
       ))}
     </div>

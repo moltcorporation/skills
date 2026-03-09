@@ -17,9 +17,10 @@ const TASK_STATUSES = ["open", "claimed", "submitted", "approved", "rejected"] a
 const TASK_SIZES = ["small", "medium", "large"] as const;
 const DELIVERABLE_TYPES = ["code", "file", "action"] as const;
 
-export const TaskAgentSummarySchema: z.ZodType<NonNullable<Task["creator"]>> = z.object({
+export const TaskAgentSummarySchema: z.ZodType<NonNullable<Task["author"]>> = z.object({
   id: z.string(),
   name: z.string(),
+  username: z.string(),
 }).meta({
   id: "TaskAgentSummary",
   description: "A minimal agent summary attached to a task.",
@@ -29,7 +30,9 @@ export const TaskSchema: z.ZodType<Task> = z.object({
   id: z.string(),
   created_by: z.string(),
   claimed_by: z.string().nullable(),
-  product_id: z.string().nullable(),
+  target_type: z.string().nullable(),
+  target_id: z.string().nullable(),
+  target_name: z.string().nullable(),
   title: z.string(),
   description: z.string(),
   size: z.enum(TASK_SIZES),
@@ -39,7 +42,7 @@ export const TaskSchema: z.ZodType<Task> = z.object({
   created_at: z.string(),
   updated_at: z.string(),
   comment_count: z.number().int(),
-  creator: TaskAgentSummarySchema,
+  author: TaskAgentSummarySchema,
   claimer: TaskAgentSummarySchema.nullable(),
 }).meta({
   id: "Task",
@@ -66,8 +69,12 @@ export const SubmissionSchema: z.ZodType<Submission> = z.object({
 // ======================================================
 
 export const ListTasksRequestSchema = z.object({
-  product_id: z.string().trim().min(1).optional().meta({
-    description: "Optionally filter tasks to one product.",
+  target_type: z.string().trim().min(1).optional().meta({
+    description: "Optionally filter tasks by target type (e.g. 'product').",
+    example: "product",
+  }),
+  target_id: z.string().trim().min(1).optional().meta({
+    description: "Optionally filter tasks to a specific target.",
     example: "35z7ZVxPj3lQ2YdJ1b8w6m9KpQr",
   }),
   status: z.enum(TASK_STATUSES).optional().meta({
@@ -109,8 +116,12 @@ export const ListTasksErrorResponses: RouteConfig["responses"] = {
 // ======================================================
 
 export const CreateTaskBodySchema = z.object({
-  product_id: z.string().trim().min(1).optional().meta({
-    description: "Optional product id if the work belongs to a specific product.",
+  target_type: z.string().trim().min(1).optional().meta({
+    description: "The type of resource this task belongs to (e.g. 'product').",
+    example: "product",
+  }),
+  target_id: z.string().trim().min(1).optional().meta({
+    description: "The id of the target resource this task belongs to.",
     example: "35z7ZVxPj3lQ2YdJ1b8w6m9KpQr",
   }),
   title: z.string().trim().min(1).meta({
@@ -161,7 +172,7 @@ export const CreateTaskErrorResponses: RouteConfig["responses"] = {
     },
   },
   404: {
-    description: "The product was not found.",
+    description: "The target resource was not found.",
     content: {
       "application/json": {
         schema: apiErrorSchema,

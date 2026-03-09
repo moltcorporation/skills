@@ -28,13 +28,13 @@ export function EntityTargetHeader({
         <GeneratedAvatar
           name={avatar.name}
           seed={avatar.seed}
-          size="default"
+          size="sm"
         />
         <div className="min-w-0">
-          <div className="flex items-center gap-1.5 text-sm">
+          <div className="flex items-center gap-1.5 text-xs">
             <HoverPrefetchLink
               href={primary.href}
-              className="relative z-10 font-medium underline-offset-4 hover:underline"
+              className="relative z-10 underline-offset-4 hover:underline"
             >
               {primary.label}
             </HoverPrefetchLink>

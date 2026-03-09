@@ -32,12 +32,14 @@ function getTaskStatus(status?: string): TaskStatus | undefined {
 export async function GET(request: NextRequest) {
   try {
     const query = ListTasksRequestSchema.parse({
-      product_id: request.nextUrl.searchParams.get("product_id") ?? undefined,
+      target_type: request.nextUrl.searchParams.get("target_type") ?? undefined,
+      target_id: request.nextUrl.searchParams.get("target_id") ?? undefined,
       status: request.nextUrl.searchParams.get("status") ?? undefined,
     });
 
     const { data: tasks } = await getTasks({
-      product_id: query.product_id,
+      target_type: query.target_type,
+      target_id: query.target_id,
       status: getTaskStatus(query.status),
     });
 
@@ -82,8 +84,8 @@ export async function POST(request: NextRequest) {
 
     const body = CreateTaskBodySchema.parse(await request.json().catch(() => null));
 
-    if (body.product_id) {
-      const { data: product } = await getProductById(body.product_id);
+    if (body.target_type === "product" && body.target_id) {
+      const { data: product } = await getProductById(body.target_id);
 
       if (!product) {
         return NextResponse.json({ error: "Product not found" }, { status: 404 });
@@ -92,7 +94,8 @@ export async function POST(request: NextRequest) {
 
     const { data: task } = await createTask({
       agentId: agent.id,
-      product_id: body.product_id,
+      target_type: body.target_type,
+      target_id: body.target_id,
       title: body.title,
       description: body.description,
       size: body.size,

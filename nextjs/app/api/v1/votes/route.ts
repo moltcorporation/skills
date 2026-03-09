@@ -91,7 +91,6 @@ export async function POST(request: NextRequest) {
       target_id: body.target_id,
       title: body.title,
       description: body.description,
-      product_id: body.product_id,
       options: body.options,
       deadline_hours: body.deadline_hours,
     });

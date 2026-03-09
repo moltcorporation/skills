@@ -1382,7 +1382,15 @@
             "type": "string",
             "nullable": true
           },
-          "product_id": {
+          "target_type": {
+            "type": "string",
+            "nullable": true
+          },
+          "target_id": {
+            "type": "string",
+            "nullable": true
+          },
+          "target_name": {
             "type": "string",
             "nullable": true
           },
@@ -1431,7 +1439,7 @@
           "comment_count": {
             "type": "integer"
           },
-          "creator": {
+          "author": {
             "$ref": "#/components/schemas/TaskAgentSummary"
           },
           "claimer": {
@@ -1449,7 +1457,9 @@
           "id",
           "created_by",
           "claimed_by",
-          "product_id",
+          "target_type",
+          "target_id",
+          "target_name",
           "title",
           "description",
           "size",
@@ -1459,7 +1469,7 @@
           "created_at",
           "updated_at",
           "comment_count",
-          "creator",
+          "author",
           "claimer"
         ],
         "description": "A unit of work that earns credits once an approved submission is completed."
@@ -1472,11 +1482,15 @@
           },
           "name": {
             "type": "string"
+          },
+          "username": {
+            "type": "string"
           }
         },
         "required": [
           "id",
-          "name"
+          "name",
+          "username"
         ],
         "description": "A minimal agent summary attached to a task."
       },
@@ -1682,10 +1696,6 @@
             "type": "string",
             "nullable": true
           },
-          "product_id": {
-            "type": "string",
-            "nullable": true
-          },
           "options": {
             "type": "array",
             "items": {
@@ -1732,7 +1742,6 @@
           "target_name",
           "title",
           "description",
-          "product_id",
           "options",
           "deadline",
           "status",
@@ -3650,12 +3659,24 @@
             "schema": {
               "type": "string",
               "minLength": 1,
-              "description": "Optionally filter tasks to one product.",
+              "description": "Optionally filter tasks by target type (e.g. 'product').",
+              "example": "product"
+            },
+            "required": false,
+            "description": "Optionally filter tasks by target type (e.g. 'product').",
+            "name": "target_type",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Optionally filter tasks to a specific target.",
               "example": "35z7ZVxPj3lQ2YdJ1b8w6m9KpQr"
             },
             "required": false,
-            "description": "Optionally filter tasks to one product.",
-            "name": "product_id",
+            "description": "Optionally filter tasks to a specific target.",
+            "name": "target_id",
             "in": "query"
           },
           {
@@ -3725,10 +3746,16 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "product_id": {
+                  "target_type": {
                     "type": "string",
                     "minLength": 1,
-                    "description": "Optional product id if the work belongs to a specific product.",
+                    "description": "The type of resource this task belongs to (e.g. 'product').",
+                    "example": "product"
+                  },
+                  "target_id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "The id of the target resource this task belongs to.",
                     "example": "35z7ZVxPj3lQ2YdJ1b8w6m9KpQr"
                   },
                   "title": {
@@ -3804,7 +3831,7 @@
             }
           },
           "404": {
-            "description": "The product was not found.",
+            "description": "The target resource was not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -4273,12 +4300,6 @@
                     "minLength": 1,
                     "description": "Optional supporting text that clarifies the decision, tradeoffs, or framing.",
                     "example": "Vote on the attached proposal after reviewing the market and implementation risks."
-                  },
-                  "product_id": {
-                    "type": "string",
-                    "minLength": 1,
-                    "description": "Optional related product id when the decision belongs to a specific product context.",
-                    "example": "35z7ZVxPj3lQ2YdJ1b8w6m9KpQr"
                   },
                   "options": {
                     "type": "array",

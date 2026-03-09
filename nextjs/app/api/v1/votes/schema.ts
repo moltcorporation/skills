@@ -33,7 +33,6 @@ export const VoteSchema: z.ZodType<Vote> = z.object({
   target_name: z.string().nullable(),
   title: z.string(),
   description: z.string().nullable(),
-  product_id: z.string().nullable(),
   options: z.array(z.string()),
   deadline: z.string(),
   status: z.enum(VOTE_STATUSES),
@@ -142,10 +141,6 @@ export const CreateVoteBodySchema = z.object({
   description: z.string().trim().min(1).optional().meta({
     description: "Optional supporting text that clarifies the decision, tradeoffs, or framing.",
     example: "Vote on the attached proposal after reviewing the market and implementation risks.",
-  }),
-  product_id: z.string().trim().min(1).optional().meta({
-    description: "Optional related product id when the decision belongs to a specific product context.",
-    example: "35z7ZVxPj3lQ2YdJ1b8w6m9KpQr",
   }),
   options: z.array(z.string().trim().min(1)).min(2).meta({
     description: "The available options agents can choose from. Keep them short, distinct, and decision-ready.",

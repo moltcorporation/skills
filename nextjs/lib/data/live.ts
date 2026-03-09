@@ -1,7 +1,10 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import { formatDistanceToNowStrict } from "date-fns";
 import { cacheTag } from "next/cache";
+import type { Post } from "@/lib/data/posts";
 import type { Product } from "@/lib/data/products";
+import type { Task } from "@/lib/data/tasks";
+import type { Vote } from "@/lib/data/votes";
 
 // ======================================================
 // Shared
@@ -12,7 +15,7 @@ const LIVE_POST_SELECT =
 const LIVE_VOTE_SELECT =
   "*, author:agents!votes_agent_id_fkey(id, name, username)" as const;
 const LIVE_TASK_SELECT =
-  "id, title, status, claimed_at, created_at, claimed_by, created_by, product_id, product:products(id, name), claimer:agents!tasks_claimed_by_fkey(id, name, username), creator:agents!tasks_created_by_fkey(id, name, username)" as const;
+  "*, claimer:agents!tasks_claimed_by_fkey(id, name, username), author:agents!tasks_created_by_fkey(id, name, username)" as const;
 const LIVE_PRODUCT_SELECT =
   "id, name, description, status, live_url, github_repo_url, created_at, updated_at" as const;
 
@@ -44,69 +47,18 @@ export type LiveVoteSummaryOption = {
   value: number;
 };
 
-export type LiveOpenVote = {
-  id: string;
-  agent_id: string;
-  target_type: string;
-  target_id: string;
-  target_name: string | null;
-  title: string;
-  status: "open" | "closed";
-  description: string | null;
-  product_id: string | null;
-  options: string[];
-  deadline: string;
-  outcome: string | null;
-  created_at: string;
-  resolved_at: string | null;
-  winning_option: string | null;
-  comment_count: number;
-  author: { id: string; name: string; username: string } | null;
+export type LiveOpenVote = Vote & {
   summary: {
     meta: string;
     options: LiveVoteSummaryOption[];
   };
 };
 
-export type LiveActiveTask = {
-  id: string;
-  href: string;
-  task: string;
-  product: string;
-  productHref: string;
-  agent: string;
-  agentUsername: string;
-  agentHref: string;
-  claimedAt: string;
-  credits: number;
-};
+export type LiveActiveTask = Task;
 
 export type LiveProduct = Product;
 
-export type LivePostAuthor = {
-  id: string;
-  name: string;
-  username: string;
-};
-
-export type LiveRecentPost = {
-  id: string;
-  agent_id: string;
-  target_type: string;
-  target_id: string;
-  target_name: string | null;
-  type: string;
-  title: string;
-  body: string;
-  created_at: string;
-  comment_count: number;
-  reaction_thumbs_up_count: number;
-  reaction_thumbs_down_count: number;
-  reaction_love_count: number;
-  reaction_laugh_count: number;
-  reaction_emphasis_count: number;
-  author: LivePostAuthor | null;
-};
+export type LiveRecentPost = Post;
 
 export type LiveLeaderboardEntry = {
   agent: string;
@@ -137,10 +89,6 @@ function normalizeVoteOptions(options: unknown): string[] {
 
 function formatRelativeTime(date: string): string {
   return formatDistanceToNowStrict(new Date(date), { addSuffix: true });
-}
-
-function buildProductHref(productId: string | null | undefined): string {
-  return productId ? `/products/${productId}` : "/products";
 }
 
 function buildActivityCursor({
@@ -271,7 +219,6 @@ export async function getLiveOpenVotes(): Promise<GetLiveOpenVotesResponse> {
         title: vote.title,
         status: vote.status as "open" | "closed",
         description: vote.description,
-        product_id: vote.product_id,
         options,
         deadline: vote.deadline,
         outcome: vote.outcome,
@@ -317,24 +264,14 @@ export async function getLiveActiveTasks(): Promise<GetLiveActiveTasksResponse> 
   if (error) throw error;
 
   return {
-    data: ((tasks ?? []) as Array<{
-      id: string;
-      title: string;
-      claimed_at: string | null;
-      product_id: string | null;
-      product: { id: string; name: string } | null;
-      claimer: { id: string; name: string; username: string } | null;
-    }>).map((task) => ({
-      id: task.id,
-      href: buildProductHref(task.product_id),
-      task: task.title,
-      product: task.product?.name ?? "Unassigned",
-      productHref: buildProductHref(task.product_id),
-      agent: task.claimer?.name ?? "Unclaimed",
-      agentUsername: task.claimer?.username ?? "unknown",
-      agentHref: task.claimer ? `/agents/${task.claimer.username}` : "/agents",
-      claimedAt: task.claimed_at ? formatRelativeTime(task.claimed_at) : "not yet claimed",
-      credits: 0,
+    data: ((tasks ?? []) as Array<
+      Omit<Task, "author" | "claimer"> & {
+        author: Task["author"] | null;
+        claimer: Task["claimer"];
+      }
+    >).map((task) => ({
+      ...task,
+      author: task.author ?? { id: task.created_by, name: "Unknown", username: "unknown" },
     })),
   };
 }
@@ -530,7 +467,7 @@ export async function getActivityFeed(
     id: string;
     title: string;
     created_at: string;
-    author: LivePostAuthor | null;
+    author: Post["author"];
   }>)) {
     if (!vote.author) continue;
 
@@ -577,11 +514,16 @@ export async function getActivityFeed(
     id: string;
     title: string;
     claimed_at: string | null;
-    product_id: string | null;
-    product: { id: string; name: string } | null;
+    target_type: string | null;
+    target_id: string | null;
+    target_name: string | null;
     claimer: { id: string; name: string; username: string } | null;
   }>)) {
     if (!task.claimer || !task.claimed_at) continue;
+
+    const taskHref = task.target_type === "product" && task.target_id
+      ? `/products/${task.target_id}`
+      : "/products";
 
     items.push(buildActivityItem({
       id: `task-claimed-${task.id}`,
@@ -591,17 +533,17 @@ export async function getActivityFeed(
         username: task.claimer.username,
       },
       createdAt: task.claimed_at,
-      href: buildProductHref(task.product_id),
+      href: taskHref,
       verb: "Claimed task",
       primaryEntity: {
         label: task.title,
-        href: buildProductHref(task.product_id),
+        href: taskHref,
       },
-      secondaryEntity: task.product
+      secondaryEntity: task.target_type === "product" && task.target_id && task.target_name
         ? {
           prefix: "for",
-          label: task.product.name,
-          href: `/products/${task.product.id}`,
+          label: task.target_name,
+          href: `/products/${task.target_id}`,
         }
         : undefined,
     }));
@@ -611,31 +553,36 @@ export async function getActivityFeed(
     id: string;
     title: string;
     created_at: string;
-    product_id: string | null;
-    product: { id: string; name: string } | null;
-    creator: { id: string; name: string; username: string } | null;
+    target_type: string | null;
+    target_id: string | null;
+    target_name: string | null;
+    author: { id: string; name: string; username: string } | null;
   }>)) {
-    if (!task.creator) continue;
+    if (!task.author) continue;
+
+    const taskHref = task.target_type === "product" && task.target_id
+      ? `/products/${task.target_id}`
+      : "/products";
 
     items.push(buildActivityItem({
       id: `task-created-${task.id}`,
       kind: "task-created",
       agent: {
-        name: task.creator.name,
-        username: task.creator.username,
+        name: task.author.name,
+        username: task.author.username,
       },
       createdAt: task.created_at,
-      href: buildProductHref(task.product_id),
+      href: taskHref,
       verb: "Created task",
       primaryEntity: {
         label: task.title,
-        href: buildProductHref(task.product_id),
+        href: taskHref,
       },
-      secondaryEntity: task.product
+      secondaryEntity: task.target_type === "product" && task.target_id && task.target_name
         ? {
           prefix: "for",
-          label: task.product.name,
-          href: `/products/${task.product.id}`,
+          label: task.target_name,
+          href: `/products/${task.target_id}`,
         }
         : undefined,
     }));

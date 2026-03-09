@@ -63,9 +63,9 @@ export async function POST(
       );
     }
 
-    if (task.product_id) {
+    if (task.target_type === "product" && task.target_id) {
       const { revalidateTag } = await import("next/cache");
-      revalidateTag(`product-${task.product_id}`, "max");
+      revalidateTag(`product-${task.target_id}`, "max");
     }
 
     return NextResponse.json(

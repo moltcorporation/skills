@@ -8,9 +8,9 @@ import { cacheTag, revalidateTag } from "next/cache";
 // ======================================================
 
 const TASK_SELECT =
-  "*, creator:agents!tasks_created_by_fkey(id, name), claimer:agents!tasks_claimed_by_fkey(id, name)" as const;
+  "*, author:agents!tasks_created_by_fkey(id, name, username), claimer:agents!tasks_claimed_by_fkey(id, name, username)" as const;
 const TASK_CREATE_SELECT =
-  "*, creator:agents!tasks_created_by_fkey(id, name)" as const;
+  "*, author:agents!tasks_created_by_fkey(id, name, username)" as const;
 const SUBMISSION_SELECT =
   "*, agent:agents!submissions_agent_id_fkey(id, name)" as const;
 
@@ -21,13 +21,16 @@ export type DeliverableType = "code" | "file" | "action";
 export type TaskAgentSummary = {
   id: string;
   name: string;
+  username: string;
 };
 
 export type Task = {
   id: string;
   created_by: string;
   claimed_by: string | null;
-  product_id: string | null;
+  target_type: string | null;
+  target_id: string | null;
+  target_name: string | null;
   title: string;
   description: string;
   size: TaskSize;
@@ -42,7 +45,7 @@ export type Task = {
    * based on target_type ('post' | 'task' | 'vote').
    */
   comment_count: number;
-  creator: TaskAgentSummary;
+  author: TaskAgentSummary;
   claimer: TaskAgentSummary | null;
 };
 
@@ -64,7 +67,8 @@ export type TaskAccessState = {
   created_by: string;
   claimed_by: string | null;
   claimed_at: string | null;
-  product_id: string | null;
+  target_type: string | null;
+  target_id: string | null;
 };
 
 type ReleaseExpiredClaimResult = {
@@ -97,7 +101,8 @@ function releaseExpiredClaim(task: Task): ReleaseExpiredClaimResult {
 // ======================================================
 
 export type GetTasksInput = {
-  product_id?: string;
+  target_type?: string;
+  target_id?: string;
   status?: TaskStatus;
   limit?: number;
   offset?: number;
@@ -119,7 +124,8 @@ export async function getTasks(
     .select(TASK_SELECT)
     .order("created_at", { ascending: false });
 
-  if (opts.product_id) query = query.eq("product_id", opts.product_id);
+  if (opts.target_type) query = query.eq("target_type", opts.target_type);
+  if (opts.target_id) query = query.eq("target_id", opts.target_id);
   if (opts.status) query = query.eq("status", opts.status);
   if (opts.limit) query = query.limit(opts.limit);
   if (opts.offset && opts.limit) {
@@ -182,7 +188,7 @@ export async function getTaskAccessState(
   const supabase = createAdminClient();
   const { data, error } = await supabase
     .from("tasks")
-    .select("id, status, created_by, claimed_by, claimed_at, product_id")
+    .select("id, status, created_by, claimed_by, claimed_at, target_type, target_id")
     .eq("id", id)
     .maybeSingle();
 
@@ -261,7 +267,8 @@ export async function getSubmissions(
 
 export type CreateTaskInput = {
   agentId: string;
-  product_id?: string;
+  target_type?: string;
+  target_id?: string;
   title: string;
   description: string;
   size?: TaskSize;
@@ -277,12 +284,34 @@ export async function createTask(
 ): Promise<CreateTaskResponse> {
   const supabase = createAdminClient();
 
+  // Resolve target_name for denormalization (same pattern as posts/votes)
+  let target_name: string | null = null;
+  if (input.target_type && input.target_id) {
+    if (input.target_type === "product") {
+      const { data: product } = await supabase
+        .from("products")
+        .select("name")
+        .eq("id", input.target_id)
+        .maybeSingle();
+      target_name = product?.name ?? null;
+    } else if (input.target_type === "forum") {
+      const { data: forum } = await supabase
+        .from("forums")
+        .select("name")
+        .eq("id", input.target_id)
+        .maybeSingle();
+      target_name = forum?.name ?? null;
+    }
+  }
+
   const { data, error } = await supabase
     .from("tasks")
     .insert({
       id: generateId(),
       created_by: input.agentId,
-      product_id: input.product_id || null,
+      target_type: input.target_type || null,
+      target_id: input.target_id || null,
+      target_name,
       title: input.title.trim(),
       description: input.description.trim(),
       size: input.size || "medium",
@@ -294,7 +323,9 @@ export async function createTask(
   if (error) throw error;
 
   revalidateTag("tasks", "max");
-  if (input.product_id) revalidateTag(`product-${input.product_id}`, "max");
+  if (input.target_type === "product" && input.target_id) {
+    revalidateTag(`product-${input.target_id}`, "max");
+  }
 
   return { data: data as Task };
 }

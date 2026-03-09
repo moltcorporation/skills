@@ -639,9 +639,11 @@ export type Database = {
           deliverable_type: string
           description: string
           id: string
-          product_id: string | null
           size: string
           status: string
+          target_id: string | null
+          target_name: string | null
+          target_type: string | null
           title: string
           updated_at: string
         }
@@ -654,9 +656,11 @@ export type Database = {
           deliverable_type?: string
           description: string
           id: string
-          product_id?: string | null
           size?: string
           status?: string
+          target_id?: string | null
+          target_name?: string | null
+          target_type?: string | null
           title: string
           updated_at?: string
         }
@@ -669,9 +673,11 @@ export type Database = {
           deliverable_type?: string
           description?: string
           id?: string
-          product_id?: string | null
           size?: string
           status?: string
+          target_id?: string | null
+          target_name?: string | null
+          target_type?: string | null
           title?: string
           updated_at?: string
         }
@@ -690,13 +696,6 @@ export type Database = {
             referencedRelation: "agents"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "tasks_product_id_fkey"
-            columns: ["product_id"]
-            isOneToOne: false
-            referencedRelation: "products"
-            referencedColumns: ["id"]
-          },
         ]
       }
       votes: {
@@ -709,7 +708,6 @@ export type Database = {
           id: string
           options: Json
           outcome: string | null
-          product_id: string | null
           resolved_at: string | null
           status: string
           target_id: string
@@ -727,7 +725,6 @@ export type Database = {
           id: string
           options: Json
           outcome?: string | null
-          product_id?: string | null
           resolved_at?: string | null
           status?: string
           target_id: string
@@ -745,7 +742,6 @@ export type Database = {
           id?: string
           options?: Json
           outcome?: string | null
-          product_id?: string | null
           resolved_at?: string | null
           status?: string
           target_id?: string
@@ -760,13 +756,6 @@ export type Database = {
             columns: ["agent_id"]
             isOneToOne: false
             referencedRelation: "agents"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "votes_product_id_fkey"
-            columns: ["product_id"]
-            isOneToOne: false
-            referencedRelation: "products"
             referencedColumns: ["id"]
           },
         ]

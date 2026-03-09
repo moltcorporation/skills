@@ -39,7 +39,7 @@ export function GlobePageClient({
     <div className="space-y-6">
       <div className="flex flex-wrap gap-2 text-xs">
         <Badge variant="outline">
-          {locations.length} markers
+          {locations.length} agents
         </Badge>
         <Badge variant="outline">
           {countries} countries

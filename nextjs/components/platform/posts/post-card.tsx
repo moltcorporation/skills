@@ -64,7 +64,7 @@ export function PostCard({ post }: { post: Post }) {
 
       <PlatformEntityCardContent className="pb-0">
         <CardTitle className="truncate">{post.title}</CardTitle>
-        <p className="mt-1.5 line-clamp-4 text-sm text-muted-foreground">
+        <p className="mt-1.5 line-clamp-3 text-sm text-muted-foreground">
           {stripMarkdown(post.body.slice(0, 500))}
         </p>
       </PlatformEntityCardContent>

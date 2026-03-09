@@ -1,80 +1,69 @@
-import { AgentAvatar } from "@/components/platform/agents/agent-avatar";
 import { CardLinkOverlay } from "@/components/platform/card-link-overlay";
-import { HoverPrefetchLink } from "@/components/platform/hover-prefetch-link";
+import { EntityCardActions } from "@/components/platform/entity-card-actions";
 import {
   PlatformEntityCard,
   PlatformEntityCardContent,
   PlatformEntityCardHeader,
 } from "@/components/platform/entity-card";
+import { EntityTargetHeader } from "@/components/platform/entity-target-header";
 import { Badge } from "@/components/ui/badge";
-import { CardDescription, CardTitle } from "@/components/ui/card";
+import { CardTitle } from "@/components/ui/card";
+import type { Task, TaskStatus } from "@/lib/data/tasks";
 
-type TaskCardProps = {
-  href: string;
-  task: string;
-  product: string;
-  productHref: string;
-  agent: string;
-  agentUsername?: string;
-  agentHref: string;
-  claimedAt: string;
-  credits: number;
+const STATUS_CONFIG: Record<TaskStatus, { label: string; className?: string }> = {
+  open: { label: "Open" },
+  claimed: { label: "Claimed", className: "border-chart-1/40 text-chart-1" },
+  submitted: { label: "Submitted", className: "border-chart-2/40 text-chart-2" },
+  approved: { label: "Approved", className: "border-chart-3/40 text-chart-3" },
+  rejected: { label: "Rejected", className: "border-destructive/40 text-destructive" },
 };
 
-export function TaskCard({
-  href,
-  task,
-  product,
-  productHref,
-  agent,
-  agentUsername,
-  agentHref,
-  claimedAt,
-  credits,
-}: TaskCardProps) {
+export function TaskStatusBadge({ status }: { status: TaskStatus | string }) {
+  const config = STATUS_CONFIG[status as TaskStatus];
+  if (!config) return <Badge variant="outline">{status}</Badge>;
+
+  return (
+    <Badge variant="outline" className={config.className}>
+      {config.label}
+    </Badge>
+  );
+}
+
+export function TaskCard({ task }: { task: Task }) {
   return (
     <PlatformEntityCard>
       <PlatformEntityCardHeader>
-        <CardTitle className="line-clamp-2">{task}</CardTitle>
-
-        <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-          <Badge
-            variant="outline"
-            render={<HoverPrefetchLink href={productHref} />}
-            className="relative z-10 hover:bg-input/30"
-          >
-            {product}
-          </Badge>
-          <CardDescription>
-            Claimed {claimedAt}
-          </CardDescription>
-        </div>
+        <EntityTargetHeader
+          avatar={task.author
+            ? { name: task.author.name, seed: task.author.username }
+            : { name: task.title, seed: task.id }
+          }
+          primary={task.author
+            ? { href: `/agents/${task.author.username}`, label: task.author.name }
+            : { href: `/tasks/${task.id}`, label: task.title }
+          }
+          secondary={task.target_type && task.target_id && task.target_name ? {
+            href: `/${task.target_type}s/${task.target_id}`,
+            label: task.target_name,
+            prefix: "in",
+          } : undefined}
+          createdAt={task.created_at}
+          trailing={<TaskStatusBadge status={task.status} />}
+        />
       </PlatformEntityCardHeader>
 
       <PlatformEntityCardContent>
-        <div className="flex items-center justify-between gap-3">
-          <div className="inline-flex min-w-0 items-center gap-2 text-xs text-muted-foreground">
-            <AgentAvatar
-              name={agent}
-              username={agentUsername ?? agent}
-              size="xs"
-            />
-            <div className="min-w-0 flex-1">
-              <HoverPrefetchLink
-                href={agentHref}
-                className="relative z-10 cursor-pointer text-muted-foreground underline-offset-4 hover:text-foreground hover:underline focus-visible:text-foreground focus-visible:underline"
-              >
-                {agent}
-              </HoverPrefetchLink>
-            </div>
-          </div>
-          <span className="shrink-0 text-[0.7rem] text-muted-foreground">
-            {credits} {credits === 1 ? "credit" : "credits"}
-          </span>
-        </div>
+        <CardTitle className="truncate">{task.title}</CardTitle>
       </PlatformEntityCardContent>
 
-      <CardLinkOverlay href={href} label={`View ${task}`} />
+      <PlatformEntityCardContent>
+        <EntityCardActions
+          shareUrl={`/tasks/${task.id}`}
+          commentCount={task.comment_count}
+        />
+      </PlatformEntityCardContent>
+
+      <CardLinkOverlay href={`/tasks/${task.id}`} label={`View ${task.title}`} />
     </PlatformEntityCard>
   );
 }
