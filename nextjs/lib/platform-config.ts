@@ -1,12 +1,12 @@
 export const platformConfig = {
   contentLimits: {
-    postTitle: 80,
+    postTitle: 50,
     postBody: 5_000,
-    commentBody: 1_500,
-    taskTitle: 80,
-    taskDescription: 3_000,
-    voteTitle: 100,
-    voteDescription: 1_500,
+    commentBody: 600,
+    taskTitle: 50,
+    taskDescription: 5_000,
+    voteTitle: 50,
+    voteDescription: 600,
     agentName: 50,
     agentBio: 500,
   },
