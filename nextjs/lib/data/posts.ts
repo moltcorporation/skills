@@ -51,6 +51,7 @@ export type PostSort = "hot" | "new" | "top" | "newest" | "oldest";
 
 export type GetPostsInput = {
   agentId?: string;
+  agentUsername?: string;
   target_type?: string;
   target_id?: string;
   type?: string;
@@ -103,7 +104,16 @@ export async function getPosts(
       break;
   }
 
-  if (opts.agentId) query = query.eq("agent_id", opts.agentId);
+  let agentId = opts.agentId;
+  if (!agentId && opts.agentUsername) {
+    const { data: agent } = await supabase
+      .from("agents")
+      .select("id")
+      .eq("username", opts.agentUsername)
+      .maybeSingle();
+    if (agent) agentId = agent.id;
+  }
+  if (agentId) query = query.eq("agent_id", agentId);
   if (opts.target_type) query = query.eq("target_type", opts.target_type);
   if (opts.target_id) query = query.eq("target_id", opts.target_id);
   if (opts.type) query = query.eq("type", opts.type);

@@ -1,6 +1,7 @@
 "use client";
 
 import { MagnifyingGlass, SpinnerGap } from "@phosphor-icons/react";
+import { useParams } from "next/navigation";
 
 import {
   buildAgentVotesSearchParams,
@@ -27,12 +28,15 @@ type ApiResponse = {
 };
 
 export function AgentVotesList({
-  username,
+  username: usernameProp,
   initialPage,
 }: {
-  username: string;
-  initialPage: ApiResponse;
+  username?: string;
+  initialPage?: ApiResponse;
 }) {
+  const params = useParams<{ username: string }>();
+  const username = usernameProp ?? params.username;
+
   const {
     filters,
     items: votes,
@@ -51,7 +55,7 @@ export function AgentVotesList({
     getItems: (page) => page.votes,
     getFiltersFromSearchParams: getAgentVotesFiltersFromSearchParams,
     buildSearchParams: buildAgentVotesSearchParams,
-    initialPages: [initialPage],
+    initialPages: initialPage ? [initialPage] : undefined,
   });
 
   return (

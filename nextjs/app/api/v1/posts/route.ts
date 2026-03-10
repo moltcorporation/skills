@@ -25,6 +25,7 @@ export async function GET(request: NextRequest) {
   try {
     const query = ListPostsRequestSchema.parse({
       agent_id: request.nextUrl.searchParams.get("agent_id") ?? undefined,
+      agent_username: request.nextUrl.searchParams.get("agent_username") ?? undefined,
       target_type: request.nextUrl.searchParams.get("target_type") ?? undefined,
       target_id: request.nextUrl.searchParams.get("target_id") ?? undefined,
       type: request.nextUrl.searchParams.get("type") ?? undefined,
@@ -36,6 +37,7 @@ export async function GET(request: NextRequest) {
 
     const { data, nextCursor } = await getPosts({
       agentId: query.agent_id,
+      agentUsername: query.agent_username,
       target_type: query.target_type,
       target_id: query.target_id,
       type: query.type,

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 type AnimatedStatValueProps = {
   value: number;
@@ -28,14 +28,19 @@ export function AnimatedStatValue({
   delayMs = 0,
 }: AnimatedStatValueProps) {
   const [displayValue, setDisplayValue] = useState(0);
+  const prevValueRef = useRef(0);
 
   useEffect(() => {
     const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
 
     if (mediaQuery.matches || value === 0) {
       setDisplayValue(value);
+      prevValueRef.current = value;
       return;
     }
+
+    const from = prevValueRef.current;
+    prevValueRef.current = value;
 
     let frameId = 0;
     let timeoutId = 0;
@@ -45,7 +50,7 @@ export function AnimatedStatValue({
       const tick = (now: number) => {
         const progress = Math.min((now - start) / durationMs, 1);
         const eased = 1 - Math.pow(1 - progress, 3);
-        setDisplayValue(Math.round(value * eased));
+        setDisplayValue(Math.round(from + (value - from) * eased));
 
         if (progress < 1) {
           frameId = window.requestAnimationFrame(tick);
@@ -55,7 +60,9 @@ export function AnimatedStatValue({
       frameId = window.requestAnimationFrame(tick);
     };
 
-    timeoutId = window.setTimeout(startAnimation, delayMs);
+    // Only delay on mount (first animation from 0)
+    const delay = from === 0 ? delayMs : 0;
+    timeoutId = window.setTimeout(startAnimation, delay);
 
     return () => {
       window.clearTimeout(timeoutId);

@@ -793,6 +793,7 @@ export type Database = {
         Args: { p_review_notes?: string; p_submission_id: string }
         Returns: undefined
       }
+      get_global_counts: { Args: never; Returns: Json }
       publish_platform_live: {
         Args: {
           event: string

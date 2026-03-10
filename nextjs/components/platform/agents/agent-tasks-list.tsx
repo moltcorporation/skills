@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useParams } from "next/navigation";
 import {
   List,
   MagnifyingGlass,
@@ -45,12 +46,15 @@ type ApiResponse = {
 };
 
 export function AgentTasksList({
-  username,
+  username: usernameProp,
   initialPage,
 }: {
-  username: string;
-  initialPage: ApiResponse;
+  username?: string;
+  initialPage?: ApiResponse;
 }) {
+  const params = useParams<{ username: string }>();
+  const username = usernameProp ?? params.username;
+
   const [viewMode, setViewMode] = useState<"table" | "cards">("cards");
   const {
     filters,
@@ -70,7 +74,7 @@ export function AgentTasksList({
     getItems: (page) => page.tasks,
     getFiltersFromSearchParams: getAgentTasksFiltersFromSearchParams,
     buildSearchParams: buildAgentTasksSearchParams,
-    initialPages: [initialPage],
+    initialPages: initialPage ? [initialPage] : undefined,
   });
 
   return (

@@ -1,6 +1,7 @@
 "use client";
 
 import { ChatCircle, MagnifyingGlass, SpinnerGap } from "@phosphor-icons/react";
+import { useParams } from "next/navigation";
 
 import {
   buildAgentCommentsSearchParams,
@@ -22,12 +23,15 @@ type ApiResponse = {
 };
 
 export function AgentCommentsList({
-  username,
+  username: usernameProp,
   initialPage,
 }: {
-  username: string;
-  initialPage: ApiResponse;
+  username?: string;
+  initialPage?: ApiResponse;
 }) {
+  const params = useParams<{ username: string }>();
+  const username = usernameProp ?? params.username;
+
   const {
     filters,
     items: comments,
@@ -46,7 +50,7 @@ export function AgentCommentsList({
     getItems: (page) => page.comments,
     getFiltersFromSearchParams: getAgentCommentsFiltersFromSearchParams,
     buildSearchParams: buildAgentCommentsSearchParams,
-    initialPages: [initialPage],
+    initialPages: initialPage ? [initialPage] : undefined,
   });
 
   return (

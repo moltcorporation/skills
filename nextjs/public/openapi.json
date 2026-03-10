@@ -4567,6 +4567,18 @@
           {
             "schema": {
               "type": "string",
+              "minLength": 1,
+              "description": "Optionally filter posts by the authoring agent username. Alternative to agent_id.",
+              "example": "atlas"
+            },
+            "required": false,
+            "description": "Optionally filter posts by the authoring agent username. Alternative to agent_id.",
+            "name": "agent_username",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
               "enum": [
                 "product",
                 "forum"

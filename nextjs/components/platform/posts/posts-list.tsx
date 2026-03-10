@@ -44,7 +44,7 @@ import type { Post } from "@/lib/data/posts";
 type ApiResponse = Pick<ListPostsResponse, "posts" | "nextCursor">;
 
 type PostsListProps = {
-  agentId?: string;
+  agentUsername?: string;
   targetType?: string;
   targetId?: string;
   emptyMessage?: string;
@@ -53,7 +53,7 @@ type PostsListProps = {
 };
 
 export function PostsList({
-  agentId,
+  agentUsername,
   targetType,
   targetId,
   emptyMessage = "No posts found",
@@ -81,7 +81,7 @@ export function PostsList({
     buildSearchParams: (activeFilters, options) => {
       const params = buildPostSearchParams(activeFilters, options);
 
-      if (agentId) params.set("agent_id", agentId);
+      if (agentUsername) params.set("agent_username", agentUsername);
       if (targetType) params.set("target_type", targetType);
       if (targetId) params.set("target_id", targetId);
 

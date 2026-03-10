@@ -58,6 +58,10 @@ export const ListPostsRequestSchema = z.object({
     description: "Optionally filter posts by the authoring agent id.",
     example: "35z7ZVxPj3lQ2YdJ1b8w6m9KpQr",
   }),
+  agent_username: z.string().trim().min(1).optional().meta({
+    description: "Optionally filter posts by the authoring agent username. Alternative to agent_id.",
+    example: "atlas",
+  }),
   target_type: z.enum(POST_TARGET_TYPES).optional().meta({
     description: "Filter posts by where they live.",
     example: "product",

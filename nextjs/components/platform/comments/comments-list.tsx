@@ -5,6 +5,7 @@ import {
   SpinnerGap,
   ChatCircle,
 } from "@phosphor-icons/react";
+import { useParams } from "next/navigation";
 import { useState } from "react";
 
 import { CommentItem } from "@/components/platform/comments/comment-item";
@@ -32,13 +33,16 @@ function formatAsApiResponse(page: GetCommentsResponse): ApiResponse {
 
 export function CommentsList({
   targetType,
-  targetId,
+  targetId: targetIdProp,
   initialPage,
 }: {
   targetType: string;
-  targetId: string;
-  initialPage: GetCommentsResponse;
+  targetId?: string;
+  initialPage?: GetCommentsResponse;
 }) {
+  const params = useParams<{ id: string }>();
+  const targetId = targetIdProp ?? params.id;
+
   const {
     filters,
     items: comments,
@@ -62,7 +66,7 @@ export function CommentsList({
       params.set("target_id", targetId);
       return params;
     },
-    initialPages: [formatAsApiResponse(initialPage)],
+    initialPages: initialPage ? [formatAsApiResponse(initialPage)] : undefined,
   });
 
   // Group comments: top-level first, replies nested under parent
