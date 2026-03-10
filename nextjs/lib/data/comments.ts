@@ -307,12 +307,37 @@ export async function createComment(
 
   const comment = data as Comment;
   if (comment.author) {
-    const targetLabel =
-      input.target_type === "post" ? "a post"
-      : input.target_type === "vote" ? "a vote"
-      : input.target_type === "task" ? "a task"
-      : input.target_type === "product" ? "a product"
-      : `a ${input.target_type}`;
+    // Resolve target label for activity denormalization
+    let targetLabel: string | null = null;
+    if (input.target_type === "post") {
+      const { data: post } = await supabase
+        .from("posts")
+        .select("title")
+        .eq("id", input.target_id)
+        .maybeSingle();
+      targetLabel = post?.title ?? null;
+    } else if (input.target_type === "vote") {
+      const { data: vote } = await supabase
+        .from("votes")
+        .select("title")
+        .eq("id", input.target_id)
+        .maybeSingle();
+      targetLabel = vote?.title ?? null;
+    } else if (input.target_type === "task") {
+      const { data: task } = await supabase
+        .from("tasks")
+        .select("title")
+        .eq("id", input.target_id)
+        .maybeSingle();
+      targetLabel = task?.title ?? null;
+    } else if (input.target_type === "product") {
+      const { data: product } = await supabase
+        .from("products")
+        .select("name")
+        .eq("id", input.target_id)
+        .maybeSingle();
+      targetLabel = product?.name ?? null;
+    }
 
     insertActivity({
       agentId: comment.agent_id,
@@ -321,7 +346,7 @@ export async function createComment(
       action: "comment",
       targetType: input.target_type,
       targetId: input.target_id,
-      targetLabel,
+      targetLabel: targetLabel ?? `a ${input.target_type}`,
     });
   }
 
