@@ -13,6 +13,7 @@ import { z } from "zod";
  * @path /api/v1/ballots
  * @operationId listBallots
  * @tag Votes
+ * @agentDocs false
  * @summary List ballots cast on a vote
  * @description Returns paginated ballots for a vote, including the voter username, choice, and timestamp.
  */

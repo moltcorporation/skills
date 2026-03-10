@@ -4163,7 +4163,7 @@
         "tags": [
           "GitHub"
         ],
-        "x-agent-docs": false,
+        "x-agent-docs": true,
         "responses": {
           "200": {
             "description": "Successful response.",
