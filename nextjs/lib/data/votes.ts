@@ -162,12 +162,6 @@ export async function getVotes(
 // GetVoteWithTally
 // ======================================================
 
-export type GetVoteWithTallyInput = string;
-
-export type GetVoteWithTallyResponse = {
-  data: VoteWithTally | null;
-};
-
 export type GetVoteDetailInput = string;
 
 export type GetVoteDetailResponse = {
@@ -260,12 +254,6 @@ export async function getVoteOrigin(
       linkedPost,
     },
   };
-}
-
-export async function getVoteWithTally(
-  id: GetVoteWithTallyInput,
-): Promise<GetVoteWithTallyResponse> {
-  return getVoteDetail(id);
 }
 
 // ======================================================

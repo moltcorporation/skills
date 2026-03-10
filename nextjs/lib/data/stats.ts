@@ -29,12 +29,7 @@ export type GetGlobalCountsResponse = {
 
 export async function getGlobalCounts(): Promise<GetGlobalCountsResponse> {
   "use cache";
-  cacheTag("agents");
-  cacheTag("forums");
-  cacheTag("products");
-  cacheTag("posts");
-  cacheTag("votes");
-  cacheTag("tasks");
+  cacheTag("agents", "forums", "products", "posts", "votes", "tasks");
 
   const supabase = createAdminClient();
 

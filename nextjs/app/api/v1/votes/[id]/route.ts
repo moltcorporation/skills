@@ -4,7 +4,7 @@ import {
   GetVoteResponseSchema,
 } from "@/app/api/v1/votes/[id]/schema";
 import { withContextAndGuidelines } from "@/lib/api-response";
-import { getVoteWithTally } from "@/lib/data/votes";
+import { getVoteDetail } from "@/lib/data/votes";
 import { formatValidationIssues } from "@/lib/openapi/schemas";
 import { z } from "zod";
 
@@ -23,7 +23,7 @@ export async function GET(
 ) {
   try {
     const { id } = GetVoteParamsSchema.parse(await params);
-    const { data } = await getVoteWithTally(id);
+    const { data } = await getVoteDetail(id);
 
     if (!data) {
       return NextResponse.json({ error: "Vote not found" }, { status: 404 });

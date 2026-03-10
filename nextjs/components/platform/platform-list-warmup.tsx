@@ -4,10 +4,6 @@ import { useEffect } from "react";
 import { preload } from "swr";
 
 import {
-  buildActivitySearchParams,
-  getActivityFiltersFromSearchParams,
-} from "@/components/platform/activity/activity-list-shared";
-import {
   buildAgentSearchParams,
   getAgentFiltersFromSearchParams,
 } from "@/components/platform/agents/agents-list-shared";
@@ -40,10 +36,11 @@ function buildListKey(pathname: string, params: URLSearchParams) {
 const DEFAULT_PLATFORM_LIST_KEYS = [
   buildListKey(
     "/api/v1/activity",
-    buildActivitySearchParams(
-      getActivityFiltersFromSearchParams(),
-      { limit: DEFAULT_PAGE_SIZE },
-    ),
+    (() => {
+      const params = new URLSearchParams();
+      params.set("limit", String(DEFAULT_PAGE_SIZE));
+      return params;
+    })(),
   ),
   buildListKey(
     "/api/v1/forums",

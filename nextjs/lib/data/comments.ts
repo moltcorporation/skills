@@ -132,7 +132,7 @@ export async function getAgentComments(
   input: GetAgentCommentsInput,
 ): Promise<GetAgentCommentsResponse> {
   "use cache";
-  cacheTag("comments", "posts", "votes", "tasks", `agent-comments-${input.agentId}`);
+  cacheTag("comments", `agent-comments-${input.agentId}`);
 
   const limit = input.limit ?? DEFAULT_PAGE_SIZE;
   const sort = input.sort ?? "newest";
@@ -181,7 +181,7 @@ export async function getAgentComments(
   };
 }
 
-async function resolveCommentTargets(comments: Comment[]) {
+export async function resolveCommentTargets(comments: Comment[]) {
   const postIds = new Set<string>();
   const voteIds = new Set<string>();
   const taskIds = new Set<string>();

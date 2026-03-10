@@ -4,23 +4,38 @@ import { SpinnerGap } from "@phosphor-icons/react";
 import { useEffect, useRef } from "react";
 
 import { ActivityTimelineList } from "@/components/platform/activity/activity-timeline-list";
-import {
-  buildActivitySearchParams,
-  getActivityFiltersFromSearchParams,
-  type ActivityFilters,
-} from "@/components/platform/activity/activity-list-shared";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { usePlatformInfiniteList } from "@/components/platform/use-platform-infinite-list";
-import type { ListActivityResponse } from "@/app/api/v1/activity/schema";
 import type { LiveActivityItem } from "@/lib/data/live";
 
-type ActivityPage = Pick<ListActivityResponse, "activity" | "nextCursor">;
+type ActivityPage = {
+  activity: LiveActivityItem[];
+  nextCursor: string | null;
+};
+
+type ActivityFilters = { search: string };
+
+function buildActivitySearchParams(
+  _filters: ActivityFilters,
+  options?: { after?: string; limit?: number },
+) {
+  const params = new URLSearchParams();
+  if (options?.after) params.set("after", options.after);
+  if (options?.limit) params.set("limit", String(options.limit));
+  return params;
+}
 
 export function ActivityTimeline({
+  apiPath = "/api/v1/activity",
   initialPage,
+  itemClassName = "px-4 py-3 sm:px-5",
+  skeletonCount = 8,
 }: {
+  apiPath?: string;
   initialPage: ActivityPage;
+  itemClassName?: string;
+  skeletonCount?: number;
 }) {
   const sentinelRef = useRef<HTMLDivElement | null>(null);
   const {
@@ -31,37 +46,29 @@ export function ActivityTimeline({
     isLoadingMore,
     loadMore,
   } = usePlatformInfiniteList<ActivityFilters, ActivityPage, LiveActivityItem>({
-    apiPath: "/api/v1/activity",
-    defaultFilters: getActivityFiltersFromSearchParams(),
+    apiPath,
+    defaultFilters: { search: "" },
     getNextCursor: (page) => page.nextCursor,
     getItems: (page) => page.activity,
-    getFiltersFromSearchParams: getActivityFiltersFromSearchParams,
+    getFiltersFromSearchParams: () => ({ search: "" }),
     buildSearchParams: buildActivitySearchParams,
     initialPages: [initialPage],
   });
 
   useEffect(() => {
     const node = sentinelRef.current;
-    if (!node || !hasMore) {
-      return;
-    }
+    if (!node || !hasMore) return;
 
     const observer = new IntersectionObserver(
       (entries) => {
         const isVisible = entries.some((entry) => entry.isIntersecting);
-
-        if (isVisible && !isLoadingMore) {
-          loadMore();
-        }
+        if (isVisible && !isLoadingMore) loadMore();
       },
       { rootMargin: "320px 0px" },
     );
 
     observer.observe(node);
-
-    return () => {
-      observer.disconnect();
-    };
+    return () => observer.disconnect();
   }, [hasMore, isLoadingMore, loadMore]);
 
   if (error && items.length === 0) {
@@ -73,7 +80,13 @@ export function ActivityTimeline({
   }
 
   if (isLoading && items.length === 0) {
-    return <ActivityTimelineSkeleton />;
+    return (
+      <div className="space-y-2 py-2">
+        {Array.from({ length: skeletonCount }).map((_, index) => (
+          <Skeleton key={index} className="h-12 w-full" />
+        ))}
+      </div>
+    );
   }
 
   if (items.length === 0) {
@@ -86,10 +99,8 @@ export function ActivityTimeline({
 
   return (
     <div className="space-y-4">
-      <ActivityTimelineList items={items} itemClassName="px-4 py-3 sm:px-5" />
-
+      <ActivityTimelineList items={items} itemClassName={itemClassName} />
       <div ref={sentinelRef} className="h-px w-full" aria-hidden="true" />
-
       {hasMore ? (
         <div className="flex justify-center pt-2">
           <Button variant="outline" onClick={loadMore} disabled={isLoadingMore}>
@@ -98,18 +109,6 @@ export function ActivityTimeline({
           </Button>
         </div>
       ) : null}
-    </div>
-  );
-}
-
-function ActivityTimelineSkeleton() {
-  return (
-    <div className="space-y-0 px-4 py-2 sm:px-5">
-      {Array.from({ length: 8 }).map((_, index) => (
-        <div key={index} className="py-2">
-          <Skeleton className="h-12 w-full" />
-        </div>
-      ))}
     </div>
   );
 }

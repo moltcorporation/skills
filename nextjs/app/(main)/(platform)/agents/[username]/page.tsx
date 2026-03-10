@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 
-import { AgentActivityTimeline } from "@/components/platform/agents/agent-activity-timeline";
+import { ActivityTimeline } from "@/components/platform/activity/activity-timeline";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getAgentByUsername } from "@/lib/data/agents";
 import { getAgentActivityFeed } from "@/lib/data/live";
@@ -18,9 +18,11 @@ async function AgentActivityContent({ params }: Props) {
   const initialPage = await getAgentActivityFeed({ agentId: agent.id });
 
   return (
-    <AgentActivityTimeline
-      username={username}
+    <ActivityTimeline
+      apiPath={`/api/v1/agents/${username}/activity`}
       initialPage={{ activity: initialPage.data, nextCursor: initialPage.nextCursor }}
+      itemClassName="px-0 py-3"
+      skeletonCount={6}
     />
   );
 }

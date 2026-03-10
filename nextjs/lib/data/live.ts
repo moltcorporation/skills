@@ -1,6 +1,6 @@
 import { DEFAULT_PAGE_SIZE } from "@/lib/constants";
 import { decodeCursor, encodeCursor } from "@/lib/cursor";
-import type { Comment } from "@/lib/data/comments";
+import { resolveCommentTargets, type Comment } from "@/lib/data/comments";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { formatDistanceToNowStrict } from "date-fns";
 import { cacheTag } from "next/cache";
@@ -333,28 +333,19 @@ export async function getLiveRecentPosts(): Promise<GetLiveRecentPostsResponse> 
 }
 
 // ======================================================
-// GetLiveActivity
+// GetLiveActivity / GetAgentActivityFeed (shared core)
 // ======================================================
 
-export type GetActivityFeedInput = {
+type FeedCoreOpts = {
+  agentId?: string;
   after?: string;
   limit?: number;
 };
 
-export type GetActivityFeedResponse = {
+async function fetchActivityFeedCore(opts: FeedCoreOpts): Promise<{
   data: LiveActivityItem[];
   nextCursor: string | null;
-};
-
-export async function getActivityFeed(
-  opts: GetActivityFeedInput = {},
-): Promise<GetActivityFeedResponse> {
-  "use cache";
-  cacheTag("posts");
-  cacheTag("votes");
-  cacheTag("products");
-  cacheTag("tasks");
-
+}> {
   const supabase = createAdminClient();
   const limit = opts.limit ?? DEFAULT_PAGE_SIZE;
   const sourceLimit = limit + 1;
@@ -362,134 +353,164 @@ export async function getActivityFeed(
     ? parseActivityCursor(decodeCursor(opts.after).id)
     : null;
 
-  const [
-    postsResult,
-    votesResult,
-    productsResult,
-    taskClaimsResult,
-    taskCreatesResult,
-  ] = await Promise.all([
-    (() => {
-      let query = supabase
-        .from("posts")
-        .select(LIVE_POST_SELECT)
-        .order("created_at", { ascending: false })
-        .limit(sourceLimit);
+  // Posts query
+  const postsQuery = (() => {
+    let query = supabase
+      .from("posts")
+      .select(LIVE_POST_SELECT)
+      .order("created_at", { ascending: false })
+      .limit(sourceLimit);
+    if (opts.agentId) query = query.eq("agent_id", opts.agentId);
+    if (afterCursor) query = query.lte("created_at", afterCursor.createdAt);
+    return query;
+  })();
 
-      if (afterCursor) {
-        query = query.lte("created_at", afterCursor.createdAt);
-      }
+  // Votes query
+  const votesQuery = (() => {
+    let query = supabase
+      .from("votes")
+      .select(LIVE_VOTE_SELECT)
+      .order("created_at", { ascending: false })
+      .limit(sourceLimit);
+    if (opts.agentId) query = query.eq("agent_id", opts.agentId);
+    if (afterCursor) query = query.lte("created_at", afterCursor.createdAt);
+    return query;
+  })();
 
-      return query;
-    })(),
-    (() => {
-      let query = supabase
-        .from("votes")
-        .select(LIVE_VOTE_SELECT)
-        .order("created_at", { ascending: false })
-        .limit(sourceLimit);
+  // Task claims query
+  const taskClaimsQuery = (() => {
+    let query = supabase
+      .from("tasks")
+      .select(LIVE_TASK_SELECT)
+      .not("claimed_at", "is", null)
+      .order("claimed_at", { ascending: false })
+      .limit(sourceLimit);
+    if (opts.agentId) query = query.eq("claimed_by", opts.agentId);
+    if (afterCursor) query = query.lte("claimed_at", afterCursor.createdAt);
+    return query;
+  })();
 
-      if (afterCursor) {
-        query = query.lte("created_at", afterCursor.createdAt);
-      }
+  // Task creates query
+  const taskCreatesQuery = (() => {
+    let query = supabase
+      .from("tasks")
+      .select(LIVE_TASK_SELECT)
+      .order("created_at", { ascending: false })
+      .limit(sourceLimit);
+    if (opts.agentId) query = query.eq("created_by", opts.agentId);
+    if (afterCursor) query = query.lte("created_at", afterCursor.createdAt);
+    return query;
+  })();
 
-      return query;
-    })(),
-    (() => {
-      let query = supabase
-        .from("products")
-        .select("id, name, created_at")
-        .order("created_at", { ascending: false })
-        .limit(sourceLimit);
+  // Agent feeds include comments; global feed includes products
+  const commentsQuery = opts.agentId
+    ? (() => {
+        let query = supabase
+          .from("comments")
+          .select("*, author:agents!comments_agent_id_fkey(id, name, username)")
+          .eq("agent_id", opts.agentId)
+          .order("created_at", { ascending: false })
+          .limit(sourceLimit);
+        if (afterCursor) query = query.lte("created_at", afterCursor.createdAt);
+        return query;
+      })()
+    : null;
 
-      if (afterCursor) {
-        query = query.lte("created_at", afterCursor.createdAt);
-      }
+  const productsQuery = !opts.agentId
+    ? (() => {
+        let query = supabase
+          .from("products")
+          .select("id, name, created_at")
+          .order("created_at", { ascending: false })
+          .limit(sourceLimit);
+        if (afterCursor) query = query.lte("created_at", afterCursor.createdAt);
+        return query;
+      })()
+    : null;
 
-      return query;
-    })(),
-    (() => {
-      let query = supabase
-        .from("tasks")
-        .select(LIVE_TASK_SELECT)
-        .not("claimed_at", "is", null)
-        .order("claimed_at", { ascending: false })
-        .limit(sourceLimit);
-
-      if (afterCursor) {
-        query = query.lte("claimed_at", afterCursor.createdAt);
-      }
-
-      return query;
-    })(),
-    (() => {
-      let query = supabase
-        .from("tasks")
-        .select(LIVE_TASK_SELECT)
-        .order("created_at", { ascending: false })
-        .limit(sourceLimit);
-
-      if (afterCursor) {
-        query = query.lte("created_at", afterCursor.createdAt);
-      }
-
-      return query;
-    })(),
-  ]);
+  const [postsResult, votesResult, taskClaimsResult, taskCreatesResult, commentsResult, productsResult] =
+    await Promise.all([
+      postsQuery,
+      votesQuery,
+      taskClaimsQuery,
+      taskCreatesQuery,
+      commentsQuery ?? Promise.resolve({ data: [] as Comment[], error: null }),
+      productsQuery ?? Promise.resolve({ data: [] as Array<{ id: string; name: string; created_at: string }>, error: null }),
+    ]);
 
   if (postsResult.error) throw postsResult.error;
   if (votesResult.error) throw votesResult.error;
-  if (productsResult.error) throw productsResult.error;
   if (taskClaimsResult.error) throw taskClaimsResult.error;
   if (taskCreatesResult.error) throw taskCreatesResult.error;
+  if (commentsResult.error) throw commentsResult.error;
+  if (productsResult.error) throw productsResult.error;
 
   const items: LiveActivityItem[] = [];
 
+  // Resolve comment targets if we have comments
+  const comments = (commentsResult.data ?? []) as Comment[];
+  const commentTargets = comments.length > 0
+    ? await resolveCommentTargets(comments)
+    : new Map();
+
+  // Posts
   for (const post of (postsResult.data ?? []) as LiveRecentPost[]) {
     if (!post.author) continue;
 
     items.push(buildActivityItem({
       id: `post-${post.id}`,
       kind: "post",
-      agent: {
-        name: post.author.name,
-        username: post.author.username,
-      },
+      agent: { name: post.author.name, username: post.author.username },
       createdAt: post.created_at,
       href: `/posts/${post.id}`,
       verb: "Posted",
+      primaryEntity: { label: post.title, href: `/posts/${post.id}` },
+    }));
+  }
+
+  // Comments (agent feed only)
+  for (const comment of comments as Array<
+    Comment & { author: { id: string; name: string; username: string } | null }
+  >) {
+    if (!comment.author) continue;
+
+    const target = commentTargets.get(`${comment.target_type}:${comment.target_id}`);
+
+    items.push(buildActivityItem({
+      id: `comment-${comment.id}`,
+      kind: "comment",
+      agent: { name: comment.author.name, username: comment.author.username },
+      createdAt: comment.created_at,
+      href: target?.href ?? `/agents/${comment.author.username}/comments`,
+      verb: "Commented on",
       primaryEntity: {
-        label: post.title,
-        href: `/posts/${post.id}`,
+        label: target?.label ?? `${comment.target_type} ${comment.target_id}`,
+        href: target?.href ?? `/agents/${comment.author.username}/comments`,
       },
     }));
   }
 
-  for (const vote of ((votesResult.data ?? []) as Array<{
+  // Votes
+  for (const vote of (votesResult.data ?? []) as Array<{
     id: string;
     title: string;
     created_at: string;
     author: Post["author"];
-  }>)) {
+  }>) {
     if (!vote.author) continue;
 
     items.push(buildActivityItem({
       id: `vote-${vote.id}`,
       kind: "vote",
-      agent: {
-        name: vote.author.name,
-        username: vote.author.username,
-      },
+      agent: { name: vote.author.name, username: vote.author.username },
       createdAt: vote.created_at,
       href: `/votes/${vote.id}`,
       verb: "Started vote",
-      primaryEntity: {
-        label: vote.title,
-        href: `/votes/${vote.id}`,
-      },
+      primaryEntity: { label: vote.title, href: `/votes/${vote.id}` },
     }));
   }
 
+  // Products (global feed only)
   for (const product of (productsResult.data ?? []) as Array<{
     id: string;
     name: string;
@@ -498,21 +519,16 @@ export async function getActivityFeed(
     items.push(buildActivityItem({
       id: `product-${product.id}`,
       kind: "product",
-      agent: {
-        name: "System",
-        username: "system",
-      },
+      agent: { name: "System", username: "system" },
       createdAt: product.created_at,
       href: `/products/${product.id}`,
       verb: "Created product",
-      primaryEntity: {
-        label: product.name,
-        href: `/products/${product.id}`,
-      },
+      primaryEntity: { label: product.name, href: `/products/${product.id}` },
     }));
   }
 
-  for (const task of ((taskClaimsResult.data ?? []) as Array<{
+  // Task claims — fallback href differs between global and agent feeds
+  for (const task of (taskClaimsResult.data ?? []) as Array<{
     id: string;
     title: string;
     claimed_at: string | null;
@@ -520,38 +536,29 @@ export async function getActivityFeed(
     target_id: string | null;
     target_name: string | null;
     claimer: { id: string; name: string; username: string } | null;
-  }>)) {
+  }>) {
     if (!task.claimer || !task.claimed_at) continue;
 
     const taskHref = task.target_type === "product" && task.target_id
       ? `/products/${task.target_id}`
-      : "/products";
+      : opts.agentId ? `/agents/${task.claimer.username}/tasks` : "/products";
 
     items.push(buildActivityItem({
       id: `task-claimed-${task.id}`,
       kind: "task-claimed",
-      agent: {
-        name: task.claimer.name,
-        username: task.claimer.username,
-      },
+      agent: { name: task.claimer.name, username: task.claimer.username },
       createdAt: task.claimed_at,
       href: taskHref,
       verb: "Claimed task",
-      primaryEntity: {
-        label: task.title,
-        href: taskHref,
-      },
+      primaryEntity: { label: task.title, href: taskHref },
       secondaryEntity: task.target_type === "product" && task.target_id && task.target_name
-        ? {
-          prefix: "for",
-          label: task.target_name,
-          href: `/products/${task.target_id}`,
-        }
+        ? { prefix: "for", label: task.target_name, href: `/products/${task.target_id}` }
         : undefined,
     }));
   }
 
-  for (const task of ((taskCreatesResult.data ?? []) as Array<{
+  // Task creates
+  for (const task of (taskCreatesResult.data ?? []) as Array<{
     id: string;
     title: string;
     created_at: string;
@@ -559,37 +566,28 @@ export async function getActivityFeed(
     target_id: string | null;
     target_name: string | null;
     author: { id: string; name: string; username: string } | null;
-  }>)) {
+  }>) {
     if (!task.author) continue;
 
     const taskHref = task.target_type === "product" && task.target_id
       ? `/products/${task.target_id}`
-      : "/products";
+      : opts.agentId ? `/agents/${task.author.username}/tasks` : "/products";
 
     items.push(buildActivityItem({
       id: `task-created-${task.id}`,
       kind: "task-created",
-      agent: {
-        name: task.author.name,
-        username: task.author.username,
-      },
+      agent: { name: task.author.name, username: task.author.username },
       createdAt: task.created_at,
       href: taskHref,
       verb: "Created task",
-      primaryEntity: {
-        label: task.title,
-        href: taskHref,
-      },
+      primaryEntity: { label: task.title, href: taskHref },
       secondaryEntity: task.target_type === "product" && task.target_id && task.target_name
-        ? {
-          prefix: "for",
-          label: task.target_name,
-          href: `/products/${task.target_id}`,
-        }
+        ? { prefix: "for", label: task.target_name, href: `/products/${task.target_id}` }
         : undefined,
     }));
   }
 
+  // Sort, paginate, encode cursor
   const sortedItems = items.sort(compareActivityItems);
   const paginatedItems = afterCursor
     ? sortedItems.filter((item) => isOlderThanCursor(item, afterCursor))
@@ -606,9 +604,24 @@ export async function getActivityFeed(
   };
 }
 
-// ======================================================
-// GetAgentActivityFeed
-// ======================================================
+export type GetActivityFeedInput = {
+  after?: string;
+  limit?: number;
+};
+
+export type GetActivityFeedResponse = {
+  data: LiveActivityItem[];
+  nextCursor: string | null;
+};
+
+export async function getActivityFeed(
+  opts: GetActivityFeedInput = {},
+): Promise<GetActivityFeedResponse> {
+  "use cache";
+  cacheTag("posts", "votes", "products", "tasks");
+
+  return fetchActivityFeedCore(opts);
+}
 
 export type GetAgentActivityFeedInput = {
   agentId: string;
@@ -627,302 +640,7 @@ export async function getAgentActivityFeed(
   "use cache";
   cacheTag("posts", "comments", "votes", "tasks", `agent-${opts.agentId}`);
 
-  const supabase = createAdminClient();
-  const limit = opts.limit ?? DEFAULT_PAGE_SIZE;
-  const sourceLimit = limit + 1;
-  const afterCursor = opts.after
-    ? parseActivityCursor(decodeCursor(opts.after).id)
-    : null;
-
-  const [
-    postsResult,
-    commentsResult,
-    votesResult,
-    taskClaimsResult,
-    taskCreatesResult,
-  ] = await Promise.all([
-    (() => {
-      let query = supabase
-        .from("posts")
-        .select(LIVE_POST_SELECT)
-        .eq("agent_id", opts.agentId)
-        .order("created_at", { ascending: false })
-        .limit(sourceLimit);
-
-      if (afterCursor) query = query.lte("created_at", afterCursor.createdAt);
-      return query;
-    })(),
-    (() => {
-      let query = supabase
-        .from("comments")
-        .select("*, author:agents!comments_agent_id_fkey(id, name, username)")
-        .eq("agent_id", opts.agentId)
-        .order("created_at", { ascending: false })
-        .limit(sourceLimit);
-
-      if (afterCursor) query = query.lte("created_at", afterCursor.createdAt);
-      return query;
-    })(),
-    (() => {
-      let query = supabase
-        .from("votes")
-        .select(LIVE_VOTE_SELECT)
-        .eq("agent_id", opts.agentId)
-        .order("created_at", { ascending: false })
-        .limit(sourceLimit);
-
-      if (afterCursor) query = query.lte("created_at", afterCursor.createdAt);
-      return query;
-    })(),
-    (() => {
-      let query = supabase
-        .from("tasks")
-        .select(LIVE_TASK_SELECT)
-        .eq("claimed_by", opts.agentId)
-        .not("claimed_at", "is", null)
-        .order("claimed_at", { ascending: false })
-        .limit(sourceLimit);
-
-      if (afterCursor) query = query.lte("claimed_at", afterCursor.createdAt);
-      return query;
-    })(),
-    (() => {
-      let query = supabase
-        .from("tasks")
-        .select(LIVE_TASK_SELECT)
-        .eq("created_by", opts.agentId)
-        .order("created_at", { ascending: false })
-        .limit(sourceLimit);
-
-      if (afterCursor) query = query.lte("created_at", afterCursor.createdAt);
-      return query;
-    })(),
-  ]);
-
-  if (postsResult.error) throw postsResult.error;
-  if (commentsResult.error) throw commentsResult.error;
-  if (votesResult.error) throw votesResult.error;
-  if (taskClaimsResult.error) throw taskClaimsResult.error;
-  if (taskCreatesResult.error) throw taskCreatesResult.error;
-
-  const items: LiveActivityItem[] = [];
-  const commentTargets = await resolveActivityCommentTargets(
-    ((commentsResult.data ?? []) as Comment[] | null) ?? [],
-  );
-
-  for (const post of (postsResult.data ?? []) as LiveRecentPost[]) {
-    if (!post.author) continue;
-
-    items.push(buildActivityItem({
-      id: `post-${post.id}`,
-      kind: "post",
-      agent: {
-        name: post.author.name,
-        username: post.author.username,
-      },
-      createdAt: post.created_at,
-      href: `/posts/${post.id}`,
-      verb: "Posted",
-      primaryEntity: {
-        label: post.title,
-        href: `/posts/${post.id}`,
-      },
-    }));
-  }
-
-  for (const comment of (commentsResult.data ?? []) as Array<
-    Comment & { author: { id: string; name: string; username: string } | null }
-  >) {
-    if (!comment.author) continue;
-
-    const target = commentTargets.get(`${comment.target_type}:${comment.target_id}`);
-
-    items.push(buildActivityItem({
-      id: `comment-${comment.id}`,
-      kind: "comment",
-      agent: {
-        name: comment.author.name,
-        username: comment.author.username,
-      },
-      createdAt: comment.created_at,
-      href: target?.href ?? `/agents/${comment.author.username}/comments`,
-      verb: "Commented on",
-      primaryEntity: {
-        label: target?.label ?? `${comment.target_type} ${comment.target_id}`,
-        href: target?.href ?? `/agents/${comment.author.username}/comments`,
-      },
-    }));
-  }
-
-  for (const vote of (votesResult.data ?? []) as Array<{
-    id: string;
-    title: string;
-    created_at: string;
-    author: Post["author"];
-  }>) {
-    if (!vote.author) continue;
-
-    items.push(buildActivityItem({
-      id: `vote-${vote.id}`,
-      kind: "vote",
-      agent: {
-        name: vote.author.name,
-        username: vote.author.username,
-      },
-      createdAt: vote.created_at,
-      href: `/votes/${vote.id}`,
-      verb: "Started vote",
-      primaryEntity: {
-        label: vote.title,
-        href: `/votes/${vote.id}`,
-      },
-    }));
-  }
-
-  for (const task of ((taskClaimsResult.data ?? []) as Array<{
-    id: string;
-    title: string;
-    claimed_at: string | null;
-    target_type: string | null;
-    target_id: string | null;
-    target_name: string | null;
-    claimer: { id: string; name: string; username: string } | null;
-  }>)) {
-    if (!task.claimer || !task.claimed_at) continue;
-
-    const taskHref = task.target_type === "product" && task.target_id
-      ? `/products/${task.target_id}`
-      : `/agents/${task.claimer.username}/tasks`;
-
-    items.push(buildActivityItem({
-      id: `task-claimed-${task.id}`,
-      kind: "task-claimed",
-      agent: {
-        name: task.claimer.name,
-        username: task.claimer.username,
-      },
-      createdAt: task.claimed_at,
-      href: taskHref,
-      verb: "Claimed task",
-      primaryEntity: {
-        label: task.title,
-        href: taskHref,
-      },
-      secondaryEntity: task.target_type === "product" && task.target_id && task.target_name
-        ? {
-          prefix: "for",
-          label: task.target_name,
-          href: `/products/${task.target_id}`,
-        }
-        : undefined,
-    }));
-  }
-
-  for (const task of ((taskCreatesResult.data ?? []) as Array<{
-    id: string;
-    title: string;
-    created_at: string;
-    target_type: string | null;
-    target_id: string | null;
-    target_name: string | null;
-    author: { id: string; name: string; username: string } | null;
-  }>)) {
-    if (!task.author) continue;
-
-    const taskHref = task.target_type === "product" && task.target_id
-      ? `/products/${task.target_id}`
-      : `/agents/${task.author.username}/tasks`;
-
-    items.push(buildActivityItem({
-      id: `task-created-${task.id}`,
-      kind: "task-created",
-      agent: {
-        name: task.author.name,
-        username: task.author.username,
-      },
-      createdAt: task.created_at,
-      href: taskHref,
-      verb: "Created task",
-      primaryEntity: {
-        label: task.title,
-        href: taskHref,
-      },
-      secondaryEntity: task.target_type === "product" && task.target_id && task.target_name
-        ? {
-          prefix: "for",
-          label: task.target_name,
-          href: `/products/${task.target_id}`,
-        }
-        : undefined,
-    }));
-  }
-
-  const sortedItems = items.sort(compareActivityItems);
-  const paginatedItems = afterCursor
-    ? sortedItems.filter((item) => isOlderThanCursor(item, afterCursor))
-    : sortedItems;
-  const hasMore = paginatedItems.length > limit;
-  const page = paginatedItems.slice(0, limit);
-  const lastItem = page[page.length - 1];
-
-  return {
-    data: page,
-    nextCursor: hasMore && lastItem
-      ? encodeCursor({ id: lastItem.cursor })
-      : null,
-  };
-}
-
-async function resolveActivityCommentTargets(comments: Comment[]) {
-  const postIds = new Set<string>();
-  const voteIds = new Set<string>();
-  const taskIds = new Set<string>();
-  const productIds = new Set<string>();
-
-  for (const comment of comments) {
-    if (comment.target_type === "post") postIds.add(comment.target_id);
-    if (comment.target_type === "vote") voteIds.add(comment.target_id);
-    if (comment.target_type === "task") taskIds.add(comment.target_id);
-    if (comment.target_type === "product") productIds.add(comment.target_id);
-  }
-
-  const supabase = createAdminClient();
-  const [postsResult, votesResult, tasksResult, productsResult] = await Promise.all([
-    postIds.size > 0
-      ? supabase.from("posts").select("id, title").in("id", [...postIds])
-      : Promise.resolve({ data: [], error: null }),
-    voteIds.size > 0
-      ? supabase.from("votes").select("id, title").in("id", [...voteIds])
-      : Promise.resolve({ data: [], error: null }),
-    taskIds.size > 0
-      ? supabase.from("tasks").select("id, title").in("id", [...taskIds])
-      : Promise.resolve({ data: [], error: null }),
-    productIds.size > 0
-      ? supabase.from("products").select("id, name").in("id", [...productIds])
-      : Promise.resolve({ data: [], error: null }),
-  ]);
-
-  if (postsResult.error) throw postsResult.error;
-  if (votesResult.error) throw votesResult.error;
-  if (tasksResult.error) throw tasksResult.error;
-  if (productsResult.error) throw productsResult.error;
-
-  const targets = new Map<string, { label: string; href: string | null }>();
-
-  for (const post of postsResult.data ?? []) {
-    targets.set(`post:${post.id}`, { label: post.title, href: `/posts/${post.id}/comments` });
-  }
-  for (const vote of votesResult.data ?? []) {
-    targets.set(`vote:${vote.id}`, { label: vote.title, href: `/votes/${vote.id}/comments` });
-  }
-  for (const task of tasksResult.data ?? []) {
-    targets.set(`task:${task.id}`, { label: task.title, href: null });
-  }
-  for (const product of productsResult.data ?? []) {
-    targets.set(`product:${product.id}`, { label: product.name, href: `/products/${product.id}` });
-  }
-
-  return targets;
+  return fetchActivityFeedCore(opts);
 }
 
 export type GetLiveActivityInput = void;
@@ -949,8 +667,7 @@ export type GetLiveLeaderboardResponse = {
 
 export async function getLiveLeaderboard(): Promise<GetLiveLeaderboardResponse> {
   "use cache";
-  cacheTag("agents");
-  cacheTag("tasks");
+  cacheTag("agents", "tasks");
 
   const supabase = createAdminClient();
   const { data, error } = await supabase
