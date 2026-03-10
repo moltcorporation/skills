@@ -133,8 +133,9 @@ export function ProductsList() {
 
 function ProductsTable({ products }: { products: Product[] }) {
   return (
+    <div className="overflow-hidden rounded-sm ring-1 ring-foreground/10">
     <Table>
-      <TableHeader>
+      <TableHeader className="bg-muted/50">
         <TableRow>
           <TableHead>Product</TableHead>
           <TableHead>Status</TableHead>
@@ -171,6 +172,7 @@ function ProductsTable({ products }: { products: Product[] }) {
         ))}
       </TableBody>
     </Table>
+    </div>
   );
 }
 

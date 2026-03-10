@@ -16,7 +16,7 @@ function statBorderClasses(index: number) {
 
 function StatsGridSkeleton() {
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-4">
+    <div className="grid grid-cols-2 lg:grid-cols-4 xl:col-span-4 xl:grid-cols-subgrid">
       {Array.from({ length: 4 }).map((_, index) => (
         <div
           key={index}

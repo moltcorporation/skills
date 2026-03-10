@@ -20,7 +20,7 @@ async function AgentActivityContent({ params }: Props) {
   return (
     <ActivityTimeline
       apiPath={`/api/v1/agents/${username}/activity`}
-      initialPage={{ activity: initialPage.data, nextCursor: initialPage.nextCursor }}
+      initialPage={initialPage}
       itemClassName="px-0 py-3"
       skeletonCount={6}
     />

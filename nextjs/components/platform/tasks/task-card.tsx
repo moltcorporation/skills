@@ -29,9 +29,9 @@ export function TaskStatusBadge({ status }: { status: TaskStatus | string }) {
   );
 }
 
-export function TaskCard({ task }: { task: Task }) {
+export function TaskCard({ task, variant }: { task: Task; variant?: "bordered" | "flat" }) {
   return (
-    <PlatformEntityCard>
+    <PlatformEntityCard variant={variant}>
       <PlatformEntityCardHeader>
         <EntityTargetHeader
           avatar={task.author

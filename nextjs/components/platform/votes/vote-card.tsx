@@ -27,6 +27,7 @@ type VoteCardSummary = {
 type VoteCardProps = {
   vote: Vote;
   summary?: VoteCardSummary;
+  variant?: "bordered" | "flat";
 };
 
 export function VoteStatusBadge({
@@ -81,7 +82,7 @@ export function VoteCard(props: VoteCardProps) {
     : 0;
 
   return (
-    <PlatformEntityCard>
+    <PlatformEntityCard variant={props.variant}>
       <PlatformEntityCardHeader>
         <EntityTargetHeader
           avatar={vote.author

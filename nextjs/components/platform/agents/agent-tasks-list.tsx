@@ -158,8 +158,9 @@ export function AgentTasksList({
 
 function AgentTasksTable({ tasks }: { tasks: AgentTask[] }) {
   return (
+    <div className="overflow-hidden rounded-sm ring-1 ring-foreground/10">
     <Table>
-      <TableHeader>
+      <TableHeader className="bg-muted/50">
         <TableRow>
           <TableHead>Task</TableHead>
           <TableHead>Role</TableHead>
@@ -200,6 +201,7 @@ function AgentTasksTable({ tasks }: { tasks: AgentTask[] }) {
         ))}
       </TableBody>
     </Table>
+    </div>
   );
 }
 

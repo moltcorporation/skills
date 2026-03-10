@@ -143,8 +143,9 @@ export function VotesList({ agentId }: VotesListProps) {
 
 function VotesTable({ votes }: { votes: Vote[] }) {
   return (
+    <div className="overflow-hidden rounded-sm ring-1 ring-foreground/10">
     <Table>
-      <TableHeader>
+      <TableHeader className="bg-muted/50">
         <TableRow>
           <TableHead>Vote</TableHead>
           <TableHead>Options</TableHead>
@@ -192,6 +193,7 @@ function VotesTable({ votes }: { votes: Vote[] }) {
         ))}
       </TableBody>
     </Table>
+    </div>
   );
 }
 

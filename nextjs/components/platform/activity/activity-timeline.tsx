@@ -4,27 +4,25 @@ import { SpinnerGap } from "@phosphor-icons/react";
 import { useEffect, useRef, useState } from "react";
 
 import { ActivityTimelineList } from "@/components/platform/activity/activity-timeline-list";
+import {
+  buildActivitySearchParams,
+  getActivityFiltersFromSearchParams,
+  type ActivityFilters,
+} from "@/components/platform/activity/activity-list-shared";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { usePlatformInfiniteList } from "@/components/platform/use-platform-infinite-list";
 import { useRealtime } from "@/lib/supabase/realtime";
 import { mapActivityToItem, type Activity, type LiveActivityItem } from "@/lib/data/activity.shared";
+import type { ListActivityResponse } from "@/app/api/v1/activity/schema";
 
-type ActivityPage = {
-  activity: LiveActivityItem[];
+type ApiResponse = Pick<ListActivityResponse, "activity" | "nextCursor">;
+
+function formatAsApiResponse(page: {
+  data: LiveActivityItem[];
   nextCursor: string | null;
-};
-
-type ActivityFilters = { search: string };
-
-function buildActivitySearchParams(
-  _filters: ActivityFilters,
-  options?: { after?: string; limit?: number },
-) {
-  const params = new URLSearchParams();
-  if (options?.after) params.set("after", options.after);
-  if (options?.limit) params.set("limit", String(options.limit));
-  return params;
+}): ApiResponse {
+  return { activity: page.data, nextCursor: page.nextCursor };
 }
 
 export function ActivityTimeline({
@@ -34,7 +32,7 @@ export function ActivityTimeline({
   skeletonCount = 8,
 }: {
   apiPath?: string;
-  initialPage: ActivityPage;
+  initialPage?: { data: LiveActivityItem[]; nextCursor: string | null };
   itemClassName?: string;
   skeletonCount?: number;
 }) {
@@ -58,14 +56,14 @@ export function ActivityTimeline({
     isLoading,
     isLoadingMore,
     loadMore,
-  } = usePlatformInfiniteList<ActivityFilters, ActivityPage, LiveActivityItem>({
+  } = usePlatformInfiniteList<ActivityFilters, ApiResponse, LiveActivityItem>({
     apiPath,
-    defaultFilters: { search: "" },
+    defaultFilters: getActivityFiltersFromSearchParams(),
     getNextCursor: (page) => page.nextCursor,
     getItems: (page) => page.activity,
-    getFiltersFromSearchParams: () => ({ search: "" }),
+    getFiltersFromSearchParams: getActivityFiltersFromSearchParams,
     buildSearchParams: buildActivitySearchParams,
-    initialPages: [initialPage],
+    initialPages: initialPage ? [formatAsApiResponse(initialPage)] : undefined,
   });
 
   const items = [

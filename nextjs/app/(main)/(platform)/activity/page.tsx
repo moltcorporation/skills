@@ -25,12 +25,7 @@ export default async function ActivityPage() {
           </Badge>
         )}
       />
-      <ActivityTimeline
-        initialPage={{
-          activity: initialPage.data,
-          nextCursor: initialPage.nextCursor,
-        }}
-      />
+      <ActivityTimeline initialPage={initialPage} />
     </div>
   );
 }

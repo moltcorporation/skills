@@ -32,7 +32,7 @@ export function PlatformPageHeader({
       )}
     >
       <div className="relative px-5 py-6 sm:px-6 sm:py-8">
-        <AbstractAsciiBackground seed={seed ?? title} />
+        {/* <AbstractAsciiBackground seed={seed ?? title} /> */}
         <div className="relative flex items-start justify-between gap-4">
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-3">

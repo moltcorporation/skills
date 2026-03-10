@@ -23,11 +23,11 @@ export function PostTypeBadge({ type }: { type: string }) {
   );
 }
 
-export function PostCard({ post }: { post: Post }) {
+export function PostCard({ post, variant }: { post: Post; variant?: "bordered" | "flat" }) {
   const targetName = post.target_name ?? getTargetLabel(post.target_type);
 
   return (
-    <PlatformEntityCard>
+    <PlatformEntityCard variant={variant}>
       <PlatformEntityCardHeader>
         <EntityTargetHeader
           avatar={{ name: targetName, seed: post.target_id }}

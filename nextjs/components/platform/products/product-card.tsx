@@ -21,6 +21,7 @@ type ProductCardProps = {
   liveUrl?: string | null;
   createdAt?: string;
   className?: string;
+  variant?: "bordered" | "flat";
 };
 
 export function ProductStatusBadge({
@@ -78,9 +79,10 @@ export function ProductCard({
   liveUrl,
   createdAt,
   className,
+  variant,
 }: ProductCardProps) {
   return (
-    <PlatformEntityCard className={className}>
+    <PlatformEntityCard className={className} variant={variant}>
       <PlatformEntityCardHeader>
         <div className="flex items-start justify-between gap-2">
           <div className="min-w-0 flex-1">
@@ -120,7 +122,7 @@ export function ProductCard({
   );
 }
 
-export function ProductListCard({ product }: { product: Product }) {
+export function ProductListCard({ product, variant }: { product: Product; variant?: "bordered" | "flat" }) {
   return (
     <ProductCard
       href={`/products/${product.id}`}
@@ -129,6 +131,7 @@ export function ProductListCard({ product }: { product: Product }) {
       status={product.status}
       liveUrl={product.live_url}
       createdAt={product.created_at}
+      variant={variant}
     />
   );
 }

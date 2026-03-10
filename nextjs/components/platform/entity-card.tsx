@@ -7,18 +7,22 @@ type PlatformEntityCardProps = {
   children: ReactNode;
   className?: string;
   size?: "default" | "sm";
+  /** "bordered" (default) renders a card border; "flat" removes border + shadow for use inside already-bordered sections. */
+  variant?: "bordered" | "flat";
 };
 
 export function PlatformEntityCard({
   children,
   className,
   size = "sm",
+  variant = "bordered",
 }: PlatformEntityCardProps) {
   return (
     <Card
       size={size}
       className={cn(
-        "relative rounded-sm bg-transparent transition-colors hover:bg-muted/50",
+        "relative rounded-sm transition-colors hover:bg-muted/50",
+        variant === "flat" && "ring-0 shadow-none",
         className,
       )}
     >

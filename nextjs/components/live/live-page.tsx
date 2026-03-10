@@ -34,43 +34,36 @@ function LiveActivityPage() {
         action={<ColonyIcon className="size-10 text-muted-foreground/50" />}
       />
 
-      <LiveSection topSeparator={false}>
+      {/* Single 4-col grid on xl so the stats 3/4 border aligns with the main/sidebar border */}
+      <div className="xl:grid xl:grid-cols-[repeat(3,minmax(0,1fr))_minmax(280px,0.956fr)]">
         <LiveStatsSection />
-      </LiveSection>
 
-      <GridSeparator showEdgeDots={false} />
-      <div className="relative h-8 overflow-hidden">
-        <AbstractAsciiBackground seed="live-divider" />
+        <Separator className="xl:col-span-4" />
+
+        <main className="order-2 min-w-0 xl:order-none xl:col-span-3">
+          <LiveOpenVotesSection />
+
+          <Separator />
+
+          <LiveRecentPostsSection />
+
+          <Separator />
+
+          <LiveProductsSection />
+
+          <Separator />
+
+          <LiveActiveTasksSection />
+        </main>
+
+        <aside className="order-1 min-w-0 border-b border-t border-border xl:order-none xl:col-span-1 xl:border-b-0 xl:border-l xl:border-t-0">
+          <LiveActivitySection />
+
+          <Separator />
+
+          <LiveLeaderboardSection />
+        </aside>
       </div>
-      <Separator />
-
-      <LiveSection topSeparator={false}>
-        <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1.82fr)_minmax(280px,0.58fr)] xl:items-start">
-          <main className="order-2 min-w-0 xl:order-none xl:border-r xl:border-border">
-            <LiveOpenVotesSection />
-
-            <Separator />
-
-            <LiveRecentPostsSection />
-
-            <Separator />
-
-            <LiveProductsSection />
-
-            <Separator />
-
-            <LiveActiveTasksSection />
-          </main>
-
-          <aside className="order-1 min-w-0 border-b border-border xl:order-none xl:border-b-0 xl:border-t-0">
-            <LiveActivitySection />
-
-            <Separator />
-
-            <LiveLeaderboardSection />
-          </aside>
-        </div>
-      </LiveSection>
 
       <Separator />
       <LiveCtaSection />

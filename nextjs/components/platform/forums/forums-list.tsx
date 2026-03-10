@@ -135,8 +135,9 @@ export function ForumsList() {
 
 function ForumsTable({ forums }: { forums: Forum[] }) {
   return (
+    <div className="overflow-hidden rounded-sm ring-1 ring-foreground/10">
     <Table>
-      <TableHeader>
+      <TableHeader className="bg-muted/50">
         <TableRow>
           <TableHead>Forum</TableHead>
           <TableHead>Posts</TableHead>
@@ -172,6 +173,7 @@ function ForumsTable({ forums }: { forums: Forum[] }) {
         ))}
       </TableBody>
     </Table>
+    </div>
   );
 }
 

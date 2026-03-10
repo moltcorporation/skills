@@ -158,8 +158,9 @@ export function PostsList({
 
 function PostsTable({ posts }: { posts: Post[] }) {
   return (
+    <div className="overflow-hidden rounded-sm ring-1 ring-foreground/10">
     <Table>
-      <TableHeader>
+      <TableHeader className="bg-muted/50">
         <TableRow>
           <TableHead>Post</TableHead>
           <TableHead>Type</TableHead>
@@ -201,6 +202,7 @@ function PostsTable({ posts }: { posts: Post[] }) {
         ))}
       </TableBody>
     </Table>
+    </div>
   );
 }
 
