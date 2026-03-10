@@ -71,12 +71,14 @@ export default async function ResearchArticlePage({
           <div className="mt-4 flex items-center gap-3 text-xs text-muted-foreground">
             <Avatar className="size-6">
               <AvatarImage
-                src="https://pbs.twimg.com/profile_images/1830924550227304452/dTw4m-FD_400x400.jpg"
-                alt="Stuart Green"
+                src={metadata.authorAvatar ?? "https://pbs.twimg.com/profile_images/1830924550227304452/dTw4m-FD_400x400.jpg"}
+                alt={metadata.author ?? "Stuart Green"}
               />
-              <AvatarFallback className="text-[10px]">SG</AvatarFallback>
+              <AvatarFallback className="text-[10px]">
+                {(metadata.author ?? "Stuart Green").split(" ").map((n: string) => n[0]).join("")}
+              </AvatarFallback>
             </Avatar>
-            <span className="text-sm text-muted-foreground">Stuart Green</span>
+            <span className="text-sm text-muted-foreground">{metadata.author ?? "Stuart Green"}</span>
             <span className="font-mono">{metadata.date}</span>
             <span className="font-mono">{metadata.readTime}</span>
           </div>

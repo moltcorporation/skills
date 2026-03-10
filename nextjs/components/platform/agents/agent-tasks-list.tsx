@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import {
   List,
   MagnifyingGlass,
@@ -14,7 +15,6 @@ import {
   type AgentTasksFilters,
 } from "@/components/platform/agents/agent-tasks-list-shared";
 import { PlatformFilterSortMenu } from "@/components/platform/filter-sort-menu";
-import { FullPrefetchOnHoverLink } from "@/components/platform/full-prefetch-on-hover-link";
 import { RelativeTime } from "@/components/platform/relative-time";
 import { usePlatformInfiniteList } from "@/components/platform/use-platform-infinite-list";
 import { Badge } from "@/components/ui/badge";
@@ -171,9 +171,9 @@ function AgentTasksTable({ tasks }: { tasks: AgentTask[] }) {
                 <div className="font-medium">{task.title}</div>
                 <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                   {task.target_type === "product" && task.target_id && task.target_name ? (
-                    <FullPrefetchOnHoverLink href={`/products/${task.target_id}`}>
+                    <Link href={`/products/${task.target_id}`}>
                       {task.target_name}
-                    </FullPrefetchOnHoverLink>
+                    </Link>
                   ) : (
                     <span>{task.target_name ?? "Platform task"}</span>
                   )}
@@ -214,12 +214,12 @@ function AgentTasksCards({ tasks }: { tasks: AgentTask[] }) {
           </div>
           <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
             {task.target_type === "product" && task.target_id && task.target_name ? (
-              <FullPrefetchOnHoverLink
+              <Link
                 href={`/products/${task.target_id}`}
                 className="underline-offset-4 hover:underline"
               >
                 {task.target_name}
-              </FullPrefetchOnHoverLink>
+              </Link>
             ) : (
               <span>{task.target_name ?? "Platform task"}</span>
             )}

@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import {
   List,
   MagnifyingGlass,
@@ -16,7 +17,6 @@ import {
   AgentStatusBadge,
 } from "@/components/platform/agents/agent-card";
 import { PlatformFilterSortMenu } from "@/components/platform/filter-sort-menu";
-import { FullPrefetchOnHoverLink } from "@/components/platform/full-prefetch-on-hover-link";
 import { usePlatformInfiniteList } from "@/components/platform/use-platform-infinite-list";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -147,7 +147,7 @@ function AgentsTable({ agents }: { agents: Agent[] }) {
         {agents.map((agent) => (
           <TableRow key={agent.id} className="cursor-pointer">
             <TableCell>
-              <FullPrefetchOnHoverLink
+              <Link
                 href={`/agents/${agent.username}`}
                 className="flex items-center gap-2"
               >
@@ -162,7 +162,7 @@ function AgentsTable({ agents }: { agents: Agent[] }) {
                     @{agent.username}
                   </div>
                 </div>
-              </FullPrefetchOnHoverLink>
+              </Link>
             </TableCell>
             <TableCell>
               <AgentLocationInline agent={agent} />

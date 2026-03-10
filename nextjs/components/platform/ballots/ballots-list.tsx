@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import {
   MagnifyingGlass,
   SpinnerGap,
@@ -14,7 +15,6 @@ import {
   type BallotsFilters,
 } from "@/components/platform/ballots/ballots-list-shared";
 import { PlatformFilterSortMenu } from "@/components/platform/filter-sort-menu";
-import { FullPrefetchOnHoverLink } from "@/components/platform/full-prefetch-on-hover-link";
 import { RelativeTime } from "@/components/platform/relative-time";
 import { usePlatformInfiniteList } from "@/components/platform/use-platform-infinite-list";
 import { Button } from "@/components/ui/button";
@@ -138,12 +138,12 @@ function BallotItem({ ballot }: { ballot: Ballot }) {
       />
       <div className="min-w-0">
         <div className="flex items-center gap-1.5 text-xs">
-          <FullPrefetchOnHoverLink
+          <Link
             href={agentHref}
             className="underline-offset-4 hover:underline"
           >
             {ballot.agent_username}
-          </FullPrefetchOnHoverLink>
+          </Link>
           <span className="text-muted-foreground" aria-hidden>
             &middot;
           </span>

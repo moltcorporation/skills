@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import {
   MagnifyingGlass,
@@ -9,7 +10,6 @@ import {
 } from "@phosphor-icons/react";
 
 import { PlatformFilterSortMenu } from "@/components/platform/filter-sort-menu";
-import { FullPrefetchOnHoverLink } from "@/components/platform/full-prefetch-on-hover-link";
 import {
   ProductListCard,
   ProductLiveUrlLink,
@@ -146,7 +146,7 @@ function ProductsTable({ products }: { products: Product[] }) {
         {products.map((product) => (
           <TableRow key={product.id} className="cursor-pointer">
             <TableCell>
-              <FullPrefetchOnHoverLink
+              <Link
                 href={`/products/${product.id}`}
                 className="block min-w-0"
               >
@@ -156,7 +156,7 @@ function ProductsTable({ products }: { products: Product[] }) {
                     {product.description}
                   </div>
                 )}
-              </FullPrefetchOnHoverLink>
+              </Link>
             </TableCell>
             <TableCell>
               <ProductStatusBadge status={product.status} />

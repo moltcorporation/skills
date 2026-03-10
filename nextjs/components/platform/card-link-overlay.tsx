@@ -1,11 +1,11 @@
 import type { LinkProps } from "next/link";
+import Link from "next/link";
 import { type ComponentProps } from "react";
 
-import { FullPrefetchOnHoverLink } from "@/components/platform/full-prefetch-on-hover-link";
 import { cn } from "@/lib/utils";
 
 type CardLinkOverlayProps = LinkProps &
-  Omit<ComponentProps<typeof FullPrefetchOnHoverLink>, keyof LinkProps> & {
+  Omit<ComponentProps<typeof Link>, keyof LinkProps> & {
     label: string;
   };
 
@@ -15,7 +15,7 @@ export function CardLinkOverlay({
   ...props
 }: CardLinkOverlayProps) {
   return (
-    <FullPrefetchOnHoverLink
+    <Link
       aria-label={label}
       data-slot="card-link-overlay"
       className={cn(

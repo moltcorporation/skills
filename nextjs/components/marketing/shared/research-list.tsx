@@ -7,11 +7,18 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { GridSeparator, GridDashedGap } from "@/components/shared/grid-wrapper";
 
-const AUTHOR = {
+const DEFAULT_AUTHOR = {
   name: "Stuart Green",
   avatar:
     "https://pbs.twimg.com/profile_images/1830924550227304452/dTw4m-FD_400x400.jpg",
 };
+
+function getAuthor(article: ContentMetadata) {
+  return {
+    name: article.author ?? DEFAULT_AUTHOR.name,
+    avatar: article.authorAvatar ?? DEFAULT_AUTHOR.avatar,
+  };
+}
 
 type Article = ContentMetadata & { slug: string };
 
@@ -23,14 +30,20 @@ function SmCenterLine() {
 }
 
 function ArticleCellContent({ article }: { article: Article }) {
+  const author = getAuthor(article);
   return (
     <>
       <div className="flex items-center gap-3">
         <Avatar className="size-6">
-          <AvatarImage src={AUTHOR.avatar} alt={AUTHOR.name} />
-          <AvatarFallback className="text-[10px]">SG</AvatarFallback>
+          <AvatarImage src={author.avatar} alt={author.name} />
+          <AvatarFallback className="text-[10px]">
+            {author.name
+              .split(" ")
+              .map((n) => n[0])
+              .join("")}
+          </AvatarFallback>
         </Avatar>
-        <span className="text-sm text-muted-foreground">{AUTHOR.name}</span>
+        <span className="text-sm text-muted-foreground">{author.name}</span>
         <span className="ml-auto flex items-center gap-2 font-mono text-xs text-muted-foreground">
           <span>{article.date}</span>
           <span>/</span>
@@ -118,11 +131,13 @@ export function ResearchList({ articles }: { articles: Article[] }) {
       >
         <div className="flex items-center gap-3">
           <Avatar className="size-6">
-            <AvatarImage src={AUTHOR.avatar} alt={AUTHOR.name} />
-            <AvatarFallback className="text-[10px]">SG</AvatarFallback>
+            <AvatarImage src={getAuthor(hero).avatar} alt={getAuthor(hero).name} />
+            <AvatarFallback className="text-[10px]">
+              {getAuthor(hero).name.split(" ").map((n) => n[0]).join("")}
+            </AvatarFallback>
           </Avatar>
           <span className="text-sm text-muted-foreground">
-            {AUTHOR.name}
+            {getAuthor(hero).name}
           </span>
           <span className="ml-auto flex items-center gap-2 font-mono text-xs text-muted-foreground">
             <span>{hero.date}</span>
@@ -160,10 +175,12 @@ export function ResearchList({ articles }: { articles: Article[] }) {
               )}
               <div className="flex items-center gap-3">
                 <Avatar className="size-6">
-                  <AvatarImage src={AUTHOR.avatar} alt={AUTHOR.name} />
-                  <AvatarFallback className="text-[10px]">SG</AvatarFallback>
+                  <AvatarImage src={getAuthor(article).avatar} alt={getAuthor(article).name} />
+                  <AvatarFallback className="text-[10px]">
+                    {getAuthor(article).name.split(" ").map((n) => n[0]).join("")}
+                  </AvatarFallback>
                 </Avatar>
-                <span className="text-sm text-muted-foreground">{AUTHOR.name}</span>
+                <span className="text-sm text-muted-foreground">{getAuthor(article).name}</span>
                 <span className="ml-auto flex items-center gap-2 font-mono text-xs text-muted-foreground">
                   <span>{article.date}</span>
                   <span>/</span>

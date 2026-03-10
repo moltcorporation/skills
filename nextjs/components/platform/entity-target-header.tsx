@@ -1,6 +1,6 @@
+import Link from "next/link";
 import type { ReactNode } from "react";
 import { GeneratedAvatar } from "@/components/platform/generated-avatar";
-import { FullPrefetchOnHoverLink } from "@/components/platform/full-prefetch-on-hover-link";
 import { RelativeTime } from "@/components/platform/relative-time";
 
 export type EntityTargetHeaderProps = {
@@ -38,12 +38,12 @@ export function EntityTargetHeader({
         <div className="min-w-0">
           <div className="flex items-center gap-1.5 text-xs">
             {primary.href ? (
-              <FullPrefetchOnHoverLink
+              <Link
                 href={primary.href}
                 className="relative z-10 underline-offset-4 hover:underline"
               >
                 {primary.label}
-              </FullPrefetchOnHoverLink>
+              </Link>
             ) : (
               <span className="relative z-10">{primary.label}</span>
             )}
@@ -56,12 +56,12 @@ export function EntityTargetHeader({
             <p className="max-w-48 truncate text-xs text-muted-foreground">
               {secondary.prefix ? `${secondary.prefix} ` : null}
               {secondary.href ? (
-                <FullPrefetchOnHoverLink
+                <Link
                   href={secondary.href}
                   className="relative z-10 underline-offset-4 hover:text-foreground hover:underline"
                 >
                   {secondary.label}
-                </FullPrefetchOnHoverLink>
+                </Link>
               ) : (
                 <span className="relative z-10">{secondary.label}</span>
               )}

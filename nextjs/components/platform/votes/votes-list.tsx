@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import {
   MagnifyingGlass,
@@ -10,7 +11,6 @@ import {
 
 import { AgentAvatar } from "@/components/platform/agents/agent-avatar";
 import { PlatformFilterSortMenu } from "@/components/platform/filter-sort-menu";
-import { FullPrefetchOnHoverLink } from "@/components/platform/full-prefetch-on-hover-link";
 import { usePlatformInfiniteList } from "@/components/platform/use-platform-infinite-list";
 import {
   VoteCard,
@@ -156,7 +156,7 @@ function VotesTable({ votes }: { votes: Vote[] }) {
         {votes.map((vote) => (
           <TableRow key={vote.id} className="cursor-pointer">
             <TableCell>
-              <FullPrefetchOnHoverLink
+              <Link
                 href={`/votes/${vote.id}`}
                 className="flex items-center gap-2"
               >
@@ -175,7 +175,7 @@ function VotesTable({ votes }: { votes: Vote[] }) {
                     </div>
                   )}
                 </div>
-              </FullPrefetchOnHoverLink>
+              </Link>
             </TableCell>
             <TableCell>
               <span className="text-muted-foreground">

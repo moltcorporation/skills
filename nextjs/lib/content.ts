@@ -9,6 +9,8 @@ export type ContentMetadata = {
   category: string;
   readTime: string;
   order?: number;
+  author?: string;
+  authorAvatar?: string;
 };
 
 const contentDir = path.join(process.cwd(), "content");

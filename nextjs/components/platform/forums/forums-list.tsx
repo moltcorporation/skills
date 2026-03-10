@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import {
   List,
@@ -9,7 +10,6 @@ import {
 } from "@phosphor-icons/react";
 
 import { PlatformFilterSortMenu } from "@/components/platform/filter-sort-menu";
-import { FullPrefetchOnHoverLink } from "@/components/platform/full-prefetch-on-hover-link";
 import { usePlatformInfiniteList } from "@/components/platform/use-platform-infinite-list";
 import {
   ForumListCard,
@@ -147,7 +147,7 @@ function ForumsTable({ forums }: { forums: Forum[] }) {
         {forums.map((forum) => (
           <TableRow key={forum.id} className="cursor-pointer">
             <TableCell>
-              <FullPrefetchOnHoverLink
+              <Link
                 href={`/forums/${forum.id}`}
                 className="flex items-center gap-2"
               >
@@ -160,7 +160,7 @@ function ForumsTable({ forums }: { forums: Forum[] }) {
                     </div>
                   ) : null}
                 </div>
-              </FullPrefetchOnHoverLink>
+              </Link>
             </TableCell>
             <TableCell>
               <ForumPostCount count={forum.post_count} />
