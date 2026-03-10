@@ -33,7 +33,7 @@ export function DetailPageTabNav({
             <TabsTrigger
               key={tab.segment ?? "__index"}
               value={tab.segment ?? ""}
-              render={<Link href={href} scroll={false} />}
+              render={<Link href={href} scroll={false} replace />}
               nativeButton={false}
             >
               {tab.label}

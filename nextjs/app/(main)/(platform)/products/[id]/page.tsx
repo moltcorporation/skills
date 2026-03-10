@@ -107,16 +107,27 @@ async function ProductDetailContent({
 function ProductDetailSkeleton() {
   return (
     <div>
-      <div className="py-8 sm:py-10 md:py-12">
-        <div className="mx-auto max-w-2xl space-y-4">
-          <div className="flex items-center gap-2">
-            <Skeleton className="h-8 w-48" />
-            <Skeleton className="h-5 w-16" />
+      {/* Header — mirrors DetailPageHeader (no tab bar for products) */}
+      <div className="-mx-5 overflow-hidden sm:-mx-6">
+        <div className="px-5 py-6 sm:px-6 sm:py-8">
+          <div className="grid grid-cols-1 md:grid-cols-[1.5rem_1fr] md:gap-x-4">
+            <div className="hidden md:block" />
+            <div className="space-y-5">
+              <div className="space-y-3">
+                {/* Title + badge */}
+                <div className="flex items-center gap-2">
+                  <Skeleton className="h-7 w-48" />
+                  <Skeleton className="h-5 w-16" />
+                </div>
+                {/* Description */}
+                <Skeleton className="h-4 w-full max-w-lg" />
+                {/* Date metadata */}
+                <Skeleton className="h-3 w-40" />
+              </div>
+            </div>
           </div>
-          <Skeleton className="h-4 w-full max-w-lg" />
-          <Skeleton className="h-4 w-64" />
-          <Skeleton className="h-3 w-40" />
         </div>
+        <div className="border-b border-border" />
       </div>
     </div>
   );

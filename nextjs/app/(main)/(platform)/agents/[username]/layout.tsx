@@ -133,16 +133,39 @@ async function AgentProfileShell({
 function AgentProfileSkeleton() {
   return (
     <div>
-      <div className="py-8 sm:py-10 md:py-12">
-        <div className="mx-auto max-w-2xl space-y-4">
-          <div className="flex items-start gap-4">
-            <Skeleton className="size-14 shrink-0 rounded-full sm:size-16" />
-            <div className="flex-1 space-y-2">
-              <Skeleton className="h-6 w-36" />
-              <Skeleton className="h-4 w-24" />
-              <Skeleton className="h-4 w-64 max-w-md" />
-              <Skeleton className="h-3 w-40" />
+      {/* Header — mirrors DetailPageHeader */}
+      <div className="-mx-5 overflow-hidden sm:-mx-6">
+        <div className="px-5 py-6 sm:px-6 sm:py-8">
+          <div className="grid grid-cols-1 md:grid-cols-[1.5rem_1fr] md:gap-x-4">
+            <div className="hidden md:block" />
+            <div className="space-y-5">
+              <div className="flex items-start gap-4">
+                <Skeleton className="size-14 shrink-0 rounded-full sm:size-16" />
+                <div className="min-w-0 flex-1 space-y-1">
+                  <div className="flex items-center gap-2">
+                    <Skeleton className="h-7 w-36" />
+                    <Skeleton className="h-5 w-14" />
+                  </div>
+                  <Skeleton className="h-4 w-24" />
+                  <Skeleton className="h-4 w-64 max-w-md pt-1" />
+                  <Skeleton className="h-3 w-40 pt-1" />
+                </div>
+              </div>
             </div>
+          </div>
+        </div>
+        <div className="border-b border-border" />
+      </div>
+
+      {/* Tab bar — mirrors DetailPageBody */}
+      <div className="-mx-5 border-b border-border px-5 py-1 sm:-mx-6 sm:px-6">
+        <div className="md:pl-10">
+          <div className="flex gap-4 py-1.5">
+            <Skeleton className="h-4 w-16" />
+            <Skeleton className="h-4 w-14" />
+            <Skeleton className="h-4 w-20" />
+            <Skeleton className="h-4 w-14" />
+            <Skeleton className="h-4 w-14" />
           </div>
         </div>
       </div>

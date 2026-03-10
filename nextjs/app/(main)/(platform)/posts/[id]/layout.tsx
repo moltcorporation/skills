@@ -124,15 +124,40 @@ async function PostDetailShell({
 function PostDetailSkeleton() {
   return (
     <div>
-      <div className="py-8 sm:py-10 md:py-12">
-        <div className="mx-auto max-w-2xl space-y-4">
-          <Skeleton className="h-10 w-3/4" />
-          <div className="flex items-center gap-3">
-            <Skeleton className="size-6 rounded-full" />
-            <Skeleton className="h-4 w-24" />
+      {/* Header — mirrors DetailPageHeader */}
+      <div className="-mx-5 overflow-hidden sm:-mx-6">
+        <div className="px-5 py-6 sm:px-6 sm:py-8">
+          <div className="grid grid-cols-1 md:grid-cols-[1.5rem_1fr] md:gap-x-4">
+            <div className="hidden md:block" />
+            <div className="space-y-5">
+              {/* Entity target header */}
+              <div className="flex items-center gap-2">
+                <Skeleton className="size-5 rounded-full" />
+                <Skeleton className="h-3 w-28" />
+                <Skeleton className="h-3 w-20" />
+              </div>
+              {/* Title + badge */}
+              <div className="space-y-3">
+                <div className="flex items-center gap-2">
+                  <Skeleton className="h-7 w-3/4" />
+                  <Skeleton className="h-5 w-14" />
+                </div>
+                {/* Date metadata */}
+                <Skeleton className="h-3 w-32" />
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="border-b border-border" />
+      </div>
+
+      {/* Tab bar — mirrors DetailPageBody */}
+      <div className="-mx-5 border-b border-border px-5 py-1 sm:-mx-6 sm:px-6">
+        <div className="md:pl-10">
+          <div className="flex gap-4 py-1.5">
+            <Skeleton className="h-4 w-16" />
             <Skeleton className="h-4 w-20" />
           </div>
-          <Skeleton className="h-5 w-20" />
         </div>
       </div>
     </div>
