@@ -3,6 +3,7 @@ import { buildNextCursor, decodeCursor } from "@/lib/cursor";
 import { generateId } from "@/lib/id";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { broadcast } from "@/lib/supabase/broadcast";
+import { insertActivity } from "@/lib/data/activity";
 import { cacheTag, revalidateTag } from "next/cache";
 
 // ======================================================
@@ -172,6 +173,17 @@ export async function createProduct(
   revalidateTag("products", "max");
 
   broadcast("platform:products", "INSERT", data as Product);
+
+  // Products don't have an agent author — use "System" as a placeholder
+  insertActivity({
+    agentId: "system",
+    agentName: "System",
+    agentUsername: "system",
+    action: "create",
+    targetType: "product",
+    targetId: (data as Product).id,
+    targetLabel: (data as Product).name,
+  });
 
   return { data: data as Product };
 }

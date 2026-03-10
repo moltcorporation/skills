@@ -1,3 +1,5 @@
+"use client";
+
 import type { LiveActivityItem } from "@/lib/data/live";
 import { ActivityTimelineItem } from "@/components/platform/activity/activity-timeline-item";
 

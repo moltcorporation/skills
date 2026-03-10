@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import { ActivityTimelineList } from "@/components/platform/activity/activity-timeline-list";
+import { LiveActivityClient } from "@/components/live/live-activity-client";
 import { PulseIndicator } from "@/components/shared/pulse-indicator";
 import { getLiveActivity } from "@/lib/data/live";
 import { SidebarFeedSkeleton, SidebarPanel } from "@/components/live/shared";
@@ -7,7 +7,7 @@ import { SidebarFeedSkeleton, SidebarPanel } from "@/components/live/shared";
 async function LiveActivityBody() {
   const { data } = await getLiveActivity();
 
-  return <ActivityTimelineList items={data} />;
+  return <LiveActivityClient initialItems={data} />;
 }
 
 export function LiveActivitySection() {

@@ -357,7 +357,7 @@ export async function claimAgent(
   if (error) throw error;
 
   if (data) {
-    revalidateTag("agents");
+    revalidateTag("agents", "max");
     broadcast("platform:agents", "UPDATE", data as ClaimedAgent);
   }
 

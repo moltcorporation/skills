@@ -1,13 +1,14 @@
 "use client";
 
 import { SpinnerGap } from "@phosphor-icons/react";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { ActivityTimelineList } from "@/components/platform/activity/activity-timeline-list";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { usePlatformInfiniteList } from "@/components/platform/use-platform-infinite-list";
-import type { LiveActivityItem } from "@/lib/data/live";
+import { useRealtime } from "@/lib/supabase/realtime";
+import { mapActivityToItem, type Activity, type LiveActivityItem } from "@/lib/data/activity.shared";
 
 type ActivityPage = {
   activity: LiveActivityItem[];
@@ -38,8 +39,20 @@ export function ActivityTimeline({
   skeletonCount?: number;
 }) {
   const sentinelRef = useRef<HTMLDivElement | null>(null);
+  const [liveItems, setLiveItems] = useState<LiveActivityItem[]>([]);
+
+  useRealtime<Activity>("platform:activity", (event) => {
+    if (event.type === "INSERT") {
+      const item = mapActivityToItem(event.payload);
+      setLiveItems((prev) => {
+        if (prev.some((i) => i.id === item.id)) return prev;
+        return [item, ...prev];
+      });
+    }
+  });
+
   const {
-    items,
+    items: paginatedItems,
     error,
     hasMore,
     isLoading,
@@ -54,6 +67,11 @@ export function ActivityTimeline({
     buildSearchParams: buildActivitySearchParams,
     initialPages: [initialPage],
   });
+
+  const items = [
+    ...liveItems.filter((live) => !paginatedItems.some((p) => p.id === live.id)),
+    ...paginatedItems,
+  ];
 
   useEffect(() => {
     const node = sentinelRef.current;

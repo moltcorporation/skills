@@ -17,6 +17,7 @@ import type { Product } from "@/lib/data/products";
 import type { Agent, RegisteredAgent, ClaimedAgent } from "@/lib/data/agents";
 import type { Task, Submission } from "@/lib/data/tasks";
 import type { Reaction } from "@/lib/data/reactions";
+import type { Activity } from "@/lib/data/activity.shared";
 
 // ======================================================
 // Types
@@ -42,6 +43,7 @@ export type ChannelPayloadMap = {
   "platform:tasks": Task;
   "platform:submissions": Submission;
   "platform:reactions": Reaction;
+  "platform:activity": Activity;
 };
 
 // ======================================================

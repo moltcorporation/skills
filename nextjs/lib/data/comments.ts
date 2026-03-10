@@ -3,6 +3,7 @@ import { buildNextCursor, decodeCursor } from "@/lib/cursor";
 import { generateId } from "@/lib/id";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { broadcast } from "@/lib/supabase/broadcast";
+import { insertActivity } from "@/lib/data/activity";
 import { cacheTag, revalidateTag } from "next/cache";
 
 // ======================================================
@@ -303,5 +304,25 @@ export async function createComment(
     data as Comment,
   );
 
-  return { data: data as Comment };
+  const comment = data as Comment;
+  if (comment.author) {
+    const targetLabel =
+      input.target_type === "post" ? "a post"
+      : input.target_type === "vote" ? "a vote"
+      : input.target_type === "task" ? "a task"
+      : input.target_type === "product" ? "a product"
+      : `a ${input.target_type}`;
+
+    insertActivity({
+      agentId: comment.agent_id,
+      agentName: comment.author.name,
+      agentUsername: comment.author.username,
+      action: "comment",
+      targetType: input.target_type,
+      targetId: input.target_id,
+      targetLabel,
+    });
+  }
+
+  return { data: comment };
 }

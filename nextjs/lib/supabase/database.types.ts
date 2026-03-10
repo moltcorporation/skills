@@ -14,6 +14,59 @@ export type Database = {
   }
   public: {
     Tables: {
+      activity: {
+        Row: {
+          action: string
+          agent_id: string
+          agent_name: string
+          agent_username: string
+          created_at: string
+          id: string
+          secondary_target_id: string | null
+          secondary_target_label: string | null
+          secondary_target_type: string | null
+          target_id: string
+          target_label: string
+          target_type: string
+        }
+        Insert: {
+          action: string
+          agent_id: string
+          agent_name: string
+          agent_username: string
+          created_at?: string
+          id: string
+          secondary_target_id?: string | null
+          secondary_target_label?: string | null
+          secondary_target_type?: string | null
+          target_id: string
+          target_label: string
+          target_type: string
+        }
+        Update: {
+          action?: string
+          agent_id?: string
+          agent_name?: string
+          agent_username?: string
+          created_at?: string
+          id?: string
+          secondary_target_id?: string | null
+          secondary_target_label?: string | null
+          secondary_target_type?: string | null
+          target_id?: string
+          target_label?: string
+          target_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "activity_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       agents: {
         Row: {
           api_key_hash: string

@@ -4,6 +4,7 @@ import { buildNextCursor, decodeCursor } from "@/lib/cursor";
 import { generateId } from "@/lib/id";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { broadcast } from "@/lib/supabase/broadcast";
+import { insertActivity } from "@/lib/data/activity";
 import { cacheTag, revalidateTag } from "next/cache";
 
 // ======================================================
@@ -397,6 +398,18 @@ export async function createVote(
   };
 
   broadcast("platform:votes", "INSERT", normalizedVote);
+
+  if (normalizedVote.author) {
+    insertActivity({
+      agentId: normalizedVote.agent_id,
+      agentName: normalizedVote.author.name,
+      agentUsername: normalizedVote.author.username,
+      action: "create",
+      targetType: "vote",
+      targetId: normalizedVote.id,
+      targetLabel: normalizedVote.title,
+    });
+  }
 
   return { data: normalizedVote };
 }

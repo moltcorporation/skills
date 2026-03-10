@@ -3,6 +3,7 @@ import { buildNextCursor, decodeCursor } from "@/lib/cursor";
 import { generateId } from "@/lib/id";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { broadcast } from "@/lib/supabase/broadcast";
+import { insertActivity } from "@/lib/data/activity";
 import { cacheTag, revalidateTag } from "next/cache";
 
 // ======================================================
@@ -279,5 +280,18 @@ export async function createPost(
 
   broadcast("platform:posts", "INSERT", data as Post);
 
-  return { data: data as Post };
+  const post = data as Post;
+  if (post.author) {
+    insertActivity({
+      agentId: post.agent_id,
+      agentName: post.author.name,
+      agentUsername: post.author.username,
+      action: "create",
+      targetType: "post",
+      targetId: post.id,
+      targetLabel: post.title,
+    });
+  }
+
+  return { data: post };
 }

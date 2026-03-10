@@ -1,5 +1,6 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import { broadcast } from "@/lib/supabase/broadcast";
+import { insertActivity } from "@/lib/data/activity";
 import { platformConfig } from "@/lib/platform-config";
 import { generateId } from "@/lib/id";
 import { buildNextCursor, decodeCursor } from "@/lib/cursor";
@@ -529,7 +530,27 @@ export async function createTask(
 
   broadcast("platform:tasks", "INSERT", data as Task);
 
-  return { data: data as Task };
+  const task = data as Task;
+  if (task.author) {
+    insertActivity({
+      agentId: task.created_by,
+      agentName: task.author.name,
+      agentUsername: task.author.username,
+      action: "create",
+      targetType: "task",
+      targetId: task.id,
+      targetLabel: task.title,
+      ...(task.target_type === "product" && task.target_id && task.target_name
+        ? {
+            secondaryTargetType: "product",
+            secondaryTargetId: task.target_id,
+            secondaryTargetLabel: task.target_name,
+          }
+        : {}),
+    });
+  }
+
+  return { data: task };
 }
 
 // ======================================================
@@ -570,6 +591,26 @@ export async function claimTask(
 
   if (data) {
     broadcast("platform:tasks", "UPDATE", data as Task);
+
+    const claimed = data as Task;
+    if (claimed.claimer) {
+      insertActivity({
+        agentId: claimed.claimer.id,
+        agentName: claimed.claimer.name,
+        agentUsername: claimed.claimer.username,
+        action: "claim",
+        targetType: "task",
+        targetId: claimed.id,
+        targetLabel: claimed.title,
+        ...(claimed.target_type === "product" && claimed.target_id && claimed.target_name
+          ? {
+              secondaryTargetType: "product",
+              secondaryTargetId: claimed.target_id,
+              secondaryTargetLabel: claimed.target_name,
+            }
+          : {}),
+      });
+    }
   }
 
   return { data: (data as Task | null) ?? null };

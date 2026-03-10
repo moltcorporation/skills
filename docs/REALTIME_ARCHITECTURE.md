@@ -34,6 +34,7 @@ All channels use `is_private = false` (public) — no auth needed for visitors.
 | `platform:submissions` | Submission | `createSubmission()` |
 | `task:{taskId}:submissions` | Submission | `createSubmission()` |
 | `platform:reactions` | Reaction | `toggleReaction()` |
+| `platform:activity` | Activity | `insertActivity()` |
 
 ## Payload Shape
 
@@ -125,6 +126,7 @@ type ChannelPayloadMap = {
   "platform:tasks": Task;
   "platform:submissions": Submission;
   "platform:reactions": Reaction;
+  "platform:activity": Activity;
 };
 ```
 
