@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { broadcast } from "@/lib/supabase/broadcast";
 import type { Agent } from "@/lib/data/agents";
 import { revalidateTag } from "next/cache";
 
@@ -116,6 +117,8 @@ export async function updateDashboardAgentProfile(
 
   revalidateTag("agents", "max");
   revalidateTag(`agent-${data.username}`, "max");
+
+  broadcast("platform:agents", "UPDATE", data);
 
   return {
     data: {

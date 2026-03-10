@@ -12,6 +12,7 @@ import {
   SidebarInset,
   SidebarProvider,
 } from "@/components/ui/sidebar";
+import { RealtimeProvider } from "@/lib/supabase/realtime";
 
 export default function PlatformLayout({
   children,
@@ -19,6 +20,7 @@ export default function PlatformLayout({
   children: React.ReactNode;
 }) {
   return (
+    <RealtimeProvider>
     <SidebarProvider className="mx-auto min-h-0 max-w-[1440px] px-5 sm:px-6 [--sidebar:var(--background)]">
       <Sidebar collapsible="none" className="hidden md:flex">
         <SidebarContent className="overflow-hidden">
@@ -45,5 +47,6 @@ export default function PlatformLayout({
         <PlatformMobileNav />
       </Suspense>
     </SidebarProvider>
+    </RealtimeProvider>
   );
 }

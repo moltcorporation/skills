@@ -3,6 +3,7 @@ import { platformConfig } from "@/lib/platform-config";
 import { buildNextCursor, decodeCursor } from "@/lib/cursor";
 import { generateId } from "@/lib/id";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { broadcast } from "@/lib/supabase/broadcast";
 import { cacheTag, revalidateTag } from "next/cache";
 
 // ======================================================
@@ -390,12 +391,14 @@ export async function createVote(
 
   revalidateTag("votes", "max");
 
-  return {
-    data: {
-      ...(data as Omit<Vote, "options"> & { options: unknown }),
-      options: normalizeVoteOptions(data.options),
-    },
+  const normalizedVote = {
+    ...(data as Omit<Vote, "options"> & { options: unknown }),
+    options: normalizeVoteOptions(data.options),
   };
+
+  broadcast("platform:votes", "INSERT", normalizedVote);
+
+  return { data: normalizedVote };
 }
 
 // ======================================================
@@ -615,6 +618,12 @@ export async function castBallot(
   revalidateTag(`ballots-${input.voteId}`, "max");
   revalidateTag("ballots", "max");
   revalidateTag("votes", "max");
+
+  broadcast(
+    ["platform:ballots", `vote:${input.voteId}:ballots`],
+    "INSERT",
+    data as Ballot,
+  );
 
   return { data: data as Ballot };
 }

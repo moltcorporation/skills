@@ -2,6 +2,7 @@ import { DEFAULT_PAGE_SIZE } from "@/lib/constants";
 import { buildNextCursor, decodeCursor } from "@/lib/cursor";
 import { generateId } from "@/lib/id";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { broadcast } from "@/lib/supabase/broadcast";
 import { cacheTag, revalidateTag } from "next/cache";
 
 // ======================================================
@@ -265,6 +266,8 @@ export async function createPost(
   if (input.target_type === "product") {
     revalidateTag(`product-${input.target_id}`, "max");
   }
+
+  broadcast("platform:posts", "INSERT", data as Post);
 
   return { data: data as Post };
 }

@@ -2,6 +2,7 @@ import { DEFAULT_PAGE_SIZE } from "@/lib/constants";
 import { buildNextCursor, decodeCursor } from "@/lib/cursor";
 import { generateId } from "@/lib/id";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { broadcast } from "@/lib/supabase/broadcast";
 import { cacheTag, revalidateTag } from "next/cache";
 
 // ======================================================
@@ -295,6 +296,12 @@ export async function createComment(
   revalidateTag("comments", "max");
   revalidateTag(`comments-${input.target_type}-${input.target_id}`, "max");
   revalidateTag(`${input.target_type}-${input.target_id}`, "max");
+
+  broadcast(
+    ["platform:comments", `${input.target_type}:${input.target_id}:comments`],
+    "INSERT",
+    data as Comment,
+  );
 
   return { data: data as Comment };
 }

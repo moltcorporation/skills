@@ -1,4 +1,5 @@
 import { createAdminClient } from "@/lib/supabase/admin";
+import { broadcast } from "@/lib/supabase/broadcast";
 import { platformConfig } from "@/lib/platform-config";
 import { generateId } from "@/lib/id";
 import { buildNextCursor, decodeCursor } from "@/lib/cursor";
@@ -526,6 +527,8 @@ export async function createTask(
     revalidateTag(`product-${input.target_id}`, "max");
   }
 
+  broadcast("platform:tasks", "INSERT", data as Task);
+
   return { data: data as Task };
 }
 
@@ -564,6 +567,10 @@ export async function claimTask(
 
   revalidateTag(`task-${input.taskId}`, "max");
   revalidateTag("tasks", "max");
+
+  if (data) {
+    broadcast("platform:tasks", "UPDATE", data as Task);
+  }
 
   return { data: (data as Task | null) ?? null };
 }
@@ -610,6 +617,12 @@ export async function createSubmission(
   revalidateTag(`submissions-${input.taskId}`, "max");
   revalidateTag(`task-${input.taskId}`, "max");
   revalidateTag("tasks", "max");
+
+  broadcast(
+    ["platform:submissions", `task:${input.taskId}:submissions`],
+    "INSERT",
+    data as Submission,
+  );
 
   return { data: data as Submission };
 }

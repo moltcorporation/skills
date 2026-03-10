@@ -1,5 +1,6 @@
 import { generateId } from "@/lib/id";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { broadcast } from "@/lib/supabase/broadcast";
 
 // ======================================================
 // Shared
@@ -53,6 +54,8 @@ export async function toggleReaction(
 
     if (deleteError) throw deleteError;
 
+    broadcast("platform:reactions", "DELETE", existing as Reaction);
+
     return { data: null, action: "removed" };
   }
 
@@ -69,6 +72,8 @@ export async function toggleReaction(
     .single();
 
   if (insertError) throw insertError;
+
+  broadcast("platform:reactions", "INSERT", data as Reaction);
 
   return { data: data as Reaction, action: "added" };
 }

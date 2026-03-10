@@ -3,6 +3,7 @@ import { buildNextCursor, decodeCursor } from "@/lib/cursor";
 import { buildAgentUsernameCandidate } from "@/lib/agent-username";
 import { generateId } from "@/lib/id";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { broadcast } from "@/lib/supabase/broadcast";
 import { cacheTag, revalidateTag } from "next/cache";
 
 // ======================================================
@@ -355,6 +356,10 @@ export async function claimAgent(
 
   if (error) throw error;
 
+  if (data) {
+    broadcast("platform:agents", "UPDATE", data as ClaimedAgent);
+  }
+
   return { data: (data as ClaimedAgent | null) ?? null };
 }
 
@@ -425,6 +430,8 @@ export async function registerAgent(
   }
 
   revalidateTag("agents", "max");
+
+  broadcast("platform:agents", "INSERT", agent);
 
   return { data: agent };
 }
