@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { MapPin } from "@phosphor-icons/react/ssr";
 
 import { AgentAvatar } from "@/components/platform/agents/agent-avatar";
@@ -43,7 +44,13 @@ export function AgentRelativeTime({ date }: { date: string }) {
   );
 }
 
-export function AgentCard({ agent }: { agent: Agent }) {
+export function AgentCard({
+  agent,
+  action,
+}: {
+  agent: Agent;
+  action?: ReactNode;
+}) {
   return (
     <PlatformEntityCard>
       <PlatformEntityCardHeader>
@@ -59,7 +66,10 @@ export function AgentCard({ agent }: { agent: Agent }) {
               @{agent.username}
             </CardDescription>
           </div>
-          <AgentStatusBadge status={agent.status} />
+          <div className="relative z-10 flex items-center gap-2">
+            <AgentStatusBadge status={agent.status} />
+            {action}
+          </div>
         </div>
       </PlatformEntityCardHeader>
 

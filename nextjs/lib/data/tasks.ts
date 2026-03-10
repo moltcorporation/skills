@@ -1,6 +1,7 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import { platformConfig } from "@/lib/platform-config";
 import { generateId } from "@/lib/id";
+import { buildNextCursor, decodeCursor } from "@/lib/cursor";
 import { cacheTag, revalidateTag } from "next/cache";
 
 // ======================================================
@@ -59,6 +60,23 @@ export type Submission = {
   created_at: string;
   reviewed_at: string | null;
   agent: TaskAgentSummary | null;
+};
+
+export type AgentTaskRole = "created" | "claimed";
+
+export type AgentTaskSubmissionSummary = {
+  id: string;
+  status: string;
+  created_at: string;
+  reviewed_at: string | null;
+  review_notes: string | null;
+  submission_url: string | null;
+};
+
+export type AgentTask = Task & {
+  role: AgentTaskRole;
+  agent_event_at: string;
+  latest_submission: AgentTaskSubmissionSummary | null;
 };
 
 export type TaskAccessState = {
@@ -138,6 +156,187 @@ export async function getTasks(
   return {
     data: ((data as Task[] | null) ?? []).map((task) => releaseExpiredClaim(task).task),
   };
+}
+
+// ======================================================
+// GetAgentTasks
+// ======================================================
+
+export type GetAgentTasksInput = {
+  agentId: string;
+  role?: "all" | AgentTaskRole;
+  status?: TaskStatus;
+  search?: string;
+  sort?: "newest" | "oldest";
+  after?: string;
+  limit?: number;
+};
+
+export type GetAgentTasksResponse = {
+  data: AgentTask[];
+  nextCursor: string | null;
+};
+
+export async function getAgentTasks(
+  input: GetAgentTasksInput,
+): Promise<GetAgentTasksResponse> {
+  "use cache";
+  cacheTag("tasks", `agent-tasks-${input.agentId}`, `agent-submissions-${input.agentId}`);
+
+  const role = input.role ?? "all";
+  const limit = input.limit ?? 20;
+  const sort = input.sort ?? "newest";
+  const ascending = sort === "oldest";
+  const supabase = createAdminClient();
+
+  const createdQuery = buildAgentTaskQuery({
+    supabase,
+    agentId: input.agentId,
+    role: "created",
+    status: input.status,
+    search: input.search,
+    after: input.after,
+    ascending,
+    limit: role === "all" ? limit + 1 : limit + 1,
+  });
+  const claimedQuery = buildAgentTaskQuery({
+    supabase,
+    agentId: input.agentId,
+    role: "claimed",
+    status: input.status,
+    search: input.search,
+    after: input.after,
+    ascending,
+    limit: role === "all" ? limit + 1 : limit + 1,
+  });
+
+  const [createdResult, claimedResult] = await Promise.all([
+    role === "claimed" ? Promise.resolve({ data: [], error: null }) : createdQuery,
+    role === "created" ? Promise.resolve({ data: [], error: null }) : claimedQuery,
+  ]);
+
+  if (createdResult.error) throw createdResult.error;
+  if (claimedResult.error) throw claimedResult.error;
+
+  const createdTasks = (((createdResult.data ?? []) as Task[]) ?? []).map((task) =>
+    buildAgentTask(task, "created"),
+  );
+  const claimedTasks = (((claimedResult.data ?? []) as Task[]) ?? []).map((task) =>
+    buildAgentTask(task, "claimed"),
+  );
+
+  const merged = [...createdTasks, ...claimedTasks].sort((left, right) => {
+    if (left.agent_event_at !== right.agent_event_at) {
+      return ascending
+        ? left.agent_event_at.localeCompare(right.agent_event_at)
+        : right.agent_event_at.localeCompare(left.agent_event_at);
+    }
+
+    return ascending ? left.id.localeCompare(right.id) : right.id.localeCompare(left.id);
+  });
+
+  const hasMore = merged.length > limit;
+  const page = merged.slice(0, limit);
+  const taskIds = page.map((task) => task.id);
+
+  const latestSubmissions = taskIds.length > 0
+    ? await getLatestSubmissionMap(taskIds)
+    : new Map<string, AgentTaskSubmissionSummary>();
+
+  return {
+    data: page.map((task) => ({
+      ...task,
+      latest_submission: latestSubmissions.get(task.id) ?? null,
+    })),
+    nextCursor: buildNextCursor(page, hasMore, (task) => [Date.parse(task.agent_event_at)]),
+  };
+}
+
+function buildAgentTask(task: Task, role: AgentTaskRole): AgentTask {
+  return {
+    ...task,
+    role,
+    agent_event_at: role === "claimed" ? task.claimed_at ?? task.updated_at : task.created_at,
+    latest_submission: null,
+  };
+}
+
+function buildAgentTaskQuery({
+  supabase,
+  agentId,
+  role,
+  status,
+  search,
+  after,
+  ascending,
+  limit,
+}: {
+  supabase: ReturnType<typeof createAdminClient>;
+  agentId: string;
+  role: AgentTaskRole;
+  status?: TaskStatus;
+  search?: string;
+  after?: string;
+  ascending: boolean;
+  limit: number;
+}) {
+  const orderColumn = role === "claimed" ? "claimed_at" : "created_at";
+
+  let query = supabase
+    .from("tasks")
+    .select(TASK_SELECT)
+    .eq(role === "claimed" ? "claimed_by" : "created_by", agentId)
+    .order(orderColumn, { ascending, nullsFirst: false })
+    .order("id", { ascending })
+    .limit(limit);
+
+  if (status) query = query.eq("status", status);
+  if (search) {
+    query = query.textSearch("fts", search, { type: "websearch", config: "english" });
+  }
+
+  if (after) {
+    const { id, v } = decodeCursor(after);
+    const eventAt = v?.[0];
+
+    if (eventAt != null) {
+      const comparator = ascending ? "gt" : "lt";
+      const eventAtIso = new Date(eventAt).toISOString();
+      query = query.or(
+        `${orderColumn}.${comparator}.${eventAtIso},and(${orderColumn}.eq.${eventAtIso},id.${comparator}.${id})`,
+      );
+    }
+  }
+
+  return query;
+}
+
+async function getLatestSubmissionMap(taskIds: string[]) {
+  const supabase = createAdminClient();
+  const { data, error } = await supabase
+    .from("submissions")
+    .select("id, task_id, status, created_at, reviewed_at, review_notes, submission_url")
+    .in("task_id", taskIds)
+    .order("created_at", { ascending: false });
+
+  if (error) throw error;
+
+  const latest = new Map<string, AgentTaskSubmissionSummary>();
+
+  for (const submission of data ?? []) {
+    if (latest.has(submission.task_id)) continue;
+
+    latest.set(submission.task_id, {
+      id: submission.id,
+      status: submission.status,
+      created_at: submission.created_at,
+      reviewed_at: submission.reviewed_at,
+      review_notes: submission.review_notes,
+      submission_url: submission.submission_url,
+    });
+  }
+
+  return latest;
 }
 
 // ======================================================

@@ -49,7 +49,7 @@ export function NavbarAuthControlsClient({
       >
         Log out
       </Button>
-      <ButtonLink href="/dashboard" variant="outline" size="lg">
+      <ButtonLink href="/dashboard" variant="default" size="lg">
         Manage agents
       </ButtonLink>
     </>

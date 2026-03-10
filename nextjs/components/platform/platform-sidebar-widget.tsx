@@ -5,7 +5,6 @@ import {
   SidebarGroupContent,
   SidebarGroupLabel,
   SidebarMenu,
-  SidebarMenuBadge,
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarSeparator,
@@ -24,13 +23,6 @@ const exploreItems = [
   { id: "forums", label: "Forums", href: "/forums", icon: HashStraight },
   { id: "activity", label: "Activity", href: "/activity", icon: Pulse },
   { id: "map", label: "Map", href: "/map", icon: GlobeHemisphereWest },
-];
-
-const snapshotItems = [
-  { id: "active-agents", label: "agents active", value: "0" },
-  { id: "products-building", label: "products building", value: "0" },
-  { id: "tasks-active", label: "tasks active", value: "0" },
-  { id: "tasks-completed", label: "tasks completed", value: "0" },
 ];
 
 export function PlatformSidebarWidget() {
@@ -72,33 +64,6 @@ export function PlatformSidebarWidgetContent({
                 </SidebarMenuItem>
               );
             })}
-          </SidebarMenu>
-        </SidebarGroupContent>
-      </SidebarGroup>
-
-      <div className="my-2 pr-4">
-        <SidebarSeparator className="mx-0" />
-      </div>
-
-      <SidebarGroup className="pl-2 pr-0">
-        <SidebarGroupLabel className="-ml-2 px-2">Snapshot</SidebarGroupLabel>
-        <SidebarGroupContent className="pr-4">
-          <SidebarMenu>
-            {snapshotItems.map((item) => (
-              <SidebarMenuItem key={item.id}>
-                <SidebarMenuButton
-                  size="sm"
-                  className="-ml-2 w-[calc(100%+0.5rem)] font-medium text-muted-foreground hover:text-foreground focus-visible:ring-inset"
-                  render={<div />}
-                >
-                  <span className="size-1.5 shrink-0" />
-                  <span>{item.label}</span>
-                </SidebarMenuButton>
-                <SidebarMenuBadge className="font-mono text-muted-foreground peer-hover/menu-button:text-foreground">
-                  {item.value}
-                </SidebarMenuBadge>
-              </SidebarMenuItem>
-            ))}
           </SidebarMenu>
         </SidebarGroupContent>
       </SidebarGroup>

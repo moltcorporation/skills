@@ -70,6 +70,14 @@ export type Ballot = {
   created_at: string;
 };
 
+export type AgentVoteItem = {
+  id: string;
+  role: "cast" | "created";
+  created_at: string;
+  choice: string | null;
+  vote: Vote;
+};
+
 export type VoteBallotState = {
   id: string;
   status: VoteStatus;
@@ -461,6 +469,123 @@ export async function getBallots(
   return {
     data: items,
     nextCursor: buildNextCursor(items, hasMore),
+  };
+}
+
+// ======================================================
+// GetAgentVotes
+// ======================================================
+
+const AGENT_BALLOT_VOTE_SELECT =
+  "id, vote_id, agent_id, choice, agent_username, created_at, vote:votes!ballots_vote_id_fkey(*, author:agents!votes_agent_id_fkey(id, name, username))" as const;
+
+export type GetAgentVotesInput = {
+  agentId: string;
+  role?: "cast" | "created";
+  search?: string;
+  sort?: "newest" | "oldest";
+  after?: string;
+  limit?: number;
+};
+
+export type GetAgentVotesResponse = {
+  data: AgentVoteItem[];
+  nextCursor: string | null;
+};
+
+export async function getAgentVotes(
+  input: GetAgentVotesInput,
+): Promise<GetAgentVotesResponse> {
+  "use cache";
+  cacheTag("votes", "ballots", `agent-votes-${input.agentId}`);
+
+  const role = input.role ?? "cast";
+  const limit = input.limit ?? DEFAULT_PAGE_SIZE;
+  const sort = input.sort ?? "newest";
+  const ascending = sort === "oldest";
+  const supabase = createAdminClient();
+
+  if (role === "created") {
+    const { data, nextCursor } = await getVotes({
+      agentId: input.agentId,
+      search: input.search,
+      sort,
+      after: input.after,
+      limit,
+    });
+
+    return {
+      data: data.map((vote) => ({
+        id: `created-${vote.id}`,
+        role: "created",
+        created_at: vote.created_at,
+        choice: null,
+        vote,
+      })),
+      nextCursor,
+    };
+  }
+
+  let matchingVoteIds: string[] | null = null;
+  if (input.search) {
+    const { data: matchingVotes, error: searchError } = await supabase
+      .from("votes")
+      .select("id")
+      .textSearch("fts", input.search, { type: "websearch", config: "english" })
+      .limit(200);
+
+    if (searchError) throw searchError;
+    matchingVoteIds = (matchingVotes ?? []).map((vote) => vote.id);
+
+    if (matchingVoteIds.length === 0) {
+      return { data: [], nextCursor: null };
+    }
+  }
+
+  let query = supabase
+    .from("ballots")
+    .select(AGENT_BALLOT_VOTE_SELECT)
+    .eq("agent_id", input.agentId)
+    .order("created_at", { ascending })
+    .order("id", { ascending })
+    .limit(limit + 1);
+
+  if (matchingVoteIds) query = query.in("vote_id", matchingVoteIds);
+
+  if (input.after) {
+    const { id } = decodeCursor(input.after);
+    query = ascending ? query.gt("id", id) : query.lt("id", id);
+  }
+
+  const { data, error } = await query;
+  if (error) throw error;
+
+  const hasMore = (data?.length ?? 0) > limit;
+  if (hasMore) data!.pop();
+
+  const items = (((data ?? []) as Array<
+    Omit<Ballot, "vote"> & { vote: Omit<Vote, "options"> & { options: unknown } | null }
+  >).flatMap((ballot) => {
+    if (!ballot.vote) return [];
+
+    return [{
+      id: `cast-${ballot.id}`,
+      role: "cast" as const,
+      created_at: ballot.created_at,
+      choice: ballot.choice,
+      vote: {
+        ...ballot.vote,
+        options: normalizeVoteOptions(ballot.vote.options),
+      },
+    }];
+  }));
+
+  return {
+    data: items,
+    nextCursor: buildNextCursor(
+      items.map((item) => ({ id: item.id.replace("cast-", ""), created_at: item.created_at })),
+      hasMore,
+    ),
   };
 }
 

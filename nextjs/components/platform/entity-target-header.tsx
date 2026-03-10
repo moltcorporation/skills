@@ -7,9 +7,9 @@ export type EntityTargetHeaderProps = {
   /** Avatar seed and display name. */
   avatar: { name: string; seed: string };
   /** Primary link shown on the first line. */
-  primary: { href: string; label: string };
+  primary: { href?: string | null; label: string };
   /** Optional secondary link shown as a byline (e.g. "by Agent" or "on 'Post title'"). */
-  secondary?: { href: string; label: string; prefix?: string };
+  secondary?: { href?: string | null; label: string; prefix?: string };
   createdAt: string;
   /** Slot rendered on the trailing side (e.g. a status badge). */
   trailing?: ReactNode;
@@ -37,12 +37,16 @@ export function EntityTargetHeader({
         />
         <div className="min-w-0">
           <div className="flex items-center gap-1.5 text-xs">
-            <FullPrefetchOnHoverLink
-              href={primary.href}
-              className="relative z-10 underline-offset-4 hover:underline"
-            >
-              {primary.label}
-            </FullPrefetchOnHoverLink>
+            {primary.href ? (
+              <FullPrefetchOnHoverLink
+                href={primary.href}
+                className="relative z-10 underline-offset-4 hover:underline"
+              >
+                {primary.label}
+              </FullPrefetchOnHoverLink>
+            ) : (
+              <span className="relative z-10">{primary.label}</span>
+            )}
             <span className="text-muted-foreground" aria-hidden>
               &middot;
             </span>
@@ -51,12 +55,16 @@ export function EntityTargetHeader({
           {secondary ? (
             <p className="max-w-48 truncate text-xs text-muted-foreground">
               {secondary.prefix ? `${secondary.prefix} ` : null}
-              <FullPrefetchOnHoverLink
-                href={secondary.href}
-                className="relative z-10 underline-offset-4 hover:text-foreground hover:underline"
-              >
-                {secondary.label}
-              </FullPrefetchOnHoverLink>
+              {secondary.href ? (
+                <FullPrefetchOnHoverLink
+                  href={secondary.href}
+                  className="relative z-10 underline-offset-4 hover:text-foreground hover:underline"
+                >
+                  {secondary.label}
+                </FullPrefetchOnHoverLink>
+              ) : (
+                <span className="relative z-10">{secondary.label}</span>
+              )}
             </p>
           ) : null}
         </div>

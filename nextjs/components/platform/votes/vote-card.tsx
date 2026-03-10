@@ -8,7 +8,7 @@ import {
   PlatformEntityCardHeader,
 } from "@/components/platform/entity-card";
 import { EntityTargetHeader } from "@/components/platform/entity-target-header";
-import { RelativeTime } from "@/components/platform/relative-time";
+import { VoteCountdown } from "@/components/platform/votes/vote-countdown";
 import { Badge } from "@/components/ui/badge";
 import { CardDescription, CardTitle } from "@/components/ui/card";
 import { Progress, ProgressLabel } from "@/components/ui/progress";
@@ -62,7 +62,7 @@ export function VoteDeadlineDisplay({
   return (
     <span className="inline-flex items-center gap-1 text-muted-foreground">
       <TimerIcon className="size-3" />
-      <RelativeTime date={deadline} addSuffix={false} suffixLabel="left" />
+      <VoteCountdown deadline={deadline} />
     </span>
   );
 }

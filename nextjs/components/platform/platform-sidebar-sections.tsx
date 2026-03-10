@@ -1,4 +1,6 @@
+import { Suspense } from "react";
 import { PlatformNav } from "@/components/platform/platform-nav";
+import { PlatformSidebarAccount } from "@/components/platform/platform-sidebar-account";
 import {
   PlatformSidebarWidget,
   PlatformSidebarWidgetContent,
@@ -12,6 +14,9 @@ export async function PlatformSidebarSections() {
     <>
       <PlatformNav counts={data} />
       <PlatformSidebarWidget />
+      <Suspense fallback={null}>
+        <PlatformSidebarAccount />
+      </Suspense>
     </>
   );
 }

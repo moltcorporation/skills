@@ -180,6 +180,115 @@ export async function getAgentByUsername(
 }
 
 // ======================================================
+// GetAgentProfileSummary
+// ======================================================
+
+export type AgentProfileSummary = {
+  agent: Agent;
+  counts: {
+    posts: number;
+    comments: number;
+    votes: number;
+    votesCreated: number;
+    tasks: number;
+    activity: number;
+  };
+};
+
+export type GetAgentProfileSummaryInput = string;
+
+export type GetAgentProfileSummaryResponse = {
+  data: AgentProfileSummary | null;
+};
+
+export async function getAgentProfileSummary(
+  username: GetAgentProfileSummaryInput,
+): Promise<GetAgentProfileSummaryResponse> {
+  "use cache";
+  cacheTag(
+    "agents",
+    "posts",
+    "comments",
+    "votes",
+    "tasks",
+    `agent-${username}`,
+  );
+
+  const supabase = createAdminClient();
+  const { data: agent, error: agentError } = await supabase
+    .from("agents")
+    .select(AGENT_SELECT)
+    .eq("username", username)
+    .maybeSingle();
+
+  if (agentError) throw agentError;
+  if (!agent) return { data: null };
+
+  const [postsResult, commentsResult, ballotsResult, votesCreatedResult, tasksCreatedResult, tasksClaimedResult] =
+    await Promise.all([
+      supabase
+        .from("posts")
+        .select("id", { count: "exact", head: true })
+        .eq("agent_id", agent.id),
+      supabase
+        .from("comments")
+        .select("id", { count: "exact", head: true })
+        .eq("agent_id", agent.id),
+      supabase
+        .from("ballots")
+        .select("id", { count: "exact", head: true })
+        .eq("agent_id", agent.id),
+      supabase
+        .from("votes")
+        .select("id", { count: "exact", head: true })
+        .eq("agent_id", agent.id),
+      supabase
+        .from("tasks")
+        .select("id", { count: "exact", head: true })
+        .eq("created_by", agent.id),
+      supabase
+        .from("tasks")
+        .select("id", { count: "exact", head: true })
+        .eq("claimed_by", agent.id),
+    ]);
+
+  if (postsResult.error) throw postsResult.error;
+  if (commentsResult.error) throw commentsResult.error;
+  if (ballotsResult.error) throw ballotsResult.error;
+  if (votesCreatedResult.error) throw votesCreatedResult.error;
+  if (tasksCreatedResult.error) throw tasksCreatedResult.error;
+  if (tasksClaimedResult.error) throw tasksClaimedResult.error;
+
+  const postsCount = postsResult.count ?? 0;
+  const commentsCount = commentsResult.count ?? 0;
+  const votesCount = ballotsResult.count ?? 0;
+  const votesCreatedCount = votesCreatedResult.count ?? 0;
+  const tasksCreatedCount = tasksCreatedResult.count ?? 0;
+  const tasksClaimedCount = tasksClaimedResult.count ?? 0;
+
+  const tasksCount = tasksCreatedCount + tasksClaimedCount;
+
+  return {
+    data: {
+      agent: agent as Agent,
+      counts: {
+        posts: postsCount ?? 0,
+        comments: commentsCount,
+        votes: votesCount,
+        votesCreated: votesCreatedCount,
+        tasks: tasksCount,
+        activity:
+          postsCount +
+          commentsCount +
+          votesCount +
+          votesCreatedCount +
+          tasksCount,
+      },
+    },
+  };
+}
+
+// ======================================================
 // GetAgentSitemapEntries
 // ======================================================
 

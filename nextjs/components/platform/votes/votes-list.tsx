@@ -43,7 +43,11 @@ import type { Vote } from "@/lib/data/votes";
 
 type ApiResponse = Pick<ListVotesResponse, "votes" | "nextCursor">;
 
-export function VotesList() {
+type VotesListProps = {
+  agentId?: string;
+};
+
+export function VotesList({ agentId }: VotesListProps) {
   const [viewMode, setViewMode] = useState<"table" | "cards">("cards");
   const {
     filters,
@@ -62,7 +66,13 @@ export function VotesList() {
     getNextCursor: (page) => page.nextCursor,
     getItems: (page) => page.votes,
     getFiltersFromSearchParams: getVoteFiltersFromSearchParams,
-    buildSearchParams: buildVoteSearchParams,
+    buildSearchParams: (activeFilters, options) => {
+      const params = buildVoteSearchParams(activeFilters, options);
+
+      if (agentId) params.set("agent_id", agentId);
+
+      return params;
+    },
   });
 
   return (

@@ -1,10 +1,8 @@
-import { format } from "date-fns";
 import { CheckCircle, Timer } from "@phosphor-icons/react/ssr";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 
 import { VoteCountdown } from "@/components/platform/votes/vote-countdown";
-import { Progress, ProgressLabel } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getVoteDetail } from "@/lib/data/votes";
@@ -28,91 +26,98 @@ async function VoteOverviewContent({ params }: Props) {
     return (tally[b] ?? 0) - (tally[a] ?? 0);
   });
 
+  // Find the leading option for open votes
+  const leadingOption =
+    !isClosed && totalVotes > 0 ? sortedOptions[0] : undefined;
+
   return (
     <div className="space-y-6">
-      {/* Status banner */}
-      {isClosed && vote.winning_option ? (
-        <div className="flex items-start gap-3 rounded-md border border-border bg-muted/30 px-4 py-3">
-          <CheckCircle weight="fill" className="mt-0.5 size-4 shrink-0 text-green-500" />
-          <div className="min-w-0 space-y-0.5">
-            <p className="text-sm font-medium">Decided: {vote.winning_option}</p>
-            <p className="text-xs text-muted-foreground">
-              Closed{" "}
-              {format(
-                new Date(vote.resolved_at ?? vote.deadline),
-                "MMM d, yyyy",
-              )}
-              {" · "}
-              {totalVotes} {totalVotes === 1 ? "ballot" : "ballots"} cast
-            </p>
-          </div>
-        </div>
-      ) : isClosed ? (
-        <div className="flex items-start gap-3 rounded-md border border-border bg-muted/30 px-4 py-3">
-          <CheckCircle className="mt-0.5 size-4 shrink-0 text-muted-foreground" />
-          <div className="min-w-0 space-y-0.5">
-            <p className="text-sm font-medium">Vote closed</p>
-            <p className="text-xs text-muted-foreground">
-              {totalVotes} {totalVotes === 1 ? "ballot" : "ballots"} cast
-            </p>
-          </div>
-        </div>
-      ) : (
-        <div className="flex items-start gap-3 rounded-md border border-green-500/20 bg-green-500/5 px-4 py-3">
-          <Timer className="mt-0.5 size-4 shrink-0 text-green-500" />
-          <div className="min-w-0 space-y-0.5">
-            <p className="text-sm font-medium">Voting is open</p>
+      {/* Results */}
+      <div className="space-y-3">
+        {sortedOptions.map((option) => {
+          const count = tally[option] ?? 0;
+          const pct = totalVotes > 0 ? (count / totalVotes) * 100 : 0;
+          const isWinner = isClosed && vote.winning_option === option;
+          const isLeading = option === leadingOption;
+
+          return (
+            <div
+              key={option}
+              className="group relative overflow-hidden rounded-lg border border-border transition-colors hover:border-muted-foreground/30"
+              role="meter"
+              aria-valuenow={Math.round(pct)}
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-label={`${option}: ${Math.round(pct)}%`}
+            >
+              {/* Fill bar */}
+              <div
+                className={`absolute inset-y-0 left-0 transition-all ${
+                  isWinner
+                    ? "bg-green-500/15"
+                    : isLeading
+                      ? "bg-primary/10"
+                      : "bg-muted/50"
+                }`}
+                style={{ width: `${pct}%` }}
+              />
+
+              {/* Content */}
+              <div className="relative flex items-center justify-between gap-3 px-4 py-3">
+                <div className="flex items-center gap-2 min-w-0">
+                  {isWinner && (
+                    <CheckCircle
+                      weight="fill"
+                      className="size-4 shrink-0 text-green-500"
+                    />
+                  )}
+                  <span
+                    className={`text-sm truncate ${
+                      isWinner || isLeading
+                        ? "font-medium text-foreground"
+                        : "text-muted-foreground"
+                    }`}
+                  >
+                    {option}
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-2.5 shrink-0">
+                  <span className="text-xs tabular-nums text-muted-foreground">
+                    {count} {count === 1 ? "vote" : "votes"}
+                  </span>
+                  <span
+                    className={`text-sm tabular-nums font-medium ${
+                      isWinner
+                        ? "text-green-500"
+                        : isLeading
+                          ? "text-foreground"
+                          : "text-muted-foreground"
+                    }`}
+                  >
+                    {Math.round(pct)}%
+                  </span>
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Summary line */}
+      <div className="flex items-center justify-between text-xs text-muted-foreground">
+        <span>
+          {totalVotes} {totalVotes === 1 ? "ballot" : "ballots"} cast
+        </span>
+        {!isClosed && (
+          <span className="flex items-center gap-1.5">
+            <Timer className="size-3.5 text-green-500" />
             <VoteCountdown
               deadline={vote.deadline}
               className="text-xs text-muted-foreground"
             />
-          </div>
-        </div>
-      )}
-
-      {/* Results */}
-      <div className="space-y-4">
-        <h2 className="text-sm font-medium">Results</h2>
-        <div className="space-y-3">
-          {sortedOptions.map((option) => {
-            const count = tally[option] ?? 0;
-            const pct = totalVotes > 0 ? (count / totalVotes) * 100 : 0;
-            const isWinner = isClosed && vote.winning_option === option;
-
-            return (
-              <Progress
-                key={option}
-                value={pct}
-                className="gap-1.5"
-                aria-label={`${option}: ${Math.round(pct)}%`}
-              >
-                <div className="flex w-full items-center justify-between gap-3">
-                  <ProgressLabel
-                    className={
-                      isWinner
-                        ? "text-xs font-medium text-foreground"
-                        : "text-xs text-muted-foreground"
-                    }
-                  >
-                    {option}
-                    {isWinner && (
-                      <CheckCircle
-                        weight="fill"
-                        className="ml-1.5 inline size-3 text-green-500"
-                      />
-                    )}
-                  </ProgressLabel>
-                  <span className="text-xs tabular-nums text-muted-foreground">
-                    {count} ({Math.round(pct)}%)
-                  </span>
-                </div>
-              </Progress>
-            );
-          })}
-        </div>
-        <p className="text-xs text-muted-foreground">
-          {totalVotes} {totalVotes === 1 ? "ballot" : "ballots"} cast
-        </p>
+          </span>
+        )}
       </div>
 
       {/* Outcome */}
@@ -133,15 +138,11 @@ async function VoteOverviewContent({ params }: Props) {
 
 function VoteOverviewSkeleton() {
   return (
-    <div className="space-y-6">
-      <Skeleton className="h-[52px] w-full rounded-md" />
-      <div className="space-y-4">
-        <Skeleton className="h-4 w-16" />
-        <div className="space-y-3">
-          {Array.from({ length: 3 }).map((_, i) => (
-            <Skeleton key={i} className="h-8 w-full" />
-          ))}
-        </div>
+    <div className="space-y-3">
+      {Array.from({ length: 3 }).map((_, i) => (
+        <Skeleton key={i} className="h-[50px] w-full rounded-lg" />
+      ))}
+      <div className="pt-3">
         <Skeleton className="h-3 w-24" />
       </div>
     </div>

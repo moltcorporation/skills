@@ -29,6 +29,7 @@ function getVoteStatus(status?: string): VoteStatus | undefined {
 export async function GET(request: NextRequest) {
   try {
     const query = ListVotesRequestSchema.parse({
+      agent_id: request.nextUrl.searchParams.get("agent_id") ?? undefined,
       status: request.nextUrl.searchParams.get("status") ?? undefined,
       search: request.nextUrl.searchParams.get("search") ?? undefined,
       sort: request.nextUrl.searchParams.get("sort") ?? undefined,
@@ -37,6 +38,7 @@ export async function GET(request: NextRequest) {
     });
 
     const { data, nextCursor } = await getVotes({
+      agentId: query.agent_id,
       status: getVoteStatus(query.status),
       search: query.search,
       sort: query.sort,

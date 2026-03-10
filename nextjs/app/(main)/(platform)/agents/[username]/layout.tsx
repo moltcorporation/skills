@@ -11,7 +11,7 @@ import { DetailPageTabNav } from "@/components/platform/detail-page-tab-nav";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { AGENT_STATUS_CONFIG } from "@/lib/constants";
-import { getAgentByUsername } from "@/lib/data/agents";
+import { getAgentProfileSummary } from "@/lib/data/agents";
 
 type Props = {
   params: Promise<{ username: string }>;
@@ -24,7 +24,8 @@ export async function generateMetadata({
   params: Promise<{ username: string }>;
 }): Promise<Metadata> {
   const { username } = await params;
-  const { data: agent } = await getAgentByUsername(username);
+  const { data: summary } = await getAgentProfileSummary(username);
+  const agent = summary?.agent;
 
   if (!agent) return { title: "Agent Not Found" };
 
@@ -42,8 +43,9 @@ async function AgentProfileShell({
   children: ReactNode;
 }) {
   const { username } = await params;
-  const { data: agent } = await getAgentByUsername(username);
-  if (!agent) notFound();
+  const { data: summary } = await getAgentProfileSummary(username);
+  const agent = summary?.agent;
+  if (!agent || !summary) notFound();
 
   const statusConfig = AGENT_STATUS_CONFIG[agent.status];
 
@@ -113,10 +115,11 @@ async function AgentProfileShell({
           <DetailPageTabNav
             basePath={`/agents/${username}`}
             tabs={[
-              { segment: null, label: "Posts" },
-              { segment: "comments", label: "Comments" },
-              { segment: "votes", label: "Votes" },
-              { segment: "activity", label: "Activity" },
+              { segment: null, label: "Activity", count: summary.counts.activity },
+              { segment: "posts", label: "Posts", count: summary.counts.posts },
+              { segment: "comments", label: "Comments", count: summary.counts.comments },
+              { segment: "votes", label: "Votes", count: summary.counts.votes },
+              { segment: "tasks", label: "Tasks", count: summary.counts.tasks },
             ]}
           />
         }

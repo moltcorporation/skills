@@ -20,7 +20,7 @@ const ReactGlobe = dynamic(() => import("react-globe.gl"), {
 const DARK_GLOBE_IMAGE_URL = "/images/globe/earth-dark.jpg";
 const PULSE_GREEN = "#22c55e";
 const PULSE_GREEN_FADE = "rgba(34, 197, 94, 0.18)";
-const AUTO_ROTATE_SPEED = 0.45;
+const AUTO_ROTATE_SPEED = -0.45;
 const AUTO_ROTATE_RESUME_DELAY_MS = 4000;
 
 type GlobeThemeStyles = {
@@ -156,6 +156,7 @@ export function AgentGlobe({
   const autoRotateTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [size, setSize] = useState(0);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
+  const [globeReady, setGlobeReady] = useState(false);
   const [themeStyles, setThemeStyles] = useState<GlobeThemeStyles>({
     border: "rgba(255,255,255,0.1)",
     popover: "rgba(0,0,0,0.92)",
@@ -223,7 +224,7 @@ export function AgentGlobe({
   useEffect(() => {
     const globe = globeRef.current;
     const controls = globe?.controls();
-    if (!globe || !controls) return;
+    if (!globeReady || !globe || !controls) return;
 
     globe.resumeAnimation();
     controls.enabled = true;
@@ -235,7 +236,25 @@ export function AgentGlobe({
     controls.minDistance = 220;
     controls.maxDistance = 320;
     controls.update();
-  }, [pathname, size, resolvedTheme]);
+
+    const handleStart = () => {
+      clearAutoRotateTimeout();
+      controls.autoRotate = false;
+      controls.update();
+    };
+
+    const handleEnd = () => {
+      scheduleAutoRotateResume();
+    };
+
+    controls.addEventListener("start", handleStart);
+    controls.addEventListener("end", handleEnd);
+
+    return () => {
+      controls.removeEventListener("start", handleStart);
+      controls.removeEventListener("end", handleEnd);
+    };
+  }, [globeReady, pathname, size, resolvedTheme, clearAutoRotateTimeout, scheduleAutoRotateResume]);
 
   useEffect(() => {
     const resumeGlobe = () => {
@@ -259,29 +278,6 @@ export function AgentGlobe({
     };
   }, [clearAutoRotateTimeout]);
 
-  useEffect(() => {
-    const controls = globeRef.current?.controls();
-    if (!controls) return;
-
-    const handleStart = () => {
-      clearAutoRotateTimeout();
-      controls.autoRotate = false;
-      controls.update();
-    };
-
-    const handleEnd = () => {
-      scheduleAutoRotateResume();
-    };
-
-    controls.addEventListener("start", handleStart);
-    controls.addEventListener("end", handleEnd);
-
-    return () => {
-      controls.removeEventListener("start", handleStart);
-      controls.removeEventListener("end", handleEnd);
-    };
-  }, [clearAutoRotateTimeout, scheduleAutoRotateResume, size, pathname, resolvedTheme]);
-
   return (
     <div
       ref={containerRef}
@@ -297,20 +293,8 @@ export function AgentGlobe({
             globeImageUrl={globeImageUrl}
             showAtmosphere={false}
             onGlobeReady={() => {
-              const globe = globeRef.current;
-              const controls = globe?.controls();
-              if (!globe || !controls) return;
-
-              globe.resumeAnimation();
-              controls.enabled = true;
-              controls.autoRotate = true;
-              controls.autoRotateSpeed = AUTO_ROTATE_SPEED;
-              controls.enablePan = false;
-              controls.enableDamping = true;
-              controls.dampingFactor = 0.08;
-              controls.minDistance = 220;
-              controls.maxDistance = 320;
-              controls.update();
+              globeRef.current?.pointOfView({ lat: 35, lng: -100, altitude: 2.2 }, 0);
+              setGlobeReady(true);
             }}
             ringsData={pointsData}
             ringLat="latitude"
@@ -331,7 +315,7 @@ export function AgentGlobe({
             labelDotRadius={(point) => {
               const gp = point as GlobePoint;
               const isCluster = gp.agents.length > 1;
-              const base = isCluster ? 0.56 : 0.48;
+              const base = isCluster ? 0.75 : 0.65;
               return gp.id === hoveredId ? base + 0.16 : base;
             }}
             labelColor={() => PULSE_GREEN}

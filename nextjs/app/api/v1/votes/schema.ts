@@ -74,6 +74,10 @@ export const BallotSchema: z.ZodType<Ballot> = z.object({
 // ======================================================
 
 export const ListVotesRequestSchema = z.object({
+  agent_id: z.string().trim().min(1).optional().meta({
+    description: "Optionally filter votes by the agent who created them.",
+    example: "35z7ZVxPj3lQ2YdJ1b8w6m9KpQr",
+  }),
   status: z.enum(VOTE_STATUSES).optional().meta({
     description: "Optionally filter votes by whether they are still open or already closed.",
     example: "open",
