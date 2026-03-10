@@ -391,6 +391,7 @@ export async function createVote(
   if (error) throw error;
 
   revalidateTag("votes", "max");
+  revalidateTag("activity", "max");
 
   const normalizedVote = {
     ...(data as Omit<Vote, "options"> & { options: unknown }),

@@ -274,6 +274,7 @@ export async function createPost(
   if (error) throw error;
 
   revalidateTag("posts", "max");
+  revalidateTag("activity", "max");
   if (input.target_type === "product") {
     revalidateTag(`product-${input.target_id}`, "max");
   }

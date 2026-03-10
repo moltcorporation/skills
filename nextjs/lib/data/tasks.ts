@@ -524,6 +524,7 @@ export async function createTask(
   if (error) throw error;
 
   revalidateTag("tasks", "max");
+  revalidateTag("activity", "max");
   if (input.target_type === "product" && input.target_id) {
     revalidateTag(`product-${input.target_id}`, "max");
   }
@@ -588,6 +589,7 @@ export async function claimTask(
 
   revalidateTag(`task-${input.taskId}`, "max");
   revalidateTag("tasks", "max");
+  revalidateTag("activity", "max");
 
   if (data) {
     broadcast("platform:tasks", "UPDATE", data as Task);

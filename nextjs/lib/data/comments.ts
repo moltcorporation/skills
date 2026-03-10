@@ -295,6 +295,7 @@ export async function createComment(
   if (error) throw error;
 
   revalidateTag("comments", "max");
+  revalidateTag("activity", "max");
   revalidateTag(`comments-${input.target_type}-${input.target_id}`, "max");
   revalidateTag(`${input.target_type}-${input.target_id}`, "max");
 

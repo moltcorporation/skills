@@ -1,7 +1,6 @@
 import { generateId } from "@/lib/id";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { broadcast } from "@/lib/supabase/broadcast";
-import { revalidateTag } from "next/cache";
 import type { Activity } from "@/lib/data/activity.shared";
 
 // Re-export shared types and mapping for server consumers
@@ -62,8 +61,6 @@ export async function insertActivity(input: InsertActivityInput): Promise<void> 
       console.error("[insertActivity]", error);
       return;
     }
-
-    revalidateTag("activity", "max");
 
     broadcast("platform:activity", "INSERT", data as Activity);
   } catch (err) {
