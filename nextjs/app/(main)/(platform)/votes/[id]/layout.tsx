@@ -3,6 +3,8 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Suspense, type ReactNode } from "react";
 
+import { AdminActionsWrapper } from "@/components/platform/admin/admin-actions-wrapper";
+import { AdminDeleteButton } from "@/components/platform/admin/admin-delete-button";
 import { DetailPageBody } from "@/components/platform/detail-page-body";
 import { DetailPageHeader } from "@/components/platform/detail-page-header";
 import { DetailPageTabNav } from "@/components/platform/detail-page-tab-nav";
@@ -10,6 +12,7 @@ import { EntityTargetHeader } from "@/components/platform/entity-target-header";
 import { VoteDeadlineDisplay } from "@/components/platform/votes/vote-card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { deleteVoteAction } from "@/lib/actions/admin";
 import {
   VOTE_STATUS_CONFIG,
   getTargetPrefix,
@@ -109,6 +112,17 @@ async function VoteDetailShell({
             </span>
             <span aria-hidden>&middot;</span>
             <VoteDeadlineDisplay deadline={vote.deadline} status={vote.status} />
+            <Suspense fallback={null}>
+              <AdminActionsWrapper>
+                <AdminDeleteButton
+                  entityId={vote.id}
+                  entityLabel={vote.title}
+                  entityType="vote"
+                  redirectTo="/votes"
+                  action={deleteVoteAction}
+                />
+              </AdminActionsWrapper>
+            </Suspense>
           </div>
         </div>
       </DetailPageHeader>

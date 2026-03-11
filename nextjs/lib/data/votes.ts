@@ -1,10 +1,12 @@
 import { DEFAULT_PAGE_SIZE } from "@/lib/constants";
-import { platformConfig } from "@/lib/platform-config";
 import { buildNextCursor, decodeCursor } from "@/lib/cursor";
+import { insertActivity } from "@/lib/data/activity";
 import { generateId } from "@/lib/id";
+import { platformConfig } from "@/lib/platform-config";
+import { slackLog } from "@/lib/slack";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { broadcast } from "@/lib/supabase/broadcast";
-import { insertActivity } from "@/lib/data/activity";
+import { createClient } from "@/lib/supabase/server";
 import { cacheTag, revalidateTag } from "next/cache";
 
 // ======================================================
@@ -640,4 +642,121 @@ export async function castBallot(
   );
 
   return { data: data as Ballot };
+}
+
+// ======================================================
+// ResolveVote
+// ======================================================
+
+export type ResolveVoteInput = {
+  voteId: string;
+  winningOption: string | null;
+  outcome: string;
+};
+
+export async function resolveVote(input: ResolveVoteInput): Promise<void> {
+  const supabase = createAdminClient();
+
+  const { error } = await supabase
+    .from("votes")
+    .update({
+      status: "closed",
+      winning_option: input.winningOption,
+      outcome: input.outcome,
+      resolved_at: new Date().toISOString(),
+    })
+    .eq("id", input.voteId);
+
+  if (error) throw error;
+
+  revalidateTag(`vote-${input.voteId}`, "max");
+  revalidateTag("votes", "max");
+
+  broadcast("platform:votes", "UPDATE", {
+    id: input.voteId,
+    status: "closed",
+    winning_option: input.winningOption,
+    outcome: input.outcome,
+  });
+
+  insertActivity({
+    agentId: "system",
+    agentName: "System",
+    agentUsername: "system",
+    action: "resolve",
+    targetType: "vote",
+    targetId: input.voteId,
+    targetLabel: input.outcome,
+  });
+}
+
+// ======================================================
+// ExtendVoteDeadline
+// ======================================================
+
+export type ExtendVoteDeadlineInput = {
+  voteId: string;
+};
+
+export async function extendVoteDeadline(
+  input: ExtendVoteDeadlineInput,
+): Promise<{ newDeadline: string }> {
+  const supabase = createAdminClient();
+
+  const { data: vote, error: fetchError } = await supabase
+    .from("votes")
+    .select("deadline")
+    .eq("id", input.voteId)
+    .single();
+
+  if (fetchError || !vote) throw fetchError ?? new Error("Vote not found");
+
+  const currentDeadline = new Date(vote.deadline);
+  const extensionMs = platformConfig.voting.tieExtensionHours * 60 * 60 * 1000;
+  const newDeadline = new Date(
+    Math.max(currentDeadline.getTime(), Date.now()) + extensionMs,
+  ).toISOString();
+
+  const { error } = await supabase
+    .from("votes")
+    .update({ deadline: newDeadline })
+    .eq("id", input.voteId);
+
+  if (error) throw error;
+
+  revalidateTag(`vote-${input.voteId}`, "max");
+  revalidateTag("votes", "max");
+
+  return { newDeadline };
+}
+
+// ======================================================
+// DeleteVote
+// ======================================================
+
+export type DeleteVoteInput = string;
+
+export async function deleteVote(voteId: DeleteVoteInput): Promise<void> {
+  // Use session client so RLS enforces the permission
+  const supabase = await createClient();
+
+  // Fetch vote details before deleting (for logging)
+  const admin = createAdminClient();
+  const { data: vote } = await admin
+    .from("votes")
+    .select("id, title, agent_id")
+    .eq("id", voteId)
+    .maybeSingle();
+
+  const { error } = await supabase.from("votes").delete().eq("id", voteId);
+  if (error) throw error;
+
+  revalidateTag("votes", "max");
+  if (vote) {
+    revalidateTag(`vote-${voteId}`, "max");
+  }
+
+  broadcast("platform:votes", "DELETE", { id: voteId });
+
+  slackLog(`Admin deleted vote: "${vote?.title ?? voteId}"`);
 }

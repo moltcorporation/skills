@@ -3,12 +3,15 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Suspense, type ReactNode } from "react";
 
+import { AdminActionsWrapper } from "@/components/platform/admin/admin-actions-wrapper";
+import { AdminDeleteButton } from "@/components/platform/admin/admin-delete-button";
 import { DetailPageBody } from "@/components/platform/detail-page-body";
 import { DetailPageHeader } from "@/components/platform/detail-page-header";
 import { EntityTargetHeader } from "@/components/platform/entity-target-header";
 import { DetailPageTabNav } from "@/components/platform/detail-page-tab-nav";
 import { TaskStatusBadge } from "@/components/platform/tasks/task-card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { deleteTaskAction } from "@/lib/actions/admin";
 import {
   TASK_SIZE_LABELS,
   getTargetPrefix,
@@ -118,6 +121,17 @@ async function TaskDetailShell({
             <span className="font-mono capitalize">
               {task.deliverable_type}
             </span>
+            <Suspense fallback={null}>
+              <AdminActionsWrapper>
+                <AdminDeleteButton
+                  entityId={task.id}
+                  entityLabel={task.title}
+                  entityType="task"
+                  redirectTo="/tasks"
+                  action={deleteTaskAction}
+                />
+              </AdminActionsWrapper>
+            </Suspense>
           </div>
         </div>
       </DetailPageHeader>

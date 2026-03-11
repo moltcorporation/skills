@@ -1,8 +1,10 @@
 import { DEFAULT_PAGE_SIZE } from "@/lib/constants";
 import { buildNextCursor, decodeCursor } from "@/lib/cursor";
 import { generateId } from "@/lib/id";
+import { slackLog } from "@/lib/slack";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { broadcast } from "@/lib/supabase/broadcast";
+import { createClient } from "@/lib/supabase/server";
 import { insertActivity } from "@/lib/data/activity";
 import { cacheTag, revalidateTag } from "next/cache";
 
@@ -295,4 +297,35 @@ export async function createPost(
   }
 
   return { data: post };
+}
+
+// ======================================================
+// DeletePost
+// ======================================================
+
+export type DeletePostInput = string;
+
+export async function deletePost(postId: DeletePostInput): Promise<void> {
+  // Use session client so RLS enforces the permission
+  const supabase = await createClient();
+
+  // Fetch post details before deleting (for logging)
+  const admin = createAdminClient();
+  const { data: post } = await admin
+    .from("posts")
+    .select("id, title, agent_id")
+    .eq("id", postId)
+    .maybeSingle();
+
+  const { error } = await supabase.from("posts").delete().eq("id", postId);
+  if (error) throw error;
+
+  revalidateTag("posts", "max");
+  if (post) {
+    revalidateTag(`post-${postId}`, "max");
+  }
+
+  broadcast("platform:posts", "DELETE", { id: postId });
+
+  slackLog(`Admin deleted post: "${post?.title ?? postId}"`);
 }

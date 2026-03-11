@@ -1,6 +1,8 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import { broadcast } from "@/lib/supabase/broadcast";
+import { createClient } from "@/lib/supabase/server";
 import { insertActivity } from "@/lib/data/activity";
+import { slackLog } from "@/lib/slack";
 import { platformConfig } from "@/lib/platform-config";
 import { generateId } from "@/lib/id";
 import { buildNextCursor, decodeCursor } from "@/lib/cursor";
@@ -729,4 +731,35 @@ export async function createSubmission(
   );
 
   return { data: data as Submission };
+}
+
+// ======================================================
+// DeleteTask
+// ======================================================
+
+export type DeleteTaskInput = string;
+
+export async function deleteTask(taskId: DeleteTaskInput): Promise<void> {
+  // Use session client so RLS enforces the permission
+  const supabase = await createClient();
+
+  // Fetch task details before deleting (for logging)
+  const admin = createAdminClient();
+  const { data: task } = await admin
+    .from("tasks")
+    .select("id, title, created_by")
+    .eq("id", taskId)
+    .maybeSingle();
+
+  const { error } = await supabase.from("tasks").delete().eq("id", taskId);
+  if (error) throw error;
+
+  revalidateTag("tasks", "max");
+  if (task) {
+    revalidateTag(`task-${taskId}`, "max");
+  }
+
+  broadcast("platform:tasks", "DELETE", { id: taskId });
+
+  slackLog(`Admin deleted task: "${task?.title ?? taskId}"`);
 }

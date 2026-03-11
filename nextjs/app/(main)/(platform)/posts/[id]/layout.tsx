@@ -3,6 +3,8 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Suspense, type ReactNode } from "react";
 
+import { AdminActionsWrapper } from "@/components/platform/admin/admin-actions-wrapper";
+import { AdminDeleteButton } from "@/components/platform/admin/admin-delete-button";
 import { DetailPageBody } from "@/components/platform/detail-page-body";
 import { DetailPageHeader } from "@/components/platform/detail-page-header";
 import { EntityTargetHeader } from "@/components/platform/entity-target-header";
@@ -10,6 +12,7 @@ import { DetailPageTabNav } from "@/components/platform/detail-page-tab-nav";
 import { PostArticleSchema } from "@/components/platform/schema-markup";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { deletePostAction } from "@/lib/actions/admin";
 import {
   POST_TYPE_CONFIG,
   getTargetPrefix,
@@ -113,6 +116,17 @@ async function PostDetailShell({
               {format(new Date(post.created_at), "MMM d, yyyy")}
             </span>
             <span className="font-mono">{readTime}</span>
+            <Suspense fallback={null}>
+              <AdminActionsWrapper>
+                <AdminDeleteButton
+                  entityId={post.id}
+                  entityLabel={post.title}
+                  entityType="post"
+                  redirectTo="/posts"
+                  action={deletePostAction}
+                />
+              </AdminActionsWrapper>
+            </Suspense>
           </div>
         </div>
       </DetailPageHeader>

@@ -57,15 +57,7 @@ export type Database = {
           target_label?: string
           target_type?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "activity_agent_id_fkey"
-            columns: ["agent_id"]
-            isOneToOne: false
-            referencedRelation: "agents"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       agents: {
         Row: {
@@ -589,6 +581,24 @@ export type Database = {
           },
         ]
       }
+      role_permissions: {
+        Row: {
+          id: number
+          permission: Database["public"]["Enums"]["app_permission"]
+          role: Database["public"]["Enums"]["app_role"]
+        }
+        Insert: {
+          id?: number
+          permission: Database["public"]["Enums"]["app_permission"]
+          role: Database["public"]["Enums"]["app_role"]
+        }
+        Update: {
+          id?: number
+          permission?: Database["public"]["Enums"]["app_permission"]
+          role?: Database["public"]["Enums"]["app_role"]
+        }
+        Relationships: []
+      }
       stripe_payment_links: {
         Row: {
           amount: number
@@ -772,6 +782,24 @@ export type Database = {
           },
         ]
       }
+      user_roles: {
+        Row: {
+          id: number
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: number
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: number
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
       votes: {
         Row: {
           agent_id: string
@@ -846,6 +874,13 @@ export type Database = {
         Args: { p_review_notes?: string; p_submission_id: string }
         Returns: undefined
       }
+      authorize: {
+        Args: {
+          requested_permission: Database["public"]["Enums"]["app_permission"]
+        }
+        Returns: boolean
+      }
+      custom_access_token_hook: { Args: { event: Json }; Returns: Json }
       get_global_counts: { Args: never; Returns: Json }
       publish_platform_live: {
         Args: {
@@ -859,6 +894,8 @@ export type Database = {
     }
     Enums: {
       agent_status: "pending_claim" | "claimed" | "suspended"
+      app_permission: "posts.delete" | "votes.delete" | "tasks.delete"
+      app_role: "admin"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -987,6 +1024,8 @@ export const Constants = {
   public: {
     Enums: {
       agent_status: ["pending_claim", "claimed", "suspended"],
+      app_permission: ["posts.delete", "votes.delete", "tasks.delete"],
+      app_role: ["admin"],
     },
   },
 } as const
