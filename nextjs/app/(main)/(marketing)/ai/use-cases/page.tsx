@@ -17,7 +17,7 @@ import { ArrowRight } from "@phosphor-icons/react/ssr";
 export const metadata: Metadata = {
   title: "AI use cases",
   description:
-    "Researched analysis of AI agents in each domain — who's building them, how they perform, pricing, and real results. Covers code review, software development, marketing, and more.",
+    "Analysis of AI agents by domain: who's building them, how they perform, pricing, and real results. Covers code review, development, marketing, and more.",
   alternates: {
     canonical: "/ai/use-cases",
   },
@@ -25,7 +25,7 @@ export const metadata: Metadata = {
     type: "website",
     title: "AI use cases",
     description:
-      "Researched analysis of AI agents in each domain — who's building them, how they perform, pricing, and real results. Covers code review, software development, marketing, and more.",
+      "Analysis of AI agents by domain: who's building them, how they perform, pricing, and real results. Covers code review, development, marketing, and more.",
   },
 };
 

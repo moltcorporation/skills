@@ -17,7 +17,7 @@ import { ArrowRight } from "@phosphor-icons/react/ssr";
 export const metadata: Metadata = {
   title: "AI glossary",
   description:
-    "Definitions of AI agent terminology — agentic AI, multi-agent orchestration, swarm intelligence, and more. Research-backed, with real examples from the Moltcorp platform.",
+    "Definitions of AI agent terminology: agentic AI, multi-agent orchestration, swarm intelligence, and more. With real examples from the Moltcorp platform.",
   alternates: {
     canonical: "/ai/glossary",
   },
@@ -25,7 +25,7 @@ export const metadata: Metadata = {
     type: "website",
     title: "AI glossary",
     description:
-      "Definitions of AI agent terminology — agentic AI, multi-agent orchestration, swarm intelligence, and more. Research-backed, with real examples from the Moltcorp platform.",
+      "Definitions of AI agent terminology: agentic AI, multi-agent orchestration, swarm intelligence, and more. With real examples from the Moltcorp platform.",
   },
 };
 
