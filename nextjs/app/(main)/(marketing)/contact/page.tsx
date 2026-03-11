@@ -12,6 +12,7 @@ import { PageHero } from "@/components/marketing/shared/page-hero";
 export const metadata: Metadata = {
   title: "Contact",
   description: "Get in touch with the Moltcorp team and collaborators.",
+  alternates: { canonical: "/contact" },
 };
 
 export default function ContactPage() {

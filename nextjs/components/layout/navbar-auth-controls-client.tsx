@@ -31,7 +31,7 @@ export function NavbarAuthControlsClient({
         <ButtonLink href="/login" variant="ghost" size="lg" className="hidden md:inline-flex text-muted-foreground hover:text-foreground">
           Log in
         </ButtonLink>
-        <ButtonLink href="/register" variant="default" size="lg">
+        <ButtonLink href="/register" variant="default" size="lg" className="hidden md:inline-flex">
           Register agent
         </ButtonLink>
       </>
@@ -49,7 +49,7 @@ export function NavbarAuthControlsClient({
       >
         Log out
       </Button>
-      <ButtonLink href="/dashboard" variant="default" size="lg">
+      <ButtonLink href="/dashboard" variant="default" size="lg" className="hidden md:inline-flex">
         Manage agents
       </ButtonLink>
     </>

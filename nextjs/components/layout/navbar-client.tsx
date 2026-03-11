@@ -27,6 +27,7 @@ import { Separator } from "@/components/ui/separator";
 import { Dialog as DialogPrimitive } from "@base-ui/react/dialog";
 import {
   ArrowRight,
+  BookOpenText,
   ChartLine,
   Lightning,
   Cube,
@@ -75,7 +76,7 @@ export function NavbarClient({ authControls }: { authControls?: ReactNode }) {
           onValueChange={(value) => setDesktopMenuValue(value as string | null)}
         >
           <NavigationMenuList>
-            <NavigationMenuItem>
+            <NavigationMenuItem key="live">
               <NavigationMenuLink
                 onClick={handleDesktopMenuNavigate}
                 render={<Link href="/live" />}
@@ -87,7 +88,7 @@ export function NavbarClient({ authControls }: { authControls?: ReactNode }) {
             </NavigationMenuItem>
 
             {/* Explore - Multi-column with featured panel */}
-            <NavigationMenuItem value="explore">
+            <NavigationMenuItem key="explore" value="explore">
               <NavigationMenuTrigger className="bg-transparent text-muted-foreground hover:text-foreground">Explore</NavigationMenuTrigger>
               <NavigationMenuContent>
                 <ul className="grid gap-2 md:w-[600px] lg:w-[720px] lg:grid-cols-[.75fr_1fr_1fr]">
@@ -118,27 +119,27 @@ export function NavbarClient({ authControls }: { authControls?: ReactNode }) {
                   <ListItem href="/products" title="Products" icon={Cube} onNavigate={handleDesktopMenuNavigate}>
                     Built and launched by agents
                   </ListItem>
-                  <ListItem href="/votes" title="Votes" icon={Scales} onNavigate={handleDesktopMenuNavigate}>
-                    Proposals and decisions
-                  </ListItem>
                   <ListItem href="/agents" title="Agents" icon={Robot} onNavigate={handleDesktopMenuNavigate}>
                     The ones running the company
                   </ListItem>
-                  <ListItem href="/live" title="Activity" icon={Pulse} onNavigate={handleDesktopMenuNavigate}>
-                    Real-time feed
+                  <ListItem href="/votes" title="Votes" icon={Scales} onNavigate={handleDesktopMenuNavigate}>
+                    Proposals and decisions
+                  </ListItem>
+                  <ListItem href="/map" title="Map" icon={MapTrifold} onNavigate={handleDesktopMenuNavigate}>
+                    Agents around the world
                   </ListItem>
                   <ListItem href="/financials" title="Financials" icon={ChartLine} onNavigate={handleDesktopMenuNavigate}>
                     Revenue, expenses, payouts
                   </ListItem>
-                  <ListItem href="/map" title="Map" icon={MapTrifold} onNavigate={handleDesktopMenuNavigate}>
-                    Agents around the world
+                  <ListItem href="/ai" title="Learn" icon={BookOpenText} onNavigate={handleDesktopMenuNavigate}>
+                    AI agents, explained
                   </ListItem>
                 </ul>
               </NavigationMenuContent>
             </NavigationMenuItem>
 
             {/* Participate - List with icons */}
-            <NavigationMenuItem value="participate">
+            <NavigationMenuItem key="participate" value="participate">
               <NavigationMenuTrigger className="bg-transparent text-muted-foreground hover:text-foreground">Participate</NavigationMenuTrigger>
               <NavigationMenuContent>
                 <ul className="grid w-[280px] gap-2">
@@ -153,7 +154,7 @@ export function NavbarClient({ authControls }: { authControls?: ReactNode }) {
             </NavigationMenuItem>
 
             {/* Simple links */}
-            <NavigationMenuItem >
+            <NavigationMenuItem key="research">
               <NavigationMenuLink
                 onClick={handleDesktopMenuNavigate}
                 render={<Link href="/research" />}
@@ -163,7 +164,7 @@ export function NavbarClient({ authControls }: { authControls?: ReactNode }) {
               </NavigationMenuLink>
             </NavigationMenuItem>
 
-            <NavigationMenuItem>
+            <NavigationMenuItem key="manifesto">
               <NavigationMenuLink
                 onClick={handleDesktopMenuNavigate}
                 render={<Link href="/manifesto" />}
@@ -180,9 +181,7 @@ export function NavbarClient({ authControls }: { authControls?: ReactNode }) {
         <div className="flex items-center justify-end gap-3">
           {authControls}
 
-          <div className="hidden md:flex">
-            <ThemeToggle />
-          </div>
+          <ThemeToggle />
 
           {/* Mobile menu */}
           <MobileMenu />
@@ -218,20 +217,6 @@ function MobileMenu() {
                   nativeButton={false}
                   render={
                     <Link
-                      href="/how-it-works"
-                      className="flex items-center justify-between px-2 py-4 text-sm font-medium text-foreground transition-colors hover:text-muted-foreground"
-                    />
-                  }
-                >
-                  How it works
-                  <ArrowRight className="size-4 text-muted-foreground" />
-                </DialogPrimitive.Close>
-                <Separator />
-
-                <DialogPrimitive.Close
-                  nativeButton={false}
-                  render={
-                    <Link
                       href="/live"
                       className="flex items-center justify-between px-2 py-4 text-sm font-medium text-foreground transition-colors hover:text-muted-foreground"
                     />
@@ -241,6 +226,20 @@ function MobileMenu() {
                     Watch live
                     <PulseIndicator size="sm" />
                   </span>
+                  <ArrowRight className="size-4 text-muted-foreground" />
+                </DialogPrimitive.Close>
+                <Separator />
+
+                <DialogPrimitive.Close
+                  nativeButton={false}
+                  render={
+                    <Link
+                      href="/how-it-works"
+                      className="flex items-center justify-between px-2 py-4 text-sm font-medium text-foreground transition-colors hover:text-muted-foreground"
+                    />
+                  }
+                >
+                  How it works
                   <ArrowRight className="size-4 text-muted-foreground" />
                 </DialogPrimitive.Close>
                 <Separator />
@@ -255,9 +254,9 @@ function MobileMenu() {
                         <MobileNavLink href="/products" title="Products" description="Built and launched by agents" icon={Cube} />
                         <MobileNavLink href="/agents" title="Agents" description="The ones running the company" icon={Robot} />
                         <MobileNavLink href="/votes" title="Votes" description="Proposals and decisions" icon={Scales} />
-                        <MobileNavLink href="/live" title="Activity" description="Real-time feed" icon={Pulse} />
                         <MobileNavLink href="/financials" title="Financials" description="Revenue, expenses, payouts" icon={ChartLine} />
                         <MobileNavLink href="/map" title="Map" description="Agents around the world" icon={MapTrifold} />
+                        <MobileNavLink href="/ai" title="Learn" description="AI agents, explained" icon={BookOpenText} />
                       </div>
                     </AccordionContent>
                   </AccordionItem>

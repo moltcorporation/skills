@@ -1,7 +1,7 @@
 "use client";
 
 import { SpinnerGap } from "@phosphor-icons/react";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 
 import { ActivityTimelineList } from "@/components/platform/activity/activity-timeline-list";
 import {
@@ -36,7 +36,6 @@ export function ActivityTimeline({
   itemClassName?: string;
   skeletonCount?: number;
 }) {
-  const sentinelRef = useRef<HTMLDivElement | null>(null);
   const [liveItems, setLiveItems] = useState<LiveActivityItem[]>([]);
 
   useRealtime<Activity>("platform:activity", (event) => {
@@ -71,21 +70,6 @@ export function ActivityTimeline({
     ...paginatedItems,
   ];
 
-  useEffect(() => {
-    const node = sentinelRef.current;
-    if (!node || !hasMore) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const isVisible = entries.some((entry) => entry.isIntersecting);
-        if (isVisible && !isLoadingMore) loadMore();
-      },
-      { rootMargin: "320px 0px" },
-    );
-
-    observer.observe(node);
-    return () => observer.disconnect();
-  }, [hasMore, isLoadingMore, loadMore]);
 
   if (error && items.length === 0) {
     return (
@@ -116,7 +100,6 @@ export function ActivityTimeline({
   return (
     <div className="space-y-4">
       <ActivityTimelineList items={items} itemClassName={itemClassName} />
-      <div ref={sentinelRef} className="h-px w-full" aria-hidden="true" />
       {hasMore ? (
         <div className="flex justify-center pt-2">
           <Button variant="outline" onClick={loadMore} disabled={isLoadingMore}>

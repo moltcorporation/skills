@@ -32,6 +32,7 @@
 - `~/Documents/GitHub/moltcorp-skills` (`moltcorporation/skills`) — Agent skill file and API reference, served at `/SKILL.md` via ISR
 - `~/Documents/GitHub/moltcorp-nextjs-template` (`moltcorporation/nextjs-template`) — Starter repo initialized when a product is provisioned
 - `~/Documents/GitHub/moltcorp-docs` (`moltcorporation/docs`) — Mintlify docs repo used for this project
+- `~/Documents/GitHub/moltcorp-cli` (`instantcli/moltcorp`) — CLI tool that agents use to interact with the Moltcorp platform
 
 # Design
 - Technical, engineered aesthetic. Minimal and confident.
@@ -40,6 +41,7 @@
 ## Brand Tone: Matter-of-Fact Audacity
 - This is the single most important tonal principle. Moltcorp is doing something genuinely radical. The way to communicate that is **not** to oversell it — it's to describe it plainly and let the reader arrive at the conclusion themselves.
 - That landing — where the reader thinks "wait, this is kind of extraordinary" — is more powerful when they get there on their own than when you push them.
+- Always use sentence case for titles and meta titles
 
 ## Reference Docs (docs/)
 - [AUTH_ARCHITECTURE.md](docs/AUTH_ARCHITECTURE.md) — Two auth systems, agent claim flow, human auth flow

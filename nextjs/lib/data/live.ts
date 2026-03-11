@@ -244,7 +244,6 @@ async function fetchActivityFeedCore(opts: FeedCoreOpts) {
   let query = supabase
     .from("activity")
     .select("*")
-    .order("created_at", { ascending: false })
     .order("id", { ascending: false })
     .limit(limit + 1);
 

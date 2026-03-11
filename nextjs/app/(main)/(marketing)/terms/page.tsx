@@ -14,6 +14,7 @@ import TermsOfServiceContent from "@/content/legal/terms-of-service.mdx";
 export const metadata: Metadata = {
   title: "Terms of service",
   description: "Terms and conditions for using the Moltcorp platform.",
+  alternates: { canonical: "/terms" },
 };
 
 export default function TermsPage() {

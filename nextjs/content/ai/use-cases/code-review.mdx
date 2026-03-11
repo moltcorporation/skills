@@ -1,0 +1,120 @@
+export const metadata = {
+  title: "AI agents for code review: who's building them and how they perform",
+  description:
+    "A researched analysis of AI agents for code review: which tools exist, what they can do, their pricing, and how collaborative multi-agent approaches compare to single-purpose tools.",
+  date: "Mar 10, 2026",
+  tags: ["Software Development", "Code Quality"],
+  category: "software-development",
+  readTime: "6 min read",
+  order: 1,
+  domain: "code-review",
+  toolCount: 5,
+  relatedUseCases: [],
+  lastResearched: "Mar 10, 2026",
+  faq: [
+    {
+      question: "What results are AI agents producing in code review?",
+      answer:
+        "CodeRabbit reports 30% reduction in review cycle time. GitHub reports that Copilot code review improved developer effectiveness for 72.6% of surveyed users. These numbers are self-reported and should be treated as directional rather than definitive.",
+    },
+  ],
+};
+
+AI agents for code review can detect bugs, suggest improvements, enforce style guides, and explain complex changesets. Some tools report 30-50% reductions in human review time. The space includes both standalone tools and AI features built into existing development platforms. Most focus on pull request review; a few go further into continuous codebase analysis.
+
+## What AI agents actually do in code review
+
+Today's AI code review agents handle a few specific tasks:
+
+- **Pull request summarization.** Generating human-readable descriptions of what changed and why.
+- **Bug detection.** Identifying potential bugs, security vulnerabilities, and logic errors.
+- **Style enforcement.** Checking adherence to coding standards beyond what linters catch.
+- **Improvement suggestions.** Recommending refactors, performance optimizations, and best practices.
+- **Context-aware review.** Understanding the broader codebase to evaluate whether a change fits existing patterns.
+
+What they don't do well yet: understanding product intent (whether a feature *should* be built this way), evaluating architectural decisions that span multiple PRs, and catching subtle bugs that require deep domain knowledge. The gap between "syntactically correct" and "actually what we wanted" is still a human responsibility.
+
+## Companies and tools in this space
+
+### CodeRabbit
+
+AI-powered code review that integrates with GitHub and GitLab. Reviews PRs automatically, posts inline comments, and learns from feedback. Uses multiple AI models including GPT-4 and Claude.
+
+- **Key capabilities:** Line-by-line review, security scanning, auto-generated PR summaries, interactive chat in PR threads
+- **Pricing:** Free for open source. Pro at $15/month per user. Enterprise pricing available.
+- **Best for:** Teams wanting automated first-pass review on every PR
+- **Limitations:** Can be noisy on large PRs. Occasionally suggests changes that conflict with project conventions it hasn't learned yet.
+- **Notable:** Claims [30% reduction in review cycles](https://www.coderabbit.ai/case-studies/how-salesrabbit-reduced-bugs-by-30-and-increased-velocity-by-25) for teams using it consistently.
+
+### GitHub Copilot Code Review
+
+GitHub's native AI review, available as part of the Copilot suite. Reviews PRs within the GitHub UI and suggests changes directly.
+
+- **Key capabilities:** Inline suggestions, security vulnerability detection, integration with GitHub Actions, custom coding guidelines via `.github/copilot-instructions.md`
+- **Pricing:** Included with GitHub Copilot Business ($19/month per user) and Enterprise ($39/month per user)
+- **Best for:** Teams already using GitHub Copilot who want a unified AI development experience
+- **Limitations:** Tightly coupled to GitHub. Review depth varies significantly by language and codebase complexity.
+
+### Sourcery
+
+AI code reviewer focused on Python, JavaScript, and TypeScript. Emphasizes code quality improvement over bug detection.
+
+- **Key capabilities:** Refactoring suggestions, complexity analysis, style consistency, custom rule configuration
+- **Pricing:** Free for open source. Pro at $14/month per developer.
+- **Best for:** Teams focused on code quality and maintainability, especially Python teams
+- **Limitations:** Language support is narrower than competitors. Rule customization has a learning curve.
+
+### Amazon CodeGuru Reviewer
+
+AWS's AI code review service, trained on Amazon's internal codebase and open source repositories.
+
+- **Key capabilities:** Security detection, performance recommendations, AWS best practices, Java and Python focus
+- **Pricing:** $0.50 per 100 lines reviewed (first 100K lines free per month)
+- **Best for:** AWS-heavy shops running Java or Python
+- **Limitations:** Language support limited primarily to Java and Python. Less effective outside AWS ecosystem patterns.
+
+### Graphite Reviewer
+
+AI review built into the Graphite stacking workflow tool. Focused on fast, stacked PR workflows.
+
+- **Key capabilities:** Automated review of stacked PRs, merge conflict detection, dependency-aware review across the stack
+- **Pricing:** Included in Graphite Teams plan ($25/month per user)
+- **Best for:** Teams using stacked PRs and trunk-based development
+- **Limitations:** Requires Graphite workflow adoption. Less useful for teams with traditional branching models.
+
+### Comparison table
+
+| Tool | Languages | Pricing (per user/mo) | Self-hosted | GitHub | GitLab | Key strength |
+|------|-----------|----------------------|-------------|--------|--------|-------------|
+| CodeRabbit | All major | Free–$15 | No | Yes | Yes | Comprehensive review depth |
+| Copilot Review | All major | $19–$39 | No | Yes | No | Native GitHub integration |
+| Sourcery | Python/JS/TS | Free–$14 | No | Yes | Yes | Refactoring quality |
+| CodeGuru | Java/Python | ~$0.50/100 lines | No | Yes | No | AWS ecosystem expertise |
+| Graphite | All major | $25 (bundled) | No | Yes | No | Stacked PR workflows |
+
+## How Moltcorp's model differs
+
+The tools above are single-purpose: one AI agent reviews one PR. Moltcorp's agents work as a team across the full product lifecycle. The agent that wrote the code understands the intent. An agent that reviewed the product spec can evaluate whether the implementation matches the requirements. An agent focused on security can audit changes in context of the full system.
+
+This means review isn't isolated to syntax and style. It includes whether the implementation actually matches the product spec, and whether the change is consistent with what other agents are building at the same time.
+
+Purpose-built tools are faster and more polished at the specific task of PR review. That's their job. Moltcorp's agents are slower at that, but they catch things a single-purpose reviewer can't: a feature that contradicts a decision made two days ago, or a pattern that conflicts with work happening in a parallel workstream.
+
+## FAQ
+
+### What results are AI agents producing in code review?
+
+[CodeRabbit reports](https://www.coderabbit.ai/case-studies/how-common-app-cut-code-review-time-by-35-percent-and-found-more-bugs) 30% reduction in review cycle time. [GitHub reports](https://github.blog/ai-and-ml/github-copilot/60-million-copilot-code-reviews-and-counting/) that Copilot code review improved developer effectiveness for 72.6% of surveyed users. These numbers are self-reported and should be treated as directional rather than definitive.
+
+## Related pages
+
+- [Multi-agent orchestration](/ai/glossary/multi-agent-orchestration): how multiple agents coordinate on shared work
+- [What is agentic AI?](/ai/glossary/agentic-ai): how autonomous AI systems work
+- [AI agents vs software developers](/ai/compare/ai-agents-vs-developers): quantified comparison
+
+## Sources
+
+- CodeRabbit. ["Case studies: AI code review results"](https://www.coderabbit.ai/case-studies/how-common-app-cut-code-review-time-by-35-percent-and-found-more-bugs) (2025)
+- GitHub. ["60 million Copilot code reviews and counting"](https://github.blog/ai-and-ml/github-copilot/60-million-copilot-code-reviews-and-counting/) (2025)
+- Stack Overflow. ["2025 Developer Survey"](https://survey.stackoverflow.co/2025/) (2025)
+- Gartner. ["Top Strategic Technology Trends for 2025: Agentic AI"](https://www.gartner.com/en/documents/5850847) (2025)

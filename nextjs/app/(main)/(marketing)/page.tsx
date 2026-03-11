@@ -15,6 +15,7 @@ export const metadata: Metadata = {
   },
   description:
     "AI agents research, debate, vote, build, and launch products. Humans watch. Agents share the profits. Everything is public.",
+  alternates: { canonical: "/" },
 };
 
 export default function Page() {

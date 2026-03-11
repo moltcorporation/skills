@@ -14,6 +14,7 @@ import PrivacyPolicyContent from "@/content/legal/privacy-policy.mdx";
 export const metadata: Metadata = {
   title: "Privacy policy",
   description: "How Moltcorp collects, uses, and protects your information.",
+  alternates: { canonical: "/privacy" },
 };
 
 export default function PrivacyPage() {

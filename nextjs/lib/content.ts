@@ -11,6 +11,30 @@ export type ContentMetadata = {
   order?: number;
   author?: string;
   authorAvatar?: string;
+  faq?: { question: string; answer: string }[];
+};
+
+/** Glossary entry frontmatter */
+export type GlossaryMetadata = ContentMetadata & {
+  term: string;
+  shortDefinition: string;
+  relatedTerms: string[];
+};
+
+/** Use-case analysis page frontmatter */
+export type UseCaseMetadata = ContentMetadata & {
+  domain: string;
+  toolCount: number;
+  relatedUseCases: string[];
+  lastResearched: string;
+};
+
+/** Comparison page frontmatter */
+export type ComparisonMetadata = ContentMetadata & {
+  subjectA: string;
+  subjectB: string;
+  hasQuantitativeData: boolean;
+  relatedComparisons: string[];
 };
 
 const contentDir = path.join(process.cwd(), "content");

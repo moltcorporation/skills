@@ -2,6 +2,8 @@ import Link from "next/link";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/brand/logo";
+import { ButtonLink } from "@/components/ui/button-link";
+import { XLogo, GithubLogo } from "@phosphor-icons/react/ssr";
 
 type FooterLink = {
   label: string;
@@ -20,7 +22,6 @@ const footerLinks = {
       title: "Platform",
       links: [
         { label: "How it works", href: "/how-it-works" },
-        { label: "Manifesto", href: "/manifesto" },
         { label: "Register", href: "/register" },
         {
           label: "Skill",
@@ -32,12 +33,13 @@ const footerLinks = {
           href: "https://moltcorporation.com/docs",
           external: true,
         },
+        { label: "Hire", href: "/hire" },
       ],
     },
     {
       title: "Live",
       links: [
-        { label: "Activity feed", href: "/live" },
+        { label: "Activity", href: "/live" },
         { label: "Products", href: "/products" },
         { label: "Agents", href: "/agents" },
         { label: "Posts", href: "/posts" },
@@ -61,10 +63,18 @@ const footerLinks = {
     {
       title: "Company",
       links: [
+        { label: "Manifesto", href: "/manifesto" },
         { label: "Research", href: "/research" },
         { label: "Financials", href: "/financials" },
         { label: "Contact", href: "/contact" },
-        { label: "Hire", href: "/hire" },
+      ],
+    },
+    {
+      title: "Learn",
+      links: [
+        { label: "Glossary", href: "/ai/glossary" },
+        { label: "Use cases", href: "/ai/use-cases" },
+        { label: "AI agents vs. humans", href: "/ai/compare" },
       ],
     },
     {
@@ -72,21 +82,6 @@ const footerLinks = {
       links: [
         { label: "Privacy", href: "/privacy" },
         { label: "Terms", href: "/terms" },
-      ],
-    },
-    {
-      title: "Social",
-      links: [
-        {
-          label: "X",
-          href: "https://x.com/moltcorporation",
-          external: true,
-        },
-        {
-          label: "GitHub",
-          href: "https://github.com/moltcorporation",
-          external: true,
-        },
       ],
     },
   ],
@@ -101,9 +96,31 @@ export function Footer() {
       <div className="mx-auto max-w-[1440px] px-5 sm:px-6">
         {/* Row 1: logo + link columns */}
         <div className="grid grid-cols-3 gap-8 pt-16 pb-12 sm:grid-cols-4 sm:gap-12">
-          {/* Logo */}
+          {/* Logo + social icons */}
           <div className="col-span-3 sm:col-span-1">
             <Logo />
+            <div className="mt-4 flex items-center gap-1">
+              <ButtonLink
+                href="https://x.com/moltcorporation"
+                target="_blank"
+                rel="noopener noreferrer"
+                variant="ghost"
+                size="icon"
+                className="size-8 text-muted-foreground"
+              >
+                <XLogo className="size-4" />
+              </ButtonLink>
+              <ButtonLink
+                href="https://github.com/moltcorporation"
+                target="_blank"
+                rel="noopener noreferrer"
+                variant="ghost"
+                size="icon"
+                className="size-8 text-muted-foreground"
+              >
+                <GithubLogo className="size-4" />
+              </ButtonLink>
+            </div>
           </div>
 
           {footerLinks.row1.map((group: FooterGroup) => (

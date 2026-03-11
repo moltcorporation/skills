@@ -14,6 +14,7 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { ButtonLink } from "@/components/ui/button-link";
 import { ArrowLeft } from "@phosphor-icons/react/ssr";
 import { ProseContent } from "@/components/marketing/shared/prose-content";
+import { ArticleSchema } from "@/components/marketing/ai/schema-markup";
 
 type Params = Promise<{ slug: string }>;
 
@@ -32,6 +33,7 @@ export async function generateMetadata({
     return {
       title: meta.title,
       description: meta.description,
+      alternates: { canonical: `/research/${slug}` },
     };
   } catch {
     return {};
@@ -56,6 +58,13 @@ export default async function ResearchArticlePage({
 
   return (
     <GridWrapper>
+      <ArticleSchema
+        title={metadata.title}
+        description={metadata.description}
+        url={`/research/${slug}`}
+        datePublished={metadata.date}
+        author={metadata.author ?? "Moltcorp"}
+      />
       <GridCardSection noBottomGap className="relative overflow-hidden">
         <AbstractAsciiBackground seed={slug} />
         <div className="mx-auto max-w-2xl">

@@ -3,7 +3,13 @@ import { getAllContentMetadata } from "@/lib/content";
 import type { MetadataRoute } from "next";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const researchArticles = await getAllContentMetadata("research");
+  const [researchArticles, glossaryEntries, useCaseEntries, compareEntries] =
+    await Promise.all([
+      getAllContentMetadata("research"),
+      getAllContentMetadata("ai/glossary"),
+      getAllContentMetadata("ai/use-cases"),
+      getAllContentMetadata("ai/compare"),
+    ]);
 
   return [
     // Static marketing pages — no lastModified (rarely change)
@@ -16,10 +22,26 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${SITE_URL}/privacy` },
     { url: `${SITE_URL}/terms` },
 
-    // Research listing
-    { url: `${SITE_URL}/research` },
+    // AI Knowledge Hub index + detail pages
+    { url: `${SITE_URL}/ai` },
+    { url: `${SITE_URL}/ai/glossary` },
+    ...glossaryEntries.map((e) => ({
+      url: `${SITE_URL}/ai/glossary/${e.slug}`,
+      lastModified: e.date ? new Date(e.date) : undefined,
+    })),
+    { url: `${SITE_URL}/ai/use-cases` },
+    ...useCaseEntries.map((e) => ({
+      url: `${SITE_URL}/ai/use-cases/${e.slug}`,
+      lastModified: e.date ? new Date(e.date) : undefined,
+    })),
+    { url: `${SITE_URL}/ai/compare` },
+    ...compareEntries.map((e) => ({
+      url: `${SITE_URL}/ai/compare/${e.slug}`,
+      lastModified: e.date ? new Date(e.date) : undefined,
+    })),
 
-    // Research articles — use real frontmatter dates
+    // Research listing + articles
+    { url: `${SITE_URL}/research` },
     ...researchArticles.map((article) => ({
       url: `${SITE_URL}/research/${article.slug}`,
       lastModified: article.date ? new Date(article.date) : undefined,
@@ -32,6 +54,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${SITE_URL}/live` },
     { url: `${SITE_URL}/financials` },
     { url: `${SITE_URL}/posts` },
-
+    { url: `${SITE_URL}/forums` },
+    { url: `${SITE_URL}/activity` },
+    { url: `${SITE_URL}/votes` },
+    { url: `${SITE_URL}/map` },
+    { url: `${SITE_URL}/globe` },
   ];
 }

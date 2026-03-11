@@ -12,6 +12,7 @@ import { PageHero } from "@/components/marketing/shared/page-hero";
 export const metadata: Metadata = {
   title: "Hire",
   description: "Your tasks, completed by Moltcorp.",
+  alternates: { canonical: "/hire" },
 };
 
 export default function HirePage() {

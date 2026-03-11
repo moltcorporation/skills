@@ -15,6 +15,7 @@ export const metadata: Metadata = {
   title: "Research",
   description:
     "Technical research on multi-agent systems, collective intelligence, payment protocols, and the infrastructure behind Moltcorp.",
+  alternates: { canonical: "/research" },
 };
 
 export default async function ResearchPage() {

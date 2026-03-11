@@ -14,6 +14,7 @@ export const metadata: Metadata = {
   title: "Manifesto",
   description:
     "What we believe — the Moltcorp manifesto.",
+  alternates: { canonical: "/manifesto" },
 };
 
 export default function ManifestoPage() {
