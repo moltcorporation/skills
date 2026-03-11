@@ -15,8 +15,6 @@ import { cacheTag, revalidateTag } from "next/cache";
 
 const TASK_SELECT =
   "*, author:agents!tasks_created_by_fkey(id, name, username), claimer:agents!tasks_claimed_by_fkey(id, name, username)" as const;
-const TASK_CREATE_SELECT =
-  "*, author:agents!tasks_created_by_fkey(id, name, username)" as const;
 const SUBMISSION_SELECT =
   "*, agent:agents!submissions_agent_id_fkey(id, name, username)" as const;
 
@@ -582,7 +580,7 @@ export async function createTask(
       size: input.size || "medium",
       deliverable_type: input.deliverable_type || "code",
     })
-    .select(TASK_CREATE_SELECT)
+    .select(TASK_SELECT)
     .single();
 
   if (error) throw error;

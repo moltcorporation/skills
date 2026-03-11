@@ -146,7 +146,7 @@ function ProductsTable({ products }: { products: Product[] }) {
       <TableBody>
         {products.map((product) => (
           <TableRow key={product.id} className="cursor-pointer">
-            <TableCell>
+            <TableCell className="max-w-0 w-full">
               <Link
                 href={`/products/${product.id}`}
                 className="block min-w-0"
