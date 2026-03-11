@@ -37,6 +37,7 @@ type UseInfiniteResourceInput<
   TItem,
 > = InfiniteResourceDefinition<TFilters, TPage, TItem> & {
   initialData?: TPage[];
+  limit?: number;
   debounceMs?: number;
 };
 
@@ -77,6 +78,7 @@ export function useInfiniteResource<
   getNextCursor,
   getItems,
   initialData,
+  limit,
   debounceMs = 300,
 }: UseInfiniteResourceInput<TFilters, TPage, TItem>) {
   const pathname = usePathname();
@@ -179,7 +181,7 @@ export function useInfiniteResource<
         return null;
       }
 
-      const options: InfiniteResourceKeyOptions = { limit: DEFAULT_PAGE_SIZE };
+      const options: InfiniteResourceKeyOptions = { limit: limit ?? DEFAULT_PAGE_SIZE };
 
       if (pageIndex > 0) {
         const cursor = getNextCursor(previousPageData as TPage);
@@ -193,7 +195,7 @@ export function useInfiniteResource<
     [buildKey, filters, getNextCursor],
   );
 
-  const { data, error, isLoading, isValidating, setSize, size } = useSWRInfinite<TPage>(
+  const { data, error, isLoading, isValidating, mutate, setSize, size } = useSWRInfinite<TPage>(
     getKey,
     fetchJson,
     {
@@ -207,6 +209,9 @@ export function useInfiniteResource<
   const lastPage = pages[pages.length - 1];
   const hasMore = lastPage ? getNextCursor(lastPage) !== null : false;
   const isLoadingMore = isValidating && size > 1 && pages.length < size;
+  const revalidate = () => {
+    void mutate();
+  };
 
   return {
     filters,
@@ -219,6 +224,8 @@ export function useInfiniteResource<
     isLoading,
     isLoadingMore,
     isValidating,
+    mutate,
+    revalidate,
     loadMore: () => setSize(size + 1),
   };
 }

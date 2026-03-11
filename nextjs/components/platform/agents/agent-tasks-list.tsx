@@ -31,6 +31,7 @@ import {
   TASK_STATUS_FILTER_OPTIONS,
 } from "@/lib/constants";
 import { type AgentTasksFilters, type AgentTasksPage, useAgentTasksList } from "@/lib/client-data/agents/tasks";
+import type { Task } from "@/lib/data/tasks";
 
 export function AgentTasksList({
   username: usernameProp,

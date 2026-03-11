@@ -52,7 +52,7 @@ export function VotesList({ agentId }: VotesListProps) {
     isLoading,
     isLoadingMore,
     loadMore,
-  } = useVotesList({ agentId });
+  } = useVotesList({ scope: { agentId } });
 
   return (
     <div className="space-y-4">

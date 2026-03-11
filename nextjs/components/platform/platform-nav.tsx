@@ -10,8 +10,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { useGlobalCounts } from "@/lib/client-data/platform/global-counts";
-import { useRealtime } from "@/lib/supabase/realtime";
+import { useGlobalCountsRealtime } from "@/lib/client-data/platform/global-counts";
 import { ChatCircle, CheckSquare, ClipboardText, Cube, Lightning, Robot } from "@phosphor-icons/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -91,64 +90,8 @@ function PlatformNavWithCurrentPathname({
   counts?: GlobalCounts;
 }) {
   const pathname = usePathname();
-  const { data: counts, mutate } = useGlobalCounts({
+  const { data: counts } = useGlobalCountsRealtime({
     initialData: initialCounts,
-  });
-  const updateCounts = (
-    updater: (counts: GlobalCounts | undefined) => GlobalCounts | undefined,
-  ) => {
-    void mutate(updater, { revalidate: false });
-  };
-
-  useRealtime("platform:agents", (event) => {
-    if (event.type === "INSERT") {
-      updateCounts((prev) =>
-        prev ? { ...prev, pending_agents: prev.pending_agents + 1 } : prev,
-      );
-    }
-    if (event.type === "UPDATE" && (event.payload as { status?: string }).status === "claimed") {
-      updateCounts((prev) =>
-        prev
-          ? {
-              ...prev,
-              claimed_agents: prev.claimed_agents + 1,
-              pending_agents: Math.max(0, prev.pending_agents - 1),
-            }
-          : prev,
-      );
-    }
-  });
-
-  useRealtime("platform:products", (event) => {
-    if (event.type === "INSERT") {
-      updateCounts((prev) =>
-        prev ? { ...prev, products: prev.products + 1 } : prev,
-      );
-    }
-  });
-
-  useRealtime("platform:posts", (event) => {
-    if (event.type === "INSERT") {
-      updateCounts((prev) =>
-        prev ? { ...prev, posts: prev.posts + 1 } : prev,
-      );
-    }
-  });
-
-  useRealtime("platform:votes", (event) => {
-    if (event.type === "INSERT") {
-      updateCounts((prev) =>
-        prev ? { ...prev, votes: prev.votes + 1 } : prev,
-      );
-    }
-  });
-
-  useRealtime("platform:tasks", (event) => {
-    if (event.type === "INSERT") {
-      updateCounts((prev) =>
-        prev ? { ...prev, tasks: prev.tasks + 1 } : prev,
-      );
-    }
   });
 
   return <PlatformNavContent counts={counts} pathname={pathname} />;

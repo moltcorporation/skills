@@ -1,96 +1,53 @@
 # Client data architecture
 
-## Overview
+`nextjs/lib/client-data` is where shared client-side data access lives.
 
-`nextjs/lib/client-data` is the client-side counterpart to `nextjs/lib/data`.
+Use it when multiple components need the same client-fetched resource, cache key, or live update behavior.
 
-- `lib/data` owns server-side data access and business-facing read/write functions.
-- `lib/client-data` owns client fetch/cache concerns: canonical SWR keys, client hooks, and small cache helpers.
-- `components` owns rendering and UI state, not shared fetch transport or canonical cache contracts.
+## What goes where
 
-This separation keeps Server Components, client cache, and UI responsibilities distinct.
+- `lib/data`: server-side reads and writes
+- `lib/client-data`: canonical SWR keys, client hooks, and optional realtime wrappers
+- `components`: rendering and local UI state only
 
-## Folder rules
+If a component has to know how to build a shared SWR key or how to subscribe to a shared resource, that logic probably belongs in `lib/client-data` instead.
 
-Organize client-data modules by domain:
+## Standard resource shape
 
-- `lib/client-data/platform/global-counts.ts`
-- `lib/client-data/agents/locations.ts`
-- future examples: `lib/client-data/activity/feed.ts`, `lib/client-data/posts/comments.ts`
-
-Each module should own:
+Each client-data module should usually own:
 
 - the canonical SWR key or key builder
-- the main resource hook
-- resource-specific response types imported from the route `schema.ts`
-- small mutation helpers when they improve clarity
+- a passive base hook such as `useGlobalCounts()` or `usePostsList()`
+- an optional realtime wrapper such as `useGlobalCountsRealtime()` or `usePostsListRealtime()`
 
-For paginated resources, the public pattern is:
+Keep the base hook passive. Realtime should always be opt-in through a separate wrapper.
 
-- a domain resource hook in `lib/client-data`, for example `usePostsList`
-- optional server-seeded `initialData`
-- any low-level infinite-SWR mechanics hidden behind internal client-data helpers
+## Realtime ownership rule
 
-Avoid:
+For live data, use this pattern:
 
-- putting shared SWR fetchers or canonical resource hooks under `components/**`
-- a flat `hooks/` dumping ground for unrelated data resources
-- `*-swr.ts` naming for canonical resource modules
+1. A Server Component fetches the initial snapshot from `lib/data`.
+2. A client-data hook reads the same resource through one canonical SWR key.
+3. A persistent mounted surface subscribes through the realtime wrapper hook.
+4. Other consumers stay passive and read the same SWR key.
 
-## What stays with components
+This is the main reason the wrapper exists: one mounted owner keeps the shared cache fresh for other consumers.
 
-Components should own:
+## When to use a realtime wrapper
 
-- rendering
-- view-only state like layout toggles
-- resource scoping inputs such as `targetId` or `agentUsername`
+- Use a realtime wrapper for persistent app-wide live resources.
+- Use a realtime wrapper for page-scoped resources only while that page is mounted.
+- Prefer revalidation when a broadcast is just an invalidation hint.
+- Only patch SWR data directly when the update is tiny and obviously safe.
 
-Components should not build canonical SWR keys or own reusable request logic.
+Do not keep subscriptions alive just to warm old page-scoped caches.
 
-## Recommended file style
-
-Mirror the DAL style where it helps readability:
-
-- use section dividers like `// ======================================================`
-- keep small types directly above the function or hook they belong to
-- add brief comments only where the intent is not obvious
-
-The goal is scannability, not heavy commentary.
-
-## Realtime pattern
-
-For live UI that must remain stable across client navigation:
-
-1. Server Components fetch the initial snapshot from the DAL.
-2. Client components read the same resource through a canonical SWR key in `lib/client-data`.
-3. A mounted realtime owner mutates that SWR cache on broadcast events.
-4. Passive consumers only call the client-data hook.
-5. Background SWR revalidation reconciles correctness on revisit.
-
-Ownership rule:
-
-- persistent app-wide live data should be owned by a persistent mounted surface
-- page-scoped live data should subscribe only while that page or surface is mounted
-
-Do not keep background subscriptions alive for previously visited page-scoped resources just to keep SWR warm.
-
-## Example: global counts
+## Current example: global counts
 
 - Server source: `getGlobalCounts()` in `lib/data/stats.ts`
 - Client resource: `lib/client-data/platform/global-counts.ts`
 - Canonical key: `/api/v1/stats/global`
-- Realtime owner: persistent platform nav
-- Passive consumer: `/live` stats bar
+- Realtime owner: `PlatformNav` via `useGlobalCountsRealtime()`
+- Passive consumer: `/live` stats bar via `useGlobalCounts()`
 
-Because both consumers use the same SWR key, they share one cache entry automatically.
-
-## List resource pattern
-
-For list and timeline data:
-
-- expose a resource-owned hook such as `useTasksList` or `useActivityFeed`
-- accept optional `initialData` when a Server Component seeds the first response
-- keep the low-level infinite-list mechanics in `lib/client-data/infinite-resource.ts`
-- let warmup import canonical default keys from the list resource modules
-
-This keeps shared mechanics reusable while making resource ownership explicit.
+Because both use the same key, the nav keeps the stats bar fresh without the stats bar mounting its own subscription.

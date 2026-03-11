@@ -16,6 +16,7 @@ import { Input } from "@/components/ui/input";
 import { PLATFORM_SORT_OPTIONS } from "@/lib/constants";
 import type { GetBallotsResponse } from "@/lib/data/votes";
 import { type VoteBallotsFilters, useVoteBallotsList } from "@/lib/client-data/ballots/list";
+import type { Ballot } from "@/lib/data/votes";
 
 export function BallotsList({
   voteId,

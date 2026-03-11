@@ -1,9 +1,10 @@
 "use client";
 
 import type { ListActivityResponse } from "@/app/api/v1/activity/schema";
-import type { LiveActivityItem } from "@/lib/data/activity.shared";
+import type { Activity, LiveActivityItem } from "@/lib/data/activity.shared";
 import { DEFAULT_PAGE_SIZE } from "@/lib/constants";
 import { buildListUrl, useInfiniteResource, type InfiniteResourceKeyOptions } from "@/lib/client-data/infinite-resource";
+import { useRealtime } from "@/lib/supabase/realtime";
 
 // ======================================================
 // Types
@@ -20,7 +21,7 @@ type ActivityFeedInitialData = {
 };
 
 type UseActivityFeedInput = {
-  apiPath?: string;
+  agentUsername?: string;
   initialData?: ActivityFeedInitialData;
 };
 
@@ -39,14 +40,15 @@ export function getActivityFiltersFromSearchParams(): ActivityFilters {
 }
 
 export function buildActivityFeedKey(
-  apiPath = activityFeedPath,
-  _filters: ActivityFilters,
+  filters: ActivityFilters,
+  scope: Pick<UseActivityFeedInput, "agentUsername"> = {},
   options?: InfiniteResourceKeyOptions,
 ) {
   const params = new URLSearchParams();
+  if (scope.agentUsername) params.set("agent_username", scope.agentUsername);
   if (options?.after) params.set("after", options.after);
   if (options?.limit) params.set("limit", String(options.limit));
-  return buildListUrl(apiPath, params);
+  return buildListUrl(activityFeedPath, params);
 }
 
 function formatInitialActivityPage(
@@ -59,8 +61,8 @@ function formatInitialActivityPage(
 }
 
 export const defaultActivityFeedKey = buildActivityFeedKey(
-  activityFeedPath,
   getDefaultActivityFilters(),
+  {},
   { limit: DEFAULT_PAGE_SIZE },
 );
 
@@ -69,15 +71,40 @@ export const defaultActivityFeedKey = buildActivityFeedKey(
 // ======================================================
 
 export function useActivityFeed({
-  apiPath = activityFeedPath,
+  agentUsername,
   initialData,
 }: UseActivityFeedInput = {}) {
   return useInfiniteResource<ActivityFilters, ActivityFeedPage, LiveActivityItem>({
     getDefaultFilters: getDefaultActivityFilters,
     getFiltersFromSearchParams: getActivityFiltersFromSearchParams,
-    buildKey: (filters, options) => buildActivityFeedKey(apiPath, filters, options),
+    buildKey: (filters, options) => buildActivityFeedKey(filters, { agentUsername }, options),
     getNextCursor: (page) => page.nextCursor,
     getItems: (page) => page.activity,
     initialData: initialData ? [formatInitialActivityPage(initialData)] : undefined,
   });
+}
+
+// ======================================================
+// UseActivityFeedRealtime
+// ======================================================
+
+export function useActivityFeedRealtime(input: UseActivityFeedInput = {}) {
+  const resource = useActivityFeed(input);
+
+  useRealtime<Activity>("platform:activity", (event) => {
+    if (event.type !== "INSERT") {
+      return;
+    }
+
+    if (
+      input.agentUsername
+      && event.payload.agent_username !== input.agentUsername
+    ) {
+      return;
+    }
+
+    resource.revalidate();
+  });
+
+  return resource;
 }

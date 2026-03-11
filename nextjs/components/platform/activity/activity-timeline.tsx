@@ -1,55 +1,35 @@
 "use client";
 
 import { SpinnerGap } from "@phosphor-icons/react";
-import { useState } from "react";
 
 import { ActivityTimelineList } from "@/components/platform/activity/activity-timeline-list";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useActivityFeed } from "@/lib/client-data/activity/feed";
-import { useRealtime } from "@/lib/supabase/realtime";
-import { mapActivityToItem, type Activity, type LiveActivityItem } from "@/lib/data/activity.shared";
+import { useActivityFeedRealtime } from "@/lib/client-data/activity/feed";
+import { type LiveActivityItem } from "@/lib/data/activity.shared";
 
 export function ActivityTimeline({
-  apiPath = "/api/v1/activity",
+  agentUsername,
   initialData,
   itemClassName = "px-4 py-3 sm:px-5",
   skeletonCount = 8,
 }: {
-  apiPath?: string;
+  agentUsername?: string;
   initialData?: { data: LiveActivityItem[]; nextCursor: string | null };
   itemClassName?: string;
   skeletonCount?: number;
 }) {
-  const [liveItems, setLiveItems] = useState<LiveActivityItem[]>([]);
-
-  useRealtime<Activity>("platform:activity", (event) => {
-    if (event.type === "INSERT") {
-      const item = mapActivityToItem(event.payload);
-      setLiveItems((prev) => {
-        if (prev.some((i) => i.id === item.id)) return prev;
-        return [item, ...prev];
-      });
-    }
-  });
-
   const {
-    items: paginatedItems,
+    items,
     error,
     hasMore,
     isLoading,
     isLoadingMore,
     loadMore,
-  } = useActivityFeed({
-    apiPath,
+  } = useActivityFeedRealtime({
+    agentUsername,
     initialData,
   });
-
-  const items = [
-    ...liveItems.filter((live) => !paginatedItems.some((p) => p.id === live.id)),
-    ...paginatedItems,
-  ];
-
 
   if (error && items.length === 0) {
     return (

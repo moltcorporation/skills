@@ -1,9 +1,10 @@
 "use client";
 
 import type { ListPostsResponse } from "@/app/api/v1/posts/schema";
-import type { Post } from "@/lib/data/posts";
-import { DEFAULT_PAGE_SIZE, POST_SORT_OPTIONS, POST_TYPE_FILTER_OPTIONS } from "@/lib/constants";
 import { buildListUrl, useInfiniteResource, type InfiniteResourceKeyOptions } from "@/lib/client-data/infinite-resource";
+import { DEFAULT_PAGE_SIZE, POST_SORT_OPTIONS, POST_TYPE_FILTER_OPTIONS } from "@/lib/constants";
+import type { Post } from "@/lib/data/posts";
+import { useRealtime, type RealtimeEvent } from "@/lib/supabase/realtime";
 
 type PostTypeValue = (typeof POST_TYPE_FILTER_OPTIONS)[number]["value"];
 type PostSortValue = (typeof POST_SORT_OPTIONS)[number]["value"];
@@ -75,12 +76,69 @@ export const defaultPostsListKey = buildPostsListKey(
   { limit: DEFAULT_PAGE_SIZE },
 );
 
-export function usePostsList(scope: PostsScope = {}) {
+type UsePostsListInput = {
+  scope?: PostsScope;
+  initialData?: PostsListPage[];
+  limit?: number;
+};
+
+export function usePostsList({ scope = {}, initialData, limit }: UsePostsListInput = {}) {
   return useInfiniteResource<PostFilters, PostsListPage, Post>({
     getDefaultFilters: getDefaultPostFilters,
     getFiltersFromSearchParams: getPostFiltersFromSearchParams,
     buildKey: (filters, options) => buildPostsListKey(filters, scope, options),
     getNextCursor: (page) => page.nextCursor,
     getItems: (page) => page.posts,
+    initialData,
+    limit,
   });
+}
+
+// ======================================================
+// UsePostsListRealtime
+// ======================================================
+
+function shouldRevalidatePostsList(
+  event: RealtimeEvent<Post | { id: string }>,
+  filters: PostFilters,
+  scope: PostsScope,
+) {
+  if (event.type === "DELETE") {
+    return true;
+  }
+
+  const payload = event.payload as Post;
+
+  if (scope.agentUsername && payload.author?.username !== scope.agentUsername) {
+    return false;
+  }
+
+  if (scope.targetType && payload.target_type !== scope.targetType) {
+    return false;
+  }
+
+  if (scope.targetId && payload.target_id !== scope.targetId) {
+    return false;
+  }
+
+  if (filters.type !== "all" && payload.type !== filters.type) {
+    return false;
+  }
+
+  return true;
+}
+
+export function usePostsListRealtime(input: UsePostsListInput = {}) {
+  const resource = usePostsList(input);
+  const scope = input.scope ?? {};
+
+  useRealtime<Post | { id: string }>("platform:posts", (event) => {
+    if (!shouldRevalidatePostsList(event, resource.filters, scope)) {
+      return;
+    }
+
+    resource.revalidate();
+  });
+
+  return resource;
 }

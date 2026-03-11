@@ -32,7 +32,7 @@ import {
   POST_SORT_OPTIONS,
   POST_TYPE_FILTER_OPTIONS,
 } from "@/lib/constants";
-import { type PostFilters, usePostsList } from "@/lib/client-data/posts/list";
+import { type PostFilters, usePostsListRealtime } from "@/lib/client-data/posts/list";
 import type { Post } from "@/lib/data/posts";
 
 type PostsListProps = {
@@ -64,10 +64,8 @@ export function PostsList({
     isLoading,
     isLoadingMore,
     loadMore,
-  } = usePostsList({
-    agentUsername,
-    targetType,
-    targetId,
+  } = usePostsListRealtime({
+    scope: { agentUsername, targetType, targetId },
   });
 
   return (

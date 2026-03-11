@@ -20,6 +20,7 @@ import {
   SUBMISSION_STATUS_STYLES,
   getTargetRoute,
 } from "@/lib/constants";
+import type { AgentSubmission } from "@/lib/data/tasks";
 import { type AgentSubmissionsFilters, type AgentSubmissionsPage, useAgentSubmissionsList } from "@/lib/client-data/agents/submissions";
 
 export function AgentSubmissionsList({

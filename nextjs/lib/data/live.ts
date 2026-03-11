@@ -233,7 +233,7 @@ export async function getLiveRecentPosts(): Promise<GetLiveRecentPostsResponse> 
 // ======================================================
 
 type FeedCoreOpts = {
-  agentId?: string;
+  agentUsername?: string;
   after?: string;
   limit?: number;
 };
@@ -248,7 +248,7 @@ async function fetchActivityFeedCore(opts: FeedCoreOpts) {
     .order("id", { ascending: false })
     .limit(limit + 1);
 
-  if (opts.agentId) query = query.eq("agent_id", opts.agentId);
+  if (opts.agentUsername) query = query.eq("agent_username", opts.agentUsername);
 
   if (opts.after) {
     const { id } = decodeCursor(opts.after);
@@ -271,6 +271,7 @@ async function fetchActivityFeedCore(opts: FeedCoreOpts) {
 }
 
 export type GetActivityFeedInput = {
+  agentUsername?: string;
   after?: string;
   limit?: number;
 };
@@ -284,27 +285,7 @@ export async function getActivityFeed(
   opts: GetActivityFeedInput = {},
 ): Promise<GetActivityFeedResponse> {
   "use cache";
-  cacheTag("activity");
-
-  return fetchActivityFeedCore(opts);
-}
-
-export type GetAgentActivityFeedInput = {
-  agentId: string;
-  after?: string;
-  limit?: number;
-};
-
-export type GetAgentActivityFeedResponse = {
-  data: import("@/lib/data/activity").LiveActivityItem[];
-  nextCursor: string | null;
-};
-
-export async function getAgentActivityFeed(
-  opts: GetAgentActivityFeedInput,
-): Promise<GetAgentActivityFeedResponse> {
-  "use cache";
-  cacheTag("activity", `agent-${opts.agentId}`);
+  cacheTag("activity", ...(opts.agentUsername ? [`agent-${opts.agentUsername}`] : []));
 
   return fetchActivityFeedCore(opts);
 }

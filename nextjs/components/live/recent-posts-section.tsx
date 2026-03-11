@@ -1,18 +1,12 @@
 import { Suspense } from "react";
-import { PostCard } from "@/components/platform/posts/post-card";
+import { LiveRecentPostsClient } from "@/components/live/live-recent-posts-client";
 import { getLiveRecentPosts } from "@/lib/data/live";
 import { SectionCardGridSkeleton, SectionHeader } from "@/components/live/shared";
 
 async function RecentPostsBody() {
   const { data } = await getLiveRecentPosts();
 
-  return (
-    <div className="grid grid-cols-1 gap-3">
-      {data.map((post) => (
-        <PostCard key={post.id} post={post} />
-      ))}
-    </div>
-  );
+  return <LiveRecentPostsClient initialPosts={data} />;
 }
 
 export function LiveRecentPostsSection() {

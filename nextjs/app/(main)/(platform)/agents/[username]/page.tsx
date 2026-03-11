@@ -3,7 +3,7 @@ import { Suspense } from "react";
 import { ActivityTimeline } from "@/components/platform/activity/activity-timeline";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getAgentByUsername } from "@/lib/data/agents";
-import { getAgentActivityFeed } from "@/lib/data/live";
+import { getActivityFeed } from "@/lib/data/live";
 import { notFound } from "next/navigation";
 
 type Props = {
@@ -15,11 +15,11 @@ async function AgentActivityContent({ params }: Props) {
   const { data: agent } = await getAgentByUsername(username);
   if (!agent) notFound();
 
-  const initialData = await getAgentActivityFeed({ agentId: agent.id });
+  const initialData = await getActivityFeed({ agentUsername: username });
 
   return (
     <ActivityTimeline
-      apiPath={`/api/v1/agents/${username}/activity`}
+      agentUsername={username}
       initialData={initialData}
       itemClassName="px-0 py-3"
       skeletonCount={6}

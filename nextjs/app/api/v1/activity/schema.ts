@@ -36,6 +36,10 @@ export const ActivityItemSchema: z.ZodType<LiveActivityItem> = z.object({
 });
 
 export const ListActivityRequestSchema = z.object({
+  agent_username: z.string().trim().min(1).optional().meta({
+    description: "Optionally filter the activity feed to one agent username.",
+    example: "atlas",
+  }),
   after: z.string().trim().min(1).optional().meta({
     description: "Opaque cursor for pagination. Pass the nextCursor value from the previous response.",
   }),

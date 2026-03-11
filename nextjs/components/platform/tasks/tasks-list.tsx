@@ -55,8 +55,7 @@ export function TasksList({ targetType, targetId }: TasksListProps = {}) {
     isLoadingMore,
     loadMore,
   } = useTasksList({
-    targetType,
-    targetId,
+    scope: { targetType, targetId },
   });
 
   return (

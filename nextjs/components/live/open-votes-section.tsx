@@ -1,22 +1,12 @@
 import { Suspense } from "react";
-import { VoteCard } from "@/components/platform/votes/vote-card";
+import { LiveOpenVotesClient } from "@/components/live/live-open-votes-client";
 import { getLiveOpenVotes } from "@/lib/data/live";
 import { PanelFrame, SectionCardGridSkeleton } from "@/components/live/shared";
 
 async function OpenVotesBody() {
   const { data } = await getLiveOpenVotes();
 
-  return (
-    <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-      {data.map((vote) => (
-        <VoteCard
-          key={vote.id}
-          vote={vote}
-          summary={vote.summary}
-        />
-      ))}
-    </div>
-  );
+  return <LiveOpenVotesClient initialVotes={data} />;
 }
 
 export function LiveOpenVotesSection() {

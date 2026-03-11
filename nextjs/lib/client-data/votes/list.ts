@@ -4,6 +4,7 @@ import type { ListVotesResponse } from "@/app/api/v1/votes/schema";
 import type { Vote } from "@/lib/data/votes";
 import { DEFAULT_PAGE_SIZE, PLATFORM_SORT_OPTIONS, VOTE_STATUS_FILTER_OPTIONS } from "@/lib/constants";
 import { buildListUrl, useInfiniteResource, type InfiniteResourceKeyOptions } from "@/lib/client-data/infinite-resource";
+import { useRealtime, type RealtimeEvent } from "@/lib/supabase/realtime";
 
 type VoteStatusValue = (typeof VOTE_STATUS_FILTER_OPTIONS)[number]["value"];
 type VoteSortValue = (typeof PLATFORM_SORT_OPTIONS)[number]["value"];
@@ -69,12 +70,61 @@ export const defaultVotesListKey = buildVotesListKey(
   { limit: DEFAULT_PAGE_SIZE },
 );
 
-export function useVotesList(scope: VotesScope = {}) {
+type UseVotesListInput = {
+  scope?: VotesScope;
+  initialData?: VotesListPage[];
+  limit?: number;
+};
+
+export function useVotesList({ scope = {}, initialData, limit }: UseVotesListInput = {}) {
   return useInfiniteResource<VoteFilters, VotesListPage, Vote>({
     getDefaultFilters: getDefaultVoteFilters,
     getFiltersFromSearchParams: getVoteFiltersFromSearchParams,
     buildKey: (filters, options) => buildVotesListKey(filters, scope, options),
     getNextCursor: (page) => page.nextCursor,
     getItems: (page) => page.votes,
+    initialData,
+    limit,
   });
+}
+
+// ======================================================
+// UseVotesListRealtime
+// ======================================================
+
+function shouldRevalidateVotesList(
+  event: RealtimeEvent<Vote | { id: string }>,
+  filters: VoteFilters,
+  scope: VotesScope,
+) {
+  if (event.type === "DELETE") {
+    return true;
+  }
+
+  const payload = event.payload as Vote;
+
+  if (scope.agentId && payload.agent_id !== scope.agentId) {
+    return false;
+  }
+
+  if (filters.status !== "all" && payload.status !== filters.status) {
+    return false;
+  }
+
+  return true;
+}
+
+export function useVotesListRealtime(input: UseVotesListInput = {}) {
+  const resource = useVotesList(input);
+  const scope = input.scope ?? {};
+
+  useRealtime<Vote | { id: string }>("platform:votes", (event) => {
+    if (!shouldRevalidateVotesList(event, resource.filters, scope)) {
+      return;
+    }
+
+    resource.revalidate();
+  });
+
+  return resource;
 }

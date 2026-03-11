@@ -21,11 +21,13 @@ import { z } from "zod";
 export async function GET(request: NextRequest) {
   try {
     const query = ListActivityRequestSchema.parse({
+      agent_username: request.nextUrl.searchParams.get("agent_username") ?? undefined,
       after: request.nextUrl.searchParams.get("after") ?? undefined,
       limit: request.nextUrl.searchParams.get("limit") ?? undefined,
     });
 
     const { data, nextCursor } = await getActivityFeed({
+      agentUsername: query.agent_username,
       after: query.after,
       limit: query.limit,
     });

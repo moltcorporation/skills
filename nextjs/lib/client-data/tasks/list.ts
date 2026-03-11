@@ -4,6 +4,7 @@ import type { ListTasksResponse } from "@/app/api/v1/tasks/schema";
 import type { Task } from "@/lib/data/tasks";
 import { DEFAULT_PAGE_SIZE, PLATFORM_SORT_OPTIONS, TASK_STATUS_FILTER_OPTIONS } from "@/lib/constants";
 import { buildListUrl, useInfiniteResource, type InfiniteResourceKeyOptions } from "@/lib/client-data/infinite-resource";
+import { useRealtime, type RealtimeEvent } from "@/lib/supabase/realtime";
 
 type TaskStatusValue = (typeof TASK_STATUS_FILTER_OPTIONS)[number]["value"];
 type TaskSortValue = (typeof PLATFORM_SORT_OPTIONS)[number]["value"];
@@ -71,12 +72,65 @@ export const defaultTasksListKey = buildTasksListKey(
   { limit: DEFAULT_PAGE_SIZE },
 );
 
-export function useTasksList(scope: TasksScope = {}) {
+type UseTasksListInput = {
+  scope?: TasksScope;
+  initialData?: TasksListPage[];
+  limit?: number;
+};
+
+export function useTasksList({ scope = {}, initialData, limit }: UseTasksListInput = {}) {
   return useInfiniteResource<TaskFilters, TasksListPage, Task>({
     getDefaultFilters: getDefaultTaskFilters,
     getFiltersFromSearchParams: getTaskFiltersFromSearchParams,
     buildKey: (filters, options) => buildTasksListKey(filters, scope, options),
     getNextCursor: (page) => page.nextCursor,
     getItems: (page) => page.tasks,
+    initialData,
+    limit,
   });
+}
+
+// ======================================================
+// UseTasksListRealtime
+// ======================================================
+
+function shouldRevalidateTasksList(
+  event: RealtimeEvent<Task | { id: string }>,
+  filters: TaskFilters,
+  scope: TasksScope,
+) {
+  if (event.type === "DELETE") {
+    return true;
+  }
+
+  const payload = event.payload as Task;
+
+  if (scope.targetType && payload.target_type !== scope.targetType) {
+    return false;
+  }
+
+  if (scope.targetId && payload.target_id !== scope.targetId) {
+    return false;
+  }
+
+  if (filters.status !== "all" && payload.status !== filters.status) {
+    return false;
+  }
+
+  return true;
+}
+
+export function useTasksListRealtime(input: UseTasksListInput = {}) {
+  const resource = useTasksList(input);
+  const scope = input.scope ?? {};
+
+  useRealtime<Task | { id: string }>("platform:tasks", (event) => {
+    if (!shouldRevalidateTasksList(event, resource.filters, scope)) {
+      return;
+    }
+
+    resource.revalidate();
+  });
+
+  return resource;
 }
