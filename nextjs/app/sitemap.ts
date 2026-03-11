@@ -12,7 +12,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ]);
 
   return [
-    // Static marketing pages — no lastModified (rarely change)
+    // Root pages
     { url: SITE_URL },
     { url: `${SITE_URL}/manifesto` },
     { url: `${SITE_URL}/how-it-works` },
@@ -22,8 +22,33 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${SITE_URL}/privacy` },
     { url: `${SITE_URL}/terms` },
 
-    // AI Knowledge Hub index + detail pages
+    // Platform pages (dynamic detail URLs intentionally omitted to avoid
+    // full-table scans at build time; add sitemap index pagination when needed)
+    { url: `${SITE_URL}/activity` },
+    { url: `${SITE_URL}/agents` },
+    { url: `${SITE_URL}/financials` },
+    { url: `${SITE_URL}/forums` },
+    { url: `${SITE_URL}/globe` },
+    { url: `${SITE_URL}/live` },
+    { url: `${SITE_URL}/map` },
+    { url: `${SITE_URL}/posts` },
+    { url: `${SITE_URL}/products` },
+    { url: `${SITE_URL}/votes` },
+
+    // Research
+    { url: `${SITE_URL}/research` },
+    ...researchArticles.map((article) => ({
+      url: `${SITE_URL}/research/${article.slug}`,
+      lastModified: article.date ? new Date(article.date) : undefined,
+    })),
+
+    // AI Knowledge Hub
     { url: `${SITE_URL}/ai` },
+    { url: `${SITE_URL}/ai/compare` },
+    ...compareEntries.map((e) => ({
+      url: `${SITE_URL}/ai/compare/${e.slug}`,
+      lastModified: e.date ? new Date(e.date) : undefined,
+    })),
     { url: `${SITE_URL}/ai/glossary` },
     ...glossaryEntries.map((e) => ({
       url: `${SITE_URL}/ai/glossary/${e.slug}`,
@@ -34,30 +59,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       url: `${SITE_URL}/ai/use-cases/${e.slug}`,
       lastModified: e.date ? new Date(e.date) : undefined,
     })),
-    { url: `${SITE_URL}/ai/compare` },
-    ...compareEntries.map((e) => ({
-      url: `${SITE_URL}/ai/compare/${e.slug}`,
-      lastModified: e.date ? new Date(e.date) : undefined,
-    })),
-
-    // Research listing + articles
-    { url: `${SITE_URL}/research` },
-    ...researchArticles.map((article) => ({
-      url: `${SITE_URL}/research/${article.slug}`,
-      lastModified: article.date ? new Date(article.date) : undefined,
-    })),
-
-    // Platform index pages. Dynamic detail URLs are intentionally omitted to avoid
-    // full-table scans at build time; add sitemap index pagination when needed.
-    { url: `${SITE_URL}/agents` },
-    { url: `${SITE_URL}/products` },
-    { url: `${SITE_URL}/live` },
-    { url: `${SITE_URL}/financials` },
-    { url: `${SITE_URL}/posts` },
-    { url: `${SITE_URL}/forums` },
-    { url: `${SITE_URL}/activity` },
-    { url: `${SITE_URL}/votes` },
-    { url: `${SITE_URL}/map` },
-    { url: `${SITE_URL}/globe` },
   ];
 }
