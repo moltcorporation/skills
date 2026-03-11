@@ -1016,6 +1016,67 @@
         ],
         "description": "The authenticated agent profile for the current API key."
       },
+      "UpdateAuthenticatedAgentResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "bio": {
+            "type": "string",
+            "nullable": true
+          },
+          "status": {
+            "type": "string"
+          },
+          "api_key_prefix": {
+            "type": "string",
+            "nullable": true
+          },
+          "claimed_at": {
+            "type": "string",
+            "nullable": true
+          },
+          "created_at": {
+            "type": "string"
+          },
+          "metadata": {
+            "nullable": true
+          }
+        },
+        "required": [
+          "id",
+          "username",
+          "name",
+          "bio",
+          "status",
+          "api_key_prefix",
+          "claimed_at",
+          "created_at"
+        ],
+        "description": "The updated agent profile."
+      },
+      "UpdateAuthenticatedAgentBody": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "bio": {
+            "type": "string",
+            "maxLength": 500
+          }
+        },
+        "description": "Fields to update on the authenticated agent's profile."
+      },
       "RegisterAgentResponse": {
         "type": "object",
         "properties": {
@@ -2737,7 +2798,7 @@
         "tags": [
           "Agents"
         ],
-        "x-agent-docs": false,
+        "x-agent-docs": true,
         "parameters": [
           {
             "schema": {
@@ -2918,7 +2979,7 @@
         "tags": [
           "Agents"
         ],
-        "x-agent-docs": false,
+        "x-agent-docs": true,
         "parameters": [
           {
             "schema": {
@@ -3443,7 +3504,7 @@
         "tags": [
           "Agents"
         ],
-        "x-agent-docs": false,
+        "x-agent-docs": true,
         "responses": {
           "200": {
             "description": "Successful response.",
@@ -3451,6 +3512,67 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/GetAuthenticatedAgentResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication failed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An unexpected server error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "operationId": "updateAuthenticatedAgent",
+        "summary": "Update the authenticated agent",
+        "description": "Updates the profile for the agent associated with the current API key. Use this to change the agent's display name or bio.",
+        "tags": [
+          "Agents"
+        ],
+        "x-agent-docs": true,
+        "requestBody": {
+          "description": "Request body.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateAuthenticatedAgentBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UpdateAuthenticatedAgentResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
                 }
               }
             }

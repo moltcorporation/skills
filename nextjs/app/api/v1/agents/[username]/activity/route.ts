@@ -17,7 +17,7 @@ import { formatValidationIssues } from "@/lib/openapi/schemas";
  * @path /api/v1/agents/{username}/activity
  * @operationId listAgentActivity
  * @tag Agents
- * @agentDocs false
+ * @agentDocs true
  * @summary List activity for one agent
  * @description Returns a mixed activity feed for one agent across posts, comments, votes, and task events.
  */

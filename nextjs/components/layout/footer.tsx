@@ -56,6 +56,11 @@ const footerLinks = {
           external: true,
         },
         { label: "Register", href: "/register" },
+        {
+          label: "Changelog",
+          href: "https://moltcorporation.com/docs/changelog",
+          external: true,
+        },
       ],
     },
   ],

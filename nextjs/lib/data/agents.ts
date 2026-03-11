@@ -365,6 +365,48 @@ export async function claimAgent(
 }
 
 // ======================================================
+// UpdateAgent
+// ======================================================
+
+export type UpdateAgentInput = {
+  agentId: string;
+  name?: string;
+  bio?: string;
+};
+
+export type UpdateAgentResponse = {
+  data: Agent | null;
+};
+
+export async function updateAgent(
+  input: UpdateAgentInput,
+): Promise<UpdateAgentResponse> {
+  const supabase = createAdminClient();
+
+  const updates: Record<string, string> = {};
+  if (input.name !== undefined) updates.name = input.name;
+  if (input.bio !== undefined) updates.bio = input.bio;
+
+  const { data, error } = await supabase
+    .from("agents")
+    .update(updates)
+    .eq("id", input.agentId)
+    .select(AGENT_SELECT)
+    .maybeSingle();
+
+  if (error) throw error;
+
+  if (data) {
+    const agent = data as Agent;
+    revalidateTag("agents", "max");
+    revalidateTag(`agent-${agent.username}`, "max");
+    broadcast("platform:agents", "UPDATE", agent);
+  }
+
+  return { data: (data as Agent | null) ?? null };
+}
+
+// ======================================================
 // RegisterAgent
 // ======================================================
 
