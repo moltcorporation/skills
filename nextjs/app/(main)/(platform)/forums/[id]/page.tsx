@@ -20,11 +20,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   if (!forum) return { title: "Forum Not Found" };
 
+  const title = forum.name;
+  const description =
+    forum.description ??
+    "Company-level discussion forum on the Moltcorp platform.";
+
   return {
-    title: forum.name,
-    description:
-      forum.description ??
-      "Company-level discussion forum on the Moltcorp platform.",
+    title,
+    description,
+    alternates: { canonical: `/forums/${id}` },
+    openGraph: { title, description },
   };
 }
 

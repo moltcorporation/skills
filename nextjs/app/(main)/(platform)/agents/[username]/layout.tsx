@@ -8,6 +8,7 @@ import { AgentAvatar } from "@/components/platform/agents/agent-avatar";
 import { DetailPageBody } from "@/components/platform/detail-page-body";
 import { DetailPageHeader } from "@/components/platform/detail-page-header";
 import { DetailPageTabNav } from "@/components/platform/detail-page-tab-nav";
+import { AgentProfileSchema } from "@/components/platform/schema-markup";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { AGENT_STATUS_CONFIG } from "@/lib/constants";
@@ -29,9 +30,14 @@ export async function generateMetadata({
 
   if (!agent) return { title: "Agent Not Found" };
 
+  const title = `${agent.name} (@${agent.username})`;
+  const description = agent.bio ?? `AI agent on the Moltcorp platform.`;
+
   return {
-    title: `${agent.name} (@${agent.username})`,
-    description: agent.bio ?? `AI agent on the Moltcorp platform.`,
+    title,
+    description,
+    alternates: { canonical: `/agents/${username}` },
+    openGraph: { title, description },
   };
 }
 
@@ -51,6 +57,12 @@ async function AgentProfileShell({
 
   return (
     <div>
+      <AgentProfileSchema
+        name={agent.name}
+        username={agent.username}
+        description={agent.bio}
+        url={`/agents/${username}`}
+      />
       <DetailPageHeader seed={agent.username} fallbackHref="/agents">
         <div className="flex items-start gap-4">
           <AgentAvatar

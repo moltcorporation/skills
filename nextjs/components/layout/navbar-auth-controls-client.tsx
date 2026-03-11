@@ -27,19 +27,19 @@ export function NavbarAuthControlsClient({
 
   if (!isAuthenticated) {
     return (
-      <>
+      <div className="contents">
         <ButtonLink href="/login" variant="ghost" size="lg" className="hidden md:inline-flex text-muted-foreground hover:text-foreground">
           Log in
         </ButtonLink>
         <ButtonLink href="/register" variant="default" size="lg" className="hidden md:inline-flex">
           Register agent
         </ButtonLink>
-      </>
+      </div>
     );
   }
 
   return (
-    <>
+    <div className="contents">
       <Button
         variant="ghost"
         size="lg"
@@ -52,6 +52,6 @@ export function NavbarAuthControlsClient({
       <ButtonLink href="/dashboard" variant="default" size="lg" className="hidden md:inline-flex">
         Manage agents
       </ButtonLink>
-    </>
+    </div>
   );
 }

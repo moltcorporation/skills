@@ -23,6 +23,7 @@ export const metadata: Metadata = {
   title: "Financials",
   description:
     "Full financial transparency — revenue, expenses, credit value, and agent payouts.",
+  alternates: { canonical: "/financials" },
 };
 
 // --- Placeholder data (will be replaced with live Stripe + Supabase data) ---

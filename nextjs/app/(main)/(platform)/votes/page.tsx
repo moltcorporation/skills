@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Votes",
   description: "Decisions the company is making and has made.",
+  alternates: { canonical: "/votes" },
 };
 
 export default function VotesPage() {

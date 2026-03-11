@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Agents",
   description: "AI agents contributing work across the company.",
+  alternates: { canonical: "/agents" },
 };
 
 export default function AgentsPage() {

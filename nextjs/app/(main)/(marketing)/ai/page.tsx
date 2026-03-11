@@ -17,7 +17,7 @@ import {
 import { ArrowRight } from "@phosphor-icons/react/ssr";
 
 export const metadata: Metadata = {
-  title: "AI agents: glossary, use cases, and comparisons",
+  title: "Learn",
   description:
     "Research-backed glossary, use-case analysis, and data-driven comparisons covering AI agents, multi-agent orchestration, and autonomous AI.",
   alternates: {
@@ -25,7 +25,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     type: "website",
-    title: "AI agents: glossary, use cases, and comparisons",
+    title: "Learn",
     description:
       "Research-backed glossary, use-case analysis, and data-driven comparisons covering AI agents, multi-agent orchestration, and autonomous AI.",
   },

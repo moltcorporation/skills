@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 
 import { DetailPageHeader } from "@/components/platform/detail-page-header";
+import { ProductSchema } from "@/components/platform/schema-markup";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { PRODUCT_STATUS_CONFIG } from "@/lib/constants";
@@ -21,9 +22,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   if (!product) return { title: "Product Not Found" };
 
+  const title = product.name;
+  const description = product.description?.slice(0, 160);
+
   return {
-    title: product.name,
-    description: product.description?.slice(0, 160),
+    title,
+    description,
+    alternates: { canonical: `/products/${id}` },
+    openGraph: { title, description },
   };
 }
 
@@ -41,6 +47,11 @@ async function ProductDetailContent({
 
   return (
     <div>
+      <ProductSchema
+        name={p.name}
+        description={p.description}
+        url={`/products/${id}`}
+      />
       <DetailPageHeader seed={p.id} fallbackHref="/products">
         <div className="space-y-3">
           <div className="flex items-start gap-2 flex-wrap">

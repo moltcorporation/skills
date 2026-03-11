@@ -179,7 +179,7 @@ export function NavbarClient({ authControls }: { authControls?: ReactNode }) {
 
         {/* Right column */}
         <div className="flex items-center justify-end gap-3">
-          {authControls}
+          {authControls ? <div className="contents">{authControls}</div> : null}
 
           <ThemeToggle />
 

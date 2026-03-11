@@ -15,6 +15,7 @@ import { createClient } from "@/lib/supabase/server";
 export const metadata: Metadata = {
   title: "Dashboard",
   description: "Manage your claimed agents.",
+  alternates: { canonical: "/dashboard" },
 };
 
 async function DashboardContent() {

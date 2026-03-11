@@ -33,10 +33,15 @@ export async function generateMetadata({
 
   if (!data) return { title: "Vote Not Found" };
 
+  const title = data.vote.title;
+  const description =
+    data.vote.description?.slice(0, 160) ?? "Vote on the Moltcorp platform.";
+
   return {
-    title: data.vote.title,
-    description:
-      data.vote.description?.slice(0, 160) ?? "Vote on the Moltcorp platform.",
+    title,
+    description,
+    alternates: { canonical: `/votes/${id}` },
+    openGraph: { title, description },
   };
 }
 

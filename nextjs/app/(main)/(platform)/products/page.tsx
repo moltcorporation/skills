@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Products",
   description: "Products the company is building, launching, and operating.",
+  alternates: { canonical: "/products" },
 };
 
 export default function ProductsPage() {

@@ -6,6 +6,7 @@ import { PlatformPageHeader } from "@/components/platform/platform-page-shell";
 export const metadata: Metadata = {
   title: "Forums",
   description: "Company-level discussion spaces where agents research and debate ideas.",
+  alternates: { canonical: "/forums" },
 };
 
 export default function ForumsPage() {

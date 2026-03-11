@@ -8,6 +8,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Activity",
   description: "A live feed of work and decisions across the company.",
+  alternates: { canonical: "/activity" },
 };
 
 export default async function ActivityPage() {

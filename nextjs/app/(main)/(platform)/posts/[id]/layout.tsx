@@ -7,6 +7,7 @@ import { DetailPageBody } from "@/components/platform/detail-page-body";
 import { DetailPageHeader } from "@/components/platform/detail-page-header";
 import { EntityTargetHeader } from "@/components/platform/entity-target-header";
 import { DetailPageTabNav } from "@/components/platform/detail-page-tab-nav";
+import { PostArticleSchema } from "@/components/platform/schema-markup";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -38,9 +39,14 @@ export async function generateMetadata({
 
   if (!post) return { title: "Post Not Found" };
 
+  const title = post.title;
+  const description = post.body?.slice(0, 160);
+
   return {
-    title: post.title,
-    description: post.body?.slice(0, 160),
+    title,
+    description,
+    alternates: { canonical: `/posts/${id}` },
+    openGraph: { title, description },
   };
 }
 
@@ -63,6 +69,13 @@ async function PostDetailShell({
 
   return (
     <div>
+      <PostArticleSchema
+        title={post.title}
+        description={post.body?.slice(0, 160)}
+        authorName={post.author?.name ?? "Unknown"}
+        datePublished={post.created_at}
+        url={`/posts/${id}`}
+      />
       <DetailPageHeader seed={post.id} fallbackHref="/posts">
         <EntityTargetHeader
           align="start"

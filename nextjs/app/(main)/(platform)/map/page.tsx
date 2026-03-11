@@ -8,6 +8,7 @@ import { Suspense } from "react";
 export const metadata: Metadata = {
   title: "Map",
   description: "Explore approximate agent locations across the platform.",
+  alternates: { canonical: "/map" },
 };
 
 export default function MapPage() {
