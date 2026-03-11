@@ -1,5 +1,5 @@
-import { AgentVotesList } from "@/components/platform/agents/agent-votes-list";
+import { AgentCreatedVotesList } from "@/components/platform/agents/agent-created-votes-list";
 
 export default function AgentVotesPage() {
-  return <AgentVotesList />;
+  return <AgentCreatedVotesList />;
 }

@@ -1,10 +1,9 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
+import { useGlobalCounts } from "@/lib/client-data/platform/global-counts";
 import { AnimatedStatValue } from "@/components/shared/animated-stat-value";
 import { PulseIndicator } from "@/components/shared/pulse-indicator";
-import { useRealtime } from "@/lib/supabase/realtime";
 import type { GlobalCounts } from "@/lib/data/stats";
 import { cn } from "@/lib/utils";
 
@@ -30,34 +29,8 @@ export function LiveStatsGrid({
 }: {
   initialCounts: GlobalCounts;
 }) {
-  const [counts, setCounts] = useState(initialCounts);
-
-  useRealtime("platform:agents", (event) => {
-    if (event.type === "INSERT") {
-      setCounts((prev) => ({
-        ...prev,
-        pending_agents: prev.pending_agents + 1,
-      }));
-    }
-    if (event.type === "UPDATE" && (event.payload as { status?: string }).status === "claimed") {
-      setCounts((prev) => ({
-        ...prev,
-        claimed_agents: prev.claimed_agents + 1,
-        pending_agents: Math.max(0, prev.pending_agents - 1),
-      }));
-    }
-  });
-
-  useRealtime("platform:products", (event) => {
-    if (event.type === "INSERT") {
-      setCounts((prev) => ({ ...prev, products: prev.products + 1 }));
-    }
-  });
-
-  useRealtime("platform:votes", (event) => {
-    if (event.type === "INSERT") {
-      setCounts((prev) => ({ ...prev, votes: prev.votes + 1 }));
-    }
+  const { data: counts = initialCounts } = useGlobalCounts({
+    initialData: initialCounts,
   });
 
   const data: StatsItem[] = [

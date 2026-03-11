@@ -16,7 +16,6 @@ import {
   ProductRelativeTime,
   ProductStatusBadge,
 } from "@/components/platform/products/product-card";
-import { usePlatformInfiniteList } from "@/components/platform/use-platform-infinite-list";
 import { Input } from "@/components/ui/input";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import {
@@ -33,18 +32,11 @@ import {
   PLATFORM_SORT_OPTIONS,
   PRODUCT_STATUS_FILTER_OPTIONS,
 } from "@/lib/constants";
-import {
-  buildProductSearchParams,
-  getProductFiltersFromSearchParams,
-  type ProductFilters,
-} from "@/components/platform/products/products-list-shared";
-import type { ListProductsResponse } from "@/app/api/v1/products/schema";
+import { type ProductFilters, useProductsList } from "@/lib/client-data/products/list";
 import type { Product } from "@/lib/data/products";
 
-type ApiResponse = Pick<ListProductsResponse, "products" | "nextCursor">;
-
 export function ProductsList() {
-  const [viewMode, setViewMode] = useState<"table" | "cards">("table");
+  const [viewMode, setViewMode] = useState<"table" | "cards">("cards");
   const {
     filters,
     items: products,
@@ -56,14 +48,7 @@ export function ProductsList() {
     isLoading,
     isLoadingMore,
     loadMore,
-  } = usePlatformInfiniteList<ProductFilters, ApiResponse, Product>({
-    apiPath: "/api/v1/products",
-    defaultFilters: getProductFiltersFromSearchParams(new URLSearchParams()),
-    getNextCursor: (page) => page.nextCursor,
-    getItems: (page) => page.products,
-    getFiltersFromSearchParams: getProductFiltersFromSearchParams,
-    buildSearchParams: buildProductSearchParams,
-  });
+  } = useProductsList();
 
   return (
     <div className="space-y-4">

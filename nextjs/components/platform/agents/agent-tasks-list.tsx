@@ -10,15 +10,9 @@ import {
 } from "@phosphor-icons/react";
 import { useState } from "react";
 
-import {
-  buildAgentTasksSearchParams,
-  getAgentTasksFiltersFromSearchParams,
-  type AgentTasksFilters,
-} from "@/components/platform/agents/agent-tasks-list-shared";
 import { PlatformFilterSortMenu } from "@/components/platform/filter-sort-menu";
 import { RelativeTime } from "@/components/platform/relative-time";
-import { usePlatformInfiniteList } from "@/components/platform/use-platform-infinite-list";
-import { Badge } from "@/components/ui/badge";
+import { TaskCard, TaskStatusBadge } from "@/components/platform/tasks/task-card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -32,25 +26,18 @@ import {
 } from "@/components/ui/table";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import {
-  AGENT_TASK_ROLE_FILTER_OPTIONS,
   PLATFORM_SORT_OPTIONS,
-  SUBMISSION_STATUS_STYLES,
+  TASK_SIZE_LABELS,
   TASK_STATUS_FILTER_OPTIONS,
 } from "@/lib/constants";
-import type { AgentTask } from "@/lib/data/tasks";
-import { TaskStatusBadge } from "@/components/platform/tasks/task-card";
-
-type ApiResponse = {
-  tasks: AgentTask[];
-  nextCursor: string | null;
-};
+import { type AgentTasksFilters, type AgentTasksPage, useAgentTasksList } from "@/lib/client-data/agents/tasks";
 
 export function AgentTasksList({
   username: usernameProp,
-  initialPage,
+  initialData,
 }: {
   username?: string;
-  initialPage?: ApiResponse;
+  initialData?: AgentTasksPage;
 }) {
   const params = useParams<{ username: string }>();
   const username = usernameProp ?? params.username;
@@ -67,15 +54,7 @@ export function AgentTasksList({
     isLoading,
     isLoadingMore,
     loadMore,
-  } = usePlatformInfiniteList<AgentTasksFilters, ApiResponse, AgentTask>({
-    apiPath: `/api/v1/agents/${username}/tasks`,
-    defaultFilters: getAgentTasksFiltersFromSearchParams(new URLSearchParams()),
-    getNextCursor: (page) => page.nextCursor,
-    getItems: (page) => page.tasks,
-    getFiltersFromSearchParams: getAgentTasksFiltersFromSearchParams,
-    buildSearchParams: buildAgentTasksSearchParams,
-    initialPages: initialPage ? [initialPage] : undefined,
-  });
+  } = useAgentTasksList({ username, initialData });
 
   return (
     <div className="space-y-4">
@@ -95,28 +74,13 @@ export function AgentTasksList({
           </ToggleGroupItem>
         </ToggleGroup>
         <PlatformFilterSortMenu
-          filterValue={filters.role}
+          filterValue={filters.status}
           sortValue={filters.sort}
-          filterOptions={AGENT_TASK_ROLE_FILTER_OPTIONS}
+          filterOptions={TASK_STATUS_FILTER_OPTIONS}
           sortOptions={PLATFORM_SORT_OPTIONS}
-          onFilterChange={(value) => setFilter("role", value as AgentTasksFilters["role"])}
+          onFilterChange={(value) => setFilter("status", value as AgentTasksFilters["status"])}
           onSortChange={(value) => setFilter("sort", value as AgentTasksFilters["sort"])}
         />
-        <ToggleGroup
-          value={[filters.status]}
-          onValueChange={(value) => {
-            if (value.length > 0) {
-              setFilter("status", value[value.length - 1] as AgentTasksFilters["status"]);
-            }
-          }}
-          variant="outline"
-        >
-          {TASK_STATUS_FILTER_OPTIONS.map((option) => (
-            <ToggleGroupItem key={option.value} value={option.value} aria-label={option.label}>
-              {option.label}
-            </ToggleGroupItem>
-          ))}
-        </ToggleGroup>
         <div className="relative min-w-48 flex-1">
           <MagnifyingGlass className="absolute left-2 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground" />
           <Input
@@ -156,123 +120,62 @@ export function AgentTasksList({
   );
 }
 
-function AgentTasksTable({ tasks }: { tasks: AgentTask[] }) {
+function AgentTasksTable({ tasks }: { tasks: Task[] }) {
   return (
     <div className="overflow-hidden rounded-sm ring-1 ring-foreground/10">
-    <Table>
-      <TableHeader className="bg-muted/50">
-        <TableRow>
-          <TableHead>Task</TableHead>
-          <TableHead>Role</TableHead>
-          <TableHead>Status</TableHead>
-          <TableHead>Latest event</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {tasks.map((task) => (
-          <TableRow key={`${task.role}-${task.id}`}>
-            <TableCell>
-              <div className="min-w-0 space-y-1">
-                <div className="font-medium">{task.title}</div>
-                <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-                  {task.target_type === "product" && task.target_id && task.target_name ? (
-                    <Link href={`/products/${task.target_id}`}>
-                      {task.target_name}
-                    </Link>
-                  ) : (
-                    <span>{task.target_name ?? "Platform task"}</span>
-                  )}
-                  {task.latest_submission ? (
-                    <SubmissionStatusBadge status={task.latest_submission.status} />
-                  ) : null}
-                </div>
-              </div>
-            </TableCell>
-            <TableCell>
-              <RoleBadge role={task.role} />
-            </TableCell>
-            <TableCell>
-              <TaskStatusBadge status={task.status} />
-            </TableCell>
-            <TableCell>
-              <RelativeTime date={task.agent_event_at} className="text-muted-foreground" />
-            </TableCell>
+      <Table>
+        <TableHeader className="bg-muted/50">
+          <TableRow>
+            <TableHead>Task</TableHead>
+            <TableHead>Status</TableHead>
+            <TableHead>Size</TableHead>
+            <TableHead>Created</TableHead>
           </TableRow>
-        ))}
-      </TableBody>
-    </Table>
+        </TableHeader>
+        <TableBody>
+          {tasks.map((task) => (
+            <TableRow key={task.id} className="cursor-pointer">
+              <TableCell>
+                <Link href={`/tasks/${task.id}`} className="block min-w-0 space-y-1">
+                  <div className="font-medium">{task.title}</div>
+                  <div className="text-xs text-muted-foreground">
+                    {task.target_name ?? "Platform task"}
+                  </div>
+                </Link>
+              </TableCell>
+              <TableCell>
+                <TaskStatusBadge status={task.status} />
+              </TableCell>
+              <TableCell>
+                <span className="text-muted-foreground">
+                  {TASK_SIZE_LABELS[task.size]?.label ?? task.size}
+                </span>
+              </TableCell>
+              <TableCell>
+                <RelativeTime date={task.created_at} className="text-muted-foreground" />
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
     </div>
   );
 }
 
-function AgentTasksCards({ tasks }: { tasks: AgentTask[] }) {
+function AgentTasksCards({ tasks }: { tasks: Task[] }) {
   return (
-    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+    <div className="grid grid-cols-1 gap-3">
       {tasks.map((task) => (
-        <article
-          key={`${task.role}-${task.id}`}
-          className="rounded-lg border border-border bg-card p-4"
-        >
-          <div className="flex flex-wrap items-center gap-2">
-            <h3 className="text-sm font-medium">{task.title}</h3>
-            <RoleBadge role={task.role} />
-            <TaskStatusBadge status={task.status} />
-          </div>
-          <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-            {task.target_type === "product" && task.target_id && task.target_name ? (
-              <Link
-                href={`/products/${task.target_id}`}
-                className="underline-offset-4 hover:underline"
-              >
-                {task.target_name}
-              </Link>
-            ) : (
-              <span>{task.target_name ?? "Platform task"}</span>
-            )}
-            <span aria-hidden>&middot;</span>
-            <RelativeTime date={task.agent_event_at} />
-          </div>
-          {task.latest_submission ? (
-            <div className="mt-3 flex flex-wrap items-center gap-2 text-xs">
-              <SubmissionStatusBadge status={task.latest_submission.status} />
-              {task.latest_submission.submission_url ? (
-                <a
-                  href={task.latest_submission.submission_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
-                >
-                  Submission
-                </a>
-              ) : null}
-            </div>
-          ) : null}
-        </article>
+        <TaskCard key={task.id} task={task} />
       ))}
     </div>
-  );
-}
-
-function RoleBadge({ role }: { role: AgentTask["role"] }) {
-  return (
-    <Badge variant="outline">
-      {role === "created" ? "Created" : "Claimed"}
-    </Badge>
-  );
-}
-
-function SubmissionStatusBadge({ status }: { status: string }) {
-  return (
-    <Badge variant="outline" className={SUBMISSION_STATUS_STYLES[status]}>
-      {status}
-    </Badge>
   );
 }
 
 function AgentTasksListSkeleton({ viewMode }: { viewMode: "table" | "cards" }) {
   if (viewMode === "cards") {
     return (
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+      <div className="grid grid-cols-1 gap-3">
         {Array.from({ length: 4 }).map((_, index) => (
           <Skeleton key={index} className="h-32 w-full" />
         ))}

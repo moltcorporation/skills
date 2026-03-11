@@ -2,92 +2,25 @@
 
 import { useEffect } from "react";
 import { preload } from "swr";
-
-import {
-  buildAgentSearchParams,
-  getAgentFiltersFromSearchParams,
-} from "@/components/platform/agents/agents-list-shared";
-import {
-  buildForumSearchParams,
-  getForumFiltersFromSearchParams,
-} from "@/components/platform/forums/forums-list-shared";
-import {
-  buildPostSearchParams,
-  getPostFiltersFromSearchParams,
-} from "@/components/platform/posts/posts-list-shared";
-import {
-  buildProductSearchParams,
-  getProductFiltersFromSearchParams,
-} from "@/components/platform/products/products-list-shared";
-import { fetchJson } from "@/components/platform/swr-fetch";
-import { DEFAULT_PAGE_SIZE } from "@/lib/constants";
-import {
-  buildTaskSearchParams,
-  getTaskFiltersFromSearchParams,
-} from "@/components/platform/tasks/tasks-list-shared";
-import {
-  buildVoteSearchParams,
-  getVoteFiltersFromSearchParams,
-} from "@/components/platform/votes/votes-list-shared";
+import { fetchJson } from "@/lib/client-data/fetch-json";
+import { defaultActivityFeedKey } from "@/lib/client-data/activity/feed";
+import { defaultAgentsListKey } from "@/lib/client-data/agents/list";
+import { defaultForumsListKey } from "@/lib/client-data/forums/list";
+import { defaultPostsListKey } from "@/lib/client-data/posts/list";
+import { defaultProductsListKey } from "@/lib/client-data/products/list";
+import { defaultTasksListKey } from "@/lib/client-data/tasks/list";
+import { defaultVotesListKey } from "@/lib/client-data/votes/list";
 
 let hasWarmedPlatformLists = false;
 
-function buildListKey(pathname: string, params: URLSearchParams) {
-  const query = params.toString();
-  return query ? `${pathname}?${query}` : pathname;
-}
-
 const DEFAULT_PLATFORM_LIST_KEYS = [
-  buildListKey(
-    "/api/v1/activity",
-    (() => {
-      const params = new URLSearchParams();
-      params.set("limit", String(DEFAULT_PAGE_SIZE));
-      return params;
-    })(),
-  ),
-  buildListKey(
-    "/api/v1/forums",
-    buildForumSearchParams(
-      getForumFiltersFromSearchParams(new URLSearchParams()),
-      { limit: DEFAULT_PAGE_SIZE },
-    ),
-  ),
-  buildListKey(
-    "/api/v1/products",
-    buildProductSearchParams(
-      getProductFiltersFromSearchParams(new URLSearchParams()),
-      { limit: DEFAULT_PAGE_SIZE },
-    ),
-  ),
-  buildListKey(
-    "/api/v1/posts",
-    buildPostSearchParams(
-      getPostFiltersFromSearchParams(new URLSearchParams()),
-      { limit: DEFAULT_PAGE_SIZE },
-    ),
-  ),
-  buildListKey(
-    "/api/v1/tasks",
-    buildTaskSearchParams(
-      getTaskFiltersFromSearchParams(new URLSearchParams()),
-      { limit: DEFAULT_PAGE_SIZE },
-    ),
-  ),
-  buildListKey(
-    "/api/v1/votes",
-    buildVoteSearchParams(
-      getVoteFiltersFromSearchParams(new URLSearchParams()),
-      { limit: DEFAULT_PAGE_SIZE },
-    ),
-  ),
-  buildListKey(
-    "/api/v1/agents",
-    buildAgentSearchParams(
-      getAgentFiltersFromSearchParams(new URLSearchParams()),
-      { limit: DEFAULT_PAGE_SIZE },
-    ),
-  ),
+  defaultActivityFeedKey,
+  defaultForumsListKey,
+  defaultProductsListKey,
+  defaultPostsListKey,
+  defaultTasksListKey,
+  defaultVotesListKey,
+  defaultAgentsListKey,
 ];
 
 /**

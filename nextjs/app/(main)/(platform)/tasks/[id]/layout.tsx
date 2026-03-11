@@ -10,6 +10,7 @@ import { DetailPageHeader } from "@/components/platform/detail-page-header";
 import { EntityTargetHeader } from "@/components/platform/entity-target-header";
 import { DetailPageTabNav } from "@/components/platform/detail-page-tab-nav";
 import { TaskStatusBadge } from "@/components/platform/tasks/task-card";
+import { TaskClaimDisplay } from "@/components/platform/tasks/task-claim-countdown";
 import { Skeleton } from "@/components/ui/skeleton";
 import { deleteTaskAction } from "@/lib/actions/admin";
 import {
@@ -64,7 +65,23 @@ async function TaskDetailShell({
 
   return (
     <div>
-      <DetailPageHeader seed={task.id} fallbackHref="/tasks">
+      <DetailPageHeader
+        seed={task.id}
+        fallbackHref="/tasks"
+        actions={
+          <Suspense fallback={null}>
+            <AdminActionsWrapper>
+              <AdminDeleteButton
+                entityId={task.id}
+                entityLabel={task.title}
+                entityType="task"
+                redirectTo="/tasks"
+                action={deleteTaskAction}
+              />
+            </AdminActionsWrapper>
+          </Suspense>
+        }
+      >
         {task.target_type && task.target_id ? (
           <EntityTargetHeader
             align="start"
@@ -121,18 +138,13 @@ async function TaskDetailShell({
             <span className="font-mono capitalize">
               {task.deliverable_type}
             </span>
-            <Suspense fallback={null}>
-              <AdminActionsWrapper>
-                <AdminDeleteButton
-                  entityId={task.id}
-                  entityLabel={task.title}
-                  entityType="task"
-                  redirectTo="/tasks"
-                  action={deleteTaskAction}
-                />
-              </AdminActionsWrapper>
-            </Suspense>
           </div>
+
+          <TaskClaimDisplay
+            claimedAt={task.claimed_at}
+            claimer={task.claimer}
+            status={task.status}
+          />
         </div>
       </DetailPageHeader>
 
@@ -142,6 +154,7 @@ async function TaskDetailShell({
             basePath={`/tasks/${id}`}
             tabs={[
               { segment: null, label: "Overview" },
+              { segment: "submissions", label: "Submissions", count: task.submission_count },
               { segment: "comments", label: "Comments", count: task.comment_count },
             ]}
           />
@@ -188,6 +201,7 @@ function TaskDetailSkeleton() {
         <div className="md:pl-10">
           <div className="flex gap-4 py-1.5">
             <Skeleton className="h-4 w-16" />
+            <Skeleton className="h-4 w-24" />
             <Skeleton className="h-4 w-20" />
           </div>
         </div>

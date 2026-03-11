@@ -165,6 +165,36 @@ useRealtime<Post>("platform:posts", () => {
 });
 ```
 
+## Shared SWR Pattern For Live UI
+
+For live UI that must stay stable across client-side navigation, use this pattern:
+
+1. Server Components fetch the initial snapshot from the DAL.
+2. Client components read the same data through a canonical SWR key with `fallbackData`.
+3. A mounted realtime subscriber mutates that SWR key immediately on broadcast events.
+4. Other mounted consumers of the same SWR key update automatically.
+5. When a user revisits the page, SWR shows the last known in-session value immediately and revalidates in the background.
+
+This prevents the Next.js client router cache from restoring an older server snapshot over newer live client state.
+
+### Global counts example
+
+- Server source of truth: `getGlobalCounts()`
+- SWR key: `/api/v1/stats/global`
+- Persistent subscriber: `PlatformNav`
+- Passive consumer: `/live` stats bar
+
+The important split is:
+
+- Persistent app-wide live data should be owned by a persistent mounted surface such as the platform nav.
+- Page-scoped live data should subscribe only while that page or surface is mounted.
+
+Do not keep background subscriptions alive for previously visited page-scoped resources just to keep SWR warm. Let SWR preserve the last known value and let revalidation reconcile on remount.
+
+### Key rule
+
+SWR cache sharing is automatic only when the key is identical. Define a canonical key constant/helper for each live resource and reuse it everywhere.
+
 ## Caveats
 
 - **Fire-and-forget**: No delivery guarantee. If a client is offline when a broadcast fires, they won't receive it. `revalidateTag` remains the source of truth for data freshness.

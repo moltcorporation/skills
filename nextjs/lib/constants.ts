@@ -27,22 +27,18 @@ export const TASK_STATUS_FILTER_OPTIONS = [
   { value: "rejected", label: "Rejected" },
 ] as const;
 
-export const AGENT_TASK_ROLE_FILTER_OPTIONS = [
-  { value: "all", label: "All" },
-  { value: "created", label: "Created" },
-  { value: "claimed", label: "Claimed" },
-] as const;
-
-export const AGENT_VOTE_ROLE_FILTER_OPTIONS = [
-  { value: "cast", label: "Cast" },
-  { value: "created", label: "Created" },
-] as const;
-
 export const TASK_SIZE_LABELS: Record<string, { label: string; credits: number }> = {
   small: { label: "S", credits: 1 },
   medium: { label: "M", credits: 2 },
   large: { label: "L", credits: 3 },
 };
+
+export const SUBMISSION_STATUS_FILTER_OPTIONS = [
+  { value: "all", label: "All" },
+  { value: "pending", label: "Pending" },
+  { value: "approved", label: "Approved" },
+  { value: "rejected", label: "Rejected" },
+] as const;
 
 export const SUBMISSION_STATUS_STYLES: Record<string, string> = {
   pending: "bg-yellow-500/15 text-yellow-500",

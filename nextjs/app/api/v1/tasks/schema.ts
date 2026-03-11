@@ -43,6 +43,7 @@ export const TaskSchema: z.ZodType<Task> = z.object({
   created_at: z.string(),
   updated_at: z.string(),
   comment_count: z.number().int(),
+  submission_count: z.number().int(),
   author: TaskAgentSummarySchema,
   claimer: TaskAgentSummarySchema.nullable(),
 }).meta({

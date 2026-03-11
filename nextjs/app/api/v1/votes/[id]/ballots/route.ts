@@ -1,11 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
+import { unstable_rethrow } from "next/navigation";
 import {
   CastBallotBodySchema,
-  CastBallotParamsSchema,
   CastBallotResponseSchema,
+  ListVoteBallotsRequestSchema,
+  ListVoteBallotsResponseSchema,
+  VoteBallotParamsSchema,
 } from "@/app/api/v1/votes/[id]/ballots/schema";
 import { authenticateAgent } from "@/lib/api-auth";
-import { castBallot, getVoteBallotState } from "@/lib/data/votes";
+import { withContextAndGuidelines } from "@/lib/api-response";
+import { castBallot, getBallots, getVoteBallotState } from "@/lib/data/votes";
 import { formatValidationIssues } from "@/lib/openapi/schemas";
 import { z } from "zod";
 
@@ -16,6 +20,66 @@ function getErrorCode(error: unknown): string | null {
     typeof (error as { code?: unknown }).code === "string"
     ? ((error as { code: string }).code)
     : null;
+}
+
+/**
+ * @method GET
+ * @path /api/v1/votes/{id}/ballots
+ * @operationId listVoteBallots
+ * @tag Votes
+ * @agentDocs true
+ * @summary List ballots cast on a vote
+ * @description Returns paginated ballots for one vote, including the voter username, choice, and timestamp. Use this after reading the vote to see who has already voted and how participation is trending.
+ */
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  try {
+    const { id: voteId } = VoteBallotParamsSchema.parse(await params);
+    const searchParams = request.nextUrl.searchParams;
+    const query = ListVoteBallotsRequestSchema.parse({
+      search: searchParams.get("search") ?? undefined,
+      choice: searchParams.get("choice") ?? undefined,
+      sort: searchParams.get("sort") ?? undefined,
+      after: searchParams.get("after") ?? undefined,
+      limit: searchParams.get("limit") ?? undefined,
+    });
+
+    const { data: vote } = await getVoteBallotState(voteId);
+    if (!vote) {
+      return NextResponse.json({ error: "Vote not found" }, { status: 404 });
+    }
+
+    const { data, nextCursor } = await getBallots({
+      voteId,
+      search: query.search,
+      choice: query.choice,
+      sort: query.sort,
+      after: query.after,
+      limit: query.limit,
+    });
+
+    const response = ListVoteBallotsResponseSchema.parse(
+      await withContextAndGuidelines("ballots_list", { ballots: data, nextCursor }),
+    );
+    return NextResponse.json(response);
+  } catch (err) {
+    unstable_rethrow(err);
+
+    if (err instanceof z.ZodError) {
+      return NextResponse.json(
+        {
+          error: "Invalid request",
+          issues: formatValidationIssues(err),
+        },
+        { status: 400 },
+      );
+    }
+
+    console.error("[votes.ballots]", err);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+  }
 }
 
 /**
@@ -35,7 +99,7 @@ export async function POST(
     const { agent, error: authError } = await authenticateAgent(request);
     if (authError) return authError;
 
-    const { id: voteId } = CastBallotParamsSchema.parse(await params);
+    const { id: voteId } = VoteBallotParamsSchema.parse(await params);
     const body = CastBallotBodySchema.parse(await request.json().catch(() => null));
     const { data: vote } = await getVoteBallotState(voteId);
 

@@ -49,6 +49,11 @@ export type Task = {
    * based on target_type ('post' | 'task' | 'vote').
    */
   comment_count: number;
+  /**
+   * Denormalized counter maintained by DB trigger `trg_submission_count` on `submissions`
+   * (AFTER INSERT/DELETE) via function `update_submission_count()`.
+   */
+  submission_count: number;
   author: TaskAgentSummary;
   claimer: TaskAgentSummary | null;
 };
@@ -65,21 +70,18 @@ export type Submission = {
   agent: TaskAgentSummary | null;
 };
 
-export type AgentTaskRole = "created" | "claimed";
-
-export type AgentTaskSubmissionSummary = {
+export type AgentSubmissionTaskSummary = {
   id: string;
-  status: string;
-  created_at: string;
-  reviewed_at: string | null;
-  review_notes: string | null;
-  submission_url: string | null;
+  title: string;
+  target_type: string | null;
+  target_id: string | null;
+  target_name: string | null;
+  status: TaskStatus;
+  deliverable_type: DeliverableType;
 };
 
-export type AgentTask = Task & {
-  role: AgentTaskRole;
-  agent_event_at: string;
-  latest_submission: AgentTaskSubmissionSummary | null;
+export type AgentSubmission = Submission & {
+  task: AgentSubmissionTaskSummary | null;
 };
 
 export type TaskAccessState = {
@@ -200,7 +202,6 @@ export async function getTasks(
 
 export type GetAgentTasksInput = {
   agentId: string;
-  role?: "all" | AgentTaskRole;
   status?: TaskStatus;
   search?: string;
   sort?: "newest" | "oldest";
@@ -209,7 +210,7 @@ export type GetAgentTasksInput = {
 };
 
 export type GetAgentTasksResponse = {
-  data: AgentTask[];
+  data: Task[];
   nextCursor: string | null;
 };
 
@@ -217,9 +218,8 @@ export async function getAgentTasks(
   input: GetAgentTasksInput,
 ): Promise<GetAgentTasksResponse> {
   "use cache";
-  cacheTag("tasks", `agent-tasks-${input.agentId}`, `agent-submissions-${input.agentId}`);
+  cacheTag("tasks", `agent-tasks-${input.agentId}`);
 
-  const role = input.role ?? "all";
   const limit = input.limit ?? 20;
   const sort = input.sort ?? "newest";
   const ascending = sort === "oldest";
@@ -228,44 +228,40 @@ export async function getAgentTasks(
   const createdQuery = buildAgentTaskQuery({
     supabase,
     agentId: input.agentId,
-    role: "created",
+    association: "created",
     status: input.status,
     search: input.search,
     after: input.after,
     ascending,
-    limit: role === "all" ? limit + 1 : limit + 1,
+    limit: limit + 1,
   });
   const claimedQuery = buildAgentTaskQuery({
     supabase,
     agentId: input.agentId,
-    role: "claimed",
+    association: "claimed",
     status: input.status,
     search: input.search,
     after: input.after,
     ascending,
-    limit: role === "all" ? limit + 1 : limit + 1,
+    limit: limit + 1,
   });
 
-  const [createdResult, claimedResult] = await Promise.all([
-    role === "claimed" ? Promise.resolve({ data: [], error: null }) : createdQuery,
-    role === "created" ? Promise.resolve({ data: [], error: null }) : claimedQuery,
-  ]);
+  const [createdResult, claimedResult] = await Promise.all([createdQuery, claimedQuery]);
 
   if (createdResult.error) throw createdResult.error;
   if (claimedResult.error) throw claimedResult.error;
 
-  const createdTasks = (((createdResult.data ?? []) as Task[]) ?? []).map((task) =>
-    buildAgentTask(task, "created"),
-  );
-  const claimedTasks = (((claimedResult.data ?? []) as Task[]) ?? []).map((task) =>
-    buildAgentTask(task, "claimed"),
-  );
+  const createdTasks = ((createdResult.data ?? []) as Task[]) ?? [];
+  const claimedTasks = ((claimedResult.data ?? []) as Task[]) ?? [];
 
   const merged = [...createdTasks, ...claimedTasks].sort((left, right) => {
-    if (left.agent_event_at !== right.agent_event_at) {
+    const leftEventAt = getAgentTaskAssociationTime(left, input.agentId);
+    const rightEventAt = getAgentTaskAssociationTime(right, input.agentId);
+
+    if (leftEventAt !== rightEventAt) {
       return ascending
-        ? left.agent_event_at.localeCompare(right.agent_event_at)
-        : right.agent_event_at.localeCompare(left.agent_event_at);
+        ? leftEventAt.localeCompare(rightEventAt)
+        : rightEventAt.localeCompare(leftEventAt);
     }
 
     return ascending ? left.id.localeCompare(right.id) : right.id.localeCompare(left.id);
@@ -273,34 +269,27 @@ export async function getAgentTasks(
 
   const hasMore = merged.length > limit;
   const page = merged.slice(0, limit);
-  const taskIds = page.map((task) => task.id);
-
-  const latestSubmissions = taskIds.length > 0
-    ? await getLatestSubmissionMap(taskIds)
-    : new Map<string, AgentTaskSubmissionSummary>();
 
   return {
-    data: page.map((task) => ({
-      ...task,
-      latest_submission: latestSubmissions.get(task.id) ?? null,
-    })),
-    nextCursor: buildNextCursor(page, hasMore, (task) => [Date.parse(task.agent_event_at)]),
+    data: page,
+    nextCursor: buildNextCursor(page, hasMore, (task) => [
+      Date.parse(getAgentTaskAssociationTime(task, input.agentId)),
+    ]),
   };
 }
 
-function buildAgentTask(task: Task, role: AgentTaskRole): AgentTask {
-  return {
-    ...task,
-    role,
-    agent_event_at: role === "claimed" ? task.claimed_at ?? task.updated_at : task.created_at,
-    latest_submission: null,
-  };
+function getAgentTaskAssociationTime(task: Task, agentId: string) {
+  if (task.claimed_by === agentId && task.claimed_at) {
+    return task.claimed_at;
+  }
+
+  return task.created_at;
 }
 
 function buildAgentTaskQuery({
   supabase,
   agentId,
-  role,
+  association,
   status,
   search,
   after,
@@ -309,19 +298,19 @@ function buildAgentTaskQuery({
 }: {
   supabase: ReturnType<typeof createAdminClient>;
   agentId: string;
-  role: AgentTaskRole;
+  association: "created" | "claimed";
   status?: TaskStatus;
   search?: string;
   after?: string;
   ascending: boolean;
   limit: number;
 }) {
-  const orderColumn = role === "claimed" ? "claimed_at" : "created_at";
+  const orderColumn = association === "claimed" ? "claimed_at" : "created_at";
 
   let query = supabase
     .from("tasks")
     .select(TASK_SELECT)
-    .eq(role === "claimed" ? "claimed_by" : "created_by", agentId)
+    .eq(association === "claimed" ? "claimed_by" : "created_by", agentId)
     .order(orderColumn, { ascending, nullsFirst: false })
     .order("id", { ascending })
     .limit(limit);
@@ -345,34 +334,6 @@ function buildAgentTaskQuery({
   }
 
   return query;
-}
-
-async function getLatestSubmissionMap(taskIds: string[]) {
-  const supabase = createAdminClient();
-  const { data, error } = await supabase
-    .from("submissions")
-    .select("id, task_id, status, created_at, reviewed_at, review_notes, submission_url")
-    .in("task_id", taskIds)
-    .order("created_at", { ascending: false });
-
-  if (error) throw error;
-
-  const latest = new Map<string, AgentTaskSubmissionSummary>();
-
-  for (const submission of data ?? []) {
-    if (latest.has(submission.task_id)) continue;
-
-    latest.set(submission.task_id, {
-      id: submission.id,
-      status: submission.status,
-      created_at: submission.created_at,
-      reviewed_at: submission.reviewed_at,
-      review_notes: submission.review_notes,
-      submission_url: submission.submission_url,
-    });
-  }
-
-  return latest;
 }
 
 // ======================================================
@@ -501,27 +462,153 @@ export async function releaseExpiredClaimInDb(
 // GetSubmissions
 // ======================================================
 
-export type GetSubmissionsInput = string;
+export type GetSubmissionsInput = {
+  taskId: string;
+  status?: string;
+  sort?: "newest" | "oldest";
+  after?: string;
+  limit?: number;
+};
 
 export type GetSubmissionsResponse = {
   data: Submission[];
+  nextCursor: string | null;
+};
+
+export type GetAgentSubmissionsInput = {
+  agentId: string;
+  status?: string;
+  search?: string;
+  sort?: "newest" | "oldest";
+  after?: string;
+  limit?: number;
+};
+
+export type GetAgentSubmissionsResponse = {
+  data: AgentSubmission[];
+  nextCursor: string | null;
 };
 
 export async function getSubmissions(
-  taskId: GetSubmissionsInput,
+  opts: GetSubmissionsInput,
 ): Promise<GetSubmissionsResponse> {
   "use cache";
-  cacheTag(`submissions-${taskId}`);
+  cacheTag(`submissions-${opts.taskId}`);
 
+  const limit = opts.limit ?? DEFAULT_PAGE_SIZE;
+  const sort = opts.sort ?? "newest";
+  const ascending = sort === "oldest";
   const supabase = createAdminClient();
-  const { data, error } = await supabase
+
+  let query = supabase
     .from("submissions")
     .select(SUBMISSION_SELECT)
-    .eq("task_id", taskId)
-    .order("created_at", { ascending: false });
+    .eq("task_id", opts.taskId)
+    .order("created_at", { ascending })
+    .order("id", { ascending })
+    .limit(limit + 1);
 
+  if (opts.status) query = query.eq("status", opts.status);
+
+  if (opts.after) {
+    const { id, v } = decodeCursor(opts.after);
+    const createdAt = v?.[0];
+
+    if (createdAt != null) {
+      const comparator = ascending ? "gt" : "lt";
+      const createdAtIso = new Date(createdAt).toISOString();
+      query = query.or(
+        `created_at.${comparator}.${createdAtIso},and(created_at.eq.${createdAtIso},id.${comparator}.${id})`,
+      );
+    }
+  }
+
+  const { data, error } = await query;
   if (error) throw error;
-  return { data: (data as Submission[] | null) ?? [] };
+
+  const hasMore = (data?.length ?? 0) > limit;
+  if (hasMore) data!.pop();
+
+  const items = (data as Submission[] | null) ?? [];
+
+  return {
+    data: items,
+    nextCursor: buildNextCursor(items, hasMore, (s) => [Date.parse(s.created_at)]),
+  };
+}
+
+export async function getAgentSubmissions(
+  opts: GetAgentSubmissionsInput,
+): Promise<GetAgentSubmissionsResponse> {
+  "use cache";
+  cacheTag("tasks", `agent-submissions-${opts.agentId}`);
+
+  const limit = opts.limit ?? DEFAULT_PAGE_SIZE;
+  const sort = opts.sort ?? "newest";
+  const ascending = sort === "oldest";
+  const supabase = createAdminClient();
+
+  let matchingTaskIds: string[] | null = null;
+  if (opts.search) {
+    const { data: matchingTasks, error: searchError } = await supabase
+      .from("tasks")
+      .select("id")
+      .textSearch("fts", opts.search, { type: "websearch", config: "english" })
+      .limit(200);
+
+    if (searchError) throw searchError;
+    matchingTaskIds = (matchingTasks ?? []).map((task) => task.id);
+
+    if (matchingTaskIds.length === 0) {
+      return { data: [], nextCursor: null };
+    }
+  }
+
+  let query = supabase
+    .from("submissions")
+    .select(
+      `${SUBMISSION_SELECT}, task:tasks!submissions_task_id_fkey(id, title, target_type, target_id, target_name, status, deliverable_type)`,
+    )
+    .eq("agent_id", opts.agentId)
+    .order("created_at", { ascending })
+    .order("id", { ascending })
+    .limit(limit + 1);
+
+  if (opts.status) query = query.eq("status", opts.status);
+  if (matchingTaskIds) query = query.in("task_id", matchingTaskIds);
+
+  if (opts.after) {
+    const { id, v } = decodeCursor(opts.after);
+    const createdAt = v?.[0];
+
+    if (createdAt != null) {
+      const comparator = ascending ? "gt" : "lt";
+      const createdAtIso = new Date(createdAt).toISOString();
+      query = query.or(
+        `created_at.${comparator}.${createdAtIso},and(created_at.eq.${createdAtIso},id.${comparator}.${id})`,
+      );
+    }
+  }
+
+  const { data, error } = await query;
+  if (error) throw error;
+
+  const hasMore = (data?.length ?? 0) > limit;
+  if (hasMore) data!.pop();
+
+  const items = (((data ?? []) as Array<
+    Submission & { task: AgentSubmissionTaskSummary | null }
+  >) ?? []).map((submission) => ({
+    ...submission,
+    task: submission.task,
+  }));
+
+  return {
+    data: items,
+    nextCursor: buildNextCursor(items, hasMore, (submission) => [
+      Date.parse(submission.created_at),
+    ]),
+  };
 }
 
 // ======================================================

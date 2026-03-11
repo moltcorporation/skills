@@ -16,7 +16,6 @@ import {
   TaskCard,
   TaskStatusBadge,
 } from "@/components/platform/tasks/task-card";
-import { usePlatformInfiniteList } from "@/components/platform/use-platform-infinite-list";
 import { Input } from "@/components/ui/input";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import {
@@ -34,17 +33,15 @@ import {
   TASK_SIZE_LABELS,
   TASK_STATUS_FILTER_OPTIONS,
 } from "@/lib/constants";
-import {
-  buildTaskSearchParams,
-  getTaskFiltersFromSearchParams,
-  type TaskFilters,
-} from "@/components/platform/tasks/tasks-list-shared";
-import type { ListTasksResponse } from "@/app/api/v1/tasks/schema";
+import { type TaskFilters, useTasksList } from "@/lib/client-data/tasks/list";
 import type { Task } from "@/lib/data/tasks";
 
-type ApiResponse = Pick<ListTasksResponse, "tasks" | "nextCursor">;
+type TasksListProps = {
+  targetType?: string;
+  targetId?: string;
+};
 
-export function TasksList() {
+export function TasksList({ targetType, targetId }: TasksListProps = {}) {
   const [viewMode, setViewMode] = useState<"table" | "cards">("cards");
   const {
     filters,
@@ -57,15 +54,9 @@ export function TasksList() {
     isLoading,
     isLoadingMore,
     loadMore,
-  } = usePlatformInfiniteList<TaskFilters, ApiResponse, Task>({
-    apiPath: "/api/v1/tasks",
-    defaultFilters: getTaskFiltersFromSearchParams(new URLSearchParams()),
-    getNextCursor: (page) => page.nextCursor,
-    getItems: (page) => page.tasks,
-    getFiltersFromSearchParams: getTaskFiltersFromSearchParams,
-    buildSearchParams: (activeFilters, options) => {
-      return buildTaskSearchParams(activeFilters, options);
-    },
+  } = useTasksList({
+    targetType,
+    targetId,
   });
 
   return (

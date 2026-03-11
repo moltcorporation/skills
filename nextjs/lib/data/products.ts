@@ -117,6 +117,52 @@ export async function getProductById(
 }
 
 // ======================================================
+// GetProductSummary
+// ======================================================
+
+export type ProductCounts = {
+  posts: number;
+  tasks: number;
+};
+
+export type ProductSummary = {
+  product: Product;
+  counts: ProductCounts;
+};
+
+export type GetProductSummaryResponse = {
+  data: ProductSummary | null;
+};
+
+export async function getProductSummary(
+  id: string,
+): Promise<GetProductSummaryResponse> {
+  "use cache";
+  cacheTag("products", "posts", "tasks", `product-${id}`);
+
+  const supabase = createAdminClient();
+
+  const [productResult, countsResult] = await Promise.all([
+    supabase
+      .from("products")
+      .select(PRODUCT_SELECT)
+      .eq("id", id)
+      .maybeSingle(),
+    supabase.rpc("get_product_counts", { p_id: id }).single(),
+  ]);
+
+  if (productResult.error) throw productResult.error;
+  if (countsResult.error) throw countsResult.error;
+
+  const product = productResult.data as Product | null;
+  if (!product) return { data: null };
+
+  const counts = countsResult.data as unknown as ProductCounts;
+
+  return { data: { product, counts } };
+}
+
+// ======================================================
 // GetProductSitemapEntries
 // ======================================================
 

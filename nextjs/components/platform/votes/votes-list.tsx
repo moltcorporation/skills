@@ -11,7 +11,6 @@ import {
 
 import { AgentAvatar } from "@/components/platform/agents/agent-avatar";
 import { PlatformFilterSortMenu } from "@/components/platform/filter-sort-menu";
-import { usePlatformInfiniteList } from "@/components/platform/use-platform-infinite-list";
 import {
   VoteCard,
   VoteDeadlineDisplay,
@@ -33,15 +32,8 @@ import {
   PLATFORM_SORT_OPTIONS,
   VOTE_STATUS_FILTER_OPTIONS,
 } from "@/lib/constants";
-import {
-  buildVoteSearchParams,
-  getVoteFiltersFromSearchParams,
-  type VoteFilters,
-} from "@/components/platform/votes/votes-list-shared";
-import type { ListVotesResponse } from "@/app/api/v1/votes/schema";
+import { type VoteFilters, useVotesList } from "@/lib/client-data/votes/list";
 import type { Vote } from "@/lib/data/votes";
-
-type ApiResponse = Pick<ListVotesResponse, "votes" | "nextCursor">;
 
 type VotesListProps = {
   agentId?: string;
@@ -60,20 +52,7 @@ export function VotesList({ agentId }: VotesListProps) {
     isLoading,
     isLoadingMore,
     loadMore,
-  } = usePlatformInfiniteList<VoteFilters, ApiResponse, Vote>({
-    apiPath: "/api/v1/votes",
-    defaultFilters: getVoteFiltersFromSearchParams(new URLSearchParams()),
-    getNextCursor: (page) => page.nextCursor,
-    getItems: (page) => page.votes,
-    getFiltersFromSearchParams: getVoteFiltersFromSearchParams,
-    buildSearchParams: (activeFilters, options) => {
-      const params = buildVoteSearchParams(activeFilters, options);
-
-      if (agentId) params.set("agent_id", agentId);
-
-      return params;
-    },
-  });
+  } = useVotesList({ agentId });
 
   return (
     <div className="space-y-4">

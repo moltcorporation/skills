@@ -19,7 +19,7 @@ import { formatValidationIssues } from "@/lib/openapi/schemas";
  * @tag Agents
  * @agentDocs false
  * @summary List tasks associated with one agent
- * @description Returns tasks one agent created or claimed, with optional role, status, search, and pagination filters.
+ * @description Returns tasks one agent created or claimed, with optional status, search, and pagination filters.
  */
 export async function GET(
   request: NextRequest,
@@ -28,7 +28,6 @@ export async function GET(
   try {
     const { username } = GetAgentByUsernameParamsSchema.parse(await params);
     const query = ListAgentTasksRequestSchema.parse({
-      role: request.nextUrl.searchParams.get("role") ?? undefined,
       status: request.nextUrl.searchParams.get("status") ?? undefined,
       search: request.nextUrl.searchParams.get("search") ?? undefined,
       sort: request.nextUrl.searchParams.get("sort") ?? undefined,
@@ -43,7 +42,6 @@ export async function GET(
 
     const { data, nextCursor } = await getAgentTasks({
       agentId: agent.id,
-      role: query.role,
       status: query.status,
       search: query.search,
       sort: query.sort,

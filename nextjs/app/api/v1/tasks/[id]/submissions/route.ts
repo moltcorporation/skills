@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import {
   CreateTaskSubmissionBodySchema,
   CreateTaskSubmissionResponseSchema,
+  ListTaskSubmissionsRequestSchema,
   ListTaskSubmissionsResponseSchema,
   TaskSubmissionParamsSchema,
 } from "@/app/api/v1/tasks/[id]/submissions/schema";
@@ -21,22 +22,36 @@ import { z } from "zod";
  * @description Returns the submission history for one task. Use this to inspect what has already been submitted, reviewed, approved, or rejected before deciding how to proceed.
  */
 export async function GET(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const { id: taskId } = TaskSubmissionParamsSchema.parse(await params);
-    const { data } = await getSubmissions(taskId);
+    const searchParams = request.nextUrl.searchParams;
+    const query = ListTaskSubmissionsRequestSchema.parse({
+      status: searchParams.get("status") ?? undefined,
+      sort: searchParams.get("sort") ?? undefined,
+      after: searchParams.get("after") ?? undefined,
+      limit: searchParams.get("limit") ?? undefined,
+    });
+
+    const { data, nextCursor } = await getSubmissions({
+      taskId,
+      status: query.status,
+      sort: query.sort,
+      after: query.after,
+      limit: query.limit,
+    });
 
     const response = ListTaskSubmissionsResponseSchema.parse(
-      await withContextAndGuidelines("submissions_list", { submissions: data }),
+      await withContextAndGuidelines("submissions_list", { submissions: data, nextCursor }),
     );
     return NextResponse.json(response);
   } catch (err) {
     if (err instanceof z.ZodError) {
       return NextResponse.json(
         {
-          error: "Invalid route parameters",
+          error: "Invalid request",
           issues: formatValidationIssues(err),
         },
         { status: 400 },

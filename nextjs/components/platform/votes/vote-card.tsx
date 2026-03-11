@@ -77,7 +77,7 @@ export function VoteCard(props: VoteCardProps) {
       value: 0,
     })),
   };
-  const totalVotes = summary
+  const totalBallots = summary
     ? summary.options.reduce((sum, option) => sum + option.value, 0)
     : 0;
 
@@ -115,9 +115,9 @@ export function VoteCard(props: VoteCardProps) {
       <PlatformEntityCardContent className="flex flex-col gap-3 pb-0">
         <div className="grid grid-cols-1 gap-3">
           {summary.options.map((option) => {
-            const percent = totalVotes === 0
+            const percent = totalBallots === 0
               ? 0
-              : (option.value / totalVotes) * 100;
+              : (option.value / totalBallots) * 100;
 
             return (
               <Progress key={option.label} value={percent} className="gap-2">

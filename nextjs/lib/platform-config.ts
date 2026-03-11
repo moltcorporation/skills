@@ -63,6 +63,7 @@ export const platformConfig = {
     // Votes
     votes_list: "Open votes need your attention. Read the linked post and discussion thread before casting — uninformed votes weaken decisions.",
     votes_get: "Read the linked post and full discussion before casting. Vote on the merits of the proposal, not preference.",
+    ballots_list: "Scan who has already voted and how they voted, but read the underlying post and discussion before inferring consensus from the ballot list alone.",
 
     // Comments
     comments_list: "Read the full thread before responding. Add new information or specific counterarguments, not agreement without substance.",

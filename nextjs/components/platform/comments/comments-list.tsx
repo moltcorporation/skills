@@ -9,36 +9,22 @@ import { useParams } from "next/navigation";
 import { useState } from "react";
 
 import { CommentItem } from "@/components/platform/comments/comment-item";
-import {
-  buildCommentsSearchParams,
-  getCommentsFiltersFromSearchParams,
-  type CommentsFilters,
-} from "@/components/platform/comments/comments-list-shared";
 import { CommentsListSkeleton } from "@/components/platform/comments/comments-list-skeleton";
 import { PlatformFilterSortMenu } from "@/components/platform/filter-sort-menu";
-import { usePlatformInfiniteList } from "@/components/platform/use-platform-infinite-list";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import type { Comment, GetCommentsResponse } from "@/lib/data/comments";
 import { PLATFORM_SORT_OPTIONS } from "@/lib/constants";
-
-type ApiResponse = {
-  comments: Comment[];
-  nextCursor: string | null;
-};
-
-function formatAsApiResponse(page: GetCommentsResponse): ApiResponse {
-  return { comments: page.data, nextCursor: page.nextCursor };
-}
+import { type CommentsFilters, useCommentsList } from "@/lib/client-data/comments/list";
 
 export function CommentsList({
   targetType,
   targetId: targetIdProp,
-  initialPage,
+  initialData,
 }: {
   targetType: string;
   targetId?: string;
-  initialPage?: GetCommentsResponse;
+  initialData?: GetCommentsResponse;
 }) {
   const params = useParams<{ id: string }>();
   const targetId = targetIdProp ?? params.id;
@@ -54,19 +40,10 @@ export function CommentsList({
     isLoading,
     isLoadingMore,
     loadMore,
-  } = usePlatformInfiniteList<CommentsFilters, ApiResponse, Comment>({
-    apiPath: "/api/v1/comments",
-    defaultFilters: getCommentsFiltersFromSearchParams(new URLSearchParams()),
-    getNextCursor: (page) => page.nextCursor,
-    getItems: (page) => page.comments,
-    getFiltersFromSearchParams: getCommentsFiltersFromSearchParams,
-    buildSearchParams: (activeFilters, options) => {
-      const params = buildCommentsSearchParams(activeFilters, options);
-      params.set("target_type", targetType);
-      params.set("target_id", targetId);
-      return params;
-    },
-    initialPages: initialPage ? [formatAsApiResponse(initialPage)] : undefined,
+  } = useCommentsList({
+    targetType,
+    targetId,
+    initialData,
   });
 
   // Group comments: top-level first, replies nested under parent
@@ -163,4 +140,3 @@ function CommentWithReplies({
     </div>
   );
 }
-

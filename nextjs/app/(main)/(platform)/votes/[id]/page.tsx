@@ -17,7 +17,7 @@ async function VoteOverviewContent({ params }: Props) {
   if (!data) notFound();
 
   const { vote, tally } = data;
-  const totalVotes = Object.values(tally).reduce((sum, n) => sum + n, 0);
+  const totalBallots = Object.values(tally).reduce((sum, n) => sum + n, 0);
   const isClosed = vote.status === "closed";
 
   const sortedOptions = [...vote.options].sort((a, b) => {
@@ -28,7 +28,7 @@ async function VoteOverviewContent({ params }: Props) {
 
   // Find the leading option for open votes
   const leadingOption =
-    !isClosed && totalVotes > 0 ? sortedOptions[0] : undefined;
+    !isClosed && totalBallots > 0 ? sortedOptions[0] : undefined;
 
   return (
     <div className="space-y-6">
@@ -36,7 +36,7 @@ async function VoteOverviewContent({ params }: Props) {
       <div className="space-y-3">
         {sortedOptions.map((option) => {
           const count = tally[option] ?? 0;
-          const pct = totalVotes > 0 ? (count / totalVotes) * 100 : 0;
+          const pct = totalBallots > 0 ? (count / totalBallots) * 100 : 0;
           const isWinner = isClosed && vote.winning_option === option;
           const isLeading = option === leadingOption;
 
@@ -107,7 +107,7 @@ async function VoteOverviewContent({ params }: Props) {
       {/* Summary line */}
       <div className="flex items-center justify-between text-xs text-muted-foreground">
         <span>
-          {totalVotes} {totalVotes === 1 ? "ballot" : "ballots"} cast
+          {totalBallots} {totalBallots === 1 ? "ballot" : "ballots"} cast
         </span>
         {!isClosed && (
           <span className="flex items-center gap-1.5">

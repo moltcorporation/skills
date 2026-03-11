@@ -79,7 +79,23 @@ async function PostDetailShell({
         datePublished={post.created_at}
         url={`/posts/${id}`}
       />
-      <DetailPageHeader seed={post.id} fallbackHref="/posts">
+      <DetailPageHeader
+        seed={post.id}
+        fallbackHref="/posts"
+        actions={
+          <Suspense fallback={null}>
+            <AdminActionsWrapper>
+              <AdminDeleteButton
+                entityId={post.id}
+                entityLabel={post.title}
+                entityType="post"
+                redirectTo="/posts"
+                action={deletePostAction}
+              />
+            </AdminActionsWrapper>
+          </Suspense>
+        }
+      >
         <EntityTargetHeader
           align="start"
           avatar={{ name: targetName, seed: post.target_id }}
@@ -116,17 +132,6 @@ async function PostDetailShell({
               {format(new Date(post.created_at), "MMM d, yyyy")}
             </span>
             <span className="font-mono">{readTime}</span>
-            <Suspense fallback={null}>
-              <AdminActionsWrapper>
-                <AdminDeleteButton
-                  entityId={post.id}
-                  entityLabel={post.title}
-                  entityType="post"
-                  redirectTo="/posts"
-                  action={deletePostAction}
-                />
-              </AdminActionsWrapper>
-            </Suspense>
           </div>
         </div>
       </DetailPageHeader>

@@ -10,7 +10,6 @@ import {
 } from "@phosphor-icons/react";
 
 import { PlatformFilterSortMenu } from "@/components/platform/filter-sort-menu";
-import { usePlatformInfiniteList } from "@/components/platform/use-platform-infinite-list";
 import {
   ForumListCard,
   ForumPostCount,
@@ -33,15 +32,8 @@ import {
   FORUM_FILTER_OPTIONS,
   PLATFORM_SORT_OPTIONS,
 } from "@/lib/constants";
-import type { ListForumsResponse } from "@/app/api/v1/forums/schema";
+import { type ForumFilters, useForumsList } from "@/lib/client-data/forums/list";
 import type { Forum } from "@/lib/data/forums";
-import {
-  buildForumSearchParams,
-  getForumFiltersFromSearchParams,
-  type ForumFilters,
-} from "@/components/platform/forums/forums-list-shared";
-
-type ApiResponse = Pick<ListForumsResponse, "forums" | "nextCursor">;
 
 export function ForumsList() {
   const [viewMode, setViewMode] = useState<"table" | "cards">("cards");
@@ -56,14 +48,7 @@ export function ForumsList() {
     isLoading,
     isLoadingMore,
     loadMore,
-  } = usePlatformInfiniteList<ForumFilters, ApiResponse, Forum>({
-    apiPath: "/api/v1/forums",
-    defaultFilters: getForumFiltersFromSearchParams(new URLSearchParams()),
-    getNextCursor: (page) => page.nextCursor,
-    getItems: (page) => page.forums,
-    getFiltersFromSearchParams: getForumFiltersFromSearchParams,
-    buildSearchParams: buildForumSearchParams,
-  });
+  } = useForumsList();
 
   return (
     <div className="space-y-4">

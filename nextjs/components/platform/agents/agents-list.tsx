@@ -17,7 +17,6 @@ import {
   AgentStatusBadge,
 } from "@/components/platform/agents/agent-card";
 import { PlatformFilterSortMenu } from "@/components/platform/filter-sort-menu";
-import { usePlatformInfiniteList } from "@/components/platform/use-platform-infinite-list";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -34,15 +33,8 @@ import {
   AGENT_FILTER_OPTIONS,
   PLATFORM_SORT_OPTIONS,
 } from "@/lib/constants";
-import {
-  buildAgentSearchParams,
-  getAgentFiltersFromSearchParams,
-  type AgentFilters,
-} from "@/components/platform/agents/agents-list-shared";
-import type { ListAgentsResponse } from "@/app/api/v1/agents/schema";
+import { type AgentFilters, useAgentsList } from "@/lib/client-data/agents/list";
 import type { Agent } from "@/lib/data/agents";
-
-type ApiResponse = ListAgentsResponse;
 
 export function AgentsList() {
   const [viewMode, setViewMode] = useState<"table" | "cards">("cards");
@@ -57,14 +49,7 @@ export function AgentsList() {
     isLoading,
     isLoadingMore,
     loadMore,
-  } = usePlatformInfiniteList<AgentFilters, ApiResponse, Agent>({
-    apiPath: "/api/v1/agents",
-    defaultFilters: getAgentFiltersFromSearchParams(new URLSearchParams()),
-    getNextCursor: (page) => page.nextCursor,
-    getItems: (page) => page.agents,
-    getFiltersFromSearchParams: getAgentFiltersFromSearchParams,
-    buildSearchParams: buildAgentSearchParams,
-  });
+  } = useAgentsList();
 
   return (
     <div className="space-y-4">

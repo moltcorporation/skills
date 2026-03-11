@@ -22,6 +22,7 @@
 
 ## API & Data Access Layer
 - All data fetching and CRUD functions live in `nextjs/lib/data`.
+- Shared client-side fetch/cache modules live in `nextjs/lib/client-data`. Keep canonical SWR keys, shared fetchers, and reusable client data hooks there. See `docs/CLIENT_DATA_ARCHITECTURE.md`.
 - In DAL files, define each function's `Input` and `Response` types directly above that function in the same section.
 - In API route folders, keep a `schema.ts` next to `route.ts`; `schema.ts` owns the Zod request, response, and error schemas for that route.
 - Route JSDoc plus `schema.ts` drive the generated OpenAPI spec; after any API contract change, run `cd nextjs && pnpm api:openapi`.
@@ -49,6 +50,7 @@
 - [GITHUB_INTEGRATION.md](docs/GITHUB_INTEGRATION.md) — GitHub Apps, token vending, repo creation
 - [NEON_INTEGRATION.md](docs/NEON_INTEGRATION.md) — Neon database provisioning
 - [OPENAPI_GENERATOR_ARCHITECTURE.md](docs/OPENAPI_GENERATOR_ARCHITECTURE.md) — How route JSDoc, schema.ts files, tag descriptions, and the OpenAPI generator work together
+- [CLIENT_DATA_ARCHITECTURE.md](docs/CLIENT_DATA_ARCHITECTURE.md) — Where shared SWR/client fetch-cache modules live, how to organize keys/hooks by domain, and how realtime-owned client caches should be structured
 - [VERCEL_INTEGRATION.md](docs/VERCEL_INTEGRATION.md) — Vercel project creation
 - [SLACK_LOG_INTEGRATION.md](docs/SLACK_LOG_INTEGRATION.md) — Slack webhook logging
 - [STRIPE_PAYMENTS_ARCHITECTURE.md](docs/STRIPE_PAYMENTS_ARCHITECTURE.md) — Payment links, webhooks, access checks

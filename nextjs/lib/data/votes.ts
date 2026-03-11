@@ -75,11 +75,8 @@ export type Ballot = {
   created_at: string;
 };
 
-export type AgentVoteItem = {
-  id: string;
-  role: "cast" | "created";
-  created_at: string;
-  choice: string | null;
+export type AgentBallot = {
+  ballot: Ballot;
   vote: Vote;
 };
 
@@ -483,58 +480,71 @@ export async function getBallots(
 }
 
 // ======================================================
-// GetAgentVotes
+// GetAgentCreatedVotes
 // ======================================================
 
 const AGENT_BALLOT_VOTE_SELECT =
   "id, vote_id, agent_id, choice, agent_username, created_at, vote:votes!ballots_vote_id_fkey(*, author:agents!votes_agent_id_fkey(id, name, username))" as const;
 
-export type GetAgentVotesInput = {
+export type GetAgentCreatedVotesInput = {
   agentId: string;
-  role?: "cast" | "created";
   search?: string;
   sort?: "newest" | "oldest";
   after?: string;
   limit?: number;
 };
 
-export type GetAgentVotesResponse = {
-  data: AgentVoteItem[];
+export type GetAgentCreatedVotesResponse = {
+  data: Vote[];
   nextCursor: string | null;
 };
 
-export async function getAgentVotes(
-  input: GetAgentVotesInput,
-): Promise<GetAgentVotesResponse> {
+export async function getAgentCreatedVotes(
+  input: GetAgentCreatedVotesInput,
+): Promise<GetAgentCreatedVotesResponse> {
   "use cache";
-  cacheTag("votes", "ballots", `agent-votes-${input.agentId}`);
+  cacheTag("votes", `agent-created-votes-${input.agentId}`);
 
-  const role = input.role ?? "cast";
+  const limit = input.limit ?? DEFAULT_PAGE_SIZE;
+  const sort = input.sort ?? "newest";
+  const { data, nextCursor } = await getVotes({
+    agentId: input.agentId,
+    search: input.search,
+    sort,
+    after: input.after,
+    limit,
+  });
+
+  return { data, nextCursor };
+}
+
+// ======================================================
+// GetAgentBallots
+// ======================================================
+
+export type GetAgentBallotsInput = {
+  agentId: string;
+  search?: string;
+  sort?: "newest" | "oldest";
+  after?: string;
+  limit?: number;
+};
+
+export type GetAgentBallotsResponse = {
+  data: AgentBallot[];
+  nextCursor: string | null;
+};
+
+export async function getAgentBallots(
+  input: GetAgentBallotsInput,
+): Promise<GetAgentBallotsResponse> {
+  "use cache";
+  cacheTag("ballots", "votes", `agent-ballots-${input.agentId}`);
+
   const limit = input.limit ?? DEFAULT_PAGE_SIZE;
   const sort = input.sort ?? "newest";
   const ascending = sort === "oldest";
   const supabase = createAdminClient();
-
-  if (role === "created") {
-    const { data, nextCursor } = await getVotes({
-      agentId: input.agentId,
-      search: input.search,
-      sort,
-      after: input.after,
-      limit,
-    });
-
-    return {
-      data: data.map((vote) => ({
-        id: `created-${vote.id}`,
-        role: "created",
-        created_at: vote.created_at,
-        choice: null,
-        vote,
-      })),
-      nextCursor,
-    };
-  }
 
   let matchingVoteIds: string[] | null = null;
   if (input.search) {
@@ -574,18 +584,22 @@ export async function getAgentVotes(
   if (hasMore) data!.pop();
 
   const items = (((data ?? []) as Array<
-    Omit<Ballot, "vote"> & { vote: Omit<Vote, "options"> & { options: unknown } | null }
-  >).flatMap((ballot) => {
-    if (!ballot.vote) return [];
+    Ballot & { vote: Omit<Vote, "options"> & { options: unknown } | null }
+  >).flatMap((row) => {
+    if (!row.vote) return [];
 
     return [{
-      id: `cast-${ballot.id}`,
-      role: "cast" as const,
-      created_at: ballot.created_at,
-      choice: ballot.choice,
+      ballot: {
+        id: row.id,
+        vote_id: row.vote_id,
+        agent_id: row.agent_id,
+        choice: row.choice,
+        agent_username: row.agent_username,
+        created_at: row.created_at,
+      },
       vote: {
-        ...ballot.vote,
-        options: normalizeVoteOptions(ballot.vote.options),
+        ...row.vote,
+        options: normalizeVoteOptions(row.vote.options),
       },
     }];
   }));
@@ -593,7 +607,7 @@ export async function getAgentVotes(
   return {
     data: items,
     nextCursor: buildNextCursor(
-      items.map((item) => ({ id: item.id.replace("cast-", ""), created_at: item.created_at })),
+      items.map((item) => ({ id: item.ballot.id, created_at: item.ballot.created_at })),
       hasMore,
     ),
   };

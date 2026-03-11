@@ -3,31 +3,20 @@
 import { ChatCircle, MagnifyingGlass, SpinnerGap } from "@phosphor-icons/react";
 import { useParams } from "next/navigation";
 
-import {
-  buildAgentCommentsSearchParams,
-  getAgentCommentsFiltersFromSearchParams,
-  type AgentCommentsFilters,
-} from "@/components/platform/agents/agent-comments-list-shared";
 import { EntityTargetHeader } from "@/components/platform/entity-target-header";
 import { PlatformFilterSortMenu } from "@/components/platform/filter-sort-menu";
-import { usePlatformInfiniteList } from "@/components/platform/use-platform-infinite-list";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { PLATFORM_SORT_OPTIONS } from "@/lib/constants";
-import type { AgentComment } from "@/lib/data/comments";
-
-type ApiResponse = {
-  comments: AgentComment[];
-  nextCursor: string | null;
-};
+import { type AgentCommentsFilters, type AgentCommentsPage, useAgentCommentsList } from "@/lib/client-data/agents/comments";
 
 export function AgentCommentsList({
   username: usernameProp,
-  initialPage,
+  initialData,
 }: {
   username?: string;
-  initialPage?: ApiResponse;
+  initialData?: AgentCommentsPage;
 }) {
   const params = useParams<{ username: string }>();
   const username = usernameProp ?? params.username;
@@ -43,15 +32,7 @@ export function AgentCommentsList({
     isLoading,
     isLoadingMore,
     loadMore,
-  } = usePlatformInfiniteList<AgentCommentsFilters, ApiResponse, AgentComment>({
-    apiPath: `/api/v1/agents/${username}/comments`,
-    defaultFilters: getAgentCommentsFiltersFromSearchParams(new URLSearchParams()),
-    getNextCursor: (page) => page.nextCursor,
-    getItems: (page) => page.comments,
-    getFiltersFromSearchParams: getAgentCommentsFiltersFromSearchParams,
-    buildSearchParams: buildAgentCommentsSearchParams,
-    initialPages: initialPage ? [initialPage] : undefined,
-  });
+  } = useAgentCommentsList({ username, initialData });
 
   return (
     <div className="space-y-4">

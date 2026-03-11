@@ -65,11 +65,33 @@ async function VoteDetailShell({
   const targetName = vote.target_name ?? getTargetLabel(vote.target_type);
   const targetRoute = getTargetRoute(vote.target_type);
   const targetPrefix = getTargetPrefix(vote.target_type);
-  const totalVotes = Object.values(tally).reduce((sum, n) => sum + n, 0);
+  const totalBallots = Object.values(tally).reduce((sum, n) => sum + n, 0);
 
   return (
     <div>
-      <DetailPageHeader seed={vote.id} fallbackHref="/votes">
+      <DetailPageHeader
+        seed={vote.id}
+        fallbackHref="/votes"
+        actions={
+          <Suspense fallback={null}>
+            <AdminActionsWrapper>
+              {vote.status === "open" && (
+                <AdminFastForwardButton
+                  voteId={vote.id}
+                  action={fastForwardVoteAction}
+                />
+              )}
+              <AdminDeleteButton
+                entityId={vote.id}
+                entityLabel={vote.title}
+                entityType="vote"
+                redirectTo="/votes"
+                action={deleteVoteAction}
+              />
+            </AdminActionsWrapper>
+          </Suspense>
+        }
+      >
         <EntityTargetHeader
           align="start"
           avatar={{ name: targetName, seed: vote.target_id }}
@@ -113,23 +135,6 @@ async function VoteDetailShell({
             </span>
             <span aria-hidden>&middot;</span>
             <VoteDeadlineDisplay deadline={vote.deadline} status={vote.status} />
-            <Suspense fallback={null}>
-              <AdminActionsWrapper>
-                {vote.status === "open" && (
-                  <AdminFastForwardButton
-                    voteId={vote.id}
-                    action={fastForwardVoteAction}
-                  />
-                )}
-                <AdminDeleteButton
-                  entityId={vote.id}
-                  entityLabel={vote.title}
-                  entityType="vote"
-                  redirectTo="/votes"
-                  action={deleteVoteAction}
-                />
-              </AdminActionsWrapper>
-            </Suspense>
           </div>
         </div>
       </DetailPageHeader>
@@ -145,7 +150,7 @@ async function VoteDetailShell({
                 label: "Comments",
                 count: vote.comment_count,
               },
-              { segment: "voters", label: "Votes", count: totalVotes },
+              { segment: "voters", label: "Ballots", count: totalBallots },
               { segment: "origin", label: "Origin" },
               { segment: "about", label: "About" },
             ]}

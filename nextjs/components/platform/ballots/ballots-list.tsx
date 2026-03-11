@@ -9,36 +9,22 @@ import {
 import { useMemo } from "react";
 
 import { AgentAvatar } from "@/components/platform/agents/agent-avatar";
-import {
-  buildBallotsSearchParams,
-  getBallotsFiltersFromSearchParams,
-  type BallotsFilters,
-} from "@/components/platform/ballots/ballots-list-shared";
 import { PlatformFilterSortMenu } from "@/components/platform/filter-sort-menu";
 import { RelativeTime } from "@/components/platform/relative-time";
-import { usePlatformInfiniteList } from "@/components/platform/use-platform-infinite-list";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PLATFORM_SORT_OPTIONS } from "@/lib/constants";
-import type { Ballot, GetBallotsResponse } from "@/lib/data/votes";
-
-type ApiResponse = {
-  ballots: Ballot[];
-  nextCursor: string | null;
-};
-
-function formatAsApiResponse(page: GetBallotsResponse): ApiResponse {
-  return { ballots: page.data, nextCursor: page.nextCursor };
-}
+import type { GetBallotsResponse } from "@/lib/data/votes";
+import { type VoteBallotsFilters, useVoteBallotsList } from "@/lib/client-data/ballots/list";
 
 export function BallotsList({
   voteId,
   voteOptions,
-  initialPage,
+  initialData,
 }: {
   voteId: string;
   voteOptions: string[];
-  initialPage: GetBallotsResponse;
+  initialData: GetBallotsResponse;
 }) {
   const choiceFilterOptions = useMemo(
     () => [
@@ -59,19 +45,7 @@ export function BallotsList({
     isLoading,
     isLoadingMore,
     loadMore,
-  } = usePlatformInfiniteList<BallotsFilters, ApiResponse, Ballot>({
-    apiPath: "/api/v1/ballots",
-    defaultFilters: { search: "", choice: "all", sort: "newest" },
-    getNextCursor: (page) => page.nextCursor,
-    getItems: (page) => page.ballots,
-    getFiltersFromSearchParams: getBallotsFiltersFromSearchParams,
-    buildSearchParams: (activeFilters, options) => {
-      const params = buildBallotsSearchParams(activeFilters, options);
-      params.set("vote_id", voteId);
-      return params;
-    },
-    initialPages: [formatAsApiResponse(initialPage)],
-  });
+  } = useVoteBallotsList({ voteId, initialData });
 
   return (
     <div className="space-y-2">
@@ -91,7 +65,7 @@ export function BallotsList({
           filterOptions={choiceFilterOptions}
           sortOptions={PLATFORM_SORT_OPTIONS}
           onFilterChange={(value) => setFilter("choice", value)}
-          onSortChange={(value) => setFilter("sort", value as BallotsFilters["sort"])}
+          onSortChange={(value) => setFilter("sort", value as VoteBallotsFilters["sort"])}
         />
       </div>
 

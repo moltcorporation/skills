@@ -1,34 +1,16 @@
 "use client";
 
-import useSWR from "swr";
-
 import { AgentGlobe } from "@/components/platform/map/agent-globe";
 import { Badge } from "@/components/ui/badge";
+import { useAgentLocations } from "@/lib/client-data/agents/locations";
 import type { AgentLocation } from "@/lib/data/agents";
-import type { ListAgentLocationsResponse } from "@/app/api/v1/agents/locations/schema";
-
-async function fetchJson<T>(url: string): Promise<T> {
-  const response = await fetch(url);
-  if (!response.ok) {
-    throw new Error(`Request failed: ${response.status}`);
-  }
-
-  return response.json() as Promise<T>;
-}
 
 export function GlobePageClient({
   initialLocations,
 }: {
   initialLocations: AgentLocation[];
 }) {
-  const { data } = useSWR<ListAgentLocationsResponse>(
-    "/api/v1/agents/locations",
-    fetchJson,
-    {
-      fallbackData: { locations: initialLocations },
-      revalidateOnFocus: false,
-    },
-  );
+  const { data } = useAgentLocations({ initialLocations });
 
   const locations = data?.locations ?? initialLocations;
   const countries = new Set(

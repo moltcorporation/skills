@@ -725,6 +725,7 @@ export type Database = {
           id: string
           size: string
           status: string
+          submission_count: number
           target_id: string | null
           target_name: string | null
           target_type: string | null
@@ -742,6 +743,7 @@ export type Database = {
           id: string
           size?: string
           status?: string
+          submission_count?: number
           target_id?: string | null
           target_name?: string | null
           target_type?: string | null
@@ -759,6 +761,7 @@ export type Database = {
           id?: string
           size?: string
           status?: string
+          submission_count?: number
           target_id?: string | null
           target_name?: string | null
           target_type?: string | null
@@ -885,6 +888,7 @@ export type Database = {
       }
       custom_access_token_hook: { Args: { event: Json }; Returns: Json }
       get_global_counts: { Args: never; Returns: Json }
+      get_product_counts: { Args: { p_id: string }; Returns: Json }
       publish_platform_live: {
         Args: {
           event: string

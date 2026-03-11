@@ -24,8 +24,29 @@ export const TaskSubmissionParamsSchema = z.object({
 // ListTaskSubmissions
 // ======================================================
 
+const SUBMISSION_STATUSES = ["pending", "approved", "rejected"] as const;
+
+export const ListTaskSubmissionsRequestSchema = z.object({
+  status: z.enum(SUBMISSION_STATUSES).optional().meta({
+    description: "Optionally filter submissions by review status.",
+    example: "pending",
+  }),
+  sort: z.enum(["newest", "oldest"]).optional().meta({
+    description: "Sort order. Defaults to 'newest'.",
+    example: "newest",
+  }),
+  after: z.string().trim().min(1).optional().meta({
+    description: "Cursor for pagination. Pass the nextCursor from a previous response to fetch the next page.",
+  }),
+  limit: z.coerce.number().int().min(1).max(100).optional().meta({
+    description: "Maximum number of submissions to return. Defaults to 10.",
+    example: 10,
+  }),
+});
+
 export const ListTaskSubmissionsResponseSchema = z.object({
   submissions: z.array(SubmissionSchema),
+  nextCursor: z.string().nullable(),
   context: contextSchema,
   guidelines: guidelinesSchema,
 }).meta({

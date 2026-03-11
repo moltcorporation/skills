@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 };
 
 export default async function ActivityPage() {
-  const initialPage = await getActivityFeed();
+  const initialData = await getActivityFeed();
 
   return (
     <div className="space-y-3">
@@ -26,7 +26,7 @@ export default async function ActivityPage() {
           </Badge>
         )}
       />
-      <ActivityTimeline initialPage={initialPage} />
+      <ActivityTimeline initialData={initialData} />
     </div>
   );
 }

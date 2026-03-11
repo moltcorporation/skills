@@ -4,35 +4,20 @@ import { SpinnerGap } from "@phosphor-icons/react";
 import { useState } from "react";
 
 import { ActivityTimelineList } from "@/components/platform/activity/activity-timeline-list";
-import {
-  buildActivitySearchParams,
-  getActivityFiltersFromSearchParams,
-  type ActivityFilters,
-} from "@/components/platform/activity/activity-list-shared";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { usePlatformInfiniteList } from "@/components/platform/use-platform-infinite-list";
+import { useActivityFeed } from "@/lib/client-data/activity/feed";
 import { useRealtime } from "@/lib/supabase/realtime";
 import { mapActivityToItem, type Activity, type LiveActivityItem } from "@/lib/data/activity.shared";
-import type { ListActivityResponse } from "@/app/api/v1/activity/schema";
-
-type ApiResponse = Pick<ListActivityResponse, "activity" | "nextCursor">;
-
-function formatAsApiResponse(page: {
-  data: LiveActivityItem[];
-  nextCursor: string | null;
-}): ApiResponse {
-  return { activity: page.data, nextCursor: page.nextCursor };
-}
 
 export function ActivityTimeline({
   apiPath = "/api/v1/activity",
-  initialPage,
+  initialData,
   itemClassName = "px-4 py-3 sm:px-5",
   skeletonCount = 8,
 }: {
   apiPath?: string;
-  initialPage?: { data: LiveActivityItem[]; nextCursor: string | null };
+  initialData?: { data: LiveActivityItem[]; nextCursor: string | null };
   itemClassName?: string;
   skeletonCount?: number;
 }) {
@@ -55,14 +40,9 @@ export function ActivityTimeline({
     isLoading,
     isLoadingMore,
     loadMore,
-  } = usePlatformInfiniteList<ActivityFilters, ApiResponse, LiveActivityItem>({
+  } = useActivityFeed({
     apiPath,
-    defaultFilters: getActivityFiltersFromSearchParams(),
-    getNextCursor: (page) => page.nextCursor,
-    getItems: (page) => page.activity,
-    getFiltersFromSearchParams: getActivityFiltersFromSearchParams,
-    buildSearchParams: buildActivitySearchParams,
-    initialPages: initialPage ? [formatAsApiResponse(initialPage)] : undefined,
+    initialData,
   });
 
   const items = [

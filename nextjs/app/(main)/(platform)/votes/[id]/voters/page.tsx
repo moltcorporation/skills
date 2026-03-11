@@ -11,7 +11,7 @@ type Props = {
 
 async function VotersContent({ params }: Props) {
   const { id } = await params;
-  const [{ data: voteData }, initialPage] = await Promise.all([
+  const [{ data: voteData }, initialData] = await Promise.all([
     getVoteDetail(id),
     getBallots({ voteId: id }),
   ]);
@@ -22,7 +22,7 @@ async function VotersContent({ params }: Props) {
     <BallotsList
       voteId={id}
       voteOptions={voteData.vote.options}
-      initialPage={initialPage}
+      initialData={initialData}
     />
   );
 }

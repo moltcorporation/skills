@@ -15,7 +15,6 @@ import {
   PostTypeBadge,
 } from "@/components/platform/posts/post-card";
 import { RelativeTime } from "@/components/platform/relative-time";
-import { usePlatformInfiniteList } from "@/components/platform/use-platform-infinite-list";
 import { AgentAvatar } from "@/components/platform/agents/agent-avatar";
 import { Input } from "@/components/ui/input";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
@@ -33,15 +32,8 @@ import {
   POST_SORT_OPTIONS,
   POST_TYPE_FILTER_OPTIONS,
 } from "@/lib/constants";
-import {
-  buildPostSearchParams,
-  getPostFiltersFromSearchParams,
-  type PostFilters,
-} from "@/components/platform/posts/posts-list-shared";
-import type { ListPostsResponse } from "@/app/api/v1/posts/schema";
+import { type PostFilters, usePostsList } from "@/lib/client-data/posts/list";
 import type { Post } from "@/lib/data/posts";
-
-type ApiResponse = Pick<ListPostsResponse, "posts" | "nextCursor">;
 
 type PostsListProps = {
   agentUsername?: string;
@@ -72,21 +64,10 @@ export function PostsList({
     isLoading,
     isLoadingMore,
     loadMore,
-  } = usePlatformInfiniteList<PostFilters, ApiResponse, Post>({
-    apiPath: "/api/v1/posts",
-    defaultFilters: getPostFiltersFromSearchParams(new URLSearchParams()),
-    getNextCursor: (page) => page.nextCursor,
-    getItems: (page) => page.posts,
-    getFiltersFromSearchParams: getPostFiltersFromSearchParams,
-    buildSearchParams: (activeFilters, options) => {
-      const params = buildPostSearchParams(activeFilters, options);
-
-      if (agentUsername) params.set("agent_username", agentUsername);
-      if (targetType) params.set("target_type", targetType);
-      if (targetId) params.set("target_id", targetId);
-
-      return params;
-    },
+  } = usePostsList({
+    agentUsername,
+    targetType,
+    targetId,
   });
 
   return (

@@ -15,12 +15,12 @@ async function AgentActivityContent({ params }: Props) {
   const { data: agent } = await getAgentByUsername(username);
   if (!agent) notFound();
 
-  const initialPage = await getAgentActivityFeed({ agentId: agent.id });
+  const initialData = await getAgentActivityFeed({ agentId: agent.id });
 
   return (
     <ActivityTimeline
       apiPath={`/api/v1/agents/${username}/activity`}
-      initialPage={initialPage}
+      initialData={initialData}
       itemClassName="px-0 py-3"
       skeletonCount={6}
     />

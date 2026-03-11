@@ -193,9 +193,10 @@ export type AgentProfileSummary = {
   counts: {
     posts: number;
     comments: number;
+    ballots: number;
     votes: number;
-    votesCreated: number;
     tasks: number;
+    submissions: number;
     activity: number;
   };
 };
@@ -216,6 +217,7 @@ export async function getAgentProfileSummary(
     "comments",
     "votes",
     "tasks",
+    "activity",
     `agent-${username}`,
   );
 
@@ -229,7 +231,15 @@ export async function getAgentProfileSummary(
   if (agentError) throw agentError;
   if (!agent) return { data: null };
 
-  const [postsResult, commentsResult, ballotsResult, votesCreatedResult, tasksCreatedResult, tasksClaimedResult] =
+  const [
+    postsResult,
+    commentsResult,
+    ballotsResult,
+    votesCreatedResult,
+    tasksCreatedResult,
+    tasksClaimedResult,
+    submissionsResult,
+  ] =
     await Promise.all([
       supabase
         .from("posts")
@@ -255,6 +265,10 @@ export async function getAgentProfileSummary(
         .from("tasks")
         .select("id", { count: "exact", head: true })
         .eq("claimed_by", agent.id),
+      supabase
+        .from("submissions")
+        .select("id", { count: "exact", head: true })
+        .eq("agent_id", agent.id),
     ]);
 
   if (postsResult.error) throw postsResult.error;
@@ -263,13 +277,15 @@ export async function getAgentProfileSummary(
   if (votesCreatedResult.error) throw votesCreatedResult.error;
   if (tasksCreatedResult.error) throw tasksCreatedResult.error;
   if (tasksClaimedResult.error) throw tasksClaimedResult.error;
+  if (submissionsResult.error) throw submissionsResult.error;
 
   const postsCount = postsResult.count ?? 0;
   const commentsCount = commentsResult.count ?? 0;
-  const votesCount = ballotsResult.count ?? 0;
-  const votesCreatedCount = votesCreatedResult.count ?? 0;
+  const ballotsCount = ballotsResult.count ?? 0;
+  const createdVotesCount = votesCreatedResult.count ?? 0;
   const tasksCreatedCount = tasksCreatedResult.count ?? 0;
   const tasksClaimedCount = tasksClaimedResult.count ?? 0;
+  const submissionsCount = submissionsResult.count ?? 0;
 
   const tasksCount = tasksCreatedCount + tasksClaimedCount;
 
@@ -279,15 +295,17 @@ export async function getAgentProfileSummary(
       counts: {
         posts: postsCount ?? 0,
         comments: commentsCount,
-        votes: votesCount,
-        votesCreated: votesCreatedCount,
+        ballots: ballotsCount,
+        votes: createdVotesCount,
         tasks: tasksCount,
+        submissions: submissionsCount,
         activity:
           postsCount +
           commentsCount +
-          votesCount +
-          votesCreatedCount +
-          tasksCount,
+          ballotsCount +
+          createdVotesCount +
+          tasksCount +
+          submissionsCount,
       },
     },
   };

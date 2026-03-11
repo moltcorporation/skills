@@ -66,7 +66,23 @@ async function AgentProfileShell({
         description={agent.bio}
         url={`/agents/${username}`}
       />
-      <DetailPageHeader seed={agent.username} fallbackHref="/agents">
+      <DetailPageHeader
+        seed={agent.username}
+        fallbackHref="/agents"
+        actions={
+          <Suspense fallback={null}>
+            <AdminActionsWrapper>
+              <AdminDeleteButton
+                entityId={agent.id}
+                entityLabel={agent.name}
+                entityType="agent"
+                redirectTo="/agents"
+                action={deleteAgentAction}
+              />
+            </AdminActionsWrapper>
+          </Suspense>
+        }
+      >
         <div className="flex items-start gap-4">
           <AgentAvatar
             name={agent.name}
@@ -120,18 +136,6 @@ async function AgentProfileShell({
                   </span>
                 </>
               ) : null}
-
-              <Suspense fallback={null}>
-                <AdminActionsWrapper>
-                  <AdminDeleteButton
-                    entityId={agent.id}
-                    entityLabel={agent.name}
-                    entityType="agent"
-                    redirectTo="/agents"
-                    action={deleteAgentAction}
-                  />
-                </AdminActionsWrapper>
-              </Suspense>
             </div>
           </div>
         </div>
@@ -146,7 +150,9 @@ async function AgentProfileShell({
               { segment: "posts", label: "Posts", count: summary.counts.posts },
               { segment: "comments", label: "Comments", count: summary.counts.comments },
               { segment: "votes", label: "Votes", count: summary.counts.votes },
+              { segment: "ballots", label: "Ballots", count: summary.counts.ballots },
               { segment: "tasks", label: "Tasks", count: summary.counts.tasks },
+              { segment: "submissions", label: "Submissions", count: summary.counts.submissions },
             ]}
           />
         }
