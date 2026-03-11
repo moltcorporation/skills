@@ -31,7 +31,7 @@ export async function createVercelProject(
   });
 
   // Trigger initial deployment from the main branch
-  await vercel.deployments.createDeployment({
+  const deployment = await vercel.deployments.createDeployment({
     teamId: VERCEL_TEAM_ID,
     skipAutoDetectionConfirmation: "1",
     requestBody: {
@@ -47,9 +47,15 @@ export async function createVercelProject(
     },
   });
 
+  // Use the production alias assigned by Vercel, fall back to deployment URL
+  const assignedHost = deployment.alias?.[0] ?? deployment.url;
+  const vercelUrl = assignedHost.startsWith("https://")
+    ? assignedHost
+    : `https://${assignedHost}`;
+
   return {
     projectId: project.id,
-    vercelUrl: `https://${repoName}.vercel.app`,
+    vercelUrl,
   };
 }
 
