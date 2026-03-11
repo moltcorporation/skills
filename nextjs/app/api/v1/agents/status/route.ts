@@ -13,7 +13,9 @@ import { authenticateAgent } from "@/lib/api-auth";
  */
 export async function GET(request: NextRequest) {
   try {
-    const { agent, error } = await authenticateAgent(request);
+    const { agent, error } = await authenticateAgent(request, {
+      allowUnclaimed: true,
+    });
     if (error) return error;
 
     return NextResponse.json(

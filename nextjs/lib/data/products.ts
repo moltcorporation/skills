@@ -1,8 +1,13 @@
 import { DEFAULT_PAGE_SIZE } from "@/lib/constants";
 import { buildNextCursor, decodeCursor } from "@/lib/cursor";
 import { generateId } from "@/lib/id";
+import { deleteGitHubRepo } from "@/lib/github";
+import { deleteNeonProject } from "@/lib/neon";
+import { slackLog } from "@/lib/slack";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { broadcast } from "@/lib/supabase/broadcast";
+import { createClient } from "@/lib/supabase/server";
+import { deleteVercelProject } from "@/lib/vercel";
 import { insertActivity } from "@/lib/data/activity";
 import { cacheTag, revalidateTag } from "next/cache";
 
@@ -187,4 +192,108 @@ export async function createProduct(
   });
 
   return { data: data as Product };
+}
+
+// ======================================================
+// GetProductResources
+// ======================================================
+
+export type ProductResources = {
+  id: string;
+  name: string;
+  github_repo_id: number | null;
+  github_repo_url: string | null;
+  vercel_project_id: string | null;
+  neon_project_id: string | null;
+  live_url: string | null;
+};
+
+export async function getProductResources(
+  id: string,
+): Promise<ProductResources | null> {
+  const supabase = createAdminClient();
+  const { data, error } = await supabase
+    .from("products")
+    .select(
+      "id, name, github_repo_id, github_repo_url, vercel_project_id, neon_project_id, live_url",
+    )
+    .eq("id", id)
+    .maybeSingle();
+
+  if (error) throw error;
+  return data as ProductResources | null;
+}
+
+// ======================================================
+// DeleteProduct
+// ======================================================
+
+export type DeleteProductInput = string;
+
+export async function deleteProduct(
+  productId: DeleteProductInput,
+): Promise<void> {
+  const admin = createAdminClient();
+
+  // Fetch product with resource IDs before deleting
+  const { data: product } = await admin
+    .from("products")
+    .select(
+      "id, name, github_repo_id, github_repo_url, vercel_project_id, neon_project_id",
+    )
+    .eq("id", productId)
+    .maybeSingle();
+
+  if (!product) throw new Error("Product not found");
+
+  // Tear down external resources (best-effort, log failures)
+  const errors: string[] = [];
+
+  if (product.vercel_project_id) {
+    try {
+      await deleteVercelProject(product.vercel_project_id);
+    } catch (err) {
+      console.error("[deleteProduct] Vercel cleanup failed:", err);
+      errors.push("Vercel project");
+    }
+  }
+
+  if (product.github_repo_id) {
+    try {
+      await deleteGitHubRepo(product.github_repo_id);
+    } catch (err) {
+      console.error("[deleteProduct] GitHub cleanup failed:", err);
+      errors.push("GitHub repo");
+    }
+  }
+
+  if (product.neon_project_id) {
+    try {
+      await deleteNeonProject(product.neon_project_id);
+    } catch (err) {
+      console.error("[deleteProduct] Neon cleanup failed:", err);
+      errors.push("Neon project");
+    }
+  }
+
+  // Delete from DB using session client (RLS enforced)
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("products")
+    .delete()
+    .eq("id", productId);
+  if (error) throw error;
+
+  revalidateTag("products", "max");
+  revalidateTag(`product-${productId}`, "max");
+
+  broadcast("platform:products", "DELETE", { id: productId });
+
+  const resourceNote =
+    errors.length > 0
+      ? ` (failed to clean up: ${errors.join(", ")})`
+      : "";
+  slackLog(
+    `Admin deleted product: "${product.name}"${resourceNote}`,
+  );
 }

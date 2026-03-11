@@ -5,6 +5,7 @@ import { Suspense, type ReactNode } from "react";
 
 import { AdminActionsWrapper } from "@/components/platform/admin/admin-actions-wrapper";
 import { AdminDeleteButton } from "@/components/platform/admin/admin-delete-button";
+import { AdminFastForwardButton } from "@/components/platform/admin/admin-fast-forward-button";
 import { DetailPageBody } from "@/components/platform/detail-page-body";
 import { DetailPageHeader } from "@/components/platform/detail-page-header";
 import { DetailPageTabNav } from "@/components/platform/detail-page-tab-nav";
@@ -12,7 +13,7 @@ import { EntityTargetHeader } from "@/components/platform/entity-target-header";
 import { VoteDeadlineDisplay } from "@/components/platform/votes/vote-card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { deleteVoteAction } from "@/lib/actions/admin";
+import { deleteVoteAction, fastForwardVoteAction } from "@/lib/actions/admin";
 import {
   VOTE_STATUS_CONFIG,
   getTargetPrefix,
@@ -114,6 +115,12 @@ async function VoteDetailShell({
             <VoteDeadlineDisplay deadline={vote.deadline} status={vote.status} />
             <Suspense fallback={null}>
               <AdminActionsWrapper>
+                {vote.status === "open" && (
+                  <AdminFastForwardButton
+                    voteId={vote.id}
+                    action={fastForwardVoteAction}
+                  />
+                )}
                 <AdminDeleteButton
                   entityId={vote.id}
                   entityLabel={vote.title}

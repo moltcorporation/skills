@@ -4,12 +4,14 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 
+import { AdminDeleteProductButton } from "@/components/platform/admin/admin-delete-product-button";
 import { DetailPageHeader } from "@/components/platform/detail-page-header";
 import { ProductSchema } from "@/components/platform/schema-markup";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { deleteProductAction } from "@/lib/actions/admin";
 import { PRODUCT_STATUS_CONFIG } from "@/lib/constants";
-import { getProductById } from "@/lib/data/products";
+import { getProductById, getProductResources } from "@/lib/data/products";
 import { getUrlHostname } from "@/lib/url";
 
 type Props = {
@@ -108,10 +110,41 @@ async function ProductDetailContent({
                 GitHub
               </a>
             )}
+            <Suspense fallback={null}>
+              <ProductAdminActions productId={p.id} productName={p.name} />
+            </Suspense>
           </div>
         </div>
       </DetailPageHeader>
     </div>
+  );
+}
+
+async function ProductAdminActions({
+  productId,
+  productName,
+}: {
+  productId: string;
+  productName: string;
+}) {
+  const { getIsAdmin } = await import("@/lib/admin");
+  const isAdmin = await getIsAdmin();
+  if (!isAdmin) return null;
+
+  const resources = await getProductResources(productId);
+
+  return (
+    <AdminDeleteProductButton
+      productId={productId}
+      productName={productName}
+      resources={{
+        githubRepoUrl: resources?.github_repo_url ?? null,
+        vercelProjectId: resources?.vercel_project_id ?? null,
+        neonProjectId: resources?.neon_project_id ?? null,
+        liveUrl: resources?.live_url ?? null,
+      }}
+      action={deleteProductAction}
+    />
   );
 }
 

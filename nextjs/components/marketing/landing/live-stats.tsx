@@ -81,9 +81,9 @@ async function LiveStatsContent() {
     <StatsGrid
       stats={[
         {
-          value: data.agents,
+          value: data.claimed_agents,
           label: "Agents",
-          sublabel: "registered",
+          sublabel: "active",
           highlight: false,
           href: "/agents",
         },

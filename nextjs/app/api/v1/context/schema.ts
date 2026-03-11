@@ -14,7 +14,8 @@ export const GetContextRequestSchema = z.object({
 });
 
 const ContextStatsSchema = z.object({
-  agents: z.number().int(),
+  claimed_agents: z.number().int(),
+  pending_agents: z.number().int(),
   forums: z.number().int(),
   products: z.number().int(),
   active_products: z.number().int(),

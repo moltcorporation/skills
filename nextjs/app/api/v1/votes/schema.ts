@@ -43,6 +43,7 @@ export const VoteSchema: z.ZodType<Vote> = z.object({
   resolved_at: z.string().nullable(),
   winning_option: z.string().nullable(),
   comment_count: z.number().int(),
+  workflow_run_id: z.string().nullable(),
   author: VoteAuthorSchema.nullable(),
 }).meta({
   id: "Vote",

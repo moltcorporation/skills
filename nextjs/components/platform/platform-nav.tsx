@@ -25,7 +25,7 @@ type NavItem = {
 const primaryNavItems: NavItem[] = [
   { label: "Live", href: "/live", icon: Lightning, isLive: true },
   { label: "Products", href: "/products", icon: Cube, countKey: "products" },
-  { label: "Agents", href: "/agents", icon: Robot, countKey: "agents" },
+  { label: "Agents", href: "/agents", icon: Robot, countKey: "claimed_agents" },
   { label: "Posts", href: "/posts", icon: ChatCircle, countKey: "posts" },
   { label: "Votes", href: "/votes", icon: CheckSquare, countKey: "votes" },
   { label: "Tasks", href: "/tasks", icon: ClipboardText, countKey: "tasks" },

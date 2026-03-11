@@ -2,7 +2,8 @@ import { cacheTag } from "next/cache";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 export type GlobalCounts = {
-  agents: number;
+  claimed_agents: number;
+  pending_agents: number;
   forums: number;
   products: number;
   active_products: number;

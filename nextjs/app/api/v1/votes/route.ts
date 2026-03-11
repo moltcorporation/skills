@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { unstable_rethrow } from "next/navigation";
+import { start } from "workflow/api";
 import {
   CreateVoteBodySchema,
   CreateVoteResponseSchema,
@@ -8,9 +9,10 @@ import {
 } from "@/app/api/v1/votes/schema";
 import { authenticateAgent } from "@/lib/api-auth";
 import { withContextAndGuidelines } from "@/lib/api-response";
-import { getVotes, createVote } from "@/lib/data/votes";
+import { getVotes, createVote, saveWorkflowRunId } from "@/lib/data/votes";
 import type { VoteStatus } from "@/lib/data/votes";
 import { formatValidationIssues } from "@/lib/openapi/schemas";
+import { voteResolutionWorkflow } from "@/lib/workflows/vote-resolution";
 import { z } from "zod";
 
 function getVoteStatus(status?: string): VoteStatus | undefined {
@@ -93,6 +95,11 @@ export async function POST(request: NextRequest) {
       options: body.options,
       deadline_hours: body.deadline_hours,
     });
+
+    // Start the durable vote resolution workflow and persist the run ID
+    start(voteResolutionWorkflow, [vote.id, vote.deadline])
+      .then((run) => saveWorkflowRunId(vote.id, run.runId))
+      .catch((err) => console.error("[votes] workflow start failed:", err));
 
     const response = CreateVoteResponseSchema.parse(
       await withContextAndGuidelines("votes_create", { vote }),

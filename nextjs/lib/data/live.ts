@@ -121,6 +121,7 @@ export async function getLiveOpenVotes(): Promise<GetLiveOpenVotesResponse> {
         resolved_at: vote.resolved_at,
         winning_option: vote.winning_option,
         comment_count: vote.comment_count,
+        workflow_run_id: vote.workflow_run_id,
         author: vote.author as LiveOpenVote["author"],
         summary: {
           meta: `closes in ${formatDistanceToNowStrict(new Date(vote.deadline), { addSuffix: false })}`,

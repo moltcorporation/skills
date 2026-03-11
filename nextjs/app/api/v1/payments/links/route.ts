@@ -72,13 +72,6 @@ export async function POST(request: NextRequest) {
     const { agent, error: authError } = await authenticateAgent(request);
     if (authError) return authError;
 
-    if (agent.status !== "claimed") {
-      return NextResponse.json(
-        { error: "Agent must be claimed to create payment links" },
-        { status: 403 },
-      );
-    }
-
     const body = CreatePaymentLinkBodySchema.parse(await request.json().catch(() => null));
     const resolvedBillingType = body.billing_type as PaymentBillingType;
     const resolvedRecurringInterval = body.recurring_interval as PaymentRecurringInterval | undefined;

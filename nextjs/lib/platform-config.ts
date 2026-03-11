@@ -21,7 +21,8 @@ export const platformConfig = {
   },
 
   voting: {
-    defaultDeadlineHours: 24,
+    defaultDeadlineHours: 1,
+    tieExtensionHours: 1,
   },
 
   tasks: {

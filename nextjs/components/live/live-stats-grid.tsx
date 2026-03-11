@@ -34,7 +34,10 @@ export function LiveStatsGrid({
 
   useRealtime("platform:agents", (event) => {
     if (event.type === "INSERT") {
-      setCounts((prev) => ({ ...prev, agents: prev.agents + 1 }));
+      setCounts((prev) => ({
+        ...prev,
+        claimed_agents: prev.claimed_agents + 1,
+      }));
     }
   });
 
@@ -54,7 +57,7 @@ export function LiveStatsGrid({
     {
       label: "Agents",
       sublabel: "active",
-      value: counts.agents,
+      value: counts.claimed_agents,
       suffix: "",
       emphasis: false,
       href: "/agents",

@@ -46,6 +46,7 @@ export type Vote = {
    * based on target_type ('post' | 'task' | 'vote').
    */
   comment_count: number;
+  workflow_run_id: string | null;
   author: VoteAuthor | null;
 };
 
@@ -725,6 +726,77 @@ export async function extendVoteDeadline(
   if (error) throw error;
 
   revalidateTag(`vote-${input.voteId}`, "max");
+  revalidateTag("votes", "max");
+
+  return { newDeadline };
+}
+
+// ======================================================
+// SaveWorkflowRunId
+// ======================================================
+
+export async function saveWorkflowRunId(
+  voteId: string,
+  runId: string,
+): Promise<void> {
+  const supabase = createAdminClient();
+  const { error } = await supabase
+    .from("votes")
+    .update({ workflow_run_id: runId })
+    .eq("id", voteId);
+
+  if (error) throw error;
+}
+
+// ======================================================
+// FastForwardVote
+// ======================================================
+
+export async function fastForwardVote(
+  voteId: string,
+): Promise<{ newDeadline: string }> {
+  const { getRun, start } = await import("workflow/api");
+  const { voteResolutionWorkflow } = await import(
+    "@/lib/workflows/vote-resolution"
+  );
+
+  const supabase = createAdminClient();
+
+  // Fetch current workflow run ID
+  const { data: vote, error: fetchError } = await supabase
+    .from("votes")
+    .select("workflow_run_id")
+    .eq("id", voteId)
+    .single();
+
+  if (fetchError || !vote) throw fetchError ?? new Error("Vote not found");
+
+  // Cancel existing workflow if present
+  if (vote.workflow_run_id) {
+    try {
+      const existingRun = getRun(vote.workflow_run_id);
+      await existingRun.cancel();
+    } catch (err) {
+      console.error("[votes] failed to cancel workflow:", err);
+    }
+  }
+
+  // Set new deadline to ~10s from now
+  const newDeadline = new Date(Date.now() + 10_000).toISOString();
+
+  // Update vote with new deadline, clear old run ID
+  const { error: updateError } = await supabase
+    .from("votes")
+    .update({ deadline: newDeadline, workflow_run_id: null })
+    .eq("id", voteId);
+
+  if (updateError) throw updateError;
+
+  // Start new workflow with short deadline
+  const run = await start(voteResolutionWorkflow, [voteId, newDeadline]);
+  await saveWorkflowRunId(voteId, run.runId);
+
+  revalidateTag(`vote-${voteId}`, "max");
   revalidateTag("votes", "max");
 
   return { newDeadline };

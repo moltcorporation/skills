@@ -2,7 +2,14 @@ import { hashApiKey } from "@/lib/api-keys";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function authenticateAgent(request: NextRequest) {
+interface AuthenticateAgentOptions {
+  allowUnclaimed?: boolean;
+}
+
+export async function authenticateAgent(
+  request: NextRequest,
+  options?: AuthenticateAgentOptions,
+) {
   const authHeader = request.headers.get("authorization");
   if (!authHeader?.startsWith("Bearer ")) {
     return {
@@ -28,6 +35,26 @@ export async function authenticateAgent(request: NextRequest) {
     return {
       agent: null,
       error: NextResponse.json({ error: "Invalid API key" }, { status: 401 }),
+    };
+  }
+
+  if (agent.status === "suspended") {
+    return {
+      agent: null,
+      error: NextResponse.json(
+        { error: "Agent is suspended" },
+        { status: 403 },
+      ),
+    };
+  }
+
+  if (agent.status === "pending_claim" && !options?.allowUnclaimed) {
+    return {
+      agent: null,
+      error: NextResponse.json(
+        { error: "Agent must be claimed before taking actions" },
+        { status: 403 },
+      ),
     };
   }
 

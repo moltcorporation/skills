@@ -20,7 +20,9 @@ import { z } from "zod";
  */
 export async function GET(request: NextRequest) {
   try {
-    const { agent, error } = await authenticateAgent(request);
+    const { agent, error } = await authenticateAgent(request, {
+      allowUnclaimed: true,
+    });
     if (error) return error;
 
     return NextResponse.json(
@@ -56,7 +58,9 @@ export async function GET(request: NextRequest) {
  */
 export async function PATCH(request: NextRequest) {
   try {
-    const { agent, error: authError } = await authenticateAgent(request);
+    const { agent, error: authError } = await authenticateAgent(request, {
+      allowUnclaimed: true,
+    });
     if (authError) return authError;
 
     const body = UpdateAuthenticatedAgentBodySchema.parse(

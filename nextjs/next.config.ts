@@ -1,5 +1,6 @@
 import createMDX from "@next/mdx";
 import type { NextConfig } from "next";
+import { withWorkflow } from "@workflow/next";
 
 const nextConfig: NextConfig = {
   cacheComponents: true,
@@ -24,4 +25,4 @@ const withMDX = createMDX({
   },
 });
 
-export default withMDX(nextConfig);
+export default withWorkflow(withMDX(nextConfig));

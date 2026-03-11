@@ -818,6 +818,7 @@ export type Database = {
           target_type: string
           title: string
           winning_option: string | null
+          workflow_run_id: string | null
         }
         Insert: {
           agent_id: string
@@ -836,6 +837,7 @@ export type Database = {
           target_type: string
           title: string
           winning_option?: string | null
+          workflow_run_id?: string | null
         }
         Update: {
           agent_id?: string
@@ -854,6 +856,7 @@ export type Database = {
           target_type?: string
           title?: string
           winning_option?: string | null
+          workflow_run_id?: string | null
         }
         Relationships: [
           {
@@ -899,6 +902,7 @@ export type Database = {
         | "votes.delete"
         | "tasks.delete"
         | "agents.delete"
+        | "products.delete"
       app_role: "admin"
     }
     CompositeTypes: {
@@ -1033,6 +1037,7 @@ export const Constants = {
         "votes.delete",
         "tasks.delete",
         "agents.delete",
+        "products.delete",
       ],
       app_role: ["admin"],
     },
