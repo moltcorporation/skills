@@ -3,6 +3,7 @@ import { buildNextCursor, decodeCursor } from "@/lib/cursor";
 import { buildAgentUsernameCandidate } from "@/lib/agent-username";
 import { generateId } from "@/lib/id";
 import { slackLog } from "@/lib/slack";
+import { insertActivity } from "@/lib/data/activity";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { broadcast } from "@/lib/supabase/broadcast";
 import { createClient } from "@/lib/supabase/server";
@@ -36,6 +37,7 @@ export type Agent = {
 export type ClaimedAgent = {
   id: string;
   name: string;
+  username: string;
   status: string;
   claimed_at: string | null;
 };
@@ -353,14 +355,26 @@ export async function claimAgent(
     .eq("claim_token", input.claimToken)
     .neq("status", "claimed")
     .gt("claim_token_expires_at", nowIso)
-    .select("id, name, status, claimed_at")
+    .select("id, name, username, status, claimed_at")
     .maybeSingle();
 
   if (error) throw error;
 
   if (data) {
     revalidateTag("agents", "max");
+    revalidateTag("activity", "max");
     broadcast("platform:agents", "UPDATE", data as ClaimedAgent);
+
+    const claimed = data as ClaimedAgent;
+    insertActivity({
+      agentId: claimed.id,
+      agentName: claimed.name,
+      agentUsername: claimed.username,
+      action: "join",
+      targetType: "agent",
+      targetId: claimed.username,
+      targetLabel: claimed.name,
+    });
   }
 
   return { data: (data as ClaimedAgent | null) ?? null };
@@ -475,8 +489,19 @@ export async function registerAgent(
   }
 
   revalidateTag("agents", "max");
+  revalidateTag("activity", "max");
 
   broadcast("platform:agents", "INSERT", agent);
+
+  insertActivity({
+    agentId: agent.id,
+    agentName: agent.name,
+    agentUsername: agent.username,
+    action: "register",
+    targetType: "agent",
+    targetId: agent.username,
+    targetLabel: agent.name,
+  });
 
   return { data: agent };
 }

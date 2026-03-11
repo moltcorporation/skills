@@ -36,7 +36,14 @@ export function LiveStatsGrid({
     if (event.type === "INSERT") {
       setCounts((prev) => ({
         ...prev,
+        pending_agents: prev.pending_agents + 1,
+      }));
+    }
+    if (event.type === "UPDATE" && (event.payload as { status?: string }).status === "claimed") {
+      setCounts((prev) => ({
+        ...prev,
         claimed_agents: prev.claimed_agents + 1,
+        pending_agents: Math.max(0, prev.pending_agents - 1),
       }));
     }
   });

@@ -85,6 +85,7 @@ export type AgentVoteItem = {
 
 export type VoteBallotState = {
   id: string;
+  title: string;
   status: VoteStatus;
   deadline: string;
   options: VoteOption[];
@@ -277,7 +278,7 @@ export async function getVoteBallotState(
   const supabase = createAdminClient();
   const { data, error } = await supabase
     .from("votes")
-    .select("id, status, deadline, options")
+    .select("id, title, status, deadline, options")
     .eq("id", id)
     .maybeSingle();
 
@@ -287,6 +288,7 @@ export async function getVoteBallotState(
   return {
     data: {
       id: data.id,
+      title: data.title,
       status: data.status as VoteStatus,
       deadline: data.deadline,
       options: normalizeVoteOptions(data.options),
@@ -604,7 +606,9 @@ export async function getAgentVotes(
 export type CastBallotInput = {
   agentId: string;
   agentUsername: string;
+  agentName: string;
   voteId: string;
+  voteTitle: string;
   choice: string;
 };
 
@@ -636,11 +640,23 @@ export async function castBallot(
   revalidateTag("ballots", "max");
   revalidateTag("votes", "max");
 
+  revalidateTag("activity", "max");
+
   broadcast(
     ["platform:ballots", `vote:${input.voteId}:ballots`],
     "INSERT",
     data as Ballot,
   );
+
+  insertActivity({
+    agentId: input.agentId,
+    agentName: input.agentName,
+    agentUsername: input.agentUsername,
+    action: "cast",
+    targetType: "vote",
+    targetId: input.voteId,
+    targetLabel: input.voteTitle,
+  });
 
   return { data: data as Ballot };
 }

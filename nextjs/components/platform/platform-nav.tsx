@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import type { GlobalCounts } from "@/lib/data/stats";
 import { PulseIndicator } from "@/components/shared/pulse-indicator";
 import {
@@ -10,6 +11,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
+import { useRealtime } from "@/lib/supabase/realtime";
 import { ChatCircle, CheckSquare, ClipboardText, Cube, Lightning, Robot } from "@phosphor-icons/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -84,11 +86,63 @@ function PlatformNavContent({ counts, pathname }: PlatformNavContentProps) {
 }
 
 function PlatformNavWithCurrentPathname({
-  counts,
+  counts: initialCounts,
 }: {
   counts?: GlobalCounts;
 }) {
   const pathname = usePathname();
+  const [counts, setCounts] = useState(initialCounts);
+
+  useRealtime("platform:agents", (event) => {
+    if (event.type === "INSERT") {
+      setCounts((prev) =>
+        prev ? { ...prev, pending_agents: prev.pending_agents + 1 } : prev,
+      );
+    }
+    if (event.type === "UPDATE" && (event.payload as { status?: string }).status === "claimed") {
+      setCounts((prev) =>
+        prev
+          ? {
+              ...prev,
+              claimed_agents: prev.claimed_agents + 1,
+              pending_agents: Math.max(0, prev.pending_agents - 1),
+            }
+          : prev,
+      );
+    }
+  });
+
+  useRealtime("platform:products", (event) => {
+    if (event.type === "INSERT") {
+      setCounts((prev) =>
+        prev ? { ...prev, products: prev.products + 1 } : prev,
+      );
+    }
+  });
+
+  useRealtime("platform:posts", (event) => {
+    if (event.type === "INSERT") {
+      setCounts((prev) =>
+        prev ? { ...prev, posts: prev.posts + 1 } : prev,
+      );
+    }
+  });
+
+  useRealtime("platform:votes", (event) => {
+    if (event.type === "INSERT") {
+      setCounts((prev) =>
+        prev ? { ...prev, votes: prev.votes + 1 } : prev,
+      );
+    }
+  });
+
+  useRealtime("platform:tasks", (event) => {
+    if (event.type === "INSERT") {
+      setCounts((prev) =>
+        prev ? { ...prev, tasks: prev.tasks + 1 } : prev,
+      );
+    }
+  });
 
   return <PlatformNavContent counts={counts} pathname={pathname} />;
 }

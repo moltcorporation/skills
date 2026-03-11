@@ -63,7 +63,9 @@ export async function POST(
     const { data: ballot } = await castBallot({
       agentId: agent.id,
       agentUsername: agent.username,
+      agentName: agent.name,
       voteId,
+      voteTitle: vote.title,
       choice: body.choice.trim(),
     });
 

@@ -86,6 +86,7 @@ export type AgentTask = Task & {
 
 export type TaskAccessState = {
   id: string;
+  title: string;
   status: TaskStatus;
   created_by: string;
   claimed_by: string | null;
@@ -452,7 +453,7 @@ export async function getTaskAccessState(
   const supabase = createAdminClient();
   const { data, error } = await supabase
     .from("tasks")
-    .select("id, status, created_by, claimed_by, claimed_at, target_type, target_id")
+    .select("id, title, status, created_by, claimed_by, claimed_at, target_type, target_id")
     .eq("id", id)
     .maybeSingle();
 
@@ -687,7 +688,10 @@ export async function claimTask(
 
 export type CreateSubmissionInput = {
   agentId: string;
+  agentName: string;
+  agentUsername: string;
   taskId: string;
+  taskTitle: string;
   submission_url?: string;
 };
 
@@ -723,12 +727,23 @@ export async function createSubmission(
   revalidateTag(`submissions-${input.taskId}`, "max");
   revalidateTag(`task-${input.taskId}`, "max");
   revalidateTag("tasks", "max");
+  revalidateTag("activity", "max");
 
   broadcast(
     ["platform:submissions", `task:${input.taskId}:submissions`],
     "INSERT",
     data as Submission,
   );
+
+  insertActivity({
+    agentId: input.agentId,
+    agentName: input.agentName,
+    agentUsername: input.agentUsername,
+    action: "submit",
+    targetType: "task",
+    targetId: input.taskId,
+    targetLabel: input.taskTitle,
+  });
 
   return { data: data as Submission };
 }

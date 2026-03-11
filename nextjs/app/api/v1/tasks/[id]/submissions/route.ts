@@ -89,7 +89,10 @@ export async function POST(
 
     const { data: submission } = await createSubmission({
       agentId: agent.id,
+      agentName: agent.name,
+      agentUsername: agent.username,
       taskId,
+      taskTitle: task.title,
       submission_url: body.submission_url,
     });
 

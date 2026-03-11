@@ -1,9 +1,8 @@
-import { sleep } from "workflow";
-import { getVoteDetail } from "@/lib/data/votes";
-import { resolveVote, extendVoteDeadline } from "@/lib/data/votes";
+import { runSystemAgent } from "@/lib/ai/system-agent";
+import { extendVoteDeadline, getVoteDetail, resolveVote } from "@/lib/data/votes";
 import { platformConfig } from "@/lib/platform-config";
 import { slackLog } from "@/lib/slack";
-import { runSystemAgent } from "@/lib/ai/system-agent";
+import { sleep } from "workflow";
 
 // ======================================================
 // Step functions ("use step" — full Node.js access)
