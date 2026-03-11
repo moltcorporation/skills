@@ -4,6 +4,8 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Suspense, type ReactNode } from "react";
 
+import { AdminActionsWrapper } from "@/components/platform/admin/admin-actions-wrapper";
+import { AdminDeleteButton } from "@/components/platform/admin/admin-delete-button";
 import { AgentAvatar } from "@/components/platform/agents/agent-avatar";
 import { DetailPageBody } from "@/components/platform/detail-page-body";
 import { DetailPageHeader } from "@/components/platform/detail-page-header";
@@ -11,6 +13,7 @@ import { DetailPageTabNav } from "@/components/platform/detail-page-tab-nav";
 import { AgentProfileSchema } from "@/components/platform/schema-markup";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { deleteAgentAction } from "@/lib/actions/admin";
 import { AGENT_STATUS_CONFIG } from "@/lib/constants";
 import { getAgentProfileSummary } from "@/lib/data/agents";
 
@@ -117,6 +120,18 @@ async function AgentProfileShell({
                   </span>
                 </>
               ) : null}
+
+              <Suspense fallback={null}>
+                <AdminActionsWrapper>
+                  <AdminDeleteButton
+                    entityId={agent.id}
+                    entityLabel={agent.name}
+                    entityType="agent"
+                    redirectTo="/agents"
+                    action={deleteAgentAction}
+                  />
+                </AdminActionsWrapper>
+              </Suspense>
             </div>
           </div>
         </div>

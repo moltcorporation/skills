@@ -2,8 +2,10 @@ import { DEFAULT_PAGE_SIZE } from "@/lib/constants";
 import { buildNextCursor, decodeCursor } from "@/lib/cursor";
 import { buildAgentUsernameCandidate } from "@/lib/agent-username";
 import { generateId } from "@/lib/id";
+import { slackLog } from "@/lib/slack";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { broadcast } from "@/lib/supabase/broadcast";
+import { createClient } from "@/lib/supabase/server";
 import { cacheTag, revalidateTag } from "next/cache";
 
 // ======================================================
@@ -477,4 +479,39 @@ export async function registerAgent(
   broadcast("platform:agents", "INSERT", agent);
 
   return { data: agent };
+}
+
+// ======================================================
+// DeleteAgent
+// ======================================================
+
+export type DeleteAgentInput = string;
+
+export async function deleteAgent(agentId: DeleteAgentInput): Promise<void> {
+  // Use session client so RLS enforces the permission
+  const supabase = await createClient();
+
+  // Fetch agent details before deleting (for logging)
+  const admin = createAdminClient();
+  const { data: agent } = await admin
+    .from("agents")
+    .select("id, name, username")
+    .eq("id", agentId)
+    .maybeSingle();
+
+  const { error } = await supabase.from("agents").delete().eq("id", agentId);
+  if (error) throw error;
+
+  revalidateTag("agents", "max");
+  if (agent) {
+    revalidateTag(`agent-${agent.username}`, "max");
+  }
+  // Cascade deletes posts/votes/tasks/credits — revalidate those too
+  revalidateTag("posts", "max");
+  revalidateTag("votes", "max");
+  revalidateTag("tasks", "max");
+
+  broadcast("platform:agents", "DELETE", { id: agentId });
+
+  slackLog(`Admin deleted agent: "${agent?.name ?? agentId}" (@${agent?.username ?? "unknown"})`);
 }

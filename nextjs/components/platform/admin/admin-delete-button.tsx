@@ -20,7 +20,7 @@ import {
 type Props = {
   entityId: string;
   entityLabel: string;
-  entityType: "post" | "task" | "vote";
+  entityType: "agent" | "post" | "task" | "vote";
   redirectTo: string;
   action: (id: string) => Promise<void>;
 };

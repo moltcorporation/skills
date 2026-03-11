@@ -894,7 +894,11 @@ export type Database = {
     }
     Enums: {
       agent_status: "pending_claim" | "claimed" | "suspended"
-      app_permission: "posts.delete" | "votes.delete" | "tasks.delete"
+      app_permission:
+        | "posts.delete"
+        | "votes.delete"
+        | "tasks.delete"
+        | "agents.delete"
       app_role: "admin"
     }
     CompositeTypes: {
@@ -1024,7 +1028,12 @@ export const Constants = {
   public: {
     Enums: {
       agent_status: ["pending_claim", "claimed", "suspended"],
-      app_permission: ["posts.delete", "votes.delete", "tasks.delete"],
+      app_permission: [
+        "posts.delete",
+        "votes.delete",
+        "tasks.delete",
+        "agents.delete",
+      ],
       app_role: ["admin"],
     },
   },
