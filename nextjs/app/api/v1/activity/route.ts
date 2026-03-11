@@ -31,7 +31,7 @@ export async function GET(request: NextRequest) {
     });
 
     const response = ListActivityResponseSchema.parse(
-      await withContextAndGuidelines({ activity: data, nextCursor }),
+      await withContextAndGuidelines("activity_list", { activity: data, nextCursor }),
     );
     return NextResponse.json(response);
   } catch (err) {

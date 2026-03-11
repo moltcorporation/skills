@@ -4,6 +4,7 @@ import { insertActivity } from "@/lib/data/activity";
 import { platformConfig } from "@/lib/platform-config";
 import { generateId } from "@/lib/id";
 import { buildNextCursor, decodeCursor } from "@/lib/cursor";
+import { DEFAULT_PAGE_SIZE } from "@/lib/constants";
 import { cacheTag, revalidateTag } from "next/cache";
 
 // ======================================================
@@ -15,7 +16,7 @@ const TASK_SELECT =
 const TASK_CREATE_SELECT =
   "*, author:agents!tasks_created_by_fkey(id, name, username)" as const;
 const SUBMISSION_SELECT =
-  "*, agent:agents!submissions_agent_id_fkey(id, name)" as const;
+  "*, agent:agents!submissions_agent_id_fkey(id, name, username)" as const;
 
 export type TaskStatus = "open" | "claimed" | "submitted" | "approved" | "rejected";
 export type TaskSize = "small" | "medium" | "large";
@@ -124,12 +125,17 @@ export type GetTasksInput = {
   target_type?: string;
   target_id?: string;
   status?: TaskStatus;
+  search?: string;
+  sort?: "newest" | "oldest";
+  after?: string;
   limit?: number;
+  /** @deprecated Use cursor-based `after` instead. Kept for backwards compat. */
   offset?: number;
 };
 
 export type GetTasksResponse = {
   data: Task[];
+  nextCursor: string | null;
 };
 
 export async function getTasks(
@@ -138,25 +144,52 @@ export async function getTasks(
   "use cache";
   cacheTag("tasks");
 
+  const limit = opts.limit ?? DEFAULT_PAGE_SIZE;
+  const sort = opts.sort ?? "newest";
+  const ascending = sort === "oldest";
   const supabase = createAdminClient();
+
   let query = supabase
     .from("tasks")
     .select(TASK_SELECT)
-    .order("created_at", { ascending: false });
+    .order("created_at", { ascending })
+    .order("id", { ascending })
+    .limit(limit + 1);
 
   if (opts.target_type) query = query.eq("target_type", opts.target_type);
   if (opts.target_id) query = query.eq("target_id", opts.target_id);
   if (opts.status) query = query.eq("status", opts.status);
-  if (opts.limit) query = query.limit(opts.limit);
-  if (opts.offset && opts.limit) {
+  if (opts.search) {
+    query = query.textSearch("fts", opts.search, { type: "websearch", config: "english" });
+  }
+
+  if (opts.after) {
+    const { id, v } = decodeCursor(opts.after);
+    const createdAt = v?.[0];
+
+    if (createdAt != null) {
+      const comparator = ascending ? "gt" : "lt";
+      const createdAtIso = new Date(createdAt).toISOString();
+      query = query.or(
+        `created_at.${comparator}.${createdAtIso},and(created_at.eq.${createdAtIso},id.${comparator}.${id})`,
+      );
+    }
+  } else if (opts.offset && opts.limit) {
+    // Legacy offset-based pagination fallback
     query = query.range(opts.offset, opts.offset + opts.limit - 1);
   }
 
   const { data, error } = await query;
   if (error) throw error;
 
+  const hasMore = (data?.length ?? 0) > limit;
+  if (hasMore) data!.pop();
+
+  const items = ((data as Task[] | null) ?? []).map((task) => releaseExpiredClaim(task).task);
+
   return {
-    data: ((data as Task[] | null) ?? []).map((task) => releaseExpiredClaim(task).task),
+    data: items,
+    nextCursor: buildNextCursor(items, hasMore, (task) => [Date.parse(task.created_at)]),
   };
 }
 
@@ -370,6 +403,34 @@ export async function getTaskById(
 
   const released = releaseExpiredClaim(data as Task);
   return { data: released.task, claimExpired: released.claimExpired };
+}
+
+// ======================================================
+// GetTaskSitemapEntries
+// ======================================================
+
+export type TaskSitemapEntry = {
+  id: string;
+  created_at: string;
+};
+
+export type GetTaskSitemapEntriesResponse = {
+  data: TaskSitemapEntry[];
+};
+
+export async function getTaskSitemapEntries(): Promise<GetTaskSitemapEntriesResponse> {
+  "use cache";
+  cacheTag("tasks");
+
+  const supabase = createAdminClient();
+  const { data, error } = await supabase
+    .from("tasks")
+    .select("id, created_at")
+    .order("id", { ascending: false });
+
+  if (error) throw error;
+
+  return { data: (data as TaskSitemapEntry[] | null) ?? [] };
 }
 
 // ======================================================

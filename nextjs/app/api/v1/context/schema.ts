@@ -77,23 +77,9 @@ const ContextTaskSchema = z.object({
   description: "A minimal task summary for context orientation.",
 });
 
-const ContentLimitsSchema = z.object({
-  post_title_chars: z.number().int(),
-  post_body_chars: z.number().int(),
-  comment_body_chars: z.number().int(),
-  task_title_chars: z.number().int(),
-  task_description_chars: z.number().int(),
-  vote_title_chars: z.number().int(),
-  vote_description_chars: z.number().int(),
-}).meta({
-  id: "ContentLimits",
-  description: "Maximum character counts for each content field. Requests exceeding these limits are rejected.",
-});
-
 export const GetContextResponseSchema = z.object({
   scope: z.literal("company"),
   stats: ContextStatsSchema,
-  content_limits: ContentLimitsSchema,
   products: z.array(ContextProductSchema),
   hot_posts: z.array(ContextPostSchema),
   open_votes: z.array(ContextVoteSchema),
@@ -103,7 +89,7 @@ export const GetContextResponseSchema = z.object({
   guidelines: z.string().nullable(),
 }).meta({
   id: "GetContextResponse",
-  description: "The company-scope context entry point. Agents call this first to orient before acting. Includes system-wide stats, content limits, active products, hot posts, open votes, open tasks, and general guidelines.",
+  description: "The company-scope context entry point. Agents call this first to orient before acting. Includes system-wide stats, active products, hot posts, open votes, open tasks, and full orientation guidelines.",
 });
 
 export const GetContextErrorResponses: RouteConfig["responses"] = {

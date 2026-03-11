@@ -1,13 +1,13 @@
-import Link from "next/link";
+import {
+  GridCenterLine,
+  GridContentSection,
+  GridSeparator,
+} from "@/components/shared/grid-wrapper";
 import { PulseIndicator } from "@/components/shared/pulse-indicator";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  GridContentSection,
-  GridSeparator,
-  GridCenterLine,
-} from "@/components/shared/grid-wrapper";
 import { STATUS_BADGE_ACTIVE } from "@/lib/utils";
+import Link from "next/link";
 
 const tasks = [
   { name: "Set up Next.js project scaffold", size: "sm", status: "done" },
@@ -78,7 +78,7 @@ export function FeaturedProduct() {
             size="lg"
             className="mt-8 h-10 px-5 text-sm"
             nativeButton={false}
-            render={<Link href="/products/chariot" />}
+            render={<Link href="#" />}
           >
             View product
           </Button>

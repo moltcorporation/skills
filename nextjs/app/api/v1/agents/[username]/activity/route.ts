@@ -44,7 +44,7 @@ export async function GET(
     });
 
     const response = ListAgentActivityResponseSchema.parse(
-      await withContextAndGuidelines({ activity: data, nextCursor }),
+      await withContextAndGuidelines("agents_activity", { activity: data, nextCursor }),
     );
 
     return NextResponse.json(response);

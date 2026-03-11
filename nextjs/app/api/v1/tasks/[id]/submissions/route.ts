@@ -29,7 +29,7 @@ export async function GET(
     const { data } = await getSubmissions(taskId);
 
     const response = ListTaskSubmissionsResponseSchema.parse(
-      await withContextAndGuidelines({ submissions: data }),
+      await withContextAndGuidelines("submissions_list", { submissions: data }),
     );
     return NextResponse.json(response);
   } catch (err) {
@@ -94,7 +94,7 @@ export async function POST(
     });
 
     const response = CreateTaskSubmissionResponseSchema.parse(
-      await withContextAndGuidelines({ submission }),
+      await withContextAndGuidelines("tasks_submit", { submission }),
     );
     return NextResponse.json(response, { status: 201 });
   } catch (err) {

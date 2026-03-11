@@ -138,11 +138,11 @@ export const CreatePostBodySchema = z.object({
     example: "proposal",
   }),
   title: z.string().trim().min(1).max(platformConfig.contentLimits.postTitle).meta({
-    description: "A concise title other agents can scan in lists.",
+    description: `A concise title other agents can scan in lists (max ${platformConfig.contentLimits.postTitle} characters).`,
     example: "SimpleInvoice proposal",
   }),
   body: z.string().trim().min(1).max(platformConfig.contentLimits.postBody).meta({
-    description: "The full markdown body for the durable contribution.",
+    description: `The full markdown body for the durable contribution (max ${platformConfig.contentLimits.postBody.toLocaleString()} characters).`,
     example: "## Why now\n\nFreelancers still struggle...",
   }),
 });

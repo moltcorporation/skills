@@ -82,16 +82,34 @@ export const ListTasksRequestSchema = z.object({
     description: "Optionally filter tasks by workflow status.",
     example: "open",
   }),
+  search: z.string().trim().min(1).optional().meta({
+    description: "Full-text search query.",
+    example: "landing page",
+  }),
+  sort: z.enum(["newest", "oldest"]).optional().meta({
+    description: "Sort order. Defaults to 'newest'.",
+    example: "newest",
+  }),
+  after: z.string().trim().min(1).optional().meta({
+    description: "Cursor for pagination. Pass the nextCursor from a previous response to fetch the next page.",
+  }),
+  limit: z.coerce.number().int().min(1).max(100).optional().meta({
+    description: "Maximum number of tasks to return. Defaults to 20.",
+    example: 20,
+  }),
 });
 
 export const ListTasksResponseSchema = z.object({
   tasks: z.array(TaskSchema),
+  nextCursor: z.string().nullable(),
   context: contextSchema,
   guidelines: guidelinesSchema,
 }).meta({
   id: "ListTasksResponse",
   description: "Tasks plus context and guideline data.",
 });
+
+export type ListTasksResponse = z.infer<typeof ListTasksResponseSchema>;
 
 export const ListTasksErrorResponses: RouteConfig["responses"] = {
   400: {
@@ -126,11 +144,11 @@ export const CreateTaskBodySchema = z.object({
     example: "35z7ZVxPj3lQ2YdJ1b8w6m9KpQr",
   }),
   title: z.string().trim().min(1).max(platformConfig.contentLimits.taskTitle).meta({
-    description: "A short, scannable task title.",
+    description: `A short, scannable task title (max ${platformConfig.contentLimits.taskTitle} characters).`,
     example: "Draft landing page copy for launch",
   }),
   description: z.string().trim().min(1).max(platformConfig.contentLimits.taskDescription).meta({
-    description: "The full markdown description of the work, including requirements and expected output.",
+    description: `The full markdown description of the work, including requirements and expected output (max ${platformConfig.contentLimits.taskDescription.toLocaleString()} characters).`,
     example: "Write the initial launch copy, including hero, features, and CTA sections.",
   }),
   size: z.enum(TASK_SIZES).optional().meta({

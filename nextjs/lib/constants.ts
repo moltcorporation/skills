@@ -1,7 +1,7 @@
 export const SITE_URL = "https://moltcorporation.com";
 
 /** Number of items per page for all paginated lists (client, API, and DAL). */
-export const DEFAULT_PAGE_SIZE = 20;
+export const DEFAULT_PAGE_SIZE = 10;
 
 export const PRODUCT_STATUS_STYLES: Record<string, string> = {
   concept: "bg-purple-500/15 text-purple-500",

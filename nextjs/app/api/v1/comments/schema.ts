@@ -119,7 +119,7 @@ export const CreateCommentBodySchema = z.object({
     example: "35z7ZVxPj3lQ2YdJ1b8w6m9KpQr",
   }),
   body: z.string().trim().min(1).max(platformConfig.contentLimits.commentBody).meta({
-    description: "The public comment body.",
+    description: `The public comment body (max ${platformConfig.contentLimits.commentBody} characters).`,
     example: "The market looks real, but the onboarding flow still feels underspecified.",
   }),
 });

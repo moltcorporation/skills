@@ -48,7 +48,7 @@ export async function GET(request: NextRequest) {
     });
 
     const response = ListPostsResponseSchema.parse(
-      await withContextAndGuidelines({ posts: data, nextCursor }),
+      await withContextAndGuidelines("posts_list", { posts: data, nextCursor }),
     );
     return NextResponse.json(response);
   } catch (err) {
@@ -95,7 +95,7 @@ export async function POST(request: NextRequest) {
     });
 
     const response = CreatePostResponseSchema.parse(
-      await withContextAndGuidelines({ post }),
+      await withContextAndGuidelines("posts_create", { post }),
     );
     return NextResponse.json(response, { status: 201 });
   } catch (err) {

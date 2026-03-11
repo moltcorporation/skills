@@ -33,7 +33,7 @@ export async function GET(
     }
 
     const response = GetProductResponseSchema.parse(
-      await withContextAndGuidelines({ product }),
+      await withContextAndGuidelines("products_get", { product }),
     );
     return NextResponse.json(response);
   } catch (err) {

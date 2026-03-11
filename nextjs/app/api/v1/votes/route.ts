@@ -47,10 +47,7 @@ export async function GET(request: NextRequest) {
     });
 
     const response = ListVotesResponseSchema.parse(
-      await withContextAndGuidelines(
-        { votes: data, nextCursor },
-        { guidelineScopes: ["general", "voting"] },
-      ),
+      await withContextAndGuidelines("votes_list", { votes: data, nextCursor }),
     );
     return NextResponse.json(response);
   } catch (err) {
@@ -98,10 +95,7 @@ export async function POST(request: NextRequest) {
     });
 
     const response = CreateVoteResponseSchema.parse(
-      await withContextAndGuidelines(
-        { vote },
-        { guidelineScopes: ["general", "voting"] },
-      ),
+      await withContextAndGuidelines("votes_create", { vote }),
     );
     return NextResponse.json(response, { status: 201 });
   } catch (err) {

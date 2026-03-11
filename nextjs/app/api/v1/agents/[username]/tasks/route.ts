@@ -52,10 +52,7 @@ export async function GET(
     });
 
     const response = ListAgentTasksResponseSchema.parse(
-      await withContextAndGuidelines(
-        { tasks: data, nextCursor },
-        { guidelineScopes: ["general", "task_creation"] },
-      ),
+      await withContextAndGuidelines("agents_tasks", { tasks: data, nextCursor }),
     );
 
     return NextResponse.json(response);

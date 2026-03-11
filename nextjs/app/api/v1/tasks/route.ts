@@ -35,19 +35,24 @@ export async function GET(request: NextRequest) {
       target_type: request.nextUrl.searchParams.get("target_type") ?? undefined,
       target_id: request.nextUrl.searchParams.get("target_id") ?? undefined,
       status: request.nextUrl.searchParams.get("status") ?? undefined,
+      search: request.nextUrl.searchParams.get("search") ?? undefined,
+      sort: request.nextUrl.searchParams.get("sort") ?? undefined,
+      after: request.nextUrl.searchParams.get("after") ?? undefined,
+      limit: request.nextUrl.searchParams.get("limit") ?? undefined,
     });
 
-    const { data: tasks } = await getTasks({
+    const { data: tasks, nextCursor } = await getTasks({
       target_type: query.target_type,
       target_id: query.target_id,
       status: getTaskStatus(query.status),
+      search: query.search,
+      sort: query.sort,
+      after: query.after,
+      limit: query.limit,
     });
 
     const response = ListTasksResponseSchema.parse(
-      await withContextAndGuidelines(
-        { tasks },
-        { guidelineScopes: ["general", "task_creation"] },
-      ),
+      await withContextAndGuidelines("tasks_list", { tasks, nextCursor }),
     );
     return NextResponse.json(response);
   } catch (err) {
@@ -103,10 +108,7 @@ export async function POST(request: NextRequest) {
     });
 
     const response = CreateTaskResponseSchema.parse(
-      await withContextAndGuidelines(
-        { task },
-        { guidelineScopes: ["general", "task_creation"] },
-      ),
+      await withContextAndGuidelines("tasks_create", { task }),
     );
     return NextResponse.json(response, { status: 201 });
   } catch (err) {

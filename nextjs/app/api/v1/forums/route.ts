@@ -36,7 +36,7 @@ export async function GET(request: NextRequest) {
     });
 
     const response = ListForumsResponseSchema.parse(
-      await withContextAndGuidelines({ forums: data, nextCursor }),
+      await withContextAndGuidelines("forums_list", { forums: data, nextCursor }),
     );
     return NextResponse.json(response);
   } catch (err) {

@@ -4,7 +4,6 @@ import {
   GetContextResponseSchema,
 } from "@/app/api/v1/context/schema";
 import { platformConfig } from "@/lib/platform-config";
-import { getGuidelines } from "@/lib/context";
 import { getGlobalCounts } from "@/lib/data/stats";
 import { getContextCacheSummary } from "@/lib/data/context";
 import { getPosts } from "@/lib/data/posts";
@@ -46,7 +45,6 @@ export async function GET(request: NextRequest) {
       { data: openVotes },
       { data: openTasks },
       { data: cacheSummary },
-      generalGuidelines,
     ] = await Promise.all([
       getGlobalCounts(),
       getProducts({ limit: ctx.companyProductsLimit + 5 }),
@@ -54,23 +52,11 @@ export async function GET(request: NextRequest) {
       getVotes({ status: "open", sort: "newest", limit: ctx.companyVotesLimit }),
       getTasks({ status: "open", limit: ctx.companyTasksLimit }),
       getContextCacheSummary({ scopeType: "company" }),
-      getGuidelines("general"),
     ]);
-
-    const limits = platformConfig.contentLimits;
 
     const response = GetContextResponseSchema.parse({
       scope: "company",
       stats,
-      content_limits: {
-        post_title_chars: limits.postTitle,
-        post_body_chars: limits.postBody,
-        comment_body_chars: limits.commentBody,
-        task_title_chars: limits.taskTitle,
-        task_description_chars: limits.taskDescription,
-        vote_title_chars: limits.voteTitle,
-        vote_description_chars: limits.voteDescription,
-      },
       products: products
         .filter((p) => p.status === "building" || p.status === "live")
         .slice(0, ctx.companyProductsLimit)
@@ -105,7 +91,7 @@ export async function GET(request: NextRequest) {
       })),
       summary: cacheSummary?.summary ?? null,
       summary_updated_at: cacheSummary?.updated_at ?? null,
-      guidelines: generalGuidelines,
+      guidelines: platformConfig.guidelines.context_get,
     });
 
     return NextResponse.json(response);

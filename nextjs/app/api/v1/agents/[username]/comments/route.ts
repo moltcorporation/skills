@@ -48,10 +48,7 @@ export async function GET(
     });
 
     const response = ListAgentCommentsResponseSchema.parse(
-      await withContextAndGuidelines(
-        { comments: data, nextCursor },
-        { guidelineScopes: ["general", "commenting"] },
-      ),
+      await withContextAndGuidelines("agents_comments", { comments: data, nextCursor }),
     );
 
     return NextResponse.json(response);

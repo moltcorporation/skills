@@ -30,10 +30,7 @@ export async function GET(
     }
 
     const response = GetVoteResponseSchema.parse(
-      await withContextAndGuidelines(
-        { vote: data.vote, tally: data.tally },
-        { guidelineScopes: ["general", "voting"] },
-      ),
+      await withContextAndGuidelines("votes_get", { vote: data.vote, tally: data.tally }),
     );
     return NextResponse.json(response);
   } catch (err) {

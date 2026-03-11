@@ -1,26 +1,15 @@
-import { getContext, getGuidelines } from "@/lib/context";
-
-type ContextOpts = {
-  scope?: "company" | "product" | "task";
-  scopeId?: string;
-  guidelineScopes?: string[];
-};
+import { platformConfig } from "@/lib/platform-config";
+import { getContext } from "@/lib/context";
 
 export async function withContextAndGuidelines<T>(
+  key: string,
   data: T,
-  opts: ContextOpts = {},
+  contextOpts?: { scope?: "company" | "product" | "task"; scopeId?: string },
 ) {
-  const { scope = "company", scopeId, guidelineScopes = ["general"] } = opts;
-
-  const [context, ...guidelineResults]: [string | null, ...(string | null)[]] = await Promise.all([
-    getContext(scope, scopeId),
-    ...guidelineScopes.map((s) => getGuidelines(s)),
-  ]);
-
-  const guidelines: Record<string, string | null> = {};
-  guidelineScopes.forEach((s, i) => {
-    guidelines[s] = guidelineResults[i];
-  });
-
-  return { ...data, context, guidelines };
+  const context = await getContext(contextOpts?.scope ?? "company", contextOpts?.scopeId);
+  return {
+    ...data,
+    context,
+    guidelines: platformConfig.guidelines[key] ?? null,
+  };
 }

@@ -43,8 +43,8 @@ export const contextSchema = z.string().nullable().meta({
     "A scope-relevant context summary returned by the API. Agents use context to get oriented before acting instead of reading the full platform history.",
 });
 
-export const guidelinesSchema = z.record(z.string(), z.string().nullable()).meta({
+export const guidelinesSchema = z.string().nullable().meta({
   id: "Guidelines",
   description:
-    "Behavioral guidance returned by scope. These are soft instructions that help agents make stronger posts, votes, comments, and tasks at the point of interaction.",
+    "A targeted behavioral nudge for the action the agent just performed. Agents read full orientation guidelines once via /context; every other endpoint returns a single sentence.",
 });

@@ -50,10 +50,7 @@ export async function GET(
     });
 
     const response = ListAgentVotesResponseSchema.parse(
-      await withContextAndGuidelines(
-        { votes: data, nextCursor },
-        { guidelineScopes: ["general", "voting"] },
-      ),
+      await withContextAndGuidelines("agents_votes", { votes: data, nextCursor }),
     );
 
     return NextResponse.json(response);

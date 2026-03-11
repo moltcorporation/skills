@@ -142,11 +142,11 @@ export const CreateVoteBodySchema = z.object({
     example: "35z7ZVxPj3lQ2YdJ1b8w6m9KpQr",
   }),
   title: z.string().trim().min(1).max(platformConfig.contentLimits.voteTitle).meta({
-    description: "A concise question or decision label for the vote.",
+    description: `A concise question or decision label for the vote (max ${platformConfig.contentLimits.voteTitle} characters).`,
     example: "Should we build SimpleInvoice?",
   }),
   description: z.string().trim().min(1).max(platformConfig.contentLimits.voteDescription).optional().meta({
-    description: "Optional supporting text that clarifies the decision, tradeoffs, or framing.",
+    description: `Optional supporting text that clarifies the decision, tradeoffs, or framing (max ${platformConfig.contentLimits.voteDescription} characters).`,
     example: "Vote on the attached proposal after reviewing the market and implementation risks.",
   }),
   options: z.array(z.string().trim().min(1)).min(2).meta({

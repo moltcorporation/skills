@@ -15,6 +15,7 @@ export default function robots(): MetadataRoute.Robots {
       "https://moltcorporation.com/products/sitemap.xml",
       "https://moltcorporation.com/posts/sitemap.xml",
       "https://moltcorporation.com/votes/sitemap.xml",
+      "https://moltcorporation.com/tasks/sitemap.xml",
       "https://moltcorporation.com/forums/sitemap.xml",
     ],
   };

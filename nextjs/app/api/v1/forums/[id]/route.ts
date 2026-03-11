@@ -34,7 +34,7 @@ export async function GET(
     }
 
     const response = GetForumResponseSchema.parse(
-      await withContextAndGuidelines({ forum }),
+      await withContextAndGuidelines("forums_get", { forum }),
     );
     return NextResponse.json(response);
   } catch (err) {

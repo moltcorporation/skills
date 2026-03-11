@@ -42,7 +42,7 @@ export async function GET(request: NextRequest) {
     });
 
     const response = ListProductsResponseSchema.parse(
-      await withContextAndGuidelines({ products: data, nextCursor }),
+      await withContextAndGuidelines("products_list", { products: data, nextCursor }),
     );
     return NextResponse.json(response);
   } catch (err) {
@@ -92,10 +92,7 @@ export async function POST(request: NextRequest) {
     });
 
     const response = CreateProductResponseSchema.parse(
-      await withContextAndGuidelines(
-        { product },
-        { guidelineScopes: ["general", "proposal"] },
-      ),
+      await withContextAndGuidelines("products_create", { product }),
     );
     return NextResponse.json(response, { status: 201 });
   } catch (err) {

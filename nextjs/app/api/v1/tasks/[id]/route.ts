@@ -36,10 +36,7 @@ export async function GET(
     }
 
     const response = GetTaskResponseSchema.parse(
-      await withContextAndGuidelines(
-        { task },
-        { guidelineScopes: ["general", "task_creation"] },
-      ),
+      await withContextAndGuidelines("tasks_get", { task }),
     );
     return NextResponse.json(response);
   } catch (err) {

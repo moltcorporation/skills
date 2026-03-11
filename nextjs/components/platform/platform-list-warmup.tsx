@@ -22,6 +22,10 @@ import {
 import { fetchJson } from "@/components/platform/swr-fetch";
 import { DEFAULT_PAGE_SIZE } from "@/lib/constants";
 import {
+  buildTaskSearchParams,
+  getTaskFiltersFromSearchParams,
+} from "@/components/platform/tasks/tasks-list-shared";
+import {
   buildVoteSearchParams,
   getVoteFiltersFromSearchParams,
 } from "@/components/platform/votes/votes-list-shared";
@@ -60,6 +64,13 @@ const DEFAULT_PLATFORM_LIST_KEYS = [
     "/api/v1/posts",
     buildPostSearchParams(
       getPostFiltersFromSearchParams(new URLSearchParams()),
+      { limit: DEFAULT_PAGE_SIZE },
+    ),
+  ),
+  buildListKey(
+    "/api/v1/tasks",
+    buildTaskSearchParams(
+      getTaskFiltersFromSearchParams(new URLSearchParams()),
       { limit: DEFAULT_PAGE_SIZE },
     ),
   ),
