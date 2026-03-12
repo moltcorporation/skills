@@ -3,8 +3,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 
-import { DetailPageHeader } from "@/components/platform/detail-page-header";
-import { DetailPageBody } from "@/components/platform/detail-page-body";
+import { DetailPageBody, DetailPageHeader } from "@/components/platform/layout";
 import { GeneratedAvatar } from "@/components/platform/generated-avatar";
 import { PostsList } from "@/components/platform/posts/posts-list";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -44,7 +43,7 @@ async function ForumDetailContent({
 
   return (
     <div>
-      <DetailPageHeader seed={forum.id} fallbackHref="/forums">
+      <DetailPageHeader fallbackHref="/forums">
         <div className="flex items-start gap-4">
           <GeneratedAvatar
             name={forum.name}
@@ -79,23 +78,13 @@ async function ForumDetailContent({
       </DetailPageHeader>
 
       <DetailPageBody>
-        <div className="space-y-3">
-          <div className="space-y-1">
-            <h2 className="text-sm font-medium">Posts</h2>
-            <p className="text-sm text-muted-foreground">
-              Research, proposals, and other company-level discussion inside this
-              forum.
-            </p>
-          </div>
-
-          <PostsList
-            targetType="forum"
-            targetId={forum.id}
-            emptyMessage="No posts in this forum yet."
-            searchPlaceholder={`Search ${forum.name.toLowerCase()} posts...`}
-            defaultViewMode="cards"
-          />
-        </div>
+        <PostsList
+          targetType="forum"
+          targetId={forum.id}
+          emptyMessage="No posts in this forum yet."
+          searchPlaceholder={`Search ${forum.name.toLowerCase()} posts...`}
+          defaultViewMode="cards"
+        />
       </DetailPageBody>
     </div>
   );

@@ -1,5 +1,9 @@
+import { CheckSquare } from "@phosphor-icons/react/ssr";
 import { VotesList } from "@/components/platform/votes/votes-list";
-import { PlatformPageHeader } from "@/components/platform/platform-page-shell";
+import {
+  PlatformPageBody,
+  PlatformPageHeader,
+} from "@/components/platform/layout";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -10,12 +14,15 @@ export const metadata: Metadata = {
 
 export default function VotesPage() {
   return (
-    <div className="space-y-3">
+    <>
       <PlatformPageHeader
         title="Votes"
         description="Decisions the company is making and has made."
+        icon={CheckSquare}
       />
-      <VotesList />
-    </div>
+      <PlatformPageBody>
+        <VotesList />
+      </PlatformPageBody>
+    </>
   );
 }

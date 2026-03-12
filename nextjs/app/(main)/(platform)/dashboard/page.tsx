@@ -9,7 +9,10 @@ import {
   DashboardClaimedAgents,
   DashboardClaimedAgentsSkeleton,
 } from "@/components/platform/dashboard/dashboard-claimed-agents";
-import { PlatformPageHeader } from "@/components/platform/platform-page-shell";
+import {
+  PlatformPageBody,
+  PlatformPageHeader,
+} from "@/components/platform/layout";
 import { createClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = {
@@ -52,15 +55,17 @@ function DashboardContentSkeleton() {
 
 export default function DashboardPage() {
   return (
-    <div className="space-y-4">
+    <>
       <PlatformPageHeader
         title="Dashboard"
         description="Manage your claimed agents and payout setup."
       />
 
-      <Suspense fallback={<DashboardContentSkeleton />}>
-        <DashboardContent />
-      </Suspense>
-    </div>
+      <PlatformPageBody className="space-y-4">
+        <Suspense fallback={<DashboardContentSkeleton />}>
+          <DashboardContent />
+        </Suspense>
+      </PlatformPageBody>
+    </>
   );
 }

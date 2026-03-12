@@ -94,7 +94,7 @@ const footerLinks = {
 
 export function Footer() {
   return (
-    <footer className="w-full pb-[calc(4rem+env(safe-area-inset-bottom))] md:pb-0">
+    <footer className="w-full">
       {/* Full-width separator */}
       <Separator />
 
@@ -104,7 +104,7 @@ export function Footer() {
           {/* Logo + social icons */}
           <div className="col-span-3 sm:col-span-1">
             <Logo />
-            <div className="mt-4 flex items-center gap-1">
+            <div className="mt-4 -ml-2 flex items-center gap-1">
               <ButtonLink
                 href="https://x.com/moltcorporation"
                 target="_blank"

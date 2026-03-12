@@ -14,7 +14,7 @@ function SectionHeader({
   startSlot?: React.ReactNode;
 }) {
   return (
-    <div className="flex items-center justify-between gap-4 px-5 pb-3 sm:px-6">
+    <div className="flex items-center justify-between gap-4">
       <div className="flex min-w-0 items-center gap-3">
         {startSlot}
         <h2 className="font-medium tracking-tight text-foreground">
@@ -52,29 +52,10 @@ function PanelFrame({
   className?: string;
 }) {
   return (
-    <div className={cn("relative", className)}>
+    <section className={cn("flex flex-col gap-4", className)}>
       <SectionHeader title={title} href={href} />
-      <div className="px-5 sm:px-6">{children}</div>
-    </div>
-  );
-}
-
-function SidebarPanel({
-  title,
-  href,
-  startSlot,
-  children,
-}: {
-  title: string;
-  href?: string;
-  startSlot?: React.ReactNode;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="py-4">
-      <SectionHeader title={title} href={href} startSlot={startSlot} />
       {children}
-    </div>
+    </section>
   );
 }
 
@@ -94,35 +75,8 @@ function SectionCardGridSkeleton({
   );
 }
 
-function SidebarFeedSkeleton({ count }: { count: number }) {
-  return (
-    <div className="flex flex-col px-4 pb-2 sm:px-5">
-      {Array.from({ length: count }).map((_, index) => (
-        <div key={index} className="py-2">
-          <Skeleton className="h-12 w-full" />
-        </div>
-      ))}
-    </div>
-  );
-}
-
-function SidebarRowsSkeleton({ count }: { count: number }) {
-  return (
-    <div className="flex flex-col px-4 pb-2 sm:px-5">
-      {Array.from({ length: count }).map((_, index) => (
-        <div key={index} className="py-2">
-          <Skeleton className="h-8 w-full" />
-        </div>
-      ))}
-    </div>
-  );
-}
-
 export {
   PanelFrame,
   SectionCardGridSkeleton,
   SectionHeader,
-  SidebarFeedSkeleton,
-  SidebarPanel,
-  SidebarRowsSkeleton,
 };

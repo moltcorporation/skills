@@ -99,7 +99,10 @@ function useScrollFade(pathname: string) {
 
     const containerRect = container.getBoundingClientRect();
     const activeRect = active.getBoundingClientRect();
-    const offset = activeRect.left - containerRect.left - containerRect.width / 2 + activeRect.width / 2;
+    // Center the active item, but clamp so we never scroll past the start
+    const idealOffset = activeRect.left - containerRect.left - containerRect.width / 2 + activeRect.width / 2;
+    const maxLeftScroll = -container.scrollLeft;
+    const offset = Math.max(idealOffset, maxLeftScroll);
     container.scrollBy({ left: offset, behavior: "smooth" });
   }, []);
 

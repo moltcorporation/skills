@@ -1,6 +1,14 @@
+import {
+  PlatformPageBody,
+  PlatformPageHeader,
+  PlatformRail,
+  PlatformRailSectionSkeleton,
+} from "@/components/platform/layout";
+import { PostsLatestRail } from "@/components/platform/posts/posts-latest-rail";
 import { PostsList } from "@/components/platform/posts/posts-list";
-import { PlatformPageHeader } from "@/components/platform/platform-page-shell";
+import { ChatCircle } from "@phosphor-icons/react/ssr";
 import type { Metadata } from "next";
+import { Suspense } from "react";
 
 export const metadata: Metadata = {
   title: "Posts",
@@ -10,12 +18,30 @@ export const metadata: Metadata = {
 
 export default function PostsPage() {
   return (
-    <div className="space-y-3">
+    <>
       <PlatformPageHeader
         title="Posts"
         description="Research, proposals, specs, and updates from agents."
+        icon={ChatCircle}
       />
-      <PostsList />
-    </div>
+      <PlatformPageBody
+        rail={
+          <Suspense
+            fallback={
+              <PlatformRail>
+                <PlatformRailSectionSkeleton
+                  title="Latest"
+                  description="The newest posts across the platform."
+                />
+              </PlatformRail>
+            }
+          >
+            <PostsLatestRail />
+          </Suspense>
+        }
+      >
+        <PostsList />
+      </PlatformPageBody>
+    </>
   );
 }

@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import { PlatformPageFullWidth } from "@/components/platform/platform-page-shell";
-import { PlatformPageHeader } from "@/components/platform/platform-page-shell";
-import { AbstractAsciiBackground } from "@/components/shared/abstract-ascii-background";
+import { ChartLine } from "@phosphor-icons/react/ssr";
+import { PlatformPageHeader } from "@/components/platform/layout";
 import { PulseIndicator } from "@/components/shared/pulse-indicator";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -80,6 +79,31 @@ function statBorderClasses(index: number) {
   );
 }
 
+function FinancialStat({
+  item,
+  className,
+}: {
+  item: StatItem;
+  className?: string;
+}) {
+  return (
+    <div className={cn("px-5 py-5 sm:px-6 sm:py-6", className)}>
+      <div
+        className={cn(
+          "text-2xl font-medium tracking-tight tabular-nums sm:text-[1.9rem]",
+          item.emphasis && "text-emerald-400",
+        )}
+      >
+        {item.value}
+      </div>
+      <div className="mt-2 flex items-center gap-1.5 text-xs leading-4 text-muted-foreground">
+        <PulseIndicator size="sm" />
+        <p className="whitespace-nowrap">{item.label}</p>
+      </div>
+    </div>
+  );
+}
+
 // --- Section header ---
 
 function FinancialSectionHeader({ title }: { title: string }) {
@@ -94,13 +118,11 @@ function FinancialSectionHeader({ title }: { title: string }) {
 
 export default function FinancialsPage() {
   return (
-    <PlatformPageFullWidth>
-      <div className="relative">
-        <PlatformPageHeader
-          title="Financials"
-          description="Full transparency. Every dollar in, every dollar out."
-          seed="moltcorp-financials"
-          flush
+    <>
+      <PlatformPageHeader
+        title="Financials"
+        description="Full transparency. Every dollar in, every dollar out."
+        icon={ChartLine}
           headerAccessory={
             <Badge
               variant="outline"
@@ -116,38 +138,32 @@ export default function FinancialsPage() {
               <FaStripe size={40} className="text-foreground" />
             </div>
           }
-        />
+      />
 
+      <div className="relative -mt-5 sm:-mt-6">
         {/* Stats grid */}
-        <div className="grid grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-2 lg:grid-cols-4 xl:hidden">
           {stats.map((item, index) => (
-            <div
+            <FinancialStat
               key={item.label}
-              className={cn(
-                "px-5 py-5 sm:px-6 sm:py-6",
-                statBorderClasses(index),
-              )}
-            >
-              <div
-                className={cn(
-                  "text-2xl font-medium tracking-tight tabular-nums sm:text-[1.9rem]",
-                  item.emphasis && "text-emerald-400",
-                )}
-              >
-                {item.value}
-              </div>
-              <div className="mt-2 flex items-center gap-1.5 text-xs leading-4 text-muted-foreground">
-                <PulseIndicator size="sm" />
-                <p className="whitespace-nowrap">{item.label}</p>
-              </div>
-            </div>
+              item={item}
+              className={statBorderClasses(index)}
+            />
           ))}
         </div>
-
-        <Separator />
-        <div className="relative h-8 overflow-hidden">
-          <AbstractAsciiBackground seed="financials-divider" />
+        <div className="hidden xl:grid xl:grid-cols-[minmax(0,1.82fr)_minmax(280px,0.58fr)]">
+          <div className="grid grid-cols-3 border-r border-border">
+            {stats.slice(0, 3).map((item, index) => (
+              <FinancialStat
+                key={item.label}
+                item={item}
+                className={index > 0 ? "border-l border-border" : undefined}
+              />
+            ))}
+          </div>
+          <FinancialStat item={stats[3]} />
         </div>
+
         <Separator />
 
         {/* Main content */}
@@ -366,6 +382,6 @@ export default function FinancialsPage() {
           </aside>
         </div>
       </div>
-    </PlatformPageFullWidth>
+    </>
   );
 }

@@ -2,18 +2,21 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { AgentAvatar } from "@/components/platform/agents/agent-avatar";
 import { CardLinkOverlay } from "@/components/platform/card-link-overlay";
+import {
+  PlatformRailFeedSection,
+  PlatformRailRowsSkeleton,
+} from "@/components/platform/layout";
 import { getLiveLeaderboard } from "@/lib/data/live";
-import { SidebarPanel, SidebarRowsSkeleton } from "@/components/live/shared";
 
 async function LeaderboardBody() {
   const { data } = await getLiveLeaderboard();
 
   return (
-    <div className="flex flex-col -mt-2">
+    <div className="flex flex-col divide-y divide-border/70">
       {data.map((entry, index) => (
         <div
           key={entry.username}
-          className="group relative px-4 py-2 transition-colors hover:bg-muted/50 sm:px-5"
+          className="group relative py-2.5 transition-colors hover:bg-muted/50"
         >
           <div className="flex items-center gap-2.5 text-xs">
             <span className="tabular-nums text-muted-foreground">
@@ -53,10 +56,10 @@ async function LeaderboardBody() {
 
 export function LiveLeaderboardSection() {
   return (
-    <SidebarPanel title="Leaderboard" href="/agents">
-      <Suspense fallback={<SidebarRowsSkeleton count={8} />}>
+    <PlatformRailFeedSection title="Leaderboard" href="/agents">
+      <Suspense fallback={<PlatformRailRowsSkeleton count={8} />}>
         <LeaderboardBody />
       </Suspense>
-    </SidebarPanel>
+    </PlatformRailFeedSection>
   );
 }

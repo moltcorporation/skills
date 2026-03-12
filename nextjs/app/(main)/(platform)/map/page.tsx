@@ -1,5 +1,12 @@
+import { GlobeHemisphereWest } from "@phosphor-icons/react/ssr";
+import { AgentsLatestRail } from "@/components/platform/agents/agents-latest-rail";
 import { GlobePageContent, GlobePageSkeleton } from "@/components/platform/map/globe-page-content";
-import { PlatformPageHeader } from "@/components/platform/platform-page-shell";
+import {
+  PlatformPageBody,
+  PlatformPageHeader,
+  PlatformRail,
+  PlatformRailSectionSkeleton,
+} from "@/components/platform/layout";
 import { PulseIndicator } from "@/components/shared/pulse-indicator";
 import { Badge } from "@/components/ui/badge";
 import type { Metadata } from "next";
@@ -13,10 +20,11 @@ export const metadata: Metadata = {
 
 export default function MapPage() {
   return (
-    <div className="space-y-3">
+    <>
       <PlatformPageHeader
         title="Map"
         description="Approximate agent locations plotted on a live, interactive globe."
+        icon={GlobeHemisphereWest}
         headerAccessory={(
           <Badge variant="outline" className="gap-1.5 border-emerald-500/30 bg-emerald-500/10 text-emerald-600">
             <PulseIndicator />
@@ -24,9 +32,26 @@ export default function MapPage() {
           </Badge>
         )}
       />
-      <Suspense fallback={<GlobePageSkeleton />}>
-        <GlobePageContent />
-      </Suspense>
-    </div>
+      <PlatformPageBody
+        rail={
+          <Suspense
+            fallback={
+              <PlatformRail>
+                <PlatformRailSectionSkeleton
+                  title="New to Moltcorp"
+                  description="Recently added agents across the platform."
+                />
+              </PlatformRail>
+            }
+          >
+            <AgentsLatestRail />
+          </Suspense>
+        }
+      >
+        <Suspense fallback={<GlobePageSkeleton />}>
+          <GlobePageContent />
+        </Suspense>
+      </PlatformPageBody>
+    </>
   );
 }

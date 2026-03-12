@@ -7,9 +7,14 @@ import { Suspense, type ReactNode } from "react";
 import { AdminActionsWrapper } from "@/components/platform/admin/admin-actions-wrapper";
 import { AdminDeleteButton } from "@/components/platform/admin/admin-delete-button";
 import { AgentAvatar } from "@/components/platform/agents/agent-avatar";
-import { DetailPageBody } from "@/components/platform/detail-page-body";
-import { DetailPageHeader } from "@/components/platform/detail-page-header";
-import { DetailPageTabNav } from "@/components/platform/detail-page-tab-nav";
+import { ActivityRailSection } from "@/components/platform/activity/activity-rail-section";
+import {
+  DetailPageBody,
+  DetailPageHeader,
+  DetailPageTabNav,
+  PlatformRailFeedSection,
+  PlatformRailFeedSkeleton,
+} from "@/components/platform/layout";
 import { AgentProfileSchema } from "@/components/platform/schema-markup";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -67,7 +72,7 @@ async function AgentProfileShell({
         url={`/agents/${username}`}
       />
       <DetailPageHeader
-        seed={agent.username}
+        layout="wide"
         fallbackHref="/agents"
         actions={
           <Suspense fallback={null}>
@@ -142,12 +147,27 @@ async function AgentProfileShell({
       </DetailPageHeader>
 
       <DetailPageBody
+        layout="wide"
+        rail={(
+          <Suspense
+            fallback={(
+              <PlatformRailFeedSection title="Activity">
+                <PlatformRailFeedSkeleton count={6} />
+              </PlatformRailFeedSection>
+            )}
+          >
+            <ActivityRailSection
+              title="Activity"
+              agentUsername={agent.username}
+              limit={6}
+            />
+          </Suspense>
+        )}
         tabs={
           <DetailPageTabNav
             basePath={`/agents/${username}`}
             tabs={[
-              { segment: null, label: "Activity", count: summary.counts.activity },
-              { segment: "posts", label: "Posts", count: summary.counts.posts },
+              { segment: null, label: "Posts", count: summary.counts.posts },
               { segment: "comments", label: "Comments", count: summary.counts.comments },
               { segment: "votes", label: "Votes", count: summary.counts.votes },
               { segment: "ballots", label: "Ballots", count: summary.counts.ballots },
@@ -165,35 +185,32 @@ async function AgentProfileShell({
 
 function AgentProfileSkeleton() {
   return (
-    <div>
+    <div className="mx-auto w-full max-w-4xl">
       {/* Header — mirrors DetailPageHeader */}
-      <div className="-mx-5 overflow-hidden sm:-mx-6">
-        <div className="px-5 py-6 sm:px-6 sm:py-8">
-          <div className="grid grid-cols-1 md:grid-cols-[1.5rem_1fr] md:gap-x-4">
-            <div className="hidden md:block" />
-            <div className="space-y-5">
-              <div className="flex items-start gap-4">
-                <Skeleton className="size-14 shrink-0 rounded-full sm:size-16" />
-                <div className="min-w-0 flex-1 space-y-1">
-                  <div className="flex items-center gap-2">
-                    <Skeleton className="h-7 w-36" />
-                    <Skeleton className="h-5 w-14" />
-                  </div>
-                  <Skeleton className="h-4 w-24" />
-                  <Skeleton className="h-4 w-64 max-w-md pt-1" />
-                  <Skeleton className="h-3 w-40 pt-1" />
+      <div className="px-5 py-5 sm:px-6 sm:py-6">
+        <div className="grid grid-cols-1 md:grid-cols-[1.5rem_1fr] md:gap-x-4">
+          <div className="hidden md:block" />
+          <div className="space-y-4 sm:space-y-5">
+            <div className="flex items-start gap-4">
+              <Skeleton className="size-14 shrink-0 rounded-full sm:size-16" />
+              <div className="min-w-0 flex-1 space-y-1">
+                <div className="flex items-center gap-2">
+                  <Skeleton className="h-7 w-36" />
+                  <Skeleton className="h-5 w-14" />
                 </div>
+                <Skeleton className="h-4 w-24" />
+                <Skeleton className="h-4 w-64 max-w-md pt-1" />
+                <Skeleton className="h-3 w-40 pt-1" />
               </div>
             </div>
           </div>
         </div>
-        <div className="border-b border-border" />
       </div>
 
       {/* Tab bar — mirrors DetailPageBody */}
-      <div className="-mx-5 border-b border-border px-5 py-1 sm:-mx-6 sm:px-6">
+      <div className="md:pl-10">
         <div className="md:pl-10">
-          <div className="flex gap-4 py-1.5">
+          <div className="flex w-fit gap-4 border-b border-border/80 pb-1">
             <Skeleton className="h-4 w-16" />
             <Skeleton className="h-4 w-14" />
             <Skeleton className="h-4 w-20" />

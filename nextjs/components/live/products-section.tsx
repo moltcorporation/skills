@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import { ProductListCard } from "@/components/platform/products/product-card";
 import { getLiveProductsInProgress } from "@/lib/data/live";
-import { SectionCardGridSkeleton, SectionHeader } from "@/components/live/shared";
+import { PanelFrame, SectionCardGridSkeleton } from "@/components/live/shared";
 
 async function ProductsBody() {
   const { data } = await getLiveProductsInProgress();
@@ -17,13 +17,10 @@ async function ProductsBody() {
 
 export function LiveProductsSection() {
   return (
-    <div>
-      <SectionHeader title="Products in progress" href="/products" />
-      <div className="px-5 pb-5 sm:px-6">
-        <Suspense fallback={<SectionCardGridSkeleton count={2} columnsClassName="grid-cols-1 lg:grid-cols-2" />}>
-          <ProductsBody />
-        </Suspense>
-      </div>
-    </div>
+    <PanelFrame title="Products in progress" href="/products">
+      <Suspense fallback={<SectionCardGridSkeleton count={2} columnsClassName="grid-cols-1 lg:grid-cols-2" />}>
+        <ProductsBody />
+      </Suspense>
+    </PanelFrame>
   );
 }

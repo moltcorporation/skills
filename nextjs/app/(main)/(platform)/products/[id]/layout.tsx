@@ -5,9 +5,11 @@ import { notFound } from "next/navigation";
 import { Suspense, type ReactNode } from "react";
 
 import { AdminDeleteProductButton } from "@/components/platform/admin/admin-delete-product-button";
-import { DetailPageBody } from "@/components/platform/detail-page-body";
-import { DetailPageHeader } from "@/components/platform/detail-page-header";
-import { DetailPageTabNav } from "@/components/platform/detail-page-tab-nav";
+import {
+  DetailPageBody,
+  DetailPageHeader,
+  DetailPageTabNav,
+} from "@/components/platform/layout";
 import { ProductSchema } from "@/components/platform/schema-markup";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -65,7 +67,6 @@ async function ProductDetailShell({
         url={`/products/${id}`}
       />
       <DetailPageHeader
-        seed={p.id}
         fallbackHref="/products"
         actions={
           <Suspense fallback={null}>
@@ -179,29 +180,26 @@ async function ProductAdminActions({
 
 function ProductDetailSkeleton() {
   return (
-    <div>
-      <div className="-mx-5 overflow-hidden sm:-mx-6">
-        <div className="px-5 py-6 sm:px-6 sm:py-8">
-          <div className="grid grid-cols-1 md:grid-cols-[1.5rem_1fr] md:gap-x-4">
-            <div className="hidden md:block" />
-            <div className="space-y-5">
-              <div className="space-y-3">
-                <div className="flex items-center gap-2">
-                  <Skeleton className="h-7 w-48" />
-                  <Skeleton className="h-5 w-16" />
-                </div>
-                <Skeleton className="h-4 w-full max-w-lg" />
-                <Skeleton className="h-3 w-40" />
+    <div className="mx-auto w-full max-w-4xl">
+      <div className="px-5 py-5 sm:px-6 sm:py-6">
+        <div className="grid grid-cols-1 md:grid-cols-[1.5rem_1fr] md:gap-x-4">
+          <div className="hidden md:block" />
+          <div className="space-y-4 sm:space-y-5">
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <Skeleton className="h-7 w-48" />
+                <Skeleton className="h-5 w-16" />
               </div>
+              <Skeleton className="h-4 w-full max-w-lg" />
+              <Skeleton className="h-3 w-40" />
             </div>
           </div>
         </div>
-        <div className="border-b border-border" />
       </div>
 
-      <div className="-mx-5 border-b border-border px-5 py-1 sm:-mx-6 sm:px-6">
+      <div className="md:pl-10">
         <div className="md:pl-10">
-          <div className="flex gap-4 py-1.5">
+          <div className="flex w-fit gap-4 border-b border-border/80 pb-1">
             <Skeleton className="h-4 w-14" />
             <Skeleton className="h-4 w-14" />
           </div>

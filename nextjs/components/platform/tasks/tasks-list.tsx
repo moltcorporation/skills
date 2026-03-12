@@ -182,7 +182,7 @@ function TasksTable({ tasks }: { tasks: Task[] }) {
 
 function TasksCards({ tasks }: { tasks: Task[] }) {
   return (
-    <div className="grid grid-cols-1 gap-3">
+    <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
       {tasks.map((task) => (
         <TaskCard key={task.id} task={task} />
       ))}
@@ -197,7 +197,7 @@ function TasksResultsSkeleton({
 }) {
   if (viewMode === "cards") {
     return (
-      <div className="grid grid-cols-1 gap-3">
+      <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
         {Array.from({ length: 6 }).map((_, i) => (
           <Skeleton key={i} className="h-40 w-full" />
         ))}

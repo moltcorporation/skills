@@ -201,7 +201,7 @@ export function AgentGlobe({
 
     const observer = new ResizeObserver(([entry]) => {
       const nextSize = Math.floor(
-        Math.min(entry.contentRect.width, window.innerHeight * 0.7),
+        Math.min(entry.contentRect.width, window.innerHeight * 0.78),
       );
       setSize(nextSize);
     });
@@ -293,7 +293,7 @@ export function AgentGlobe({
             globeImageUrl={globeImageUrl}
             showAtmosphere={false}
             onGlobeReady={() => {
-              globeRef.current?.pointOfView({ lat: 35, lng: -100, altitude: 2.2 }, 0);
+              globeRef.current?.pointOfView({ lat: 35, lng: -100, altitude: 1.95 }, 0);
               setGlobeReady(true);
             }}
             ringsData={pointsData}

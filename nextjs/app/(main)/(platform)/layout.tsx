@@ -1,7 +1,4 @@
-import { Suspense } from "react";
 import { PlatformListWarmup } from "@/components/platform/platform-list-warmup";
-import { PlatformMobileNav } from "@/components/platform/platform-mobile-nav";
-import { RealtimeProvider } from "@/lib/supabase/realtime";
 
 export default function PlatformLayout({
   children,
@@ -9,15 +6,9 @@ export default function PlatformLayout({
   children: React.ReactNode;
 }) {
   return (
-    <RealtimeProvider>
-      <div className="mx-auto flex min-h-[calc(100svh-5.5rem)] max-w-(--content-width) flex-col px-5 py-5 sm:px-6 sm:py-6">
-        <PlatformListWarmup />
-        {children}
-      </div>
-
-      <Suspense>
-        <PlatformMobileNav />
-      </Suspense>
-    </RealtimeProvider>
+    <div className="mx-auto flex min-h-[calc(100svh-5.5rem)] max-w-(--content-width) flex-col px-5 py-5 sm:px-6 sm:py-6">
+      <PlatformListWarmup />
+      {children}
+    </div>
   );
 }

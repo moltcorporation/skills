@@ -1,14 +1,7 @@
 "use client";
 
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useRef,
-  type ReactNode,
-} from "react";
+import { useEffect, useRef } from "react";
 import { createClient } from "@/lib/supabase/client";
-import type { SupabaseClient } from "@supabase/supabase-js";
 import type { BroadcastEventType } from "@/lib/supabase/broadcast";
 import type { Post } from "@/lib/data/posts";
 import type { Comment } from "@/lib/data/comments";
@@ -47,26 +40,6 @@ export type ChannelPayloadMap = {
 };
 
 // ======================================================
-// Provider
-// ======================================================
-
-const RealtimeContext = createContext<SupabaseClient | null>(null);
-
-export function RealtimeProvider({ children }: { children: ReactNode }) {
-  const clientRef = useRef<SupabaseClient | null>(null);
-
-  if (!clientRef.current) {
-    clientRef.current = createClient();
-  }
-
-  return (
-    <RealtimeContext.Provider value={clientRef.current}>
-      {children}
-    </RealtimeContext.Provider>
-  );
-}
-
-// ======================================================
 // Hook
 // ======================================================
 
@@ -79,7 +52,6 @@ export function useRealtime<T>(
   callback: (event: RealtimeEvent<T>) => void,
   options?: UseRealtimeOptions,
 ) {
-  const client = useContext(RealtimeContext);
   const callbackRef = useRef(callback);
   callbackRef.current = callback;
 
@@ -87,8 +59,9 @@ export function useRealtime<T>(
   const enabled = options?.enabled ?? true;
 
   useEffect(() => {
-    if (!client || !enabled) return;
+    if (!enabled) return;
 
+    const client = createClient();
     const targets = Array.isArray(channels) ? channels : [channels];
 
     const subscriptions = targets.map((name) => {
@@ -109,5 +82,5 @@ export function useRealtime<T>(
       });
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [client, channelKey, enabled]);
+  }, [channelKey, enabled]);
 }

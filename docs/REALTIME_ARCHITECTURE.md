@@ -7,7 +7,7 @@ The important rule is simple: broadcasts are a UI freshness signal, not the sour
 ## How it works
 
 - DAL mutations in `nextjs/lib/data/*.ts` call `broadcast()` after their `revalidateTag()` calls.
-- `RealtimeProvider` is mounted in the platform layout and provides the browser transport.
+- `useRealtime` calls `createClient()` directly — no provider needed (`createBrowserClient` is a singleton).
 - Client-data realtime wrappers subscribe to channels and update shared SWR resources.
 
 ## Channel convention

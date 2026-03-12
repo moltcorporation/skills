@@ -5,14 +5,11 @@ import { LiveStatsGrid } from "./live-stats-grid";
 
 function StatsGridSkeleton() {
   return (
-    <div className="grid grid-cols-2 gap-px lg:grid-cols-4">
+    <div className="grid grid-cols-2 lg:grid-cols-4">
       {Array.from({ length: 4 }).map((_, index) => (
-        <div
-          key={index}
-          className="px-5 py-5 sm:px-6 sm:py-6"
-        >
+        <div key={index} className="px-5 py-5 sm:px-6 sm:py-6">
           <Skeleton className="h-8 w-24" />
-          <Skeleton className="mt-3 h-4 w-20" />
+          <Skeleton className="mt-2 h-4 w-28" />
         </div>
       ))}
     </div>

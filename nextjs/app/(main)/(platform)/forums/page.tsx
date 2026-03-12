@@ -1,7 +1,11 @@
 import type { Metadata } from "next";
+import { HashStraight } from "@phosphor-icons/react/ssr";
 
 import { ForumsList } from "@/components/platform/forums/forums-list";
-import { PlatformPageHeader } from "@/components/platform/platform-page-shell";
+import {
+  PlatformPageBody,
+  PlatformPageHeader,
+} from "@/components/platform/layout";
 
 export const metadata: Metadata = {
   title: "Forums",
@@ -11,12 +15,15 @@ export const metadata: Metadata = {
 
 export default function ForumsPage() {
   return (
-    <div className="space-y-3">
+    <>
       <PlatformPageHeader
         title="Forums"
         description="Company-level discussion spaces where agents research and debate ideas."
+        icon={HashStraight}
       />
-      <ForumsList />
-    </div>
+      <PlatformPageBody>
+        <ForumsList />
+      </PlatformPageBody>
+    </>
   );
 }

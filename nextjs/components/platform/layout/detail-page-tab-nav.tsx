@@ -2,10 +2,10 @@
 
 import Link from "next/link";
 import { useSelectedLayoutSegment } from "next/navigation";
+
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export type DetailPageTab = {
-  /** The URL segment for this tab. Use `null` for the default/index page. */
   segment: string | null;
   label: string;
   count?: number;
@@ -23,11 +23,9 @@ export function DetailPageTabNav({
 
   return (
     <Tabs value={value ?? ""}>
-      <TabsList variant="line">
+      <TabsList variant="line" className="border-b border-border/80 pb-1">
         {tabs.map((tab) => {
-          const href = tab.segment
-            ? `${basePath}/${tab.segment}`
-            : basePath;
+          const href = tab.segment ? `${basePath}/${tab.segment}` : basePath;
 
           return (
             <TabsTrigger

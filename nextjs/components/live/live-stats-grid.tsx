@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useGlobalCounts } from "@/lib/client-data/platform/global-counts";
+import { useGlobalCountsRealtime } from "@/lib/client-data/platform/global-counts";
 import { AnimatedStatValue } from "@/components/shared/animated-stat-value";
 import { PulseIndicator } from "@/components/shared/pulse-indicator";
 import type { GlobalCounts } from "@/lib/data/stats";
@@ -16,12 +16,20 @@ type StatsItem = {
   href: string;
 };
 
+function statBorderClasses(index: number) {
+  return cn(
+    index % 2 === 1 && "border-l border-border lg:border-l-0",
+    index >= 2 && "border-t border-border lg:border-t-0",
+    index > 0 && "lg:border-l",
+  );
+}
+
 export function LiveStatsGrid({
   initialCounts,
 }: {
   initialCounts: GlobalCounts;
 }) {
-  const { data: counts = initialCounts } = useGlobalCounts({
+  const { data: counts = initialCounts } = useGlobalCountsRealtime({
     initialData: initialCounts,
   });
 
@@ -61,38 +69,37 @@ export function LiveStatsGrid({
   ];
 
   return (
-    <div className="grid grid-cols-2 gap-px lg:grid-cols-4">
+    <div className="grid grid-cols-2 lg:grid-cols-4">
       {data.map((item, index) => (
-        <div
+        <Link
           key={item.label}
-          className="relative rounded-lg transition-colors hover:bg-muted/50"
+          href={item.href}
+          className={cn(
+            "block px-5 py-5 outline-none transition-colors hover:bg-muted/40 sm:px-6 sm:py-6",
+            statBorderClasses(index),
+          )}
         >
-          <Link
-            href={item.href}
-            className="relative flex flex-col gap-2 px-5 py-5 outline-none sm:px-6 sm:py-6"
+          <div
+            className={cn(
+              "text-2xl font-medium tracking-tight tabular-nums sm:text-[1.9rem]",
+              item.emphasis && "text-emerald-600",
+            )}
           >
-            <div
-              className={cn(
-                "text-2xl font-medium tracking-tight tabular-nums sm:text-[1.9rem]",
-                item.emphasis && "text-emerald-400",
-              )}
-            >
-              <AnimatedStatValue
-                value={item.value}
-                suffix={item.suffix}
-                durationMs={950 + index * 140}
-                delayMs={index * 70}
-              />
-            </div>
-            <div className="flex items-center gap-1.5 text-xs leading-4 text-muted-foreground">
-              <PulseIndicator size="sm" />
-              <p className="whitespace-nowrap">
-                {item.label}
-                {item.sublabel ? ` ${item.sublabel}` : ""}
-              </p>
-            </div>
-          </Link>
-        </div>
+            <AnimatedStatValue
+              value={item.value}
+              suffix={item.suffix}
+              durationMs={950 + index * 140}
+              delayMs={index * 70}
+            />
+          </div>
+          <div className="mt-2 flex items-center gap-1.5 text-xs leading-4 text-muted-foreground">
+            <PulseIndicator size="sm" />
+            <p>
+              {item.label}
+              {item.sublabel ? ` ${item.sublabel}` : ""}
+            </p>
+          </div>
+        </Link>
       ))}
     </div>
   );

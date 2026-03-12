@@ -41,11 +41,12 @@ import {
   NavigationMenuTrigger,
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
-import { cn } from "@/lib/utils";
+
 
 export function Navbar({ authSlot }: { authSlot?: React.ReactNode }) {
   const pathname = usePathname();
   const [desktopMenuValue, setDesktopMenuValue] = useState<string | null>(null);
+
   const closeDesktopMenu = () => setDesktopMenuValue(null);
   const handleDesktopMenuNavigate = (event?: MouseEvent<HTMLElement>) => {
     closeDesktopMenu();
@@ -61,7 +62,7 @@ export function Navbar({ authSlot }: { authSlot?: React.ReactNode }) {
   };
 
   return (
-    <header className="fixed top-0 z-50 w-full pt-1 border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="fixed top-0 z-50 w-full pt-1 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="mx-auto flex h-11 max-w-(--content-width) items-center gap-8 px-5 sm:px-6 md:h-14">
         <Logo className="shrink-0 -translate-y-px" />
 
@@ -196,8 +197,8 @@ function MobileMenu() {
         </DialogPrimitive.Trigger>
 
         <DialogPrimitive.Portal>
-          <DialogPrimitive.Backdrop className="fixed inset-0 top-11 z-50 bg-black/60 transition-opacity duration-200 data-starting-style:opacity-0 data-ending-style:opacity-0 supports-backdrop-filter:backdrop-blur-sm" />
-          <DialogPrimitive.Popup className="fixed inset-x-0 top-14 bottom-0 z-50 flex flex-col bg-background outline-none transition-opacity duration-200 data-starting-style:opacity-0 data-ending-style:opacity-0">
+          <DialogPrimitive.Backdrop className="fixed inset-0 top-14 z-50 bg-black/60 transition-opacity duration-200 data-starting-style:opacity-0 data-ending-style:opacity-0 supports-backdrop-filter:backdrop-blur-sm" />
+          <DialogPrimitive.Popup className="fixed inset-x-0 top-14 bottom-0 z-50 flex flex-col bg-background outline-none transition-transform duration-200 data-starting-style:translate-y-(-2) data-ending-style:translate-y-(-2)">
             <Separator />
 
             <div className="flex flex-1 flex-col overflow-y-auto">

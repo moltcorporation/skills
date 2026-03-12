@@ -5,10 +5,12 @@ import { Suspense, type ReactNode } from "react";
 
 import { AdminActionsWrapper } from "@/components/platform/admin/admin-actions-wrapper";
 import { AdminDeleteButton } from "@/components/platform/admin/admin-delete-button";
-import { DetailPageBody } from "@/components/platform/detail-page-body";
-import { DetailPageHeader } from "@/components/platform/detail-page-header";
 import { EntityTargetHeader } from "@/components/platform/entity-target-header";
-import { DetailPageTabNav } from "@/components/platform/detail-page-tab-nav";
+import {
+  DetailPageBody,
+  DetailPageHeader,
+  DetailPageTabNav,
+} from "@/components/platform/layout";
 import { TaskStatusBadge } from "@/components/platform/tasks/task-card";
 import { TaskClaimDisplay } from "@/components/platform/tasks/task-claim-countdown";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -66,7 +68,6 @@ async function TaskDetailShell({
   return (
     <div>
       <DetailPageHeader
-        seed={task.id}
         fallbackHref="/tasks"
         actions={
           <Suspense fallback={null}>
@@ -168,38 +169,32 @@ async function TaskDetailShell({
 
 function TaskDetailSkeleton() {
   return (
-    <div>
+    <div className="mx-auto w-full max-w-4xl">
       {/* Header — mirrors DetailPageHeader */}
-      <div className="-mx-5 overflow-hidden sm:-mx-6">
-        <div className="px-5 py-6 sm:px-6 sm:py-8">
-          <div className="grid grid-cols-1 md:grid-cols-[1.5rem_1fr] md:gap-x-4">
-            <div className="hidden md:block" />
-            <div className="space-y-5">
-              {/* Entity target header */}
+      <div className="px-5 py-5 sm:px-6 sm:py-6">
+        <div className="grid grid-cols-1 md:grid-cols-[1.5rem_1fr] md:gap-x-4">
+          <div className="hidden md:block" />
+          <div className="space-y-4 sm:space-y-5">
+            <div className="flex items-center gap-2">
+              <Skeleton className="size-5 rounded-full" />
+              <Skeleton className="h-3 w-28" />
+              <Skeleton className="h-3 w-20" />
+            </div>
+            <div className="space-y-3">
               <div className="flex items-center gap-2">
-                <Skeleton className="size-5 rounded-full" />
-                <Skeleton className="h-3 w-28" />
-                <Skeleton className="h-3 w-20" />
+                <Skeleton className="h-7 w-3/4" />
+                <Skeleton className="h-5 w-14" />
               </div>
-              {/* Title + badge */}
-              <div className="space-y-3">
-                <div className="flex items-center gap-2">
-                  <Skeleton className="h-7 w-3/4" />
-                  <Skeleton className="h-5 w-14" />
-                </div>
-                {/* Date metadata */}
-                <Skeleton className="h-3 w-40" />
-              </div>
+              <Skeleton className="h-3 w-40" />
             </div>
           </div>
         </div>
-        <div className="border-b border-border" />
       </div>
 
       {/* Tab bar — mirrors DetailPageBody */}
-      <div className="-mx-5 border-b border-border px-5 py-1 sm:-mx-6 sm:px-6">
+      <div className="md:pl-10">
         <div className="md:pl-10">
-          <div className="flex gap-4 py-1.5">
+          <div className="flex w-fit gap-4 border-b border-border/80 pb-1">
             <Skeleton className="h-4 w-16" />
             <Skeleton className="h-4 w-24" />
             <Skeleton className="h-4 w-20" />
