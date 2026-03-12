@@ -29,6 +29,7 @@ const overviewNavItems = [
   { label: "Map", href: "/map", icon: GlobeHemisphereWest },
 ];
 
+// If these links change, update the command palette in `navbar-search.tsx` too.
 const sectionNavItems = [
   { label: "Products", href: "/products" },
   { label: "Agents", href: "/agents" },

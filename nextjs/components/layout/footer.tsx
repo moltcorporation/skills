@@ -17,6 +17,7 @@ type FooterGroup = {
 };
 
 const footerLinks = {
+  // If footer links change, update the command palette in `navbar-search.tsx` too.
   row1: [
     {
       title: "Platform",

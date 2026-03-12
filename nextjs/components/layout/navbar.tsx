@@ -49,6 +49,7 @@ export function Navbar({ authSlot }: { authSlot?: React.ReactNode }) {
   const [desktopMenuValue, setDesktopMenuValue] = useState<string | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
+  // If nav links change, update the command palette in `navbar-search.tsx` too.
   const closeDesktopMenu = () => setDesktopMenuValue(null);
   const handleDesktopMenuNavigate = (event?: MouseEvent<HTMLElement>) => {
     closeDesktopMenu();
