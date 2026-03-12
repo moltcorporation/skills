@@ -24,7 +24,7 @@ export function Logo({
     >
       <ColonyIcon size={iconSize} className="shrink-0" />
       <span
-        className="font-semibold tracking-tight leading-none"
+        className="font-bold tracking-tight leading-none"
         style={{
           fontFamily: "var(--font-geist-mono)",
           fontSize: `${lockup.wordmarkSize}px`,

@@ -1,10 +1,10 @@
 "use client";
 
 import { useState, type MouseEvent, type ReactNode } from "react";
+import { NavbarSubNav } from "@/components/layout/navbar-sub-nav";
 import { AbstractAsciiBackground } from "@/components/shared/abstract-ascii-background";
 import { ColonyIcon } from "@/components/brand/colony-icon";
 import { Logo } from "@/components/brand/logo";
-import { PulseIndicator } from "@/components/shared/pulse-indicator";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
 import {
   Accordion,
@@ -13,6 +13,12 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+} from "@/components/ui/input-group";
+import { Kbd } from "@/components/ui/kbd";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -32,8 +38,8 @@ import {
   Lightning,
   Cube,
   List,
+  MagnifyingGlass,
   MapTrifold,
-  Pulse,
   Robot,
   Scales,
   UserPlus,
@@ -62,31 +68,29 @@ export function NavbarClient({ authControls }: { authControls?: ReactNode }) {
 
   return (
     <header className="fixed top-0 z-50 w-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="mx-auto flex h-14 max-w-[1440px] items-center justify-between px-5 sm:px-6 md:grid md:grid-cols-[1fr_auto_1fr]">
-        {/* Logo — left column */}
-        <div className="flex items-center">
-          <Logo />
-        </div>
+      <div className="mx-auto flex h-14 max-w-(--content-width) items-center px-5 sm:px-6">
+        {/* Logo — self-center so the icon+wordmark unit centers in the h-14 bar */}
+        <Logo className="shrink-0" />
 
-        {/* Desktop Navigation — center column */}
+        {/* Search */}
+        <InputGroup className="ml-6 hidden w-56 md:flex">
+          <InputGroupAddon>
+            <MagnifyingGlass />
+          </InputGroupAddon>
+          <InputGroupInput placeholder="Search" />
+          <InputGroupAddon align="inline-end">
+            <Kbd>/</Kbd>
+          </InputGroupAddon>
+        </InputGroup>
+
+        {/* Desktop Navigation — right-aligned */}
         <NavigationMenu
-          align="center"
-          className="hidden md:flex"
+          align="end"
+          className="ml-auto hidden translate-y-px md:flex"
           value={desktopMenuValue}
           onValueChange={(value) => setDesktopMenuValue(value as string | null)}
         >
-          <NavigationMenuList>
-            <NavigationMenuItem key="live">
-              <NavigationMenuLink
-                onClick={handleDesktopMenuNavigate}
-                render={<Link href="/live" />}
-                className={cn(navigationMenuTriggerStyle(), "bg-transparent gap-2 text-muted-foreground hover:text-foreground")}
-              >
-                <PulseIndicator size="sm" />
-                Watch live
-              </NavigationMenuLink>
-            </NavigationMenuItem>
-
+          <NavigationMenuList className="gap-0.5">
             {/* Explore - Multi-column with featured panel */}
             <NavigationMenuItem key="explore" value="explore">
               <NavigationMenuTrigger className="bg-transparent text-muted-foreground hover:text-foreground">Explore</NavigationMenuTrigger>
@@ -177,8 +181,8 @@ export function NavbarClient({ authControls }: { authControls?: ReactNode }) {
           </NavigationMenuList>
         </NavigationMenu>
 
-        {/* Right column */}
-        <div className="flex items-center justify-end gap-3">
+        {/* Right side */}
+        <div className="ml-4 flex shrink-0 items-center gap-3">
           {authControls ? <div className="contents">{authControls}</div> : null}
 
           <ThemeToggle />
@@ -187,8 +191,7 @@ export function NavbarClient({ authControls }: { authControls?: ReactNode }) {
           <MobileMenu />
         </div>
       </div>
-      {/* Full-width border under navbar */}
-      <Separator />
+      <NavbarSubNav />
     </header>
   );
 }
@@ -213,22 +216,6 @@ function MobileMenu() {
             {/* Content */}
             <div className="flex flex-1 flex-col overflow-y-auto">
               <nav className="flex-1 px-3 pt-2 pb-6 sm:px-6">
-                <DialogPrimitive.Close
-                  nativeButton={false}
-                  render={
-                    <Link
-                      href="/live"
-                      className="flex items-center justify-between px-2 py-4 text-sm font-medium text-foreground transition-colors hover:text-muted-foreground"
-                    />
-                  }
-                >
-                  <span className="inline-flex items-center gap-2">
-                    Watch live
-                    <PulseIndicator size="sm" />
-                  </span>
-                  <ArrowRight className="size-4 text-muted-foreground" />
-                </DialogPrimitive.Close>
-                <Separator />
 
                 <DialogPrimitive.Close
                   nativeButton={false}

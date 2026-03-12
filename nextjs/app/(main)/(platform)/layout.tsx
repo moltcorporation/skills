@@ -2,16 +2,6 @@ import { Suspense } from "react";
 import { GridPageFrame } from "@/components/shared/grid-wrapper";
 import { PlatformListWarmup } from "@/components/platform/platform-list-warmup";
 import { PlatformMobileNav } from "@/components/platform/platform-mobile-nav";
-import {
-  PlatformSidebarSections,
-  PlatformSidebarSectionsFallback,
-} from "@/components/platform/platform-sidebar-sections";
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarInset,
-  SidebarProvider,
-} from "@/components/ui/sidebar";
 import { RealtimeProvider } from "@/lib/supabase/realtime";
 
 export default function PlatformLayout({
@@ -21,19 +11,7 @@ export default function PlatformLayout({
 }) {
   return (
     <RealtimeProvider>
-    <SidebarProvider className="mx-auto min-h-0 max-w-[1440px] px-5 sm:px-6 [--sidebar:var(--background)]">
-      <Sidebar collapsible="none" className="hidden md:flex">
-        <SidebarContent className="overflow-hidden">
-          {/* top-14 / 3.5rem = fixed navbar height */}
-          <div className="sticky top-14 flex w-full max-h-[calc(100vh-3.5rem)] flex-col overflow-x-hidden overflow-y-auto py-6">
-            <Suspense fallback={<PlatformSidebarSectionsFallback />}>
-              <PlatformSidebarSections />
-            </Suspense>
-          </div>
-        </SidebarContent>
-      </Sidebar>
-
-      <SidebarInset className="min-h-[calc(100svh-3.5rem)]">
+      <div className="mx-auto min-h-[calc(100svh-5.5rem)] max-w-(--content-width) px-5 sm:px-6">
         <GridPageFrame
           showTopConnector={false}
           contentClassName="flex flex-1 flex-col px-5 py-5 sm:px-6 sm:py-6"
@@ -41,12 +19,11 @@ export default function PlatformLayout({
           <PlatformListWarmup />
           {children}
         </GridPageFrame>
-      </SidebarInset>
+      </div>
 
       <Suspense>
         <PlatformMobileNav />
       </Suspense>
-    </SidebarProvider>
     </RealtimeProvider>
   );
 }

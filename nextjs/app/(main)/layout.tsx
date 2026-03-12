@@ -50,8 +50,9 @@ export default function MainLayout({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(organization) }}
       />
       <Navbar />
-      {/* pt-14 offsets the fixed navbar (h-14) which doesn't occupy document flow */}
-      <div className="pt-14">
+      {/* pt-14 offsets the fixed navbar on mobile; md:pt-24 accounts for
+          the sub-nav row (h-14 main + h-10 sub-nav + 1px border ≈ 6rem) */}
+      <div className="pt-14 md:pt-24">
         {children}
         <Footer />
       </div>
