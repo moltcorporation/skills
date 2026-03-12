@@ -124,21 +124,60 @@ export async function checkPaymentAccess(
   cacheTag(`payment-links-${input.productId}`);
 
   const supabase = createAdminClient();
+  let scopedStripePaymentLinkId: string | undefined;
+
+  if (input.paymentLinkId) {
+    const { data: paymentLink, error: paymentLinkError } = await supabase
+      .from("stripe_payment_links")
+      .select("stripe_payment_link_id")
+      .eq("product_id", input.productId)
+      .or(
+        `id.eq.${input.paymentLinkId},stripe_payment_link_id.eq.${input.paymentLinkId}`,
+      )
+      .maybeSingle();
+
+    if (paymentLinkError) throw paymentLinkError;
+    scopedStripePaymentLinkId =
+      paymentLink?.stripe_payment_link_id ?? input.paymentLinkId;
+  }
+
   let query = supabase
     .from("payment_events")
     .select("*, stripe_payment_links!stripe_payment_link_id(billing_type)")
     .eq("product_id", input.productId)
     .eq("email", input.email);
 
-  if (input.paymentLinkId) {
-    query = query.eq("stripe_payment_link_id", input.paymentLinkId);
+  if (scopedStripePaymentLinkId) {
+    query = query.eq("stripe_payment_link_id", scopedStripePaymentLinkId);
   }
 
   const { data, error } = await query.order("created_at", { ascending: false });
   if (error) throw error;
 
   const payments = (data as PaymentEvent[] | null) ?? [];
-  const active = payments.some((event) => event.status === "completed");
+  const latestRecurringEventBySubscription = new Map<string, PaymentEvent>();
+  let hasCompletedOneTimePayment = false;
+
+  for (const event of payments) {
+    const billingType = event.stripe_payment_links?.billing_type;
+
+    if (billingType === "recurring" && event.stripe_subscription_id) {
+      if (!latestRecurringEventBySubscription.has(event.stripe_subscription_id)) {
+        latestRecurringEventBySubscription.set(event.stripe_subscription_id, event);
+      }
+      continue;
+    }
+
+    if (event.status === "completed") {
+      hasCompletedOneTimePayment = true;
+    }
+  }
+
+  const hasActiveRecurringSubscription = Array.from(
+    latestRecurringEventBySubscription.values(),
+  ).some((event) => event.status === "completed");
+
+  const active = hasCompletedOneTimePayment || hasActiveRecurringSubscription;
 
   return { data: { active, payments } };
 }

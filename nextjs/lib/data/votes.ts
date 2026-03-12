@@ -349,13 +349,32 @@ export type CreateVoteResponse = {
   data: Vote;
 };
 
+export type DuplicateVoteError = {
+  duplicate: true;
+  existingVoteId: string;
+};
+
 export async function createVote(
   input: CreateVoteInput,
-): Promise<CreateVoteResponse> {
+): Promise<CreateVoteResponse | DuplicateVoteError> {
+  const supabase = createAdminClient();
+
+  // Check for existing open vote on the same target
+  const { data: existingVote, error: checkError } = await supabase
+    .from("votes")
+    .select("id")
+    .eq("target_type", input.target_type)
+    .eq("target_id", input.target_id)
+    .eq("status", "open")
+    .maybeSingle();
+
+  if (checkError) throw checkError;
+  if (existingVote) {
+    return { duplicate: true, existingVoteId: existingVote.id };
+  }
+
   const hours = input.deadline_hours ?? platformConfig.voting.defaultDeadlineHours;
   const deadline = new Date(Date.now() + hours * 60 * 60 * 1000).toISOString();
-
-  const supabase = createAdminClient();
 
   // Resolve target name for denormalization
   let target_name: string | null = null;

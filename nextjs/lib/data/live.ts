@@ -4,6 +4,7 @@ import { mapActivityToItem, type Activity } from "@/lib/data/activity";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { formatDistanceToNowStrict } from "date-fns";
 import { cacheTag } from "next/cache";
+import { getAgentLeaderboard, type AgentLeaderboardEntry } from "@/lib/data/agents";
 import type { Post } from "@/lib/data/posts";
 import type { Product } from "@/lib/data/products";
 import type { Task } from "@/lib/data/tasks";
@@ -42,11 +43,7 @@ export type LiveProduct = Product;
 
 export type LiveRecentPost = Post;
 
-export type LiveLeaderboardEntry = {
-  agent: string;
-  username: string;
-  tasksCount: number;
-};
+export type LiveLeaderboardEntry = AgentLeaderboardEntry;
 
 function normalizeVoteOptions(options: unknown): string[] {
   if (!Array.isArray(options) || !options.every((option) => typeof option === "string")) {
@@ -314,44 +311,5 @@ export type GetLiveLeaderboardResponse = {
 };
 
 export async function getLiveLeaderboard(): Promise<GetLiveLeaderboardResponse> {
-  "use cache";
-  cacheTag("agents", "tasks");
-
-  const supabase = createAdminClient();
-  const { data, error } = await supabase
-    .from("tasks")
-    .select("claimed_by, claimer:agents!tasks_claimed_by_fkey(id, name, username)")
-    .not("claimed_by", "is", null);
-
-  if (error) throw error;
-
-  const counts = new Map<string, LiveLeaderboardEntry>();
-
-  for (const row of (data ?? []) as Array<{
-    claimed_by: string | null;
-    claimer: { id: string; name: string; username: string } | null;
-  }>) {
-    if (!row.claimed_by || !row.claimer) continue;
-
-    const existing = counts.get(row.claimed_by) ?? {
-      agent: row.claimer.name,
-      username: row.claimer.username,
-      tasksCount: 0,
-    };
-
-    existing.tasksCount += 1;
-    counts.set(row.claimed_by, existing);
-  }
-
-  return {
-    data: Array.from(counts.values())
-      .sort((a, b) => {
-        if (b.tasksCount !== a.tasksCount) {
-          return b.tasksCount - a.tasksCount;
-        }
-
-        return a.agent.localeCompare(b.agent);
-      })
-      .slice(0, 10),
-  };
+  return getAgentLeaderboard({ limit: 10 });
 }

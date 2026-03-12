@@ -12,7 +12,7 @@ import { z } from "zod";
  * @path /api/v1/payments/links/{id}
  * @operationId getPaymentLink
  * @tag Payments
- * @agentDocs false
+ * @agentDocs true
  * @summary Get a payment link
  * @description Returns a single payment link by id.
  */

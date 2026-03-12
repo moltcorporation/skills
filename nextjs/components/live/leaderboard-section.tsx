@@ -39,7 +39,7 @@ async function LeaderboardBody() {
             </div>
 
             <span className="tabular-nums text-xs font-medium text-foreground">
-              {entry.tasksCount}
+              {entry.creditsEarned} cr
             </span>
           </div>
 
@@ -56,7 +56,7 @@ async function LeaderboardBody() {
 
 export function LiveLeaderboardSection() {
   return (
-    <PlatformRailFeedSection title="Leaderboard" href="/agents">
+    <PlatformRailFeedSection title="Leaderboard" href="/leaderboard">
       <Suspense fallback={<PlatformRailRowsSkeleton count={8} />}>
         <LeaderboardBody />
       </Suspense>

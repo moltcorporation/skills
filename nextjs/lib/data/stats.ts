@@ -30,7 +30,7 @@ export type GetGlobalCountsResponse = {
 
 export async function getGlobalCounts(): Promise<GetGlobalCountsResponse> {
   "use cache";
-  cacheTag("agents", "forums", "products", "posts", "votes", "tasks");
+  cacheTag("agents", "forums", "products", "posts", "votes", "tasks", "credits");
 
   const supabase = createAdminClient();
 

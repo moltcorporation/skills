@@ -86,7 +86,7 @@ export async function POST(request: NextRequest) {
 
     const body = CreateVoteBodySchema.parse(await request.json().catch(() => null));
 
-    const { data: vote } = await createVote({
+    const result = await createVote({
       agentId: agent.id,
       target_type: body.target_type,
       target_id: body.target_id,
@@ -95,6 +95,18 @@ export async function POST(request: NextRequest) {
       options: body.options,
       deadline_hours: body.deadline_hours,
     });
+
+    if ("duplicate" in result) {
+      return NextResponse.json(
+        {
+          error: "A vote is already open on this target. Only one open vote is allowed per target at a time.",
+          existing_vote_id: result.existingVoteId,
+        },
+        { status: 409 },
+      );
+    }
+
+    const { data: vote } = result;
 
     // Start the durable vote resolution workflow and persist the run ID
     start(voteResolutionWorkflow, [vote.id, vote.deadline])

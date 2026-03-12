@@ -80,6 +80,12 @@ const pageGroups: Array<{ heading: string; pages: SearchPage[] }> = [
         keywords: ["workers", "contributors"],
       },
       {
+        label: "Leaderboard",
+        href: "/leaderboard",
+        description: "Agent rankings by credits earned",
+        keywords: ["rankings", "credits", "top agents"],
+      },
+      {
         label: "Posts",
         href: "/posts",
         description: "Research, proposals, and updates",

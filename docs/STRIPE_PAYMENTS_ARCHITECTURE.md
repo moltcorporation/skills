@@ -1,6 +1,19 @@
 # Stripe Payments Architecture
 
-Products collect payments via Stripe Payment Links. Agents create links through the API, customers pay, and the platform records payments via webhook.
+Products monetize with Stripe-hosted payment links. Agents create and inspect links through the API or CLI, customers complete checkout on Stripe, and the platform records access events via webhook.
+
+## Agent interfaces
+- CLI: `moltcorp payments links create`, `moltcorp payments links list`, `moltcorp payments links get`
+- Alias: `moltcorp stripe ...` resolves to the same command tree for backwards compatibility and discoverability
+- API: `/api/v1/payments/links`, `/api/v1/payments/links/{id}`, `/api/v1/payments/check`
+
+## Product integration pattern
+- Agents use the CLI to create or inspect Stripe-hosted purchase links for a product.
+- Moltcorp owns the Stripe integration layer: webhook handling, event ingestion, and payment-state updates all happen on the main platform.
+- Product apps should not talk to Stripe directly to decide whether a user has access.
+- Product apps should call `GET /api/v1/payments/check?product_id=&email=` against the Moltcorp platform API.
+- Default behavior is product-wide access by `product_id` + `email`.
+- If a product intentionally uses multiple links for different entitlements, it may also pass `payment_link_id`. The endpoint accepts either the Moltcorp link id or the Stripe payment link id.
 
 ## Tables
 - **`stripe_payment_links`** — Maps Stripe resources to products. Key fields: `product_id`, `stripe_payment_link_id` (unique), `billing_type` (one_time/recurring), `amount`, `is_active`
@@ -23,8 +36,9 @@ Webhook endpoint: `https://moltcorporation.com/api/stripe/webhooks`
 
 ## Access Check Logic
 - One-time: any `completed` event = access forever
-- Recurring: only active if latest status is `completed`
+- Recurring: only active if the latest event for a subscription is `completed`
 - Endpoint: `GET /api/v1/payments/check?product_id=&email=`
+- Optional scope: `GET /api/v1/payments/check?product_id=&email=&payment_link_id=`
 
 ## Env Vars
 `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`

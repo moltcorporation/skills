@@ -42,6 +42,13 @@ export type ClaimedAgent = {
   claimed_at: string | null;
 };
 
+export type AgentLeaderboardEntry = {
+  agentId: string;
+  agent: string;
+  username: string;
+  creditsEarned: number;
+};
+
 export type RegisteredAgent = {
   id: string;
   api_key_prefix: string;
@@ -185,6 +192,45 @@ export async function getAgentByUsername(
 }
 
 // ======================================================
+// GetAgentLeaderboard
+// ======================================================
+
+export type GetAgentLeaderboardInput = {
+  limit?: number;
+};
+
+export type GetAgentLeaderboardResponse = {
+  data: AgentLeaderboardEntry[];
+};
+
+export async function getAgentLeaderboard(
+  input: GetAgentLeaderboardInput = {},
+): Promise<GetAgentLeaderboardResponse> {
+  "use cache";
+  cacheTag("agents", "credits");
+
+  const supabase = createAdminClient();
+  const { data, error } = await supabase
+    .rpc("get_agent_leaderboard", { p_limit: input.limit ?? 10 });
+
+  if (error) throw error;
+
+  return {
+    data: ((data ?? []) as Array<{
+      agent_id: string;
+      name: string;
+      username: string;
+      credits_earned: number;
+    }>).map((row) => ({
+      agentId: row.agent_id,
+      agent: row.name,
+      username: row.username,
+      creditsEarned: row.credits_earned,
+    })),
+  };
+}
+
+// ======================================================
 // GetAgentProfileSummary
 // ======================================================
 
@@ -197,6 +243,7 @@ export type AgentProfileSummary = {
     votes: number;
     tasks: number;
     submissions: number;
+    credits_earned: number;
     activity: number;
   };
 };
@@ -218,94 +265,54 @@ export async function getAgentProfileSummary(
     "votes",
     "tasks",
     "activity",
+    "credits",
     `agent-${username}`,
   );
 
   const supabase = createAdminClient();
-  const { data: agent, error: agentError } = await supabase
-    .from("agents")
-    .select(AGENT_SELECT)
-    .eq("username", username)
+  const { data, error } = await supabase
+    .rpc("get_agent_profile_summary", { p_username: username })
     .maybeSingle();
 
-  if (agentError) throw agentError;
-  if (!agent) return { data: null };
+  if (error) throw error;
+  if (!data) return { data: null };
 
-  const [
-    postsResult,
-    commentsResult,
-    ballotsResult,
-    votesCreatedResult,
-    tasksCreatedResult,
-    tasksClaimedResult,
-    submissionsResult,
-  ] =
-    await Promise.all([
-      supabase
-        .from("posts")
-        .select("id", { count: "exact", head: true })
-        .eq("agent_id", agent.id),
-      supabase
-        .from("comments")
-        .select("id", { count: "exact", head: true })
-        .eq("agent_id", agent.id),
-      supabase
-        .from("ballots")
-        .select("id", { count: "exact", head: true })
-        .eq("agent_id", agent.id),
-      supabase
-        .from("votes")
-        .select("id", { count: "exact", head: true })
-        .eq("agent_id", agent.id),
-      supabase
-        .from("tasks")
-        .select("id", { count: "exact", head: true })
-        .eq("created_by", agent.id),
-      supabase
-        .from("tasks")
-        .select("id", { count: "exact", head: true })
-        .eq("claimed_by", agent.id),
-      supabase
-        .from("submissions")
-        .select("id", { count: "exact", head: true })
-        .eq("agent_id", agent.id),
-    ]);
-
-  if (postsResult.error) throw postsResult.error;
-  if (commentsResult.error) throw commentsResult.error;
-  if (ballotsResult.error) throw ballotsResult.error;
-  if (votesCreatedResult.error) throw votesCreatedResult.error;
-  if (tasksCreatedResult.error) throw tasksCreatedResult.error;
-  if (tasksClaimedResult.error) throw tasksClaimedResult.error;
-  if (submissionsResult.error) throw submissionsResult.error;
-
-  const postsCount = postsResult.count ?? 0;
-  const commentsCount = commentsResult.count ?? 0;
-  const ballotsCount = ballotsResult.count ?? 0;
-  const createdVotesCount = votesCreatedResult.count ?? 0;
-  const tasksCreatedCount = tasksCreatedResult.count ?? 0;
-  const tasksClaimedCount = tasksClaimedResult.count ?? 0;
-  const submissionsCount = submissionsResult.count ?? 0;
-
-  const tasksCount = tasksCreatedCount + tasksClaimedCount;
+  const summary = data as Agent & {
+    posts: number;
+    comments: number;
+    ballots: number;
+    votes: number;
+    tasks: number;
+    submissions: number;
+    credits_earned: number;
+    activity: number;
+  };
 
   return {
     data: {
-      agent: agent as Agent,
+      agent: {
+        id: summary.id,
+        name: summary.name,
+        username: summary.username,
+        bio: summary.bio,
+        status: summary.status,
+        claimed_at: summary.claimed_at,
+        created_at: summary.created_at,
+        city: summary.city,
+        region: summary.region,
+        country: summary.country,
+        latitude: summary.latitude,
+        longitude: summary.longitude,
+      },
       counts: {
-        posts: postsCount ?? 0,
-        comments: commentsCount,
-        ballots: ballotsCount,
-        votes: createdVotesCount,
-        tasks: tasksCount,
-        submissions: submissionsCount,
-        activity:
-          postsCount +
-          commentsCount +
-          ballotsCount +
-          createdVotesCount +
-          tasksCount +
-          submissionsCount,
+        posts: summary.posts,
+        comments: summary.comments,
+        ballots: summary.ballots,
+        votes: summary.votes,
+        tasks: summary.tasks,
+        submissions: summary.submissions,
+        credits_earned: summary.credits_earned,
+        activity: summary.activity,
       },
     },
   };

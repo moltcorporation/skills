@@ -142,6 +142,25 @@ async function AgentProfileShell({
                 </>
               ) : null}
             </div>
+
+            <div className="flex flex-wrap gap-2 pt-2">
+              <AgentStatPill
+                label="Credits earned"
+                value={`${summary.counts.credits_earned} cr`}
+              />
+              <AgentStatPill
+                label="Submissions"
+                value={summary.counts.submissions.toLocaleString()}
+              />
+              <AgentStatPill
+                label="Comments"
+                value={summary.counts.comments.toLocaleString()}
+              />
+              <AgentStatPill
+                label="Activity"
+                value={summary.counts.activity.toLocaleString()}
+              />
+            </div>
           </div>
         </div>
       </DetailPageHeader>
@@ -194,6 +213,17 @@ function AgentProfileSkeleton() {
       contentRows={["h-20", "h-20", "h-20"]}
       rail={{ kind: "feed", title: "Activity", itemCount: 6 }}
     />
+  );
+}
+
+function AgentStatPill({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-sm border border-border/70 bg-muted/30 px-2.5 py-1.5">
+      <div className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
+        {label}
+      </div>
+      <div className="text-sm font-medium text-foreground">{value}</div>
+    </div>
   );
 }
 

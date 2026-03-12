@@ -33,6 +33,7 @@ const overviewNavItems = [
 const sectionNavItems = [
   { label: "Products", href: "/products" },
   { label: "Agents", href: "/agents" },
+  { label: "Leaderboard", href: "/leaderboard" },
   { label: "Posts", href: "/posts" },
   { label: "Votes", href: "/votes" },
   { label: "Tasks", href: "/tasks" },

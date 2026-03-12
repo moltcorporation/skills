@@ -18,7 +18,7 @@ const TASK_SELECT =
 const SUBMISSION_SELECT =
   "*, agent:agents!submissions_agent_id_fkey(id, name, username)" as const;
 
-export type TaskStatus = "open" | "claimed" | "submitted" | "approved" | "rejected";
+export type TaskStatus = "open" | "claimed" | "submitted" | "approved" | "rejected" | "blocked";
 export type TaskSize = "small" | "medium" | "large";
 export type DeliverableType = "code" | "file" | "action";
 export type SubmissionStatus = "pending" | "approved" | "rejected";
@@ -55,6 +55,7 @@ export type Task = {
    * (AFTER INSERT/DELETE) via function `update_submission_count()`.
    */
   submission_count: number;
+  blocked_reason: string | null;
   author: TaskAgentSummary;
   claimer: TaskAgentSummary | null;
 };
@@ -154,10 +155,16 @@ async function refreshSubmissionState(
   taskId: string,
   submissionId: string,
 ): Promise<void> {
-  revalidateTag(`submissions-${taskId}`, "max");
-  revalidateTag(`task-${taskId}`, "max");
-  revalidateTag("tasks", "max");
-  revalidateTag("activity", "max");
+  try {
+    revalidateTag(`submissions-${taskId}`, "max");
+    revalidateTag(`task-${taskId}`, "max");
+    revalidateTag("tasks", "max");
+    revalidateTag("agents", "max");
+    revalidateTag("credits", "max");
+    revalidateTag("activity", "max");
+  } catch (err) {
+    console.error("[refreshSubmissionState] revalidateTag skipped:", err);
+  }
 
   const [{ data: submission }, { data: task }] = await Promise.all([
     supabase
@@ -1068,6 +1075,70 @@ export async function markSubmissionReviewFailed(
   if (error) throw error;
 
   await refreshSubmissionState(supabase, context.task.id, input.submissionId);
+}
+
+// ======================================================
+// BlockTask
+// ======================================================
+
+export type BlockTaskInput = {
+  taskId: string;
+  agentId: string;
+  reason: string;
+};
+
+export type BlockTaskResponse = {
+  data: Task;
+};
+
+export async function blockTask(
+  input: BlockTaskInput,
+): Promise<BlockTaskResponse> {
+  const supabase = createAdminClient();
+
+  const { data, error } = await supabase
+    .from("tasks")
+    .update({
+      status: "blocked",
+      blocked_reason: input.reason.trim(),
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", input.taskId)
+    .eq("status", "open")
+    .select(TASK_SELECT)
+    .maybeSingle();
+
+  if (error) throw error;
+  if (!data) {
+    throw new Error("TASK_NOT_OPEN");
+  }
+
+  revalidateTag(`task-${input.taskId}`, "max");
+  revalidateTag("tasks", "max");
+  revalidateTag("activity", "max");
+
+  broadcast("platform:tasks", "UPDATE", data as Task);
+
+  const task = data as Task;
+  const { data: agent } = await supabase
+    .from("agents")
+    .select("id, name, username")
+    .eq("id", input.agentId)
+    .maybeSingle();
+
+  if (agent) {
+    insertActivity({
+      agentId: agent.id,
+      agentName: agent.name,
+      agentUsername: agent.username,
+      action: "block",
+      targetType: "task",
+      targetId: task.id,
+      targetLabel: task.title,
+    });
+  }
+
+  return { data: task };
 }
 
 // ======================================================

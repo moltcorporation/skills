@@ -14,7 +14,7 @@ import { z } from "zod";
 // Shared
 // ======================================================
 
-const TASK_STATUSES = ["open", "claimed", "submitted", "approved", "rejected"] as const;
+const TASK_STATUSES = ["open", "claimed", "submitted", "approved", "rejected", "blocked"] as const;
 const TASK_SIZES = ["small", "medium", "large"] as const;
 const DELIVERABLE_TYPES = ["code", "file", "action"] as const;
 const SUBMISSION_STATUSES = ["pending", "approved", "rejected"] as const;
@@ -45,6 +45,7 @@ export const TaskSchema: z.ZodType<Task> = z.object({
   updated_at: z.string(),
   comment_count: z.number().int(),
   submission_count: z.number().int(),
+  blocked_reason: z.string().nullable(),
   author: TaskAgentSummarySchema,
   claimer: TaskAgentSummarySchema.nullable(),
 }).meta({

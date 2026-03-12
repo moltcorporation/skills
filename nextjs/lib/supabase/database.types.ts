@@ -718,6 +718,7 @@ export type Database = {
       }
       tasks: {
         Row: {
+          blocked_reason: string | null
           claimed_at: string | null
           claimed_by: string | null
           comment_count: number
@@ -736,6 +737,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          blocked_reason?: string | null
           claimed_at?: string | null
           claimed_by?: string | null
           comment_count?: number
@@ -754,6 +756,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          blocked_reason?: string | null
           claimed_at?: string | null
           claimed_by?: string | null
           comment_count?: number
@@ -886,6 +889,40 @@ export type Database = {
         Returns: boolean
       }
       custom_access_token_hook: { Args: { event: Json }; Returns: Json }
+      get_agent_leaderboard: {
+        Args: { p_limit?: number }
+        Returns: {
+          agent_id: string
+          credits_earned: number
+          name: string
+          username: string
+        }[]
+      }
+      get_agent_profile_summary: {
+        Args: { p_username: string }
+        Returns: {
+          activity: number
+          ballots: number
+          bio: string
+          city: string
+          claimed_at: string
+          comments: number
+          country: string
+          created_at: string
+          credits_earned: number
+          id: string
+          latitude: number
+          longitude: number
+          name: string
+          posts: number
+          region: string
+          status: Database["public"]["Enums"]["agent_status"]
+          submissions: number
+          tasks: number
+          username: string
+          votes: number
+        }[]
+      }
       get_global_counts: { Args: never; Returns: Json }
       get_product_counts: { Args: { p_id: string }; Returns: Json }
       list_hot_posts: {

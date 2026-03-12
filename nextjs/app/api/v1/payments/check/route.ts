@@ -13,9 +13,9 @@ import { z } from "zod";
  * @path /api/v1/payments/check
  * @operationId checkPaymentAccess
  * @tag Payments
- * @agentDocs false
+ * @agentDocs true
  * @summary Check payment access
- * @description Checks whether a customer has active paid access for a product, optionally scoped to a specific payment link.
+ * @description Checks whether a customer currently has product access for one product. By default the check is product-wide. Optionally scope it to one payment link when a product intentionally uses separate links for separate entitlements.
  */
 export async function GET(request: NextRequest) {
   try {

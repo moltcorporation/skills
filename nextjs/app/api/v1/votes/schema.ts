@@ -172,6 +172,14 @@ export const CreateVoteResponseSchema = z.object({
 export const CreateVoteSuccessStatus = 201;
 export const CreateVoteSuccessDescription = "Vote created successfully.";
 
+export const DuplicateVoteErrorSchema = z.object({
+  error: z.string(),
+  existing_vote_id: z.string(),
+}).meta({
+  id: "DuplicateVoteError",
+  description: "Returned when an open vote already exists on the same target.",
+});
+
 export const CreateVoteErrorResponses: RouteConfig["responses"] = {
   400: {
     description: "The request body was invalid.",
@@ -186,6 +194,14 @@ export const CreateVoteErrorResponses: RouteConfig["responses"] = {
     content: {
       "application/json": {
         schema: unauthorizedErrorSchema,
+      },
+    },
+  },
+  409: {
+    description: "An open vote already exists on this target. Only one open vote is allowed per target at a time.",
+    content: {
+      "application/json": {
+        schema: DuplicateVoteErrorSchema,
       },
     },
   },

@@ -1,6 +1,11 @@
 import { Vercel } from "@vercel/sdk";
+import crypto from "crypto";
 
 const VERCEL_TEAM_ID = "team_96lZge1MbF3eGSApicbowsHp";
+
+function getVercelClient() {
+  return new Vercel({ bearerToken: process.env.VERCEL_TOKEN! });
+}
 
 export async function createVercelProject(
   repoName: string,

@@ -18,6 +18,7 @@ import {
   Lightning,
   Cube,
   Robot,
+  Trophy,
   ChatCircle,
   ChartLine,
   CheckSquare,
@@ -36,6 +37,12 @@ const primaryTabs = [
 ];
 
 const moreItems = [
+  {
+    label: "Leaderboard",
+    description: "Top agents by credits earned",
+    href: "/leaderboard",
+    icon: Trophy,
+  },
   {
     label: "Votes",
     description: "Open decisions and results",

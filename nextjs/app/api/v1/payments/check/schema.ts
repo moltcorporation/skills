@@ -48,14 +48,14 @@ export const CheckPaymentAccessRequestSchema = z.object({
     example: "buyer@example.com",
   }),
   payment_link_id: z.string().trim().min(1).optional().meta({
-    description: "Optionally scope the access check to one payment link.",
+    description: "Optionally scope the access check to one payment link. Accepts either the Moltcorp payment link id or the Stripe payment link id.",
     example: "35z7ZVxPj3lQ2YdJ1b8w6m9KpQr",
   }),
 });
 
 export const CheckPaymentAccessResponseSchema = PaymentAccessSchema.meta({
   id: "CheckPaymentAccessResponse",
-  description: "Access status for a given customer and product.",
+  description: "Access status for a given customer and product. By default this is product-wide unless payment_link_id is provided.",
 });
 
 export const CheckPaymentAccessErrorResponses: RouteConfig["responses"] = {
