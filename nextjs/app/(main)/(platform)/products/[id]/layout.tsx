@@ -5,14 +5,19 @@ import { notFound } from "next/navigation";
 import { Suspense, type ReactNode } from "react";
 
 import { AdminDeleteProductButton } from "@/components/platform/admin/admin-delete-product-button";
+import { ActivityRailSection } from "@/components/platform/activity/activity-rail-section";
 import {
   DetailPageBody,
   DetailPageHeader,
+  DetailPageSkeleton,
   DetailPageTabNav,
+  PlatformRail,
+  PlatformRailFeedSection,
+  PlatformRailFeedSkeleton,
 } from "@/components/platform/layout";
 import { ProductSchema } from "@/components/platform/schema-markup";
+import { PulseIndicator } from "@/components/shared/pulse-indicator";
 import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
 import { deleteProductAction } from "@/lib/actions/admin";
 import { PRODUCT_STATUS_CONFIG } from "@/lib/constants";
 import { getProductResources, getProductSummary } from "@/lib/data/products";
@@ -67,6 +72,7 @@ async function ProductDetailShell({
         url={`/products/${id}`}
       />
       <DetailPageHeader
+        layout="wide"
         fallbackHref="/products"
         actions={
           <Suspense fallback={null}>
@@ -134,6 +140,7 @@ async function ProductDetailShell({
       </DetailPageHeader>
 
       <DetailPageBody
+        layout="wide"
         tabs={
           <DetailPageTabNav
             basePath={`/products/${id}`}
@@ -142,6 +149,28 @@ async function ProductDetailShell({
               { segment: "tasks", label: "Tasks", count: counts.tasks },
             ]}
           />
+        }
+        rail={
+          <Suspense
+            fallback={
+              <PlatformRail>
+                <PlatformRailFeedSection
+                  title="Activity"
+                  href="/activity"
+                  startSlot={<PulseIndicator />}
+                >
+                  <PlatformRailFeedSkeleton count={7} />
+                </PlatformRailFeedSection>
+              </PlatformRail>
+            }
+          >
+            <ActivityRailSection
+              title="Activity"
+              href="/activity"
+              startSlot={<PulseIndicator />}
+              limit={7}
+            />
+          </Suspense>
         }
       >
         {children}
@@ -180,32 +209,16 @@ async function ProductAdminActions({
 
 function ProductDetailSkeleton() {
   return (
-    <div className="mx-auto w-full max-w-4xl">
-      <div className="px-5 py-5 sm:px-6 sm:py-6">
-        <div className="grid grid-cols-1 md:grid-cols-[1.5rem_1fr] md:gap-x-4">
-          <div className="hidden md:block" />
-          <div className="space-y-4 sm:space-y-5">
-            <div className="space-y-3">
-              <div className="flex items-center gap-2">
-                <Skeleton className="h-7 w-48" />
-                <Skeleton className="h-5 w-16" />
-              </div>
-              <Skeleton className="h-4 w-full max-w-lg" />
-              <Skeleton className="h-3 w-40" />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="md:pl-10">
-        <div className="md:pl-10">
-          <div className="flex w-fit gap-4 border-b border-border/80 pb-1">
-            <Skeleton className="h-4 w-14" />
-            <Skeleton className="h-4 w-14" />
-          </div>
-        </div>
-      </div>
-    </div>
+    <DetailPageSkeleton
+      header="simple"
+      titleWidth="w-48"
+      badgeWidth="w-16"
+      descriptionLines={["w-full max-w-lg"]}
+      metaLines={["w-40"]}
+      tabs={["w-14", "w-14"]}
+      contentRows={["h-20", "h-20", "h-20"]}
+      rail={{ kind: "feed", title: "Activity", itemCount: 7 }}
+    />
   );
 }
 

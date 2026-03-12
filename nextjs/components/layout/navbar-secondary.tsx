@@ -131,7 +131,7 @@ function useScrollFade(pathname: string) {
   return { onRef, updateFades, showLeftFade, showRightFade };
 }
 
-export function NavbarSecondary() {
+export function NavbarSecondary({ className }: { className?: string }) {
   const pathname = usePathname();
   const [menuValue, setMenuValue] = useState<string | null>(null);
   const closeMenu = () => setMenuValue(null);
@@ -154,7 +154,7 @@ export function NavbarSecondary() {
       {/* Left padding reduced on mobile by 2.5 (10px) to offset the first nav link's
           internal px-2.5, so its text aligns flush with the logo and body content above.
           Desktop uses -ml-2.5 on the NavigationMenuList instead (overflow is visible). */}
-      <div className="mx-auto max-w-(--content-width) px-5 pl-2.5 sm:px-6 sm:pl-3.5 md:pl-5 md:sm:pl-6">
+      <div className={cn("mx-auto max-w-(--content-width) px-5 pl-2.5 sm:px-6 sm:pl-3.5 md:pl-5 md:sm:pl-6", className)}>
         <nav className="relative flex h-9 items-center pb-2">
           {/* Left fade */}
           {showLeftFade && (

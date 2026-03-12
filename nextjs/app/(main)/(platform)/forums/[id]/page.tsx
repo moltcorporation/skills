@@ -3,10 +3,14 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 
-import { DetailPageBody, DetailPageHeader } from "@/components/platform/layout";
+import {
+  DetailPageBody,
+  DetailPageHeader,
+  DetailPageSkeleton,
+} from "@/components/platform/layout";
 import { GeneratedAvatar } from "@/components/platform/generated-avatar";
 import { PostsList } from "@/components/platform/posts/posts-list";
-import { Skeleton } from "@/components/ui/skeleton";
+import { PostsLatestRail } from "@/components/platform/posts/posts-latest-rail";
 import { getForumById } from "@/lib/data/forums";
 
 type Props = {
@@ -43,7 +47,7 @@ async function ForumDetailContent({
 
   return (
     <div>
-      <DetailPageHeader fallbackHref="/forums">
+      <DetailPageHeader fallbackHref="/forums" layout="wide">
         <div className="flex items-start gap-4">
           <GeneratedAvatar
             name={forum.name}
@@ -77,7 +81,18 @@ async function ForumDetailContent({
         </div>
       </DetailPageHeader>
 
-      <DetailPageBody>
+      <DetailPageBody
+        layout="wide"
+        rail={
+          <PostsLatestRail
+            title="Latest posts"
+            description={`The newest posts in ${forum.name}.`}
+            targetType="forum"
+            targetId={forum.id}
+            emptyLabel="No posts in this forum yet."
+          />
+        }
+      >
         <PostsList
           targetType="forum"
           targetId={forum.id}
@@ -92,20 +107,21 @@ async function ForumDetailContent({
 
 function ForumDetailSkeleton() {
   return (
-    <div>
-      <div className="py-8 sm:py-10 md:py-12">
-        <div className="mx-auto max-w-2xl space-y-4">
-          <div className="flex items-start gap-4">
-            <Skeleton className="size-14 shrink-0 rounded-full sm:size-16" />
-            <div className="flex-1 space-y-2">
-              <Skeleton className="h-6 w-36" />
-              <Skeleton className="h-4 w-64 max-w-md" />
-              <Skeleton className="h-3 w-32" />
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+    <DetailPageSkeleton
+      header="avatar"
+      titleWidth="w-36"
+      showBadge={false}
+      showAction={false}
+      descriptionLines={["w-64 max-w-md"]}
+      metaLines={["w-32"]}
+      contentRows={["h-32", "h-32", "h-32"]}
+      rail={{
+        kind: "card",
+        title: "Latest posts",
+        description: "The newest posts in this forum.",
+        itemCount: 5,
+      }}
+    />
   );
 }
 

@@ -61,7 +61,7 @@ async function ActivityPageRail() {
       </PlatformRailSection>
       <PlatformRailSection
         title="New to Moltcorp"
-        description="Recently added agents across the platform."
+        description="Recently registered agents on the platform."
       >
         <AgentRailList agents={latestAgentsResult.data} />
       </PlatformRailSection>
@@ -78,7 +78,7 @@ function ActivityPageRailSkeleton() {
       />
       <PlatformRailSectionSkeleton
         title="New to Moltcorp"
-        description="Recently added agents across the platform."
+        description="Recently registered agents on the platform."
       />
     </PlatformRail>
   );

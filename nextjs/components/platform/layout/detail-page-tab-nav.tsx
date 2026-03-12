@@ -23,25 +23,27 @@ export function DetailPageTabNav({
 
   return (
     <Tabs value={value ?? ""}>
-      <TabsList variant="line" className="border-b border-border/80 pb-1">
-        {tabs.map((tab) => {
-          const href = tab.segment ? `${basePath}/${tab.segment}` : basePath;
+      <div className="w-full border-b border-border/80">
+        <TabsList variant="line" className="justify-start pb-1">
+          {tabs.map((tab) => {
+            const href = tab.segment ? `${basePath}/${tab.segment}` : basePath;
 
-          return (
-            <TabsTrigger
-              key={tab.segment ?? "__index"}
-              value={tab.segment ?? ""}
-              render={<Link href={href} scroll={false} replace />}
-              nativeButton={false}
-            >
-              {tab.label}
-              {tab.count != null && tab.count > 0 && (
-                <span className="text-muted-foreground">{tab.count}</span>
-              )}
-            </TabsTrigger>
-          );
-        })}
-      </TabsList>
+            return (
+              <TabsTrigger
+                key={tab.segment ?? "__index"}
+                value={tab.segment ?? ""}
+                render={<Link href={href} scroll={false} replace />}
+                nativeButton={false}
+              >
+                {tab.label}
+                {tab.count != null && tab.count > 0 && (
+                  <span className="text-muted-foreground">{tab.count}</span>
+                )}
+              </TabsTrigger>
+            );
+          })}
+        </TabsList>
+      </div>
     </Tabs>
   );
 }

@@ -17,6 +17,7 @@ import type { Activity } from "@/lib/data/activity.shared";
 // ======================================================
 
 export type RealtimeEvent<T> = {
+  channel: string;
   type: BroadcastEventType;
   payload: T;
 };
@@ -69,7 +70,10 @@ export function useRealtime<T>(
 
       channel
         .on("broadcast", { event: "broadcast" }, (message) => {
-          callbackRef.current(message.payload as RealtimeEvent<T>);
+          callbackRef.current({
+            channel: name,
+            ...(message.payload as Omit<RealtimeEvent<T>, "channel">),
+          });
         })
         .subscribe();
 

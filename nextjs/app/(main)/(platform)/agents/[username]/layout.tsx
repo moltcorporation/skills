@@ -11,13 +11,13 @@ import { ActivityRailSection } from "@/components/platform/activity/activity-rai
 import {
   DetailPageBody,
   DetailPageHeader,
+  DetailPageSkeleton,
   DetailPageTabNav,
   PlatformRailFeedSection,
   PlatformRailFeedSkeleton,
 } from "@/components/platform/layout";
 import { AgentProfileSchema } from "@/components/platform/schema-markup";
 import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
 import { deleteAgentAction } from "@/lib/actions/admin";
 import { AGENT_STATUS_CONFIG } from "@/lib/constants";
 import { getAgentProfileSummary } from "@/lib/data/agents";
@@ -151,13 +151,13 @@ async function AgentProfileShell({
         rail={(
           <Suspense
             fallback={(
-              <PlatformRailFeedSection title="Activity">
+              <PlatformRailFeedSection title="Agent activity">
                 <PlatformRailFeedSkeleton count={6} />
               </PlatformRailFeedSection>
             )}
           >
             <ActivityRailSection
-              title="Activity"
+              title="Agent activity"
               agentUsername={agent.username}
               limit={6}
             />
@@ -185,41 +185,15 @@ async function AgentProfileShell({
 
 function AgentProfileSkeleton() {
   return (
-    <div className="mx-auto w-full max-w-4xl">
-      {/* Header — mirrors DetailPageHeader */}
-      <div className="px-5 py-5 sm:px-6 sm:py-6">
-        <div className="grid grid-cols-1 md:grid-cols-[1.5rem_1fr] md:gap-x-4">
-          <div className="hidden md:block" />
-          <div className="space-y-4 sm:space-y-5">
-            <div className="flex items-start gap-4">
-              <Skeleton className="size-14 shrink-0 rounded-full sm:size-16" />
-              <div className="min-w-0 flex-1 space-y-1">
-                <div className="flex items-center gap-2">
-                  <Skeleton className="h-7 w-36" />
-                  <Skeleton className="h-5 w-14" />
-                </div>
-                <Skeleton className="h-4 w-24" />
-                <Skeleton className="h-4 w-64 max-w-md pt-1" />
-                <Skeleton className="h-3 w-40 pt-1" />
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Tab bar — mirrors DetailPageBody */}
-      <div className="md:pl-10">
-        <div className="md:pl-10">
-          <div className="flex w-fit gap-4 border-b border-border/80 pb-1">
-            <Skeleton className="h-4 w-16" />
-            <Skeleton className="h-4 w-14" />
-            <Skeleton className="h-4 w-20" />
-            <Skeleton className="h-4 w-14" />
-            <Skeleton className="h-4 w-14" />
-          </div>
-        </div>
-      </div>
-    </div>
+    <DetailPageSkeleton
+      header="avatar"
+      titleWidth="w-36"
+      descriptionLines={["w-24", "w-full max-w-md"]}
+      metaLines={["w-56"]}
+      tabs={["w-16", "w-20", "w-16", "w-16", "w-14", "w-24"]}
+      contentRows={["h-20", "h-20", "h-20"]}
+      rail={{ kind: "feed", title: "Activity", itemCount: 6 }}
+    />
   );
 }
 

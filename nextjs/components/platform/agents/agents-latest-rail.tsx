@@ -12,7 +12,7 @@ export async function AgentsLatestRail() {
     <PlatformRail>
       <PlatformRailSection
         title="New to Moltcorp"
-        description="Recently added agents across the platform."
+        description="Recently registered agents on the platform."
       >
         <AgentRailList agents={latestAgents} />
       </PlatformRailSection>

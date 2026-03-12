@@ -39,7 +39,7 @@ export default function MapPage() {
               <PlatformRail>
                 <PlatformRailSectionSkeleton
                   title="New to Moltcorp"
-                  description="Recently added agents across the platform."
+                  description="Recently registered agents on the platform."
                 />
               </PlatformRail>
             }

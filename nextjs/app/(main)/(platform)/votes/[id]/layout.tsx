@@ -6,15 +6,20 @@ import { Suspense, type ReactNode } from "react";
 import { AdminActionsWrapper } from "@/components/platform/admin/admin-actions-wrapper";
 import { AdminDeleteButton } from "@/components/platform/admin/admin-delete-button";
 import { AdminFastForwardButton } from "@/components/platform/admin/admin-fast-forward-button";
+import { ActivityRailSection } from "@/components/platform/activity/activity-rail-section";
 import {
   DetailPageBody,
   DetailPageHeader,
+  DetailPageSkeleton,
   DetailPageTabNav,
+  PlatformRail,
+  PlatformRailFeedSection,
+  PlatformRailFeedSkeleton,
 } from "@/components/platform/layout";
 import { EntityTargetHeader } from "@/components/platform/entity-target-header";
+import { PulseIndicator } from "@/components/shared/pulse-indicator";
 import { VoteDeadlineDisplay } from "@/components/platform/votes/vote-card";
 import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
 import { deleteVoteAction, fastForwardVoteAction } from "@/lib/actions/admin";
 import {
   VOTE_STATUS_CONFIG,
@@ -72,6 +77,7 @@ async function VoteDetailShell({
   return (
     <div>
       <DetailPageHeader
+        layout="wide"
         fallbackHref="/votes"
         actions={
           <Suspense fallback={null}>
@@ -141,6 +147,7 @@ async function VoteDetailShell({
       </DetailPageHeader>
 
       <DetailPageBody
+        layout="wide"
         tabs={
           <DetailPageTabNav
             basePath={`/votes/${id}`}
@@ -157,6 +164,28 @@ async function VoteDetailShell({
             ]}
           />
         }
+        rail={
+          <Suspense
+            fallback={
+              <PlatformRail>
+                <PlatformRailFeedSection
+                  title="Activity"
+                  href="/activity"
+                  startSlot={<PulseIndicator />}
+                >
+                  <PlatformRailFeedSkeleton count={7} />
+                </PlatformRailFeedSection>
+              </PlatformRail>
+            }
+          >
+            <ActivityRailSection
+              title="Activity"
+              href="/activity"
+              startSlot={<PulseIndicator />}
+              limit={7}
+            />
+          </Suspense>
+        }
       >
         {children}
       </DetailPageBody>
@@ -166,42 +195,14 @@ async function VoteDetailShell({
 
 function VoteDetailSkeleton() {
   return (
-    <div className="mx-auto w-full max-w-4xl">
-      {/* Header — mirrors DetailPageHeader */}
-      <div className="px-5 py-5 sm:px-6 sm:py-6">
-        <div className="grid grid-cols-1 md:grid-cols-[1.5rem_1fr] md:gap-x-4">
-          <div className="hidden md:block" />
-          <div className="space-y-4 sm:space-y-5">
-            <div className="flex items-center gap-2">
-              <Skeleton className="size-5 rounded-full" />
-              <Skeleton className="h-3 w-28" />
-              <Skeleton className="h-3 w-20" />
-            </div>
-            <div className="space-y-3">
-              <div className="flex items-center gap-2">
-                <Skeleton className="h-7 w-3/4" />
-                <Skeleton className="h-5 w-14" />
-              </div>
-              <Skeleton className="h-4 w-2/3" />
-              <Skeleton className="h-3 w-40" />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Tab bar — mirrors DetailPageBody */}
-      <div className="md:pl-10">
-        <div className="md:pl-10">
-          <div className="flex w-fit gap-4 border-b border-border/80 pb-1">
-            <Skeleton className="h-4 w-16" />
-            <Skeleton className="h-4 w-20" />
-            <Skeleton className="h-4 w-14" />
-            <Skeleton className="h-4 w-14" />
-            <Skeleton className="h-4 w-14" />
-          </div>
-        </div>
-      </div>
-    </div>
+    <DetailPageSkeleton
+      header="eyebrow"
+      descriptionLines={["w-2/3"]}
+      metaLines={["w-40"]}
+      tabs={["w-16", "w-20", "w-14", "w-14", "w-14"]}
+      contentRows={["h-20", "h-20", "h-20"]}
+      rail={{ kind: "feed", title: "Activity", itemCount: 7 }}
+    />
   );
 }
 

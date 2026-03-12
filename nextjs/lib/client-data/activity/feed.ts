@@ -2,6 +2,7 @@
 
 import type { ListActivityResponse } from "@/app/api/v1/activity/schema";
 import type { Activity, LiveActivityItem } from "@/lib/data/activity.shared";
+import { mapActivityToItem } from "@/lib/data/activity.shared";
 import { DEFAULT_PAGE_SIZE } from "@/lib/constants";
 import { buildListUrl, useInfiniteResource, type InfiniteResourceKeyOptions } from "@/lib/client-data/infinite-resource";
 import { useRealtime } from "@/lib/supabase/realtime";
@@ -103,7 +104,27 @@ export function useActivityFeedRealtime(input: UseActivityFeedInput = {}) {
       return;
     }
 
-    resource.revalidate();
+    const nextItem = mapActivityToItem(event.payload);
+
+    void resource.mutate((pages) => {
+      const currentPages = pages ?? [];
+
+      if (currentPages.length === 0) {
+        return [{
+          activity: [nextItem],
+          nextCursor: null,
+        }];
+      }
+
+      const [firstPage, ...restPages] = currentPages;
+      const dedupedItems = firstPage.activity.filter((item) => item.id !== nextItem.id);
+      const nextFirstPageItems = [nextItem, ...dedupedItems].slice(0, DEFAULT_PAGE_SIZE);
+
+      return [{
+        ...firstPage,
+        activity: nextFirstPageItems,
+      }, ...restPages];
+    }, { revalidate: false });
   });
 
   return resource;

@@ -1,14 +1,16 @@
 import { Cube } from "@phosphor-icons/react/ssr";
 import { Suspense } from "react";
 
+import { ActivityRailSection } from "@/components/platform/activity/activity-rail-section";
 import { ProductsList } from "@/components/platform/products/products-list";
-import { ProductsLatestRail } from "@/components/platform/products/products-latest-rail";
 import {
   PlatformPageBody,
   PlatformPageHeader,
   PlatformRail,
-  PlatformRailSectionSkeleton,
+  PlatformRailFeedSection,
+  PlatformRailFeedSkeleton,
 } from "@/components/platform/layout";
+import { PulseIndicator } from "@/components/shared/pulse-indicator";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -30,14 +32,22 @@ export default function ProductsPage() {
           <Suspense
             fallback={
               <PlatformRail>
-                <PlatformRailSectionSkeleton
-                  title="Latest"
-                  description="The newest products across the platform."
-                />
+                <PlatformRailFeedSection
+                  title="Activity"
+                  href="/activity"
+                  startSlot={<PulseIndicator />}
+                >
+                  <PlatformRailFeedSkeleton count={7} />
+                </PlatformRailFeedSection>
               </PlatformRail>
             }
           >
-            <ProductsLatestRail />
+            <ActivityRailSection
+              title="Activity"
+              href="/activity"
+              startSlot={<PulseIndicator />}
+              limit={7}
+            />
           </Suspense>
         }
       >
