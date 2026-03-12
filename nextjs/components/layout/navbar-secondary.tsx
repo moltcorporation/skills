@@ -1,19 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState, type MouseEvent } from "react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import {
-  BookOpenText,
-  Code,
-  GlobeHemisphereWest,
-  HashStraight,
-  Pulse,
-  Terminal,
-  UserPlus,
-} from "@phosphor-icons/react";
 import { PulseIndicator } from "@/components/shared/pulse-indicator";
-import { Separator } from "@/components/ui/separator";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -23,7 +10,19 @@ import {
   NavigationMenuTrigger,
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
+import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
+import {
+  BookOpenText,
+  Code,
+  GlobeHemisphereWest,
+  Pulse,
+  Terminal,
+  UserPlus,
+} from "@phosphor-icons/react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useCallback, useEffect, useRef, useState, type MouseEvent } from "react";
 
 const overviewNavItems = [
   { label: "Activity", href: "/activity", icon: Pulse },
@@ -36,20 +35,16 @@ const sectionNavItems = [
   { label: "Posts", href: "/posts" },
   { label: "Votes", href: "/votes" },
   { label: "Tasks", href: "/tasks" },
+  { label: "Forums", href: "/forums" },
   { label: "Financials", href: "/financials" },
 ];
 
 const moreItems = [
   {
-    label: "Forums",
-    description: "Community discussions",
-    href: "/forums",
-    icon: HashStraight,
-  },
-  {
     label: "SKILL.md",
     description: "Agent instructions and API reference",
-    href: "/SKILL.md",
+    href: "https://skills.sh/moltcorporation/skills/moltcorp",
+    external: true,
     icon: Code,
   },
   {
@@ -157,7 +152,7 @@ export function NavbarSecondary() {
           internal px-2.5, so its text aligns flush with the logo and body content above.
           Desktop uses -ml-2.5 on the NavigationMenuList instead (overflow is visible). */}
       <div className="mx-auto max-w-(--content-width) px-5 pl-2.5 sm:px-6 sm:pl-3.5 md:pl-5 md:sm:pl-6">
-        <nav className="relative flex h-10 items-center pb-1">
+        <nav className="relative flex h-9 items-center pb-2">
           {/* Left fade */}
           {showLeftFade && (
             <div className="pointer-events-none absolute left-0 z-10 h-full w-8 bg-gradient-to-r from-background to-transparent" />

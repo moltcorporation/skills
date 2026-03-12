@@ -28,6 +28,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { ColonyIcon } from "@/components/brand/colony-icon";
 import { Logo } from "@/components/brand/logo";
+import { NavbarSearch } from "@/components/layout/navbar-search";
 import { NavbarSecondary } from "@/components/layout/navbar-secondary";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
 import { Separator } from "@/components/ui/separator";
@@ -42,7 +43,7 @@ import {
 } from "@/components/ui/navigation-menu";
 import { cn } from "@/lib/utils";
 
-export function Navbar() {
+export function Navbar({ authSlot }: { authSlot?: React.ReactNode }) {
   const pathname = usePathname();
   const [desktopMenuValue, setDesktopMenuValue] = useState<string | null>(null);
   const closeDesktopMenu = () => setDesktopMenuValue(null);
@@ -72,18 +73,6 @@ export function Navbar() {
           onValueChange={(value) => setDesktopMenuValue(value as string | null)}
         >
           <NavigationMenuList className="justify-start gap-0.5">
-            {/* How it works — simple link */}
-            <NavigationMenuItem key="how-it-works">
-              <NavigationMenuLink
-                onClick={handleDesktopMenuNavigate}
-                active={pathname.startsWith("/how-it-works")}
-                render={<Link href="/how-it-works" />}
-                className={navigationMenuTriggerStyle()}
-              >
-                How it works
-              </NavigationMenuLink>
-            </NavigationMenuItem>
-
             {/* Explore — dropdown */}
             <NavigationMenuItem key="explore" value="explore">
               <NavigationMenuTrigger>Explore</NavigationMenuTrigger>
@@ -172,33 +161,19 @@ export function Navbar() {
                 Manifesto
               </NavigationMenuLink>
             </NavigationMenuItem>
+
           </NavigationMenuList>
         </NavigationMenu>
 
         {/* Right side */}
         <div className="ml-auto flex shrink-0 items-center gap-2 md:ml-0">
-          <NavigationMenu className="hidden md:flex">
-            <NavigationMenuList className="gap-2">
-              <NavigationMenuItem>
-                <NavigationMenuLink href="/login" className={navigationMenuTriggerStyle()}>
-                  Log in
-                </NavigationMenuLink>
-              </NavigationMenuItem>
-              <NavigationMenuItem>
-                <NavigationMenuLink
-                  href="/register"
-                  className={cn(
-                    navigationMenuTriggerStyle(),
-                    "bg-primary text-primary-foreground hover:bg-primary/80 focus-visible:bg-primary/80"
-                  )}
-                >
-                  Register agent
-                </NavigationMenuLink>
-              </NavigationMenuItem>
-            </NavigationMenuList>
-          </NavigationMenu>
+          <NavbarSearch />
+          <ThemeToggle className="hidden md:inline-flex" />
+          <div className="hidden items-center gap-2 md:flex">
+            {authSlot}
+          </div>
 
-          <ThemeToggle />
+          <ThemeToggle className="md:hidden" />
 
           <MobileMenu />
         </div>

@@ -1,6 +1,8 @@
 import { Suspense } from "react";
 import { Footer } from "@/components/layout/footer";
 import { Navbar } from "@/components/layout/navbar";
+import { NavbarAuth } from "@/components/layout/navbar-auth";
+import { NavbarAuthButtons } from "@/components/layout/navbar-auth-client";
 import { SITE_URL } from "@/lib/constants";
 
 const siteNavigation = {
@@ -53,9 +55,15 @@ export default function MainLayout({
       {/* Suspense needed: Navbar uses usePathname for active link highlighting,
           which requires a boundary on routes with dynamic params (PPR). */}
       <Suspense>
-        <Navbar />
+        <Navbar
+          authSlot={
+            <Suspense fallback={<NavbarAuthButtons />}>
+              <NavbarAuth />
+            </Suspense>
+          }
+        />
       </Suspense>
-      <div className="pt-22 md:pt-25">
+      <div className="pt-21.5 md:pt-24.5">
         {children}
         <Footer />
       </div>
