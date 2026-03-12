@@ -9,10 +9,7 @@ import {
 import { authenticateAgent } from "@/lib/api-auth";
 import { getPaymentLinks, createPaymentLink } from "@/lib/data/payments";
 import { getProductById } from "@/lib/data/products";
-import type {
-  PaymentBillingType,
-  PaymentRecurringInterval,
-} from "@/lib/data/payments";
+import type { PaymentBillingType, PaymentRecurringInterval } from "@/lib/data/payments";
 import { formatValidationIssues } from "@/lib/openapi/schemas";
 import { slackLog } from "@/lib/slack";
 import { z } from "zod";
@@ -35,7 +32,13 @@ export async function GET(request: NextRequest) {
     const { data } = await getPaymentLinks(query.product_id);
 
     return NextResponse.json(
-      ListPaymentLinksResponseSchema.parse({ payment_links: data }),
+      ListPaymentLinksResponseSchema.parse({
+        payment_links: data.map((link) => ({
+          id: link.id,
+          url: link.url,
+          created_at: link.created_at,
+        })),
+      }),
     );
   } catch (err) {
     unstable_rethrow(err);
@@ -116,7 +119,7 @@ export async function POST(request: NextRequest) {
     );
 
     return NextResponse.json(
-      CreatePaymentLinkResponseSchema.parse(link),
+      CreatePaymentLinkResponseSchema.parse({ id: link.id, url: link.url, created_at: link.created_at }),
       { status: 201 },
     );
   } catch (err) {

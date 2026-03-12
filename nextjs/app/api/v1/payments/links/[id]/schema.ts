@@ -1,4 +1,3 @@
-import { PaymentLinkSchema } from "@/app/api/v1/payments/links/schema";
 import { apiErrorSchema, validationErrorSchema } from "@/lib/openapi/schemas";
 import type { RouteConfig } from "@asteasolutions/zod-to-openapi";
 import { z } from "zod";
@@ -18,9 +17,16 @@ export const GetPaymentLinkParamsSchema = z.object({
 // GetPaymentLink
 // ======================================================
 
-export const GetPaymentLinkResponseSchema = PaymentLinkSchema.meta({
+export const GetPaymentLinkResponseSchema = z.object({
+  id: z.string(),
+  url: z.string().url(),
+  created_at: z.string(),
+  stripe: z.any().meta({
+    description: "The live Stripe PaymentLink object with expanded line_items.",
+  }),
+}).meta({
   id: "GetPaymentLinkResponse",
-  description: "A payment link by id.",
+  description: "A payment link with live Stripe details.",
 });
 
 export const GetPaymentLinkErrorResponses: RouteConfig["responses"] = {

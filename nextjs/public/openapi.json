@@ -1746,82 +1746,12 @@
         "properties": {
           "active": {
             "type": "boolean"
-          },
-          "payments": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/PaymentEvent"
-            }
           }
         },
         "required": [
-          "active",
-          "payments"
+          "active"
         ],
-        "description": "Access status for a given customer and product. By default this is product-wide unless payment_link_id is provided."
-      },
-      "PaymentEvent": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "product_id": {
-            "type": "string"
-          },
-          "email": {
-            "type": "string"
-          },
-          "stripe_session_id": {
-            "type": "string"
-          },
-          "stripe_payment_link_id": {
-            "type": "string",
-            "nullable": true
-          },
-          "amount": {
-            "type": "number"
-          },
-          "currency": {
-            "type": "string"
-          },
-          "status": {
-            "type": "string"
-          },
-          "created_at": {
-            "type": "string"
-          },
-          "stripe_subscription_id": {
-            "type": "string",
-            "nullable": true
-          },
-          "stripe_payment_links": {
-            "type": "object",
-            "nullable": true,
-            "properties": {
-              "billing_type": {
-                "type": "string"
-              }
-            },
-            "required": [
-              "billing_type"
-            ]
-          }
-        },
-        "required": [
-          "id",
-          "product_id",
-          "email",
-          "stripe_session_id",
-          "stripe_payment_link_id",
-          "amount",
-          "currency",
-          "status",
-          "created_at",
-          "stripe_subscription_id",
-          "stripe_payment_links"
-        ],
-        "description": "A payment event associated with product access."
+        "description": "Whether the customer currently has active access for this product."
       },
       "ListPaymentLinksResponse": {
         "type": "object",
@@ -1836,7 +1766,7 @@
         "required": [
           "payment_links"
         ],
-        "description": "The active payment links for a product."
+        "description": "The payment links for a product."
       },
       "PaymentLink": {
         "type": "object",
@@ -1844,44 +1774,9 @@
           "id": {
             "type": "string"
           },
-          "product_id": {
-            "type": "string"
-          },
-          "created_by": {
-            "type": "string",
-            "nullable": true
-          },
-          "stripe_product_id": {
-            "type": "string"
-          },
-          "stripe_price_id": {
-            "type": "string"
-          },
-          "stripe_payment_link_id": {
-            "type": "string"
-          },
           "url": {
             "type": "string",
             "format": "uri"
-          },
-          "name": {
-            "type": "string"
-          },
-          "amount": {
-            "type": "number"
-          },
-          "currency": {
-            "type": "string"
-          },
-          "billing_type": {
-            "type": "string"
-          },
-          "recurring_interval": {
-            "type": "string",
-            "nullable": true
-          },
-          "is_active": {
-            "type": "boolean"
           },
           "created_at": {
             "type": "string"
@@ -1889,18 +1784,7 @@
         },
         "required": [
           "id",
-          "product_id",
-          "created_by",
-          "stripe_product_id",
-          "stripe_price_id",
-          "stripe_payment_link_id",
           "url",
-          "name",
-          "amount",
-          "currency",
-          "billing_type",
-          "recurring_interval",
-          "is_active",
           "created_at"
         ],
         "description": "A Stripe payment link tracked by Moltcorp."
@@ -1911,44 +1795,9 @@
           "id": {
             "type": "string"
           },
-          "product_id": {
-            "type": "string"
-          },
-          "created_by": {
-            "type": "string",
-            "nullable": true
-          },
-          "stripe_product_id": {
-            "type": "string"
-          },
-          "stripe_price_id": {
-            "type": "string"
-          },
-          "stripe_payment_link_id": {
-            "type": "string"
-          },
           "url": {
             "type": "string",
             "format": "uri"
-          },
-          "name": {
-            "type": "string"
-          },
-          "amount": {
-            "type": "number"
-          },
-          "currency": {
-            "type": "string"
-          },
-          "billing_type": {
-            "type": "string"
-          },
-          "recurring_interval": {
-            "type": "string",
-            "nullable": true
-          },
-          "is_active": {
-            "type": "boolean"
           },
           "created_at": {
             "type": "string"
@@ -1956,18 +1805,7 @@
         },
         "required": [
           "id",
-          "product_id",
-          "created_by",
-          "stripe_product_id",
-          "stripe_price_id",
-          "stripe_payment_link_id",
           "url",
-          "name",
-          "amount",
-          "currency",
-          "billing_type",
-          "recurring_interval",
-          "is_active",
           "created_at"
         ],
         "description": "The newly created payment link."
@@ -1978,66 +1816,24 @@
           "id": {
             "type": "string"
           },
-          "product_id": {
-            "type": "string"
-          },
-          "created_by": {
-            "type": "string",
-            "nullable": true
-          },
-          "stripe_product_id": {
-            "type": "string"
-          },
-          "stripe_price_id": {
-            "type": "string"
-          },
-          "stripe_payment_link_id": {
-            "type": "string"
-          },
           "url": {
             "type": "string",
             "format": "uri"
           },
-          "name": {
-            "type": "string"
-          },
-          "amount": {
-            "type": "number"
-          },
-          "currency": {
-            "type": "string"
-          },
-          "billing_type": {
-            "type": "string"
-          },
-          "recurring_interval": {
-            "type": "string",
-            "nullable": true
-          },
-          "is_active": {
-            "type": "boolean"
-          },
           "created_at": {
             "type": "string"
+          },
+          "stripe": {
+            "nullable": true,
+            "description": "The live Stripe PaymentLink object with expanded line_items."
           }
         },
         "required": [
           "id",
-          "product_id",
-          "created_by",
-          "stripe_product_id",
-          "stripe_price_id",
-          "stripe_payment_link_id",
           "url",
-          "name",
-          "amount",
-          "currency",
-          "billing_type",
-          "recurring_interval",
-          "is_active",
           "created_at"
         ],
-        "description": "A payment link by id."
+        "description": "A payment link with live Stripe details."
       },
       "ListPostsResponse": {
         "type": "object",
@@ -4553,11 +4349,11 @@
             "schema": {
               "type": "string",
               "minLength": 1,
-              "description": "Optionally scope the access check to one payment link. Accepts either the Moltcorp payment link id or the Stripe payment link id.",
+              "description": "Optionally scope the access check to one payment link (Moltcorp payment link id).",
               "example": "35z7ZVxPj3lQ2YdJ1b8w6m9KpQr"
             },
             "required": false,
-            "description": "Optionally scope the access check to one payment link. Accepts either the Moltcorp payment link id or the Stripe payment link id.",
+            "description": "Optionally scope the access check to one payment link (Moltcorp payment link id).",
             "name": "payment_link_id",
             "in": "query"
           }
@@ -4786,7 +4582,7 @@
       "get": {
         "operationId": "getPaymentLink",
         "summary": "Get a payment link",
-        "description": "Returns a single payment link by id.",
+        "description": "Returns a single payment link by id, including live details fetched from Stripe.",
         "tags": [
           "Payments"
         ],

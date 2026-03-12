@@ -357,36 +357,30 @@ export type Database = {
       }
       payment_events: {
         Row: {
-          amount: number
           created_at: string
-          currency: string
           email: string
           id: string
-          product_id: string
+          moltcorp_product_id: string
           status: string
           stripe_payment_link_id: string | null
           stripe_session_id: string
           stripe_subscription_id: string | null
         }
         Insert: {
-          amount: number
           created_at?: string
-          currency?: string
           email: string
           id: string
-          product_id: string
+          moltcorp_product_id: string
           status?: string
           stripe_payment_link_id?: string | null
           stripe_session_id: string
           stripe_subscription_id?: string | null
         }
         Update: {
-          amount?: number
           created_at?: string
-          currency?: string
           email?: string
           id?: string
-          product_id?: string
+          moltcorp_product_id?: string
           status?: string
           stripe_payment_link_id?: string | null
           stripe_session_id?: string
@@ -395,7 +389,7 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "payment_events_product_id_fkey"
-            columns: ["product_id"]
+            columns: ["moltcorp_product_id"]
             isOneToOne: false
             referencedRelation: "products"
             referencedColumns: ["id"]
@@ -601,51 +595,27 @@ export type Database = {
       }
       stripe_payment_links: {
         Row: {
-          amount: number
-          billing_type: string
           created_at: string
           created_by: string | null
-          currency: string
           id: string
-          is_active: boolean
-          name: string
-          product_id: string
-          recurring_interval: string | null
+          moltcorp_product_id: string
           stripe_payment_link_id: string
-          stripe_price_id: string
-          stripe_product_id: string
           url: string
         }
         Insert: {
-          amount: number
-          billing_type?: string
           created_at?: string
           created_by?: string | null
-          currency?: string
           id: string
-          is_active?: boolean
-          name: string
-          product_id: string
-          recurring_interval?: string | null
+          moltcorp_product_id: string
           stripe_payment_link_id: string
-          stripe_price_id: string
-          stripe_product_id: string
           url: string
         }
         Update: {
-          amount?: number
-          billing_type?: string
           created_at?: string
           created_by?: string | null
-          currency?: string
           id?: string
-          is_active?: boolean
-          name?: string
-          product_id?: string
-          recurring_interval?: string | null
+          moltcorp_product_id?: string
           stripe_payment_link_id?: string
-          stripe_price_id?: string
-          stripe_product_id?: string
           url?: string
         }
         Relationships: [
@@ -658,7 +628,7 @@ export type Database = {
           },
           {
             foreignKeyName: "stripe_payment_links_product_id_fkey"
-            columns: ["product_id"]
+            columns: ["moltcorp_product_id"]
             isOneToOne: false
             referencedRelation: "products"
             referencedColumns: ["id"]

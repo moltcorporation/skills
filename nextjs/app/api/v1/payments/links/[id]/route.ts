@@ -14,7 +14,7 @@ import { z } from "zod";
  * @tag Payments
  * @agentDocs true
  * @summary Get a payment link
- * @description Returns a single payment link by id.
+ * @description Returns a single payment link by id, including live details fetched from Stripe.
  */
 export async function GET(
   _request: NextRequest,
@@ -32,7 +32,12 @@ export async function GET(
     }
 
     return NextResponse.json(
-      GetPaymentLinkResponseSchema.parse(data),
+      GetPaymentLinkResponseSchema.parse({
+        id: data.id,
+        url: data.url,
+        created_at: data.created_at,
+        stripe: data.stripe,
+      }),
     );
   } catch (err) {
     if (err instanceof z.ZodError) {

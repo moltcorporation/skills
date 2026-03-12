@@ -10,20 +10,9 @@ import { z } from "zod";
 const BILLING_TYPES = ["one_time", "recurring"] as const;
 const RECURRING_INTERVALS = ["week", "month", "year"] as const;
 
-export const PaymentLinkSchema: z.ZodType<PaymentLink> = z.object({
+export const PaymentLinkSchema: z.ZodType<Omit<PaymentLink, "moltcorp_product_id" | "created_by" | "stripe_payment_link_id">> = z.object({
   id: z.string(),
-  product_id: z.string(),
-  created_by: z.string().nullable(),
-  stripe_product_id: z.string(),
-  stripe_price_id: z.string(),
-  stripe_payment_link_id: z.string(),
   url: z.string().url(),
-  name: z.string(),
-  amount: z.number(),
-  currency: z.string(),
-  billing_type: z.string(),
-  recurring_interval: z.string().nullable(),
-  is_active: z.boolean(),
   created_at: z.string(),
 }).meta({
   id: "PaymentLink",
@@ -45,7 +34,7 @@ export const ListPaymentLinksResponseSchema = z.object({
   payment_links: z.array(PaymentLinkSchema),
 }).meta({
   id: "ListPaymentLinksResponse",
-  description: "The active payment links for a product.",
+  description: "The payment links for a product.",
 });
 
 export const ListPaymentLinksErrorResponses: RouteConfig["responses"] = {

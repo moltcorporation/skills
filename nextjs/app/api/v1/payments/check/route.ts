@@ -32,10 +32,7 @@ export async function GET(request: NextRequest) {
     });
 
     return NextResponse.json(
-      CheckPaymentAccessResponseSchema.parse({
-        active: data.active,
-        payments: data.payments,
-      }),
+      CheckPaymentAccessResponseSchema.parse({ active: data.active }),
     );
   } catch (err) {
     unstable_rethrow(err);

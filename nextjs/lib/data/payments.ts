@@ -1,5 +1,6 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createStripePaymentLink } from "@/lib/stripe-payments";
+import { stripe } from "@/lib/stripe";
 import { generateId } from "@/lib/id";
 import { cacheTag, revalidateTag } from "next/cache";
 
@@ -12,40 +13,26 @@ export type PaymentRecurringInterval = "week" | "month" | "year";
 
 export type PaymentLink = {
   id: string;
-  product_id: string;
+  moltcorp_product_id: string;
   created_by: string | null;
-  stripe_product_id: string;
-  stripe_price_id: string;
   stripe_payment_link_id: string;
   url: string;
-  name: string;
-  amount: number;
-  currency: string;
-  billing_type: string;
-  recurring_interval: string | null;
-  is_active: boolean;
   created_at: string;
 };
 
 export type PaymentEvent = {
   id: string;
-  product_id: string;
+  moltcorp_product_id: string;
   email: string;
   stripe_session_id: string;
   stripe_payment_link_id: string | null;
-  amount: number;
-  currency: string;
+  stripe_subscription_id: string | null;
   status: string;
   created_at: string;
-  stripe_subscription_id: string | null;
-  stripe_payment_links: {
-    billing_type: string;
-  } | null;
 };
 
 export type PaymentAccess = {
   active: boolean;
-  payments: PaymentEvent[];
 };
 
 // ======================================================
@@ -67,9 +54,8 @@ export async function getPaymentLinks(
   const supabase = createAdminClient();
   const { data, error } = await supabase
     .from("stripe_payment_links")
-    .select("*")
-    .eq("product_id", productId)
-    .eq("is_active", true)
+    .select("id, moltcorp_product_id, created_by, stripe_payment_link_id, url, created_at")
+    .eq("moltcorp_product_id", productId)
     .order("created_at", { ascending: false });
 
   if (error) throw error;
@@ -83,24 +69,30 @@ export async function getPaymentLinks(
 export type GetPaymentLinkByIdInput = string;
 
 export type GetPaymentLinkByIdResponse = {
-  data: PaymentLink | null;
+  data: (PaymentLink & { stripe: unknown }) | null;
 };
 
 export async function getPaymentLinkById(
   id: GetPaymentLinkByIdInput,
 ): Promise<GetPaymentLinkByIdResponse> {
-  "use cache";
-  cacheTag(`payment-link-${id}`);
-
   const supabase = createAdminClient();
   const { data, error } = await supabase
     .from("stripe_payment_links")
-    .select("*")
+    .select("id, moltcorp_product_id, created_by, stripe_payment_link_id, url, created_at")
     .eq("id", id)
     .maybeSingle();
 
   if (error) throw error;
-  return { data: (data as PaymentLink | null) ?? null };
+  if (!data) return { data: null };
+
+  const link = data as PaymentLink;
+
+  const stripeLink = await stripe.paymentLinks.retrieve(
+    link.stripe_payment_link_id,
+    { expand: ["line_items"] },
+  );
+
+  return { data: { ...link, stripe: stripeLink } };
 }
 
 // ======================================================
@@ -130,21 +122,18 @@ export async function checkPaymentAccess(
     const { data: paymentLink, error: paymentLinkError } = await supabase
       .from("stripe_payment_links")
       .select("stripe_payment_link_id")
-      .eq("product_id", input.productId)
-      .or(
-        `id.eq.${input.paymentLinkId},stripe_payment_link_id.eq.${input.paymentLinkId}`,
-      )
+      .eq("moltcorp_product_id", input.productId)
+      .eq("id", input.paymentLinkId)
       .maybeSingle();
 
     if (paymentLinkError) throw paymentLinkError;
-    scopedStripePaymentLinkId =
-      paymentLink?.stripe_payment_link_id ?? input.paymentLinkId;
+    scopedStripePaymentLinkId = paymentLink?.stripe_payment_link_id;
   }
 
   let query = supabase
     .from("payment_events")
-    .select("*, stripe_payment_links!stripe_payment_link_id(billing_type)")
-    .eq("product_id", input.productId)
+    .select("id, moltcorp_product_id, email, stripe_session_id, stripe_payment_link_id, stripe_subscription_id, status, created_at")
+    .eq("moltcorp_product_id", input.productId)
     .eq("email", input.email);
 
   if (scopedStripePaymentLinkId) {
@@ -154,20 +143,20 @@ export async function checkPaymentAccess(
   const { data, error } = await query.order("created_at", { ascending: false });
   if (error) throw error;
 
-  const payments = (data as PaymentEvent[] | null) ?? [];
+  const events = (data as PaymentEvent[] | null) ?? [];
   const latestRecurringEventBySubscription = new Map<string, PaymentEvent>();
   let hasCompletedOneTimePayment = false;
 
-  for (const event of payments) {
-    const billingType = event.stripe_payment_links?.billing_type;
-
-    if (billingType === "recurring" && event.stripe_subscription_id) {
+  for (const event of events) {
+    if (event.stripe_subscription_id) {
+      // Recurring: track latest event per subscription
       if (!latestRecurringEventBySubscription.has(event.stripe_subscription_id)) {
         latestRecurringEventBySubscription.set(event.stripe_subscription_id, event);
       }
       continue;
     }
 
+    // One-time: any completed event = permanent access
     if (event.status === "completed") {
       hasCompletedOneTimePayment = true;
     }
@@ -179,7 +168,7 @@ export async function checkPaymentAccess(
 
   const active = hasCompletedOneTimePayment || hasActiveRecurringSubscription;
 
-  return { data: { active, payments } };
+  return { data: { active } };
 }
 
 // ======================================================
@@ -222,19 +211,12 @@ export async function createPaymentLink(
     .from("stripe_payment_links")
     .insert({
       id: generateId(),
-      product_id: input.product_id,
+      moltcorp_product_id: input.product_id,
       created_by: input.agentId,
-      stripe_product_id: stripeResult.stripeProductId,
-      stripe_price_id: stripeResult.stripePriceId,
       stripe_payment_link_id: stripeResult.stripePaymentLinkId,
       url: stripeResult.url,
-      name: input.name,
-      amount: input.amount,
-      currency: input.currency ?? "usd",
-      billing_type: input.billing_type ?? "one_time",
-      recurring_interval: input.recurring_interval ?? null,
     })
-    .select()
+    .select("id, moltcorp_product_id, created_by, stripe_payment_link_id, url, created_at")
     .single();
 
   if (error) throw error;
