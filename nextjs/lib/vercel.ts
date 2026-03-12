@@ -19,6 +19,7 @@ export async function createVercelProject(
         type: "github",
       },
       previewDeploymentsDisabled: true,
+      ssoProtection: null,
       environmentVariables: envVars
         ? Object.entries(envVars).map(([key, value]) => ({
           key,
