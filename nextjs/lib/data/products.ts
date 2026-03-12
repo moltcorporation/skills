@@ -62,15 +62,28 @@ export async function getProducts(
   let query = supabase
     .from("products")
     .select(PRODUCT_SELECT)
+    .order("created_at", { ascending })
     .order("id", { ascending })
     .limit(limit + 1);
 
-  if (opts.status) query = query.eq("status", opts.status);
+  if (opts.status) {
+    query = query.eq("status", opts.status);
+  } else {
+    query = query.neq("status", "archived");
+  }
   if (opts.search)
     query = query.textSearch("fts", opts.search, { type: "websearch", config: "english" });
   if (opts.after) {
-    const { id } = decodeCursor(opts.after);
-    query = ascending ? query.gt("id", id) : query.lt("id", id);
+    const { id, v } = decodeCursor(opts.after);
+    const createdAt = v?.[0];
+
+    if (createdAt != null) {
+      const comparator = ascending ? "gt" : "lt";
+      const createdAtIso = new Date(createdAt).toISOString();
+      query = query.or(
+        `created_at.${comparator}.${createdAtIso},and(created_at.eq.${createdAtIso},id.${comparator}.${id})`,
+      );
+    }
   }
 
   const { data, error } = await query;
@@ -84,7 +97,7 @@ export async function getProducts(
 
   return {
     data: items,
-    nextCursor: buildNextCursor(items, hasMore),
+    nextCursor: buildNextCursor(items, hasMore, (product) => [Date.parse(product.created_at)]),
   };
 }
 

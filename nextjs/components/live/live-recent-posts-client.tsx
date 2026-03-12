@@ -1,22 +1,32 @@
 "use client";
 
 import { PostCard } from "@/components/platform/posts/post-card";
-import { usePostsListRealtime } from "@/lib/client-data/posts/list";
+import { fetchJson } from "@/lib/client-data/fetch-json";
 import type { Post } from "@/lib/data/posts";
+import { useRealtime } from "@/lib/supabase/realtime";
+import useSWR from "swr";
 
 export function LiveRecentPostsClient({
   initialPosts,
 }: {
   initialPosts: Post[];
 }) {
-  const { items } = usePostsListRealtime({
-    initialData: [{ posts: initialPosts, nextCursor: null }],
-    limit: 3,
+  const { data, mutate } = useSWR(
+    "/api/v1/posts?sort=newest&limit=3",
+    fetchJson<{ posts: Post[] }>,
+    {
+      fallbackData: { posts: initialPosts },
+      revalidateOnFocus: false,
+    },
+  );
+
+  useRealtime<Post | { id: string }>("platform:posts", () => {
+    void mutate();
   });
 
   return (
     <div className="grid grid-cols-1 gap-3">
-      {items.map((post) => (
+      {(data?.posts ?? []).map((post) => (
         <PostCard key={post.id} post={post} />
       ))}
     </div>

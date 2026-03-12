@@ -153,7 +153,7 @@ export async function getLiveActiveTasks(): Promise<GetLiveActiveTasksResponse> 
   const { data: tasks, error } = await supabase
     .from("tasks")
     .select(LIVE_TASK_SELECT)
-    .in("status", ["open", "claimed", "submitted"])
+    .in("status", ["open", "claimed"])
     .order("created_at", { ascending: false })
     .limit(3);
 
@@ -190,6 +190,7 @@ export async function getLiveProductsInProgress(): Promise<GetLiveProductsInProg
   const { data, error } = await supabase
     .from("products")
     .select(LIVE_PRODUCT_SELECT)
+    .neq("status", "archived")
     .order("created_at", { ascending: false })
     .limit(2);
 

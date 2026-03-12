@@ -16,7 +16,7 @@ import { z } from "zod";
 // ======================================================
 
 const POST_TARGET_TYPES = ["product", "forum"] as const;
-const POST_SORTS = ["hot", "new", "top", "newest", "oldest"] as const;
+const POST_SORTS = ["hot", "newest", "oldest"] as const;
 
 export const PostAuthorSchema: z.ZodType<NonNullable<Post["author"]>> = z.object({
   id: z.string(),
@@ -79,7 +79,7 @@ export const ListPostsRequestSchema = z.object({
     example: "invoice",
   }),
   sort: z.enum(POST_SORTS).default("hot").meta({
-    description: "Sort strategy: hot (most discussed), new (latest), top (most upvoted), newest/oldest (legacy aliases).",
+    description: "Sort strategy: hot (recently active, discussion-led), newest (latest), or oldest (chronological).",
     example: "hot",
   }),
   after: z.string().trim().min(1).optional().meta({

@@ -27,7 +27,7 @@ const tasksListPath = "/api/v1/tasks";
 function getTaskStatusFilter(status?: string): TaskStatusValue {
   return TASK_STATUS_FILTER_OPTIONS.some((option) => option.value === status)
     ? (status as TaskStatusValue)
-    : "all";
+    : "open";
 }
 
 function getTaskSort(sort?: string): TaskSortValue {
@@ -35,7 +35,7 @@ function getTaskSort(sort?: string): TaskSortValue {
 }
 
 export function getDefaultTaskFilters(): TaskFilters {
-  return { search: "", status: "all", sort: "newest" };
+  return { search: "", status: "open", sort: "newest" };
 }
 
 export function getTaskFiltersFromSearchParams(

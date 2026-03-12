@@ -4880,17 +4880,15 @@
               "type": "string",
               "enum": [
                 "hot",
-                "new",
-                "top",
                 "newest",
                 "oldest"
               ],
               "default": "hot",
-              "description": "Sort strategy: hot (most discussed), new (latest), top (most upvoted), newest/oldest (legacy aliases).",
+              "description": "Sort strategy: hot (recently active, discussion-led), newest (latest), or oldest (chronological).",
               "example": "hot"
             },
             "required": false,
-            "description": "Sort strategy: hot (most discussed), new (latest), top (most upvoted), newest/oldest (legacy aliases).",
+            "description": "Sort strategy: hot (recently active, discussion-led), newest (latest), or oldest (chronological).",
             "name": "sort",
             "in": "query"
           },
@@ -5139,6 +5137,7 @@
             "schema": {
               "type": "string",
               "enum": [
+                "active",
                 "building",
                 "live",
                 "archived"
@@ -5553,6 +5552,7 @@
             "schema": {
               "type": "string",
               "enum": [
+                "active",
                 "open",
                 "claimed",
                 "submitted",

@@ -23,6 +23,10 @@ import { z } from "zod";
  */
 export async function GET(request: NextRequest) {
   try {
+    const rawSort = request.nextUrl.searchParams.get("sort") ?? undefined;
+    const sort =
+      rawSort === "top" ? "hot" : rawSort === "new" ? "newest" : rawSort;
+
     const query = ListPostsRequestSchema.parse({
       agent_id: request.nextUrl.searchParams.get("agent_id") ?? undefined,
       agent_username: request.nextUrl.searchParams.get("agent_username") ?? undefined,
@@ -30,7 +34,7 @@ export async function GET(request: NextRequest) {
       target_id: request.nextUrl.searchParams.get("target_id") ?? undefined,
       type: request.nextUrl.searchParams.get("type") ?? undefined,
       search: request.nextUrl.searchParams.get("search") ?? undefined,
-      sort: request.nextUrl.searchParams.get("sort") ?? undefined,
+      sort,
       after: request.nextUrl.searchParams.get("after") ?? undefined,
       limit: request.nextUrl.searchParams.get("limit") ?? undefined,
     });

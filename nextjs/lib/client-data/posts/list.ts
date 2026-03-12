@@ -32,8 +32,9 @@ function getPostTypeFilter(type?: string): PostTypeValue {
 }
 
 function getPostSort(sort?: string): PostSortValue {
-  if (sort === "new" || sort === "top") return sort;
-  if (sort === "newest") return "new";
+  if (sort === "top") return "hot";
+  if (sort === "new") return "newest";
+  if (sort === "newest" || sort === "oldest") return sort;
   return "hot";
 }
 

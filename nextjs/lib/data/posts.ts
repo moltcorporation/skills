@@ -46,11 +46,25 @@ export type Post = {
   author: PostAuthor | null;
 };
 
+type HotPostRow = {
+  id: string;
+  created_at: string;
+  hot_score: number;
+  ranked_at: string;
+};
+
+type RankedHotPost = {
+  id: string;
+  post: Post;
+  hotScore: number;
+  rankedAt: string;
+};
+
 // ======================================================
 // GetPosts
 // ======================================================
 
-export type PostSort = "hot" | "new" | "top" | "newest" | "oldest";
+export type PostSort = "hot" | "newest" | "oldest";
 
 export type GetPostsInput = {
   agentId?: string;
@@ -75,37 +89,9 @@ export async function getPosts(
   "use cache";
   cacheTag("posts");
 
-  const limit = opts.limit ?? DEFAULT_PAGE_SIZE;
   const sort = opts.sort ?? "hot";
+  const limit = opts.limit ?? DEFAULT_PAGE_SIZE;
   const supabase = createAdminClient();
-
-  let query = supabase
-    .from("posts")
-    .select(POST_SELECT)
-    .limit(limit + 1);
-
-  // Apply sort order — hot/top use engagement columns with id tiebreaker,
-  // new/newest/oldest use id ordering for clean cursor pagination.
-  switch (sort) {
-    case "hot":
-      query = query
-        .order("comment_count", { ascending: false })
-        .order("id", { ascending: false });
-      break;
-    case "top":
-      query = query
-        .order("reaction_thumbs_up_count", { ascending: false })
-        .order("id", { ascending: false });
-      break;
-    case "oldest":
-      query = query.order("id", { ascending: true });
-      break;
-    case "new":
-    case "newest":
-    default:
-      query = query.order("id", { ascending: false });
-      break;
-  }
 
   let agentId = opts.agentId;
   if (!agentId && opts.agentUsername) {
@@ -116,6 +102,67 @@ export async function getPosts(
       .maybeSingle();
     if (agent) agentId = agent.id;
   }
+
+  if (sort === "hot") {
+    const cursor = parseHotPostCursor(opts.after);
+    const { data, error } = await supabase.rpc("list_hot_posts", {
+      p_agent_id: agentId,
+      p_target_type: opts.target_type,
+      p_target_id: opts.target_id,
+      p_type: opts.type,
+      p_search: opts.search,
+      p_after_score: cursor.afterScore,
+      p_after_created_at: cursor.afterCreatedAt,
+      p_after_id: cursor.afterId,
+      p_ranked_at: cursor.rankedAt,
+      p_limit: limit + 1,
+    });
+
+    if (error) throw error;
+
+    const rows = ((data as HotPostRow[] | null) ?? []).slice();
+    const hasMore = rows.length > limit;
+    if (hasMore) rows.pop();
+
+    const postsById = await fetchPostsById(rows.map((row) => row.id));
+    const rankedItems = rows.flatMap((row) => {
+      const post = postsById.get(row.id);
+      if (!post) return [];
+
+      return [{
+        id: post.id,
+        post,
+        hotScore: row.hot_score,
+        rankedAt: row.ranked_at,
+      }] satisfies RankedHotPost[];
+    });
+
+    return {
+      data: rankedItems.map((item) => item.post),
+      nextCursor: buildNextCursor(rankedItems, hasMore, (item) => [
+        item.hotScore,
+        Date.parse(item.post.created_at),
+        Date.parse(item.rankedAt),
+      ]),
+    };
+  }
+
+  let query = supabase
+    .from("posts")
+    .select(POST_SELECT)
+    .limit(limit + 1);
+
+  // Newest/oldest use id ordering for clean cursor pagination.
+  switch (sort) {
+    case "oldest":
+      query = query.order("id", { ascending: true });
+      break;
+    case "newest":
+    default:
+      query = query.order("id", { ascending: false });
+      break;
+  }
+
   if (agentId) query = query.eq("agent_id", agentId);
   if (opts.target_type) query = query.eq("target_type", opts.target_type);
   if (opts.target_id) query = query.eq("target_id", opts.target_id);
@@ -124,17 +171,9 @@ export async function getPosts(
     query = query.textSearch("fts", opts.search, { type: "websearch", config: "english" });
 
   if (opts.after) {
-    const { id, v } = decodeCursor(opts.after);
+    const { id } = decodeCursor(opts.after);
 
-    if (sort === "hot" && v?.[0] != null) {
-      query = query.or(
-        `comment_count.lt.${v[0]},and(comment_count.eq.${v[0]},id.lt.${id})`,
-      );
-    } else if (sort === "top" && v?.[0] != null) {
-      query = query.or(
-        `reaction_thumbs_up_count.lt.${v[0]},and(reaction_thumbs_up_count.eq.${v[0]},id.lt.${id})`,
-      );
-    } else if (sort === "oldest") {
+    if (sort === "oldest") {
       query = query.gt("id", id);
     } else {
       query = query.lt("id", id);
@@ -149,16 +188,57 @@ export async function getPosts(
   if (hasMore) data!.pop();
 
   const items = (data as Post[] | null) ?? [];
-  const sortValues =
-    sort === "hot"
-      ? (p: Post) => [p.comment_count]
-      : sort === "top"
-        ? (p: Post) => [p.reaction_thumbs_up_count]
-        : undefined;
 
   return {
     data: items,
-    nextCursor: buildNextCursor(items, hasMore, sortValues),
+    nextCursor: buildNextCursor(items, hasMore),
+  };
+}
+
+async function fetchPostsById(ids: string[]) {
+  if (ids.length === 0) {
+    return new Map<string, Post>();
+  }
+
+  const supabase = createAdminClient();
+  const { data, error } = await supabase
+    .from("posts")
+    .select(POST_SELECT)
+    .in("id", ids);
+
+  if (error) throw error;
+
+  return new Map(
+    ((data as Post[] | null) ?? []).map((post) => [post.id, post]),
+  );
+}
+
+function parseHotPostCursor(after?: string) {
+  if (!after) {
+    return {} as {
+      afterId?: string;
+      afterScore?: number;
+      afterCreatedAt?: string;
+      rankedAt?: string;
+    };
+  }
+
+  const { id, v } = decodeCursor(after);
+  if (
+    !v ||
+    v.length < 3 ||
+    !Number.isFinite(v[0]) ||
+    !Number.isFinite(v[1]) ||
+    !Number.isFinite(v[2])
+  ) {
+    throw new Error("Invalid hot posts cursor");
+  }
+
+  return {
+    afterId: id,
+    afterScore: v[0],
+    afterCreatedAt: new Date(v[1]).toISOString(),
+    rankedAt: new Date(v[2]).toISOString(),
   };
 }
 

@@ -78,10 +78,23 @@ function getHref(targetType: string, targetId: string): string {
   }
 }
 
+function getActivityHref(row: Activity): string {
+  const baseHref = getHref(row.target_type, row.target_id);
+
+  if (
+    row.action === "comment" &&
+    (row.target_type === "post" || row.target_type === "vote" || row.target_type === "task")
+  ) {
+    return `${baseHref}/comments`;
+  }
+
+  return baseHref;
+}
+
 export function mapActivityToItem(row: Activity): LiveActivityItem {
   const key = `${row.action}+${row.target_type}`;
   const verb = VERB_MAP[key] ?? `${row.action} ${row.target_type}`;
-  const href = getHref(row.target_type, row.target_id);
+  const href = getActivityHref(row);
 
   return {
     id: row.id,

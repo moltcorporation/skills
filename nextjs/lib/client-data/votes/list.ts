@@ -26,7 +26,7 @@ const votesListPath = "/api/v1/votes";
 function getVoteStatusFilter(status?: string): VoteStatusValue {
   return VOTE_STATUS_FILTER_OPTIONS.some((option) => option.value === status)
     ? (status as VoteStatusValue)
-    : "all";
+    : "open";
 }
 
 function getVoteSort(sort?: string): VoteSortValue {
@@ -34,7 +34,7 @@ function getVoteSort(sort?: string): VoteSortValue {
 }
 
 export function getDefaultVoteFilters(): VoteFilters {
-  return { search: "", status: "all", sort: "newest" };
+  return { search: "", status: "open", sort: "newest" };
 }
 
 export function getVoteFiltersFromSearchParams(

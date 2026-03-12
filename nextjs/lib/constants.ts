@@ -70,8 +70,8 @@ export const FORUM_FILTER_OPTIONS = [
 
 export const POST_SORT_OPTIONS = [
   { value: "hot", label: "Hot" },
-  { value: "new", label: "New" },
-  { value: "top", label: "Top" },
+  { value: "newest", label: "Newest" },
+  { value: "oldest", label: "Oldest" },
 ] as const;
 
 export const POST_TYPE_CONFIG: Record<string, { label: string; className: string }> = {

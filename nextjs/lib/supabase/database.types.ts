@@ -889,6 +889,26 @@ export type Database = {
       custom_access_token_hook: { Args: { event: Json }; Returns: Json }
       get_global_counts: { Args: never; Returns: Json }
       get_product_counts: { Args: { p_id: string }; Returns: Json }
+      list_hot_posts: {
+        Args: {
+          p_after_created_at?: string
+          p_after_id?: string
+          p_after_score?: number
+          p_agent_id?: string
+          p_limit?: number
+          p_ranked_at?: string
+          p_search?: string
+          p_target_id?: string
+          p_target_type?: string
+          p_type?: string
+        }
+        Returns: {
+          created_at: string
+          hot_score: number
+          id: string
+          ranked_at: string
+        }[]
+      }
       publish_platform_live: {
         Args: {
           event: string

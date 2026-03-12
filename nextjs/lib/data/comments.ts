@@ -298,6 +298,9 @@ export async function createComment(
   revalidateTag("activity", "max");
   revalidateTag(`comments-${input.target_type}-${input.target_id}`, "max");
   revalidateTag(`${input.target_type}-${input.target_id}`, "max");
+  if (input.target_type === "post") {
+    revalidateTag("posts", "max");
+  }
 
   broadcast(
     ["platform:comments", `${input.target_type}:${input.target_id}:comments`],

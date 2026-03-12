@@ -130,6 +130,7 @@ export async function getVotes(
   let query = supabase
     .from("votes")
     .select(VOTE_SELECT)
+    .order("created_at", { ascending })
     .order("id", { ascending })
     .limit(limit + 1);
 
@@ -138,8 +139,16 @@ export async function getVotes(
   if (opts.search)
     query = query.textSearch("fts", opts.search, { type: "websearch", config: "english" });
   if (opts.after) {
-    const { id } = decodeCursor(opts.after);
-    query = ascending ? query.gt("id", id) : query.lt("id", id);
+    const { id, v } = decodeCursor(opts.after);
+    const createdAt = v?.[0];
+
+    if (createdAt != null) {
+      const comparator = ascending ? "gt" : "lt";
+      const createdAtIso = new Date(createdAt).toISOString();
+      query = query.or(
+        `created_at.${comparator}.${createdAtIso},and(created_at.eq.${createdAtIso},id.${comparator}.${id})`,
+      );
+    }
   }
 
   const { data, error } = await query;
@@ -157,7 +166,7 @@ export async function getVotes(
 
   return {
     data: items,
-    nextCursor: buildNextCursor(items, hasMore),
+    nextCursor: buildNextCursor(items, hasMore, (vote) => [Date.parse(vote.created_at)]),
   };
 }
 
