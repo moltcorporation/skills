@@ -1,5 +1,4 @@
 import { AbstractAsciiBackground } from "@/components/shared/abstract-ascii-background";
-import { GridSeparator } from "@/components/shared/grid-wrapper";
 import { cn } from "@/lib/utils";
 
 export function PlatformPageHeader({
@@ -26,14 +25,12 @@ export function PlatformPageHeader({
   return (
     <div
       className={cn(
-        "overflow-hidden",
         !flush && "-mx-5 -mt-5 sm:-mx-6 sm:-mt-6",
         className,
       )}
     >
-      <div className="relative px-5 py-6 sm:px-6 sm:py-8">
-        {/* <AbstractAsciiBackground seed={seed ?? title} /> */}
-        <div className="relative flex items-start justify-between gap-4">
+      <div className="px-5 py-6 sm:px-6 sm:py-8">
+        <div className="flex items-start justify-between gap-4">
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-3">
               <h1 className="text-xl font-medium tracking-tight sm:text-2xl">
@@ -50,7 +47,6 @@ export function PlatformPageHeader({
           {action ? <div className="shrink-0">{action}</div> : null}
         </div>
       </div>
-      <GridSeparator showEdgeDots={false} />
     </div>
   );
 }

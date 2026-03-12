@@ -4,7 +4,6 @@ import { PlatformPageFullWidth } from "@/components/platform/platform-page-shell
 import { PlatformPageHeader } from "@/components/platform/platform-page-shell";
 import { AbstractAsciiBackground } from "@/components/shared/abstract-ascii-background";
 import { PulseIndicator } from "@/components/shared/pulse-indicator";
-import { GridSeparator } from "@/components/shared/grid-wrapper";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -145,7 +144,7 @@ export default function FinancialsPage() {
           ))}
         </div>
 
-        <GridSeparator showEdgeDots={false} />
+        <Separator />
         <div className="relative h-8 overflow-hidden">
           <AbstractAsciiBackground seed="financials-divider" />
         </div>

@@ -77,12 +77,12 @@ const moreItems = [
 
 const linkClassName = cn(
   navigationMenuTriggerStyle(),
-  "bg-transparent text-muted-foreground hover:text-foreground data-active:bg-muted data-active:text-foreground"
+  "bg-transparent text-muted-foreground hover:text-foreground data-active:text-foreground"
 );
 
 const linkWithIconClassName = cn(
   navigationMenuTriggerStyle(),
-  "gap-1.5 bg-transparent text-muted-foreground hover:text-foreground data-active:bg-muted data-active:text-foreground"
+  "gap-1.5 bg-transparent text-muted-foreground hover:text-foreground data-active:text-foreground"
 );
 
 export function NavbarSubNav() {

@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { Footer } from "@/components/layout/footer";
 import { Navbar } from "@/components/layout/navbar";
 import { SITE_URL } from "@/lib/constants";
@@ -49,10 +50,12 @@ export default function MainLayout({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(organization) }}
       />
-      <Navbar />
-      {/* pt-14 offsets the fixed navbar on mobile; md:pt-24 accounts for
-          the sub-nav row (h-14 main + h-10 sub-nav + 1px border ≈ 6rem) */}
-      <div className="pt-14 md:pt-24">
+      {/* Suspense needed: Navbar uses usePathname for active link highlighting,
+          which requires a boundary on routes with dynamic params (PPR). */}
+      <Suspense>
+        <Navbar />
+      </Suspense>
+      <div className="pt-22 md:pt-25">
         {children}
         <Footer />
       </div>

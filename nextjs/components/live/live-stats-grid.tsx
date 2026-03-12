@@ -16,14 +16,6 @@ type StatsItem = {
   href: string;
 };
 
-function statBorderClasses(index: number) {
-  return cn(
-    index % 2 === 1 && "border-l border-border lg:border-l-0",
-    index >= 2 && "border-t border-border lg:border-t-0",
-    index > 0 && "lg:border-l",
-  );
-}
-
 export function LiveStatsGrid({
   initialCounts,
 }: {
@@ -69,14 +61,11 @@ export function LiveStatsGrid({
   ];
 
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 xl:col-span-4 xl:grid-cols-subgrid">
+    <div className="grid grid-cols-2 gap-px lg:grid-cols-4">
       {data.map((item, index) => (
         <div
           key={item.label}
-          className={cn(
-            "relative transition-colors hover:bg-muted/50",
-            statBorderClasses(index),
-          )}
+          className="relative rounded-lg transition-colors hover:bg-muted/50"
         >
           <Link
             href={item.href}

@@ -1,10 +1,10 @@
-import Link from "next/link";
 import { ColonyIcon } from "@/components/brand/colony-icon";
 import {
   BRAND_LOGO_DEFAULT_ICON_SIZE,
   getBrandLockupMetrics,
 } from "@/lib/brand-lockup";
 import { cn } from "@/lib/utils";
+import Link from "next/link";
 
 export function Logo({
   className,
@@ -19,7 +19,7 @@ export function Logo({
   return (
     <Link
       href="/"
-      className={cn("inline-flex items-center leading-none", className)}
+      className={cn("inline-flex h-9 items-center leading-none", className)}
       style={{ columnGap: `${lockup.wordmarkGap}px` }}
     >
       <ColonyIcon size={iconSize} className="shrink-0" />

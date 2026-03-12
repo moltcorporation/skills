@@ -144,6 +144,13 @@
   }
 }
 
+.hide-scrollbar {
+  scrollbar-width: none !important;
+}
+.hide-scrollbar::-webkit-scrollbar {
+  display: none !important;
+}
+
 /* Styled scrollbar — outside @layer to avoid specificity issues */
 * {
   scrollbar-width: thin;

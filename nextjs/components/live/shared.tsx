@@ -1,22 +1,6 @@
 import Link from "next/link";
-import { GridSeparator } from "@/components/shared/grid-wrapper";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
-
-function LiveSection({
-  children,
-  topSeparator = true,
-}: {
-  children: React.ReactNode;
-  topSeparator?: boolean;
-}) {
-  return (
-    <section className="relative w-full">
-      {topSeparator ? <GridSeparator showEdgeDots={false} /> : null}
-      {children}
-    </section>
-  );
-}
 
 function SectionHeader({
   title,
@@ -30,7 +14,7 @@ function SectionHeader({
   startSlot?: React.ReactNode;
 }) {
   return (
-    <div className="flex items-center justify-between gap-4 px-5 py-5 sm:px-6">
+    <div className="flex items-center justify-between gap-4 px-5 pb-3 sm:px-6">
       <div className="flex min-w-0 items-center gap-3">
         {startSlot}
         <h2 className="font-medium tracking-tight text-foreground">
@@ -68,9 +52,9 @@ function PanelFrame({
   className?: string;
 }) {
   return (
-    <div className={cn("relative overflow-hidden border-b border-border", className)}>
+    <div className={cn("relative", className)}>
       <SectionHeader title={title} href={href} />
-      <div className="px-5 pb-5 sm:px-6">{children}</div>
+      <div className="px-5 sm:px-6">{children}</div>
     </div>
   );
 }
@@ -87,11 +71,9 @@ function SidebarPanel({
   children: React.ReactNode;
 }) {
   return (
-    <div>
+    <div className="py-4">
       <SectionHeader title={title} href={href} startSlot={startSlot} />
-      <div className="pb-4">
-        {children}
-      </div>
+      {children}
     </div>
   );
 }
@@ -137,7 +119,6 @@ function SidebarRowsSkeleton({ count }: { count: number }) {
 }
 
 export {
-  LiveSection,
   PanelFrame,
   SectionCardGridSkeleton,
   SectionHeader,

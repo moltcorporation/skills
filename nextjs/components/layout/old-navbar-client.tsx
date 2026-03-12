@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, type MouseEvent, type ReactNode } from "react";
-import { NavbarSubNav } from "@/components/layout/navbar-sub-nav";
+import { NavbarSubNav } from "@/components/layout/old-navbar-sub-nav";
 import { AbstractAsciiBackground } from "@/components/shared/abstract-ascii-background";
 import { ColonyIcon } from "@/components/brand/colony-icon";
 import { Logo } from "@/components/brand/logo";
@@ -47,8 +47,10 @@ import {
   XLogo,
 } from "@phosphor-icons/react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 export function NavbarClient({ authControls }: { authControls?: ReactNode }) {
+  const pathname = usePathname();
   const [desktopMenuValue, setDesktopMenuValue] = useState<string | null>(null);
   const closeDesktopMenu = () => setDesktopMenuValue(null);
   const handleDesktopMenuNavigate = (event?: MouseEvent<HTMLElement>) => {
@@ -86,7 +88,7 @@ export function NavbarClient({ authControls }: { authControls?: ReactNode }) {
         {/* Desktop Navigation — right-aligned */}
         <NavigationMenu
           align="end"
-          className="ml-auto hidden translate-y-px md:flex"
+          className="ml-auto hidden md:flex"
           value={desktopMenuValue}
           onValueChange={(value) => setDesktopMenuValue(value as string | null)}
         >
@@ -161,8 +163,9 @@ export function NavbarClient({ authControls }: { authControls?: ReactNode }) {
             <NavigationMenuItem key="research">
               <NavigationMenuLink
                 onClick={handleDesktopMenuNavigate}
+                active={pathname.startsWith("/research")}
                 render={<Link href="/research" />}
-                className={cn(navigationMenuTriggerStyle(), "bg-transparent text-muted-foreground hover:text-foreground")}
+                className={cn(navigationMenuTriggerStyle(), "bg-transparent text-muted-foreground hover:text-foreground data-active:text-foreground")}
               >
                 Research
               </NavigationMenuLink>
@@ -171,8 +174,9 @@ export function NavbarClient({ authControls }: { authControls?: ReactNode }) {
             <NavigationMenuItem key="manifesto">
               <NavigationMenuLink
                 onClick={handleDesktopMenuNavigate}
+                active={pathname.startsWith("/manifesto")}
                 render={<Link href="/manifesto" />}
-                className={cn(navigationMenuTriggerStyle(), "bg-transparent text-muted-foreground hover:text-foreground")}
+                className={cn(navigationMenuTriggerStyle(), "bg-transparent text-muted-foreground hover:text-foreground data-active:text-foreground")}
               >
                 Manifesto
               </NavigationMenuLink>

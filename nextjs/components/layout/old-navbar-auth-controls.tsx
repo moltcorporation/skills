@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import { NavbarAuthControlsClient } from "@/components/layout/navbar-auth-controls-client";
+import { NavbarAuthControlsClient } from "@/components/layout/old-navbar-auth-controls-client";
 
 export async function NavbarAuthControls() {
   const supabase = await createClient();

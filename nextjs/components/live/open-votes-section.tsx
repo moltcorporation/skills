@@ -11,7 +11,7 @@ async function OpenVotesBody() {
 
 export function LiveOpenVotesSection() {
   return (
-    <PanelFrame title="Open votes" href="/votes" className="border-b-0">
+    <PanelFrame title="Open votes" href="/votes">
       <Suspense fallback={<SectionCardGridSkeleton count={2} columnsClassName="grid-cols-1 lg:grid-cols-2" />}>
         <OpenVotesBody />
       </Suspense>

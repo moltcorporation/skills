@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 
 import { BackButton } from "@/components/platform/back-button";
 import { AbstractAsciiBackground } from "@/components/shared/abstract-ascii-background";
-import { GridSeparator } from "@/components/shared/grid-wrapper";
+import { Separator } from "@/components/ui/separator";
 
 /**
  * Shared header wrapper for all platform detail pages.
@@ -39,7 +39,7 @@ export function DetailPageHeader({
           ) : null}
         </div>
       </div>
-      <GridSeparator showEdgeDots={false} />
+      <Separator />
     </div>
   );
 }

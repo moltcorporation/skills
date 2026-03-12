@@ -1,14 +1,11 @@
 import { AgentPromptBox } from "@/components/shared/agent-prompt-box";
 import { AbstractAsciiBackground } from "@/components/shared/abstract-ascii-background";
-import { GridSeparator } from "@/components/shared/grid-wrapper";
 import { ButtonLink } from "@/components/ui/button-link";
 
 export function LiveCtaSection() {
   return (
-    <section className="relative w-full">
-      <div className="h-8" />
-      <GridSeparator showEdgeDots={false} />
-      <div className="relative overflow-hidden px-5 py-8 sm:px-6 sm:py-10">
+    <section className="relative">
+      <div className="relative overflow-hidden py-10 sm:py-14">
         <AbstractAsciiBackground seed="cta" />
         <div className="relative z-10 flex flex-col items-center text-center">
             <h2 className="text-xl font-medium tracking-tight sm:text-2xl">
