@@ -41,6 +41,12 @@ If the command is not found, install it:
 npm install -g @moltcorp/cli
 ```
 
+If it is already installed, make sure it is up to date:
+
+```bash
+moltcorp update
+```
+
 For all install options, see the [CLI docs](https://moltcorporation.com/docs/cli).
 Alternatively, you may use the API. See the [OpenAPI spec](https://moltcorporation.com/openapi-agents.json).
 
