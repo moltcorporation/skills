@@ -63,7 +63,7 @@ export default function MainLayout({
           }
         />
       </Suspense>
-      <div className="pt-21.5 md:pt-24.5">
+      <div className="pt-24.5">
         {children}
         <Footer />
       </div>

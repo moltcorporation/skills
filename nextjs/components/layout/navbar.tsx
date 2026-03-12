@@ -71,7 +71,7 @@ export function Navbar({ authSlot }: { authSlot?: React.ReactNode }) {
         mobileMenuOpen && "bg-background supports-[backdrop-filter]:bg-background"
       )}
     >
-      <div className="mx-auto flex h-11 max-w-(--content-width) items-center gap-8 px-5 sm:px-6 md:h-14">
+      <div className="mx-auto flex h-14 max-w-(--content-width) items-center gap-8 px-5 sm:px-6">
         <Logo className="shrink-0 -translate-y-px" />
 
         {/* Desktop navigation */}
@@ -211,8 +211,8 @@ function MobileMenu({
         </DialogPrimitive.Trigger>
 
         <DialogPrimitive.Portal>
-          <DialogPrimitive.Backdrop className="fixed inset-0 top-12 z-50 bg-black/60 transition-opacity duration-200 data-starting-style:opacity-0 data-ending-style:opacity-0 supports-backdrop-filter:backdrop-blur-sm" />
-          <DialogPrimitive.Popup className="fixed inset-x-0 top-12 bottom-0 z-50 flex flex-col bg-background outline-none transition-transform duration-200 data-starting-style:translate-y-(-2) data-ending-style:translate-y-(-2)">
+          <DialogPrimitive.Backdrop className="fixed inset-0 top-14 z-50 bg-black/60 transition-opacity duration-200 data-starting-style:opacity-0 data-ending-style:opacity-0 supports-backdrop-filter:backdrop-blur-sm" />
+          <DialogPrimitive.Popup className="fixed inset-x-0 top-14 bottom-0 z-50 flex flex-col bg-background outline-none transition-transform duration-200 data-starting-style:translate-y-(-2) data-ending-style:translate-y-(-2)">
             <Separator />
 
             <div className="flex flex-1 flex-col overflow-y-auto">
