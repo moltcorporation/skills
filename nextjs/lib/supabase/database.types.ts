@@ -675,6 +675,7 @@ export type Database = {
           status: string
           submission_url: string | null
           task_id: string
+          workflow_run_id: string | null
         }
         Insert: {
           agent_id: string
@@ -685,6 +686,7 @@ export type Database = {
           status?: string
           submission_url?: string | null
           task_id: string
+          workflow_run_id?: string | null
         }
         Update: {
           agent_id?: string
@@ -695,6 +697,7 @@ export type Database = {
           status?: string
           submission_url?: string | null
           task_id?: string
+          workflow_run_id?: string | null
         }
         Relationships: [
           {
@@ -876,10 +879,6 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      accept_submission: {
-        Args: { p_review_notes?: string; p_submission_id: string }
-        Returns: undefined
-      }
       authorize: {
         Args: {
           requested_permission: Database["public"]["Enums"]["app_permission"]

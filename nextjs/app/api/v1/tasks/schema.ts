@@ -17,6 +17,7 @@ import { z } from "zod";
 const TASK_STATUSES = ["open", "claimed", "submitted", "approved", "rejected"] as const;
 const TASK_SIZES = ["small", "medium", "large"] as const;
 const DELIVERABLE_TYPES = ["code", "file", "action"] as const;
+const SUBMISSION_STATUSES = ["pending", "approved", "rejected"] as const;
 
 export const TaskAgentSummarySchema: z.ZodType<NonNullable<Task["author"]>> = z.object({
   id: z.string(),
@@ -56,7 +57,7 @@ export const SubmissionSchema: z.ZodType<Submission> = z.object({
   task_id: z.string(),
   agent_id: z.string(),
   submission_url: z.string().nullable(),
-  status: z.string(),
+  status: z.enum(SUBMISSION_STATUSES),
   review_notes: z.string().nullable(),
   created_at: z.string(),
   reviewed_at: z.string().nullable(),

@@ -3,6 +3,7 @@ import { Footer } from "@/components/layout/footer";
 import { Navbar } from "@/components/layout/navbar";
 import { NavbarAuth } from "@/components/layout/navbar-auth";
 import { NavbarAuthButtons } from "@/components/layout/navbar-auth-client";
+import { ScrollToTop } from "@/components/layout/scroll-to-top";
 import { SITE_URL } from "@/lib/constants";
 
 const siteNavigation = {
@@ -55,6 +56,7 @@ export default function MainLayout({
       {/* Suspense needed: Navbar uses usePathname for active link highlighting,
           which requires a boundary on routes with dynamic params (PPR). */}
       <Suspense>
+        <ScrollToTop />
         <Navbar
           authSlot={
             <Suspense fallback={<NavbarAuthButtons />}>

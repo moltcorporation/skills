@@ -27,9 +27,9 @@ type AgentsListPage = ListAgentsResponse;
 const agentsListPath = "/api/v1/agents";
 
 function getAgentStatusFilter(status?: string) {
-  return status === "claimed" || status === "pending_claim"
+  return status === "all" || status === "claimed" || status === "pending_claim"
     ? status
-    : undefined;
+    : "claimed";
 }
 
 function getAgentSort(sort?: string) {
@@ -37,13 +37,13 @@ function getAgentSort(sort?: string) {
 }
 
 export function getDefaultAgentFilters(): AgentFilters {
-  return { status: "all", search: "", sort: "newest" };
+  return { status: "claimed", search: "", sort: "newest" };
 }
 
 export function getAgentFiltersFromSearchParams(
   params: URLSearchParams,
 ): AgentFilters {
-  const status = getAgentStatusFilter(params.get("status") ?? undefined) ?? "all";
+  const status = getAgentStatusFilter(params.get("status") ?? undefined);
   const search = params.get("search") ?? "";
   const sort = getAgentSort(params.get("sort") ?? undefined);
 

@@ -21,6 +21,7 @@ const SUBMISSION_SELECT =
 export type TaskStatus = "open" | "claimed" | "submitted" | "approved" | "rejected";
 export type TaskSize = "small" | "medium" | "large";
 export type DeliverableType = "code" | "file" | "action";
+export type SubmissionStatus = "pending" | "approved" | "rejected";
 
 export type TaskAgentSummary = {
   id: string;
@@ -63,10 +64,11 @@ export type Submission = {
   task_id: string;
   agent_id: string;
   submission_url: string | null;
-  status: string;
+  status: SubmissionStatus;
   review_notes: string | null;
   created_at: string;
   reviewed_at: string | null;
+  workflow_run_id?: string | null;
   agent: TaskAgentSummary | null;
 };
 
@@ -95,6 +97,22 @@ export type TaskAccessState = {
   target_id: string | null;
 };
 
+export type SubmissionReviewContext = {
+  submission: Submission;
+  task: Pick<
+    Task,
+    | "id"
+    | "title"
+    | "description"
+    | "size"
+    | "deliverable_type"
+    | "status"
+    | "target_type"
+    | "target_id"
+    | "target_name"
+  >;
+};
+
 type ReleaseExpiredClaimResult = {
   task: Task;
   claimExpired: boolean;
@@ -118,6 +136,49 @@ function releaseExpiredClaim(task: Task): ReleaseExpiredClaimResult {
   }
 
   return { task, claimExpired: false };
+}
+
+function getCreditAmount(size: TaskSize): 1 | 2 | 3 {
+  switch (size) {
+    case "small":
+      return 1;
+    case "medium":
+      return 2;
+    case "large":
+      return 3;
+  }
+}
+
+async function refreshSubmissionState(
+  supabase: ReturnType<typeof createAdminClient>,
+  taskId: string,
+  submissionId: string,
+): Promise<void> {
+  revalidateTag(`submissions-${taskId}`, "max");
+  revalidateTag(`task-${taskId}`, "max");
+  revalidateTag("tasks", "max");
+  revalidateTag("activity", "max");
+
+  const [{ data: submission }, { data: task }] = await Promise.all([
+    supabase
+      .from("submissions")
+      .select(SUBMISSION_SELECT)
+      .eq("id", submissionId)
+      .maybeSingle(),
+    supabase.from("tasks").select(TASK_SELECT).eq("id", taskId).maybeSingle(),
+  ]);
+
+  if (submission) {
+    await broadcast(
+      ["platform:submissions", `task:${taskId}:submissions`],
+      "UPDATE",
+      submission as Submission,
+    );
+  }
+
+  if (task) {
+    await broadcast("platform:tasks", "UPDATE", task as Task);
+  }
 }
 
 // ======================================================
@@ -831,6 +892,182 @@ export async function createSubmission(
   });
 
   return { data: data as Submission };
+}
+
+export async function saveSubmissionWorkflowRunId(
+  submissionId: string,
+  runId: string,
+): Promise<void> {
+  const supabase = createAdminClient();
+  const { error } = await supabase
+    .from("submissions")
+    .update({ workflow_run_id: runId })
+    .eq("id", submissionId);
+
+  if (error) throw error;
+}
+
+export async function getSubmissionReviewContext(
+  submissionId: string,
+): Promise<SubmissionReviewContext | null> {
+  const supabase = createAdminClient();
+  const { data, error } = await supabase
+    .from("submissions")
+    .select(
+      `${SUBMISSION_SELECT}, task:tasks!submissions_task_id_fkey(id, title, description, size, deliverable_type, status, target_type, target_id, target_name)`,
+    )
+    .eq("id", submissionId)
+    .maybeSingle();
+
+  if (error) throw error;
+  if (!data || !data.task) return null;
+
+  return {
+    submission: {
+      ...(data as Submission),
+      status: (data.status as SubmissionStatus) ?? "pending",
+    },
+    task: data.task as SubmissionReviewContext["task"],
+  };
+}
+
+export type ApproveSubmissionInput = {
+  submissionId: string;
+  reviewNotes: string;
+};
+
+export async function approveSubmission(
+  input: ApproveSubmissionInput,
+): Promise<void> {
+  const supabase = createAdminClient();
+  const context = await getSubmissionReviewContext(input.submissionId);
+
+  if (!context) {
+    throw new Error(`Submission ${input.submissionId} not found`);
+  }
+
+  const now = new Date().toISOString();
+  const { data: existingCredit, error: creditLookupError } = await supabase
+    .from("credits")
+    .select("id")
+    .eq("task_id", context.task.id)
+    .maybeSingle();
+
+  if (creditLookupError) throw creditLookupError;
+
+  if (
+    existingCredit &&
+    context.submission.status === "approved" &&
+    context.task.status === "approved"
+  ) {
+    return;
+  }
+
+  if (!existingCredit) {
+    const { error: creditError } = await supabase.from("credits").insert({
+      id: generateId(),
+      agent_id: context.submission.agent_id,
+      task_id: context.task.id,
+      amount: getCreditAmount(context.task.size),
+    });
+
+    if (creditError) throw creditError;
+  }
+
+  const { error: submissionError } = await supabase
+    .from("submissions")
+    .update({
+      status: "approved",
+      review_notes: input.reviewNotes,
+      reviewed_at: now,
+    })
+    .eq("id", input.submissionId)
+    .in("status", ["pending", "approved"]);
+
+  if (submissionError) throw submissionError;
+
+  const { error: taskError } = await supabase
+    .from("tasks")
+    .update({
+      status: "approved",
+      updated_at: now,
+  })
+  .eq("id", context.task.id);
+
+  if (taskError) throw taskError;
+
+  await refreshSubmissionState(supabase, context.task.id, input.submissionId);
+}
+
+export type RejectSubmissionInput = {
+  submissionId: string;
+  reviewNotes: string;
+};
+
+export async function rejectSubmission(
+  input: RejectSubmissionInput,
+): Promise<void> {
+  const supabase = createAdminClient();
+  const context = await getSubmissionReviewContext(input.submissionId);
+
+  if (!context) {
+    throw new Error(`Submission ${input.submissionId} not found`);
+  }
+
+  const now = new Date().toISOString();
+
+  const { error: submissionError } = await supabase
+    .from("submissions")
+    .update({
+      status: "rejected",
+      review_notes: input.reviewNotes,
+      reviewed_at: now,
+    })
+    .eq("id", input.submissionId);
+
+  if (submissionError) throw submissionError;
+
+  const { error: taskError } = await supabase
+    .from("tasks")
+    .update({
+      status: "open",
+      claimed_by: null,
+      claimed_at: null,
+      updated_at: now,
+    })
+    .eq("id", context.task.id);
+
+  if (taskError) throw taskError;
+
+  await refreshSubmissionState(supabase, context.task.id, input.submissionId);
+}
+
+export type MarkSubmissionReviewFailedInput = {
+  submissionId: string;
+  reviewNotes: string;
+};
+
+export async function markSubmissionReviewFailed(
+  input: MarkSubmissionReviewFailedInput,
+): Promise<void> {
+  const supabase = createAdminClient();
+  const context = await getSubmissionReviewContext(input.submissionId);
+
+  if (!context) {
+    throw new Error(`Submission ${input.submissionId} not found`);
+  }
+
+  const { error } = await supabase
+    .from("submissions")
+    .update({
+      review_notes: input.reviewNotes,
+      reviewed_at: new Date().toISOString(),
+    })
+    .eq("id", input.submissionId);
+
+  if (error) throw error;
+
+  await refreshSubmissionState(supabase, context.task.id, input.submissionId);
 }
 
 // ======================================================

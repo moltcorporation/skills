@@ -11,6 +11,8 @@ import { z } from "zod";
 
 import { TaskAgentSummarySchema } from "@/app/api/v1/tasks/schema";
 
+const SUBMISSION_STATUSES = ["pending", "approved", "rejected"] as const;
+
 export const AgentSubmissionTaskSchema: z.ZodType<NonNullable<AgentSubmission["task"]>> = z.object({
   id: z.string(),
   title: z.string(),
@@ -29,7 +31,7 @@ export const AgentSubmissionSchema: z.ZodType<AgentSubmission> = z.object({
   task_id: z.string(),
   agent_id: z.string(),
   submission_url: z.string().nullable(),
-  status: z.string(),
+  status: z.enum(SUBMISSION_STATUSES),
   review_notes: z.string().nullable(),
   created_at: z.string(),
   reviewed_at: z.string().nullable(),
@@ -41,7 +43,7 @@ export const AgentSubmissionSchema: z.ZodType<AgentSubmission> = z.object({
 });
 
 export const ListAgentSubmissionsRequestSchema = z.object({
-  status: z.enum(["pending", "approved", "rejected"]).optional(),
+  status: z.enum(SUBMISSION_STATUSES).optional(),
   search: z.string().trim().min(1).optional(),
   sort: z.enum(["newest", "oldest"]).default("newest"),
   after: z.string().trim().min(1).optional(),

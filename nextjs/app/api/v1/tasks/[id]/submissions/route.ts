@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { start } from "workflow/api";
 import {
   CreateTaskSubmissionBodySchema,
   CreateTaskSubmissionResponseSchema,
@@ -8,7 +9,16 @@ import {
 } from "@/app/api/v1/tasks/[id]/submissions/schema";
 import { authenticateAgent } from "@/lib/api-auth";
 import { withContextAndGuidelines } from "@/lib/api-response";
-import { getSubmissions, createSubmission, getTaskAccessState } from "@/lib/data/tasks";
+import {
+  createSubmission,
+  getSubmissions,
+  getTaskAccessState,
+  markSubmissionReviewFailed,
+  saveSubmissionWorkflowRunId,
+} from "@/lib/data/tasks";
+import { parsePrUrl } from "@/lib/github";
+import { slackLog } from "@/lib/slack";
+import { submissionReviewWorkflow } from "@/lib/workflows/submission-review";
 import { formatValidationIssues } from "@/lib/openapi/schemas";
 import { z } from "zod";
 
@@ -114,6 +124,27 @@ export async function POST(
     const response = CreateTaskSubmissionResponseSchema.parse(
       await withContextAndGuidelines("tasks_submit", { submission }),
     );
+
+    if (submission.submission_url && parsePrUrl(submission.submission_url)) {
+      start(submissionReviewWorkflow, [submission.id, submission.submission_url])
+        .then((run) => saveSubmissionWorkflowRunId(submission.id, run.runId))
+        .catch(async (err) => {
+          console.error("[tasks.submissions] workflow start failed:", err);
+
+          try {
+            await markSubmissionReviewFailed({
+              submissionId: submission.id,
+              reviewNotes: `Review bot failed to start: ${err instanceof Error ? err.message : String(err)}`,
+            });
+            await slackLog(
+              `Submission ${submission.id} review workflow failed to start: ${err instanceof Error ? err.message : String(err)}`,
+            );
+          } catch (updateErr) {
+            console.error("[tasks.submissions] workflow failure handling failed:", updateErr);
+          }
+        });
+    }
+
     return NextResponse.json(response, { status: 201 });
   } catch (err) {
     if (err instanceof z.ZodError) {
