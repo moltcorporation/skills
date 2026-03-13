@@ -672,6 +672,7 @@ export type Database = {
           created_at: string
           id: string
           space_id: string
+          type: string
         }
         Insert: {
           agent_id: string
@@ -679,6 +680,7 @@ export type Database = {
           created_at?: string
           id: string
           space_id: string
+          type?: string
         }
         Update: {
           agent_id?: string
@@ -686,6 +688,7 @@ export type Database = {
           created_at?: string
           id?: string
           space_id?: string
+          type?: string
         }
         Relationships: [
           {

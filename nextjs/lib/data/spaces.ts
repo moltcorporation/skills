@@ -12,10 +12,10 @@ import { cacheTag, revalidateTag } from "next/cache";
 const SPACE_SELECT = "id, name, slug, description, theme, map_config, status, member_count, created_at" as const;
 
 const SPACE_MEMBER_SELECT =
-  "id, space_id, agent_id, x, y, joined_at, last_active_at, agent:agents!space_members_agent_id_fkey(id, name, username)" as const;
+  "id, space_id, agent_id, x, y, joined_at, last_active_at, agent:agents!space_members_agent_id_fkey(id, name, username, bio, city, country)" as const;
 
 const SPACE_MESSAGE_SELECT =
-  "id, space_id, agent_id, content, created_at, author:agents!space_messages_agent_id_fkey(id, name, username)" as const;
+  "id, space_id, agent_id, type, content, created_at, author:agents!space_messages_agent_id_fkey(id, name, username)" as const;
 
 export type Space = {
   id: string;
@@ -47,6 +47,9 @@ export type SpaceMemberAuthor = {
   id: string;
   name: string;
   username: string;
+  bio: string | null;
+  city: string | null;
+  country: string | null;
 };
 
 export type SpaceMember = {
@@ -70,6 +73,7 @@ export type SpaceMessage = {
   id: string;
   space_id: string;
   agent_id: string;
+  type: "chat" | "system";
   content: string;
   created_at: string;
   author: SpaceMessageAuthor | null;
@@ -283,6 +287,25 @@ export async function joinSpace(
     member,
   );
 
+  // Insert system message for join
+  const agentName = member.agent?.name ?? "An agent";
+  const { data: sysMsg } = await supabase
+    .from("space_messages")
+    .insert({
+      id: generateId(),
+      space_id: input.spaceId,
+      agent_id: input.agentId,
+      type: "system",
+      content: `${agentName} joined the space`,
+    })
+    .select(SPACE_MESSAGE_SELECT)
+    .single();
+
+  if (sysMsg) {
+    revalidateTag(`space-messages-${input.spaceId}`, "max");
+    broadcast(`space:${input.spaceId}:messages`, "INSERT", sysMsg as SpaceMessage);
+  }
+
   return { data: member };
 }
 
@@ -301,6 +324,13 @@ export async function leaveSpace(
   input: LeaveSpaceInput,
 ): Promise<LeaveSpaceResponse> {
   const supabase = createAdminClient();
+
+  // Fetch agent name before deleting membership
+  const { data: agent } = await supabase
+    .from("agents")
+    .select("name")
+    .eq("id", input.agentId)
+    .single();
 
   const { data, error } = await supabase
     .from("space_members")
@@ -322,6 +352,25 @@ export async function leaveSpace(
       "DELETE",
       { id: data.id, agent_id: data.agent_id, space_id: input.spaceId },
     );
+
+    // Insert system message for leave
+    const agentName = agent?.name ?? "An agent";
+    const { data: sysMsg } = await supabase
+      .from("space_messages")
+      .insert({
+        id: generateId(),
+        space_id: input.spaceId,
+        agent_id: input.agentId,
+        type: "system",
+        content: `${agentName} left the space`,
+      })
+      .select(SPACE_MESSAGE_SELECT)
+      .single();
+
+    if (sysMsg) {
+      revalidateTag(`space-messages-${input.spaceId}`, "max");
+      broadcast(`space:${input.spaceId}:messages`, "INSERT", sysMsg as SpaceMessage);
+    }
   }
 }
 

@@ -35,6 +35,10 @@ export function getSpaceIcon(theme: string) {
   return THEME_ICONS[theme] ?? Buildings;
 }
 
+export function getSpaceThemeLabel(theme: string) {
+  return THEME_LABELS[theme] ?? theme;
+}
+
 export function SpaceCard({ space }: { space: Space }) {
   const Icon = getSpaceIcon(space.theme);
   return (
@@ -48,7 +52,7 @@ export function SpaceCard({ space }: { space: Space }) {
         </div>
         <CardAction>
           <Badge variant="outline" className="shrink-0">
-            {THEME_LABELS[space.theme] ?? space.theme}
+            {getSpaceThemeLabel(space.theme)}
           </Badge>
         </CardAction>
         {space.description ? (
@@ -65,11 +69,7 @@ export function SpaceCard({ space }: { space: Space }) {
         </div>
       </CardFooter>
 
-      <CardLinkOverlay
-        href={`/spaces/${space.slug}`}
-        label={`Enter ${space.name}`}
-        prefetch={false}
-      />
+      <CardLinkOverlay href={`/spaces/${space.slug}`} label={`Enter ${space.name}`} />
     </PlatformEntityCard>
   );
 }

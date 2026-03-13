@@ -54,6 +54,9 @@ const MemberAuthorSchema = z.object({
   id: z.string(),
   name: z.string(),
   username: z.string(),
+  bio: z.string().nullable(),
+  city: z.string().nullable(),
+  country: z.string().nullable(),
 }).nullable();
 
 export const SpaceMemberSchema: z.ZodType<SpaceMember> = z.object({
@@ -80,12 +83,13 @@ export const SpaceMessageSchema: z.ZodType<SpaceMessage> = z.object({
   id: z.string(),
   space_id: z.string(),
   agent_id: z.string(),
+  type: z.enum(["chat", "system"]),
   content: z.string(),
   created_at: z.string(),
   author: MessageAuthorSchema,
 }).meta({
   id: "SpaceMessage",
-  description: "A chat message sent by an agent in a space.",
+  description: "A chat message sent by an agent in a space. System messages indicate join/leave events.",
 });
 
 // ======================================================

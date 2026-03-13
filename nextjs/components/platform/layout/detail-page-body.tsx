@@ -10,11 +10,14 @@ export function DetailPageBody({
   children,
   rail,
   layout = "default",
+  flush = false,
 }: {
   tabs?: ReactNode;
   children: ReactNode;
   rail?: ReactNode;
   layout?: "default" | "wide";
+  /** Remove top/bottom padding from the content area. */
+  flush?: boolean;
 }) {
   if (rail) {
     return (
@@ -27,7 +30,7 @@ export function DetailPageBody({
       >
         <div className="min-w-0">
           {tabs ? <div className="md:pl-10">{tabs}</div> : null}
-          <div className={cn(tabs ? "pt-5 md:pl-10" : "py-6 md:pl-10")}>
+          <div className={cn(tabs ? "pt-5 md:pl-10" : flush ? "md:pl-10" : "py-6 md:pl-10")}>
             {children}
           </div>
         </div>

@@ -1,9 +1,9 @@
 "use client";
 
-import useSWR from "swr";
+import useSWRInfinite from "swr/infinite";
 import { fetchJson } from "@/lib/client-data/fetch-json";
 import type { SpaceMessage } from "@/lib/data/spaces";
-import { useRealtime, type RealtimeEvent } from "@/lib/supabase/realtime";
+import { useRealtime } from "@/lib/supabase/realtime";
 
 // ======================================================
 // Key
@@ -17,7 +17,7 @@ export function spaceMessagesKey(slug: string) {
 // Types
 // ======================================================
 
-type SpaceMessagesResponse = {
+type SpaceMessagesPage = {
   messages: SpaceMessage[];
   nextCursor: string | null;
 };
@@ -25,20 +25,50 @@ type SpaceMessagesResponse = {
 type UseSpaceMessagesInput = {
   slug: string;
   initialData?: SpaceMessage[];
+  initialNextCursor?: string | null;
+  limit?: number;
 };
 
 // ======================================================
-// UseSpaceMessages
+// UseSpaceMessages (infinite)
 // ======================================================
 
-export function useSpaceMessages({ slug, initialData }: UseSpaceMessagesInput) {
-  return useSWR<SpaceMessagesResponse>(
-    spaceMessagesKey(slug),
-    fetchJson,
-    {
-      fallbackData: initialData ? { messages: initialData, nextCursor: null } : undefined,
-    },
-  );
+const DEFAULT_CHAT_PAGE_SIZE = 20;
+
+export function useSpaceMessages({ slug, initialData, initialNextCursor, limit }: UseSpaceMessagesInput) {
+  const pageSize = limit ?? DEFAULT_CHAT_PAGE_SIZE;
+
+  const getKey = (pageIndex: number, previousPageData: SpaceMessagesPage | null) => {
+    if (previousPageData && previousPageData.nextCursor === null) return null;
+
+    const params = new URLSearchParams({ limit: String(pageSize) });
+    if (pageIndex > 0 && previousPageData?.nextCursor) {
+      params.set("after", previousPageData.nextCursor);
+    }
+
+    return `${spaceMessagesKey(slug)}?${params.toString()}`;
+  };
+
+  const result = useSWRInfinite<SpaceMessagesPage>(getKey, fetchJson, {
+    fallbackData: initialData
+      ? [{ messages: initialData, nextCursor: initialNextCursor ?? null }]
+      : undefined,
+    revalidateFirstPage: false,
+  });
+
+  const pages = result.data ?? [];
+  const messages = pages.flatMap((page) => page.messages);
+  const lastPage = pages[pages.length - 1];
+  const hasMore = lastPage ? lastPage.nextCursor !== null : false;
+  const isLoadingMore = result.isValidating && result.size > 1 && pages.length < result.size;
+
+  return {
+    ...result,
+    messages,
+    hasMore,
+    isLoadingMore,
+    loadMore: () => result.setSize(result.size + 1),
+  };
 }
 
 // ======================================================
@@ -53,11 +83,13 @@ export function useSpaceMessagesRealtime(input: UseSpaceMessagesInput & { spaceI
     (event) => {
       if (event.type === "INSERT") {
         void resource.mutate((current) => {
-          if (!current) return current;
-          return {
-            ...current,
-            messages: [event.payload, ...current.messages],
-          };
+          if (!current || current.length === 0) return current;
+          // Prepend new message to the first page (newest messages)
+          const [firstPage, ...rest] = current;
+          return [
+            { ...firstPage, messages: [event.payload, ...firstPage.messages] },
+            ...rest,
+          ];
         }, { revalidate: false });
       }
     },

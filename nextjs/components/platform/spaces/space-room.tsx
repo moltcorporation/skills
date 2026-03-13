@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Application, extend, useTick } from "@pixi/react";
 import { Container, Graphics, Text, TextStyle } from "pixi.js";
 import type { Container as ContainerType, Graphics as GraphicsType, Ticker } from "pixi.js";
@@ -57,9 +58,27 @@ type ViewportSize = {
   height: number;
 };
 
+type HoveredAgentState = {
+  member: SpaceMember;
+  left: number;
+  top: number;
+};
+
+function formatAgentLocation(member: SpaceMember) {
+  return [member.agent?.city, member.agent?.country].filter(Boolean).join(", ");
+}
+
 export function SpaceRoom({ space, initialMembers }: SpaceRoomProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState<ViewportSize>({ width: 0, height: 0 });
+  const [canvasVisible, setCanvasVisible] = useState(false);
+  const [hoveredAgentId, setHoveredAgentId] = useState<string | null>(null);
+  const { data } = useSpaceMembersRealtime({
+    slug: space.slug,
+    spaceId: space.id,
+    initialData: initialMembers,
+  });
+  const members = data?.members ?? initialMembers;
 
   useEffect(() => {
     const element = containerRef.current;
@@ -85,15 +104,54 @@ export function SpaceRoom({ space, initialMembers }: SpaceRoomProps) {
     return () => observer.disconnect();
   }, []);
 
+  useEffect(() => {
+    if (size.width === 0 || size.height === 0) {
+      setCanvasVisible(false);
+      return;
+    }
+
+    const frameId = window.requestAnimationFrame(() => {
+      setCanvasVisible(true);
+    });
+
+    return () => {
+      window.cancelAnimationFrame(frameId);
+    };
+  }, [size.height, size.width, space.id]);
+
+  const hoveredAgent = useMemo<HoveredAgentState | null>(() => {
+    if (!hoveredAgentId || size.width === 0 || size.height === 0) return null;
+
+    const member = members.find((entry) => entry.agent_id === hoveredAgentId);
+    if (!member) return null;
+
+    const mapWidth = space.map_config.width * CELL_SIZE;
+    const mapHeight = space.map_config.height * CELL_SIZE;
+    const scale = Math.min(size.width / mapWidth, size.height / mapHeight);
+
+    if (!Number.isFinite(scale) || scale <= 0) return null;
+
+    const offsetX = (size.width - mapWidth * scale) / 2;
+    const offsetY = (size.height - mapHeight * scale) / 2;
+    const centerX = (member.x * CELL_SIZE + CELL_SIZE / 2) * scale + offsetX;
+    const centerY = (member.y * CELL_SIZE + CELL_SIZE / 2) * scale + offsetY;
+
+    return {
+      member,
+      left: centerX,
+      top: centerY,
+    };
+  }, [hoveredAgentId, members, size.height, size.width, space.map_config.height, space.map_config.width]);
+
   return (
     <div
       ref={containerRef}
-      className="min-h-[36rem] overflow-hidden rounded-sm border border-border bg-card"
+      className="relative min-h-[36rem] overflow-hidden rounded-sm border border-border bg-card"
     >
       {size.width > 0 && size.height > 0 ? (
         <Application
           key={space.id}
-          className="block"
+          className={canvasVisible ? "block opacity-100 transition-opacity duration-150" : "block opacity-0 transition-opacity duration-150"}
           width={size.width}
           height={size.height}
           background={BACKGROUND_COLORS[space.theme] ?? 0x1a1a2e}
@@ -103,29 +161,28 @@ export function SpaceRoom({ space, initialMembers }: SpaceRoomProps) {
         >
           <SpaceRoomStage
             space={space}
-            initialMembers={initialMembers}
+            members={members}
             viewport={size}
+            onHoverChange={setHoveredAgentId}
           />
         </Application>
       ) : null}
+      {hoveredAgent ? <HoveredAgentCard hoveredAgent={hoveredAgent} /> : null}
     </div>
   );
 }
 
 function SpaceRoomStage({
   space,
-  initialMembers,
+  members,
   viewport,
-}: SpaceRoomProps & {
+  onHoverChange,
+}: {
+  space: Space;
+  members: SpaceMember[];
   viewport: ViewportSize;
+  onHoverChange: (agentId: string | null) => void;
 }) {
-  const { data } = useSpaceMembersRealtime({
-    slug: space.slug,
-    spaceId: space.id,
-    initialData: initialMembers,
-  });
-  const members = data?.members ?? initialMembers;
-
   const mapWidth = space.map_config.width * CELL_SIZE;
   const mapHeight = space.map_config.height * CELL_SIZE;
   const scale = Math.min(viewport.width / mapWidth, viewport.height / mapHeight);
@@ -142,7 +199,11 @@ function SpaceRoomStage({
         <FurnitureItem key={index} item={item} />
       ))}
       {members.map((member) => (
-        <AgentAvatar key={member.agent_id} member={member} />
+        <AgentAvatar
+          key={member.agent_id}
+          member={member}
+          onHoverChange={onHoverChange}
+        />
       ))}
     </pixiContainer>
   );
@@ -231,7 +292,14 @@ function FurnitureItem({ item }: { item: FurnitureItemType }) {
   );
 }
 
-function AgentAvatar({ member }: { member: SpaceMember }) {
+function AgentAvatar({
+  member,
+  onHoverChange,
+}: {
+  member: SpaceMember;
+  onHoverChange: (agentId: string | null) => void;
+}) {
+  const router = useRouter();
   const targetX = member.x * CELL_SIZE + CELL_SIZE / 2;
   const targetY = member.y * CELL_SIZE + CELL_SIZE / 2;
   const containerRef = useRef<ContainerType>(null);
@@ -283,9 +351,22 @@ function AgentAvatar({ member }: { member: SpaceMember }) {
   );
 
   const name = member.agent?.name ?? member.agent?.username ?? "?";
+  const username = member.agent?.username;
 
   return (
-    <pixiContainer ref={containerRef} x={posRef.current.x} y={posRef.current.y}>
+    <pixiContainer
+      ref={containerRef}
+      x={posRef.current.x}
+      y={posRef.current.y}
+      eventMode="static"
+      cursor={username ? "pointer" : "default"}
+      onPointerEnter={() => onHoverChange(member.agent_id)}
+      onPointerLeave={() => onHoverChange(null)}
+      onPointerTap={() => {
+        if (!username) return;
+        router.push(`/agents/${username}`);
+      }}
+    >
       <pixiGraphics draw={drawAvatar} />
       <pixiText
         text={name}
@@ -294,5 +375,33 @@ function AgentAvatar({ member }: { member: SpaceMember }) {
         anchor={{ x: 0.5, y: 0 }}
       />
     </pixiContainer>
+  );
+}
+
+function HoveredAgentCard({ hoveredAgent }: { hoveredAgent: HoveredAgentState }) {
+  const name = hoveredAgent.member.agent?.name ?? "Unknown";
+  const username = hoveredAgent.member.agent?.username ?? "unknown";
+  const bio = hoveredAgent.member.agent?.bio?.trim();
+  const location = formatAgentLocation(hoveredAgent.member);
+
+  return (
+    <div
+      className="pointer-events-none absolute z-10 w-52 -translate-x-1/2 -translate-y-full rounded-sm border border-border/80 bg-background/95 px-3 py-2 shadow-sm backdrop-blur-sm"
+      style={{
+        left: hoveredAgent.left,
+        top: hoveredAgent.top - 10,
+      }}
+    >
+      <div className="truncate text-xs font-medium text-foreground">{name}</div>
+      <div className="truncate text-[11px] text-muted-foreground">@{username}</div>
+      {location ? (
+        <div className="pt-1 text-[11px] text-muted-foreground">{location}</div>
+      ) : null}
+      {bio ? (
+        <p className="pt-1 text-[11px] leading-4 text-foreground/80 line-clamp-3">
+          {bio}
+        </p>
+      ) : null}
+    </div>
   );
 }
