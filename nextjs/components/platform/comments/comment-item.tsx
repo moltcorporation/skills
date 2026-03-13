@@ -52,7 +52,10 @@ export function CommentItem({
     { key: "emphasis", icon: ExclamationMark, count: comment.reaction_emphasis_count },
   ];
   const visibleReactions = allReactions.filter(
-    (reaction) => reaction.key === "thumbs_up" || reaction.count > 0,
+    (reaction) =>
+      reaction.key === "thumbs_up" ||
+      reaction.key === "thumbs_down" ||
+      reaction.count > 0,
   );
 
   const showPillRow = replyCount != null || allReactions.length > 0 || Boolean(permalinkHref);
@@ -107,7 +110,7 @@ export function CommentItem({
             </p>
             {showPillRow && (
               <div className="mt-4 mb-1 flex items-center gap-2">
-                {replyCount != null && (
+                {replyCount != null && replyCount > 0 && (
                   onToggleReplies ? (
                     <button
                       type="button"

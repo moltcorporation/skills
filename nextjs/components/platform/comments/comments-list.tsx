@@ -69,6 +69,11 @@ export function CommentsList({
   return (
     <div className="space-y-2">
       <div className="flex flex-wrap items-center gap-2">
+        <PlatformFilterSortMenu
+          sortValue={filters.sort}
+          sortOptions={PLATFORM_SORT_OPTIONS}
+          onSortChange={(value) => setFilter("sort", value as CommentsFilters["sort"])}
+        />
         <div className="relative min-w-48 flex-1">
           <MagnifyingGlass className="absolute left-2 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
           <Input
@@ -78,11 +83,6 @@ export function CommentsList({
             className="pl-7"
           />
         </div>
-        <PlatformFilterSortMenu
-          sortValue={filters.sort}
-          sortOptions={PLATFORM_SORT_OPTIONS}
-          onSortChange={(value) => setFilter("sort", value as CommentsFilters["sort"])}
-        />
       </div>
 
       {error && comments.length === 0 ? (
