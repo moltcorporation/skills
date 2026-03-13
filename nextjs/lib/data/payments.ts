@@ -100,9 +100,8 @@ export async function getPaymentLinkById(
 // ======================================================
 
 export type CheckPaymentAccessInput = {
-  productId: string;
+  stripePaymentLinkId: string;
   email: string;
-  paymentLinkId?: string;
 };
 
 export type CheckPaymentAccessResponse = {
@@ -113,34 +112,28 @@ export async function checkPaymentAccess(
   input: CheckPaymentAccessInput,
 ): Promise<CheckPaymentAccessResponse> {
   "use cache";
-  cacheTag(`payment-links-${input.productId}`);
 
   const supabase = createAdminClient();
-  let scopedStripePaymentLinkId: string | undefined;
 
-  if (input.paymentLinkId) {
-    const { data: paymentLink, error: paymentLinkError } = await supabase
-      .from("stripe_payment_links")
-      .select("stripe_payment_link_id")
-      .eq("moltcorp_product_id", input.productId)
-      .eq("id", input.paymentLinkId)
-      .maybeSingle();
+  // Look up the internal record so we can tag the cache by product
+  const { data: linkRecord, error: linkError } = await supabase
+    .from("stripe_payment_links")
+    .select("moltcorp_product_id")
+    .eq("stripe_payment_link_id", input.stripePaymentLinkId)
+    .maybeSingle();
 
-    if (paymentLinkError) throw paymentLinkError;
-    scopedStripePaymentLinkId = paymentLink?.stripe_payment_link_id;
+  if (linkError) throw linkError;
+  if (linkRecord) {
+    cacheTag(`payment-links-${linkRecord.moltcorp_product_id}`);
   }
 
-  let query = supabase
+  const { data, error } = await supabase
     .from("payment_events")
     .select("id, moltcorp_product_id, email, stripe_session_id, stripe_payment_link_id, stripe_subscription_id, status, created_at")
-    .eq("moltcorp_product_id", input.productId)
-    .eq("email", input.email);
+    .eq("stripe_payment_link_id", input.stripePaymentLinkId)
+    .eq("email", input.email)
+    .order("created_at", { ascending: false });
 
-  if (scopedStripePaymentLinkId) {
-    query = query.eq("stripe_payment_link_id", scopedStripePaymentLinkId);
-  }
-
-  const { data, error } = await query.order("created_at", { ascending: false });
   if (error) throw error;
 
   const events = (data as PaymentEvent[] | null) ?? [];
@@ -188,13 +181,13 @@ export type CreatePaymentLinkInput = {
 };
 
 export type CreatePaymentLinkResponse = {
-  data: PaymentLink;
+  data: PaymentLink & { stripe: unknown };
 };
 
 export async function createPaymentLink(
   input: CreatePaymentLinkInput,
 ): Promise<CreatePaymentLinkResponse> {
-  const stripeResult = await createStripePaymentLink({
+  const stripePaymentLink = await createStripePaymentLink({
     productId: input.product_id,
     name: input.name,
     amount: input.amount,
@@ -213,8 +206,8 @@ export async function createPaymentLink(
       id: generateId(),
       moltcorp_product_id: input.product_id,
       created_by: input.agentId,
-      stripe_payment_link_id: stripeResult.stripePaymentLinkId,
-      url: stripeResult.url,
+      stripe_payment_link_id: stripePaymentLink.id,
+      url: stripePaymentLink.url,
     })
     .select("id, moltcorp_product_id, created_by, stripe_payment_link_id, url, created_at")
     .single();
@@ -223,5 +216,5 @@ export async function createPaymentLink(
 
   revalidateTag(`payment-links-${input.product_id}`, "max");
 
-  return { data: data as PaymentLink };
+  return { data: { ...(data as PaymentLink), stripe: stripePaymentLink } };
 }

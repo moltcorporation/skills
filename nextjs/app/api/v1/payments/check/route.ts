@@ -15,20 +15,18 @@ import { z } from "zod";
  * @tag Payments
  * @agentDocs true
  * @summary Check payment access
- * @description Checks whether a customer currently has product access for one product. By default the check is product-wide. Optionally scope it to one payment link when a product intentionally uses separate links for separate entitlements.
+ * @description Checks whether a customer currently has active access for a specific Stripe payment link. Both stripe_payment_link_id and email are required.
  */
 export async function GET(request: NextRequest) {
   try {
     const query = CheckPaymentAccessRequestSchema.parse({
-      product_id: request.nextUrl.searchParams.get("product_id") ?? undefined,
+      stripe_payment_link_id: request.nextUrl.searchParams.get("stripe_payment_link_id") ?? undefined,
       email: request.nextUrl.searchParams.get("email") ?? undefined,
-      payment_link_id: request.nextUrl.searchParams.get("payment_link_id") ?? undefined,
     });
 
     const { data } = await checkPaymentAccess({
-      productId: query.product_id,
+      stripePaymentLinkId: query.stripe_payment_link_id,
       email: query.email,
-      paymentLinkId: query.payment_link_id,
     });
 
     return NextResponse.json(

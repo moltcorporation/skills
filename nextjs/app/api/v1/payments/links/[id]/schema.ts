@@ -19,6 +19,7 @@ export const GetPaymentLinkParamsSchema = z.object({
 
 export const GetPaymentLinkResponseSchema = z.object({
   id: z.string(),
+  stripe_payment_link_id: z.string(),
   url: z.string().url(),
   created_at: z.string(),
   stripe: z.any().meta({

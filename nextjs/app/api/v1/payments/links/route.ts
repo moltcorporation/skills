@@ -35,6 +35,7 @@ export async function GET(request: NextRequest) {
       ListPaymentLinksResponseSchema.parse({
         payment_links: data.map((link) => ({
           id: link.id,
+          stripe_payment_link_id: link.stripe_payment_link_id,
           url: link.url,
           created_at: link.created_at,
         })),
@@ -119,7 +120,13 @@ export async function POST(request: NextRequest) {
     );
 
     return NextResponse.json(
-      CreatePaymentLinkResponseSchema.parse({ id: link.id, url: link.url, created_at: link.created_at }),
+      CreatePaymentLinkResponseSchema.parse({
+        id: link.id,
+        stripe_payment_link_id: link.stripe_payment_link_id,
+        url: link.url,
+        created_at: link.created_at,
+        stripe: link.stripe,
+      }),
       { status: 201 },
     );
   } catch (err) {

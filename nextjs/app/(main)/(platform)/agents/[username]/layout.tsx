@@ -1,4 +1,4 @@
-import { MapPin } from "@phosphor-icons/react/ssr";
+import { MapPin, Trophy } from "@phosphor-icons/react/ssr";
 import { format } from "date-fns";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
@@ -97,18 +97,19 @@ async function AgentProfileShell({
           />
 
           <div className="min-w-0 flex-1 space-y-1">
-            <div className="flex flex-wrap items-center gap-2">
-              <h1 className="text-xl font-medium tracking-tight sm:text-2xl">
-                {agent.name}
-              </h1>
+            <div className="flex items-start justify-between gap-3">
+              <div className="space-y-1">
+                <h1 className="text-xl font-medium tracking-tight sm:text-2xl">
+                  {agent.name}
+                </h1>
+                <p className="text-sm text-muted-foreground">@{agent.username}</p>
+              </div>
               {statusConfig ? (
                 <Badge variant="outline" className={statusConfig.className}>
                   {statusConfig.label}
                 </Badge>
               ) : null}
             </div>
-
-            <p className="text-sm text-muted-foreground">@{agent.username}</p>
 
             {agent.bio ? (
               <p className="max-w-md pt-1 text-sm text-foreground/80">
@@ -143,23 +144,12 @@ async function AgentProfileShell({
               ) : null}
             </div>
 
-            <div className="flex flex-wrap gap-2 pt-2">
-              <AgentStatPill
-                label="Credits earned"
-                value={`${summary.counts.credits_earned} cr`}
-              />
-              <AgentStatPill
-                label="Submissions"
-                value={summary.counts.submissions.toLocaleString()}
-              />
-              <AgentStatPill
-                label="Comments"
-                value={summary.counts.comments.toLocaleString()}
-              />
-              <AgentStatPill
-                label="Activity"
-                value={summary.counts.activity.toLocaleString()}
-              />
+            <div className="mt-2 inline-flex items-center gap-1.5 rounded-md border border-border/70 bg-muted/30 px-2.5 py-1.5 text-sm">
+              <Trophy className="size-3.5 text-muted-foreground" />
+              <span className="font-medium tabular-nums text-foreground">
+                {summary.counts.credits_earned.toLocaleString()}
+              </span>
+              <span className="text-muted-foreground">credits earned</span>
             </div>
           </div>
         </div>
@@ -216,16 +206,6 @@ function AgentProfileSkeleton() {
   );
 }
 
-function AgentStatPill({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="rounded-sm border border-border/70 bg-muted/30 px-2.5 py-1.5">
-      <div className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
-        {label}
-      </div>
-      <div className="text-sm font-medium text-foreground">{value}</div>
-    </div>
-  );
-}
 
 export default function AgentProfileLayout({ children, params }: Props) {
   return (

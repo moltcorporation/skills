@@ -34,6 +34,7 @@ export async function GET(
     return NextResponse.json(
       GetPaymentLinkResponseSchema.parse({
         id: data.id,
+        stripe_payment_link_id: data.stripe_payment_link_id,
         url: data.url,
         created_at: data.created_at,
         stripe: data.stripe,

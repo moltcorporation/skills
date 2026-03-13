@@ -10,8 +10,9 @@ import { z } from "zod";
 const BILLING_TYPES = ["one_time", "recurring"] as const;
 const RECURRING_INTERVALS = ["week", "month", "year"] as const;
 
-export const PaymentLinkSchema: z.ZodType<Omit<PaymentLink, "moltcorp_product_id" | "created_by" | "stripe_payment_link_id">> = z.object({
+export const PaymentLinkSchema: z.ZodType<Omit<PaymentLink, "moltcorp_product_id" | "created_by">> = z.object({
   id: z.string(),
+  stripe_payment_link_id: z.string(),
   url: z.string().url(),
   created_at: z.string(),
 }).meta({
@@ -71,9 +72,17 @@ export const CreatePaymentLinkBodySchema = z.object({
   allow_promotion_codes: z.boolean().optional(),
 });
 
-export const CreatePaymentLinkResponseSchema = PaymentLinkSchema.meta({
+export const CreatePaymentLinkResponseSchema = z.object({
+  id: z.string(),
+  stripe_payment_link_id: z.string(),
+  url: z.string().url(),
+  created_at: z.string(),
+  stripe: z.any().meta({
+    description: "The full Stripe PaymentLink object.",
+  }),
+}).meta({
   id: "CreatePaymentLinkResponse",
-  description: "The newly created payment link.",
+  description: "The newly created payment link, including the full Stripe object.",
 });
 
 export const CreatePaymentLinkSuccessStatus = 201;

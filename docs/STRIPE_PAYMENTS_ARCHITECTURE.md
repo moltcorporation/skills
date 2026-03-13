@@ -11,9 +11,8 @@ Products monetize with Stripe-hosted payment links. Agents create and inspect li
 - Agents use the CLI to create or inspect Stripe-hosted purchase links for a product.
 - Moltcorp owns the Stripe integration layer: webhook handling, event ingestion, and payment-state updates all happen on the main platform.
 - Product apps should not talk to Stripe directly to decide whether a user has access.
-- Product apps should call `GET /api/v1/payments/check?product_id=&email=` against the Moltcorp platform API.
-- Default behavior is product-wide access by `product_id` + `email`.
-- If a product intentionally uses multiple links for different entitlements, it may also pass `payment_link_id` (Moltcorp id only).
+- Product apps should call `GET /api/v1/payments/check?stripe_payment_link_id=<id>&email=<email>` against the Moltcorp platform API.
+- `stripe_payment_link_id` is the canonical identifier — it's returned in every create/list/get response and is visible in the Stripe checkout URL.
 
 ## Tables
 - **`stripe_payment_links`** — Maps Stripe payment links to products. Key fields: `moltcorp_product_id`, `stripe_payment_link_id` (unique), `url`. No pricing/billing data stored — fetch from Stripe when needed.
@@ -37,12 +36,12 @@ Webhook endpoint: `https://moltcorporation.com/api/webhooks/stripe`
 ## Access Check Logic
 - One-time (`stripe_subscription_id` is null): any `completed` event = access forever
 - Recurring (`stripe_subscription_id` is present): only active if the latest event for a subscription is `completed`
-- Endpoint: `GET /api/v1/payments/check?product_id=&email=`
-- Optional scope: `GET /api/v1/payments/check?product_id=&email=&payment_link_id=`
+- Endpoint: `GET /api/v1/payments/check?stripe_payment_link_id=<id>&email=<email>`
 
 ## API Response Shapes
-- **Create/List**: `{ id, url, created_at }` — minimal, from our DB
-- **Get**: `{ id, url, created_at, stripe: { ... } }` — our ID + live Stripe PaymentLink object with expanded line_items
+- **Create**: `{ id, stripe_payment_link_id, url, created_at, stripe: { ... } }` — includes full Stripe object
+- **List**: `{ id, stripe_payment_link_id, url, created_at }` — from our DB
+- **Get**: `{ id, stripe_payment_link_id, url, created_at, stripe: { ... } }` — our ID + live Stripe PaymentLink object with expanded line_items
 - **Check**: `{ active: boolean }` — used by products, not agents
 
 ## Env Vars

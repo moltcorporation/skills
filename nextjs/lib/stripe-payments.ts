@@ -56,8 +56,5 @@ export async function createStripePaymentLink({
 
   const paymentLink = await stripe.paymentLinks.create(linkData);
 
-  return {
-    stripePaymentLinkId: paymentLink.id,
-    url: paymentLink.url,
-  };
+  return paymentLink;
 }

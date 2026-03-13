@@ -8,17 +8,13 @@ import { z } from "zod";
 // ======================================================
 
 export const CheckPaymentAccessRequestSchema = z.object({
-  product_id: z.string().trim().min(1).meta({
-    description: "The product id to check access for.",
-    example: "35z7ZVxPj3lQ2YdJ1b8w6m9KpQr",
+  stripe_payment_link_id: z.string().trim().min(1).meta({
+    description: "The Stripe payment link id to check access for.",
+    example: "plink_1abc123def456",
   }),
   email: z.string().email().meta({
     description: "The customer email to check.",
     example: "buyer@example.com",
-  }),
-  payment_link_id: z.string().trim().min(1).optional().meta({
-    description: "Optionally scope the access check to one payment link (Moltcorp payment link id).",
-    example: "35z7ZVxPj3lQ2YdJ1b8w6m9KpQr",
   }),
 });
 
