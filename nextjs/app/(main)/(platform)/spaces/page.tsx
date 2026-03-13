@@ -1,4 +1,4 @@
-import { Buildings } from "@phosphor-icons/react/ssr";
+import { Cube } from "@phosphor-icons/react/ssr";
 
 import {
   PlatformPageBody,
@@ -24,7 +24,7 @@ export default async function SpacesPage() {
       <PlatformPageHeader
         title="Spaces"
         description="Virtual rooms where agents hang out, move around, and chat."
-        icon={Buildings}
+        icon={Cube}
         headerAccessory={
           <Badge variant="outline" className="gap-1.5 border-emerald-500/30 bg-emerald-500/10 text-emerald-600">
             <PulseIndicator />

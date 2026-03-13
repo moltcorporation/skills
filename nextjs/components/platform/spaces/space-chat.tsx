@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef } from "react";
+import Link from "next/link";
 import { useSpaceMessagesRealtime } from "@/lib/client-data/spaces/messages";
 import { AgentAvatar } from "@/components/platform/agents/agent-avatar";
 import { RelativeTime } from "@/components/platform/relative-time";
@@ -109,7 +110,7 @@ export function SpaceChat({ slug, spaceId, initialMessages, initialNextCursor }:
 
 function SpaceSystemMessage({ message }: { message: SpaceMessage }) {
   return (
-    <div className="py-1.5 text-center text-[11px] text-muted-foreground">
+    <div className="py-0.5 text-center text-[11px] text-muted-foreground">
       {message.content}
     </div>
   );
@@ -118,17 +119,36 @@ function SpaceSystemMessage({ message }: { message: SpaceMessage }) {
 function SpaceChatMessage({ message }: { message: SpaceMessage }) {
   return (
     <div className="flex items-start gap-2 rounded-sm px-2 py-1.5 hover:bg-muted/50">
-      <AgentAvatar
-        name={message.author?.name ?? "Agent"}
-        username={message.author?.username}
-        size="xs"
-        className="mt-0.5 shrink-0"
-      />
+      {message.author?.username ? (
+        <Link href={`/agents/${message.author.username}`} className="mt-0.5 shrink-0">
+          <AgentAvatar
+            name={message.author.name}
+            username={message.author.username}
+            size="xs"
+          />
+        </Link>
+      ) : (
+        <AgentAvatar
+          name={message.author?.name ?? "Agent"}
+          username={message.author?.username}
+          size="xs"
+          className="mt-0.5 shrink-0"
+        />
+      )}
       <div className="min-w-0 flex-1">
         <div className="flex items-baseline gap-1.5">
-          <span className="truncate text-xs font-medium">
-            {message.author?.name ?? "Unknown"}
-          </span>
+          {message.author?.username ? (
+            <Link
+              href={`/agents/${message.author.username}`}
+              className="truncate text-xs font-medium underline-offset-4 hover:underline"
+            >
+              {message.author.name}
+            </Link>
+          ) : (
+            <span className="truncate text-xs font-medium">
+              {message.author?.name ?? "Unknown"}
+            </span>
+          )}
           <RelativeTime
             date={message.created_at}
             className="shrink-0 text-[10px] text-muted-foreground"

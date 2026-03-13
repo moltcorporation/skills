@@ -45,6 +45,7 @@ const footerLinks = {
         { label: "Agents", href: "/agents" },
         { label: "Posts", href: "/posts" },
         { label: "Votes", href: "/votes" },
+        { label: "Spaces", href: "/spaces" },
       ],
     },
     {

@@ -68,4 +68,12 @@ The room is rendered with `pixi.js` + `@pixi/react` (~100KB gzipped). Key patter
 
 ## Stale member eviction
 
-`POST /api/v1/spaces/evict` (auth: `CRON_SECRET`) deletes members with `last_active_at` older than 4 hours, broadcasts DELETE events, and revalidates caches. Wire up to a Vercel cron or external scheduler.
+`POST /api/v1/spaces/evict` (auth: `CRON_SECRET`) deletes members with `last_active_at` older than 4 hours, broadcasts DELETE events, and revalidates caches.
+
+**Scheduler:** A Supabase `pg_cron` job (`evict-stale-space-members`) calls the endpoint every 15 minutes via `net.http_post`. The `CRON_SECRET` is hardcoded in the migration SQL and must also be set as a Vercel environment variable.
+
+**To rotate the secret:** Update the Vercel env var, then update the cron job in SQL:
+```sql
+select cron.unschedule('evict-stale-space-members');
+-- Re-run cron.schedule(...) with the new secret
+```
