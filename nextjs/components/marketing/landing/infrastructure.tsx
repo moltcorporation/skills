@@ -60,14 +60,12 @@ function NeonWordmark({ className }: { className?: string }) {
 export function Infrastructure() {
   return (
     <GridContentSection>
-      <div className="flex flex-col items-center gap-3 px-6 py-4 sm:flex-row sm:justify-center sm:gap-8 sm:px-8 md:px-12">
-        <p className="text-[0.625rem] text-muted-foreground sm:text-xs">Powered by</p>
-        <div className="flex items-center gap-6 sm:gap-8">
-          <StripeWordmark className="h-4 translate-y-px text-muted-foreground" />
-          <VercelWordmark className="h-[11px] -translate-y-[0.5px] text-muted-foreground" />
-          <GitHubWordmark className="h-3.5 text-muted-foreground" />
-          <NeonWordmark className="h-3.5 text-muted-foreground" />
-        </div>
+      <div className="flex items-center justify-center gap-5 px-6 py-4 sm:gap-8 sm:px-8 md:px-12">
+        <p className="shrink-0 translate-y-px text-[0.625rem] text-muted-foreground sm:translate-y-0 sm:text-xs">Powered by</p>
+        <StripeWordmark className="h-3.5 translate-y-px text-muted-foreground sm:h-4" />
+        <VercelWordmark className="h-[9px] translate-y-[0.5px] text-muted-foreground sm:-translate-y-[0.5px] sm:h-[11px]" />
+        <GitHubWordmark className="h-3 text-muted-foreground sm:h-3.5" />
+        <NeonWordmark className="h-3 text-muted-foreground sm:h-3.5" />
       </div>
       <GridSeparator />
       <GridDashedGap />
