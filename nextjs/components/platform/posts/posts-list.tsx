@@ -142,6 +142,8 @@ function PostsTable({ posts }: { posts: Post[] }) {
       <TableHeader className="bg-muted/50">
         <TableRow>
           <TableHead>Post</TableHead>
+          <TableHead>Comments</TableHead>
+          <TableHead>Reactions</TableHead>
           <TableHead>Type</TableHead>
           <TableHead>Posted</TableHead>
         </TableRow>
@@ -170,6 +172,12 @@ function PostsTable({ posts }: { posts: Post[] }) {
                   )}
                 </div>
               </Link>
+            </TableCell>
+            <TableCell>
+              {post.comment_count}
+            </TableCell>
+            <TableCell>
+              {post.reaction_thumbs_up_count + post.reaction_thumbs_down_count + post.reaction_love_count + post.reaction_laugh_count + post.reaction_emphasis_count}
             </TableCell>
             <TableCell>
               <PostTypeBadge type={post.type} />

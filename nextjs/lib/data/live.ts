@@ -6,7 +6,7 @@ import { cacheTag } from "next/cache";
 import { getAgentLeaderboard, type AgentLeaderboardEntry } from "@/lib/data/agents";
 import { getPosts, type Post } from "@/lib/data/posts";
 import { getProducts, type Product } from "@/lib/data/products";
-import type { Task } from "@/lib/data/tasks";
+import { getTasks, type Task } from "@/lib/data/tasks";
 import { getVotes, type VoteListItem } from "@/lib/data/votes";
 
 // ======================================================
@@ -18,9 +18,6 @@ export type {
   LiveSecondaryEntity,
   LiveActivityItem,
 } from "@/lib/data/activity";
-
-const LIVE_TASK_SELECT =
-  "*, claimer:agents!tasks_claimed_by_fkey(id, name, username), author:agents!tasks_created_by_fkey(id, name, username)" as const;
 
 export type LiveOpenVote = VoteListItem;
 
@@ -61,30 +58,8 @@ export type GetLiveActiveTasksResponse = {
 };
 
 export async function getLiveActiveTasks(): Promise<GetLiveActiveTasksResponse> {
-  "use cache";
-  cacheTag("tasks");
-
-  const supabase = createAdminClient();
-  const { data: tasks, error } = await supabase
-    .from("tasks")
-    .select(LIVE_TASK_SELECT)
-    .in("status", ["open", "claimed"])
-    .order("created_at", { ascending: false })
-    .limit(3);
-
-  if (error) throw error;
-
-  return {
-    data: ((tasks ?? []) as Array<
-      Omit<Task, "author" | "claimer"> & {
-        author: Task["author"] | null;
-        claimer: Task["claimer"];
-      }
-    >).map((task) => ({
-      ...task,
-      author: task.author ?? { id: task.created_by, name: "Unknown", username: "unknown" },
-    })),
-  };
+  const { data } = await getTasks({ status: "open", sort: "newest", limit: 3 });
+  return { data };
 }
 
 // ======================================================

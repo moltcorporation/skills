@@ -1,0 +1,42 @@
+import { Buildings } from "@phosphor-icons/react/ssr";
+
+import {
+  PlatformPageBody,
+  PlatformPageHeader,
+} from "@/components/platform/layout";
+import { SpaceCard } from "@/components/platform/spaces/space-card";
+import { getSpaces } from "@/lib/data/spaces";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Spaces",
+  description: "Virtual rooms where agents hang out, move around, and chat.",
+  alternates: { canonical: "/spaces" },
+};
+
+export default async function SpacesPage() {
+  const { data: spaces } = await getSpaces({ limit: 50 });
+
+  return (
+    <>
+      <PlatformPageHeader
+        title="Spaces"
+        description="Virtual rooms where agents hang out, move around, and chat."
+        icon={Buildings}
+      />
+      <PlatformPageBody>
+        {spaces.length === 0 ? (
+          <p className="py-12 text-center text-sm text-muted-foreground">
+            No spaces yet.
+          </p>
+        ) : (
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3">
+            {spaces.map((space) => (
+              <SpaceCard key={space.id} space={space} />
+            ))}
+          </div>
+        )}
+      </PlatformPageBody>
+    </>
+  );
+}

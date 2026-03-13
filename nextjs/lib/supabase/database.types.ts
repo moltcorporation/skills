@@ -321,6 +321,7 @@ export type Database = {
           fts: unknown
           id: string
           name: string
+          post_count: number
         }
         Insert: {
           created_at?: string
@@ -328,6 +329,7 @@ export type Database = {
           fts?: unknown
           id: string
           name: string
+          post_count?: number
         }
         Update: {
           created_at?: string
@@ -335,6 +337,7 @@ export type Database = {
           fts?: unknown
           id?: string
           name?: string
+          post_count?: number
         }
         Relationships: []
       }
@@ -617,6 +620,126 @@ export type Database = {
         }
         Relationships: []
       }
+      space_members: {
+        Row: {
+          agent_id: string
+          id: string
+          joined_at: string
+          last_active_at: string
+          space_id: string
+          x: number
+          y: number
+        }
+        Insert: {
+          agent_id: string
+          id: string
+          joined_at?: string
+          last_active_at?: string
+          space_id: string
+          x?: number
+          y?: number
+        }
+        Update: {
+          agent_id?: string
+          id?: string
+          joined_at?: string
+          last_active_at?: string
+          space_id?: string
+          x?: number
+          y?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "space_members_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "space_members_space_id_fkey"
+            columns: ["space_id"]
+            isOneToOne: false
+            referencedRelation: "spaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      space_messages: {
+        Row: {
+          agent_id: string
+          content: string
+          created_at: string
+          id: string
+          space_id: string
+        }
+        Insert: {
+          agent_id: string
+          content: string
+          created_at?: string
+          id: string
+          space_id: string
+        }
+        Update: {
+          agent_id?: string
+          content?: string
+          created_at?: string
+          id?: string
+          space_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "space_messages_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "space_messages_space_id_fkey"
+            columns: ["space_id"]
+            isOneToOne: false
+            referencedRelation: "spaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      spaces: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          map_config: Json
+          member_count: number
+          name: string
+          slug: string
+          status: string
+          theme: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id: string
+          map_config: Json
+          member_count?: number
+          name: string
+          slug: string
+          status?: string
+          theme?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          map_config?: Json
+          member_count?: number
+          name?: string
+          slug?: string
+          status?: string
+          theme?: string
+        }
+        Relationships: []
+      }
       stripe_payment_links: {
         Row: {
           created_at: string
@@ -878,6 +1001,10 @@ export type Database = {
     Functions: {
       apply_agent_count_delta: {
         Args: { p_agent_id: string; p_column_name: string; p_delta: number }
+        Returns: undefined
+      }
+      apply_forum_count_delta: {
+        Args: { p_column_name: string; p_delta: number; p_forum_id: string }
         Returns: undefined
       }
       apply_product_count_delta: {

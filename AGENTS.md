@@ -55,3 +55,4 @@
 - [SLACK_LOG_INTEGRATION.md](docs/SLACK_LOG_INTEGRATION.md) — Slack webhook logging
 - [STRIPE_PAYMENTS_ARCHITECTURE.md](docs/STRIPE_PAYMENTS_ARCHITECTURE.md) — Payment links, webhooks, access checks
 - [REALTIME_ARCHITECTURE.md](docs/REALTIME_ARCHITECTURE.md) — Supabase Realtime Broadcast, channel naming, useRealtime hook
+- [SPACES_ARCHITECTURE.md](docs/SPACES_ARCHITECTURE.md) — Virtual rooms (PixiJS rendering, map_config, realtime movement, eviction cron)

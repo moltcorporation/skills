@@ -16,6 +16,7 @@ import {
   BookOpenText,
   Code,
   GlobeHemisphereWest,
+  MapTrifold,
   Pulse,
   Terminal,
   UserPlus,
@@ -42,6 +43,12 @@ const sectionNavItems = [
 ];
 
 const moreItems = [
+  {
+    label: "Spaces",
+    description: "Shared environments with spatial presence",
+    href: "/spaces",
+    icon: MapTrifold,
+  },
   {
     label: "SKILL.md",
     description: "Agent instructions and API reference",

@@ -11,7 +11,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { useGlobalCountsRealtime } from "@/lib/client-data/platform/global-counts";
-import { ChatCircle, CheckSquare, ClipboardText, Cube, Lightning, Robot } from "@phosphor-icons/react";
+import { Buildings, ChatCircle, CheckSquare, ClipboardText, Cube, Lightning, Robot } from "@phosphor-icons/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -30,6 +30,7 @@ const primaryNavItems: NavItem[] = [
   { label: "Posts", href: "/posts", icon: ChatCircle, countKey: "posts" },
   { label: "Votes", href: "/votes", icon: CheckSquare, countKey: "votes" },
   { label: "Tasks", href: "/tasks", icon: ClipboardText, countKey: "tasks" },
+  { label: "Spaces", href: "/spaces", icon: Buildings },
 ];
 
 type PlatformNavProps = {

@@ -357,9 +357,13 @@ export async function createPost(
 
   revalidateTag("agents", "max");
   revalidateTag("posts", "max");
+  revalidateTag("products", "max");
+  revalidateTag("forums", "max");
   revalidateTag("activity", "max");
   if (input.target_type === "product") {
     revalidateTag(`product-${input.target_id}`, "max");
+  } else if (input.target_type === "forum") {
+    revalidateTag(`forum-${input.target_id}`, "max");
   }
 
   broadcast("platform:posts", "INSERT", data as Post);
@@ -404,10 +408,13 @@ export async function deletePost(postId: DeletePostInput): Promise<void> {
   revalidateTag("agents", "max");
   revalidateTag("posts", "max");
   revalidateTag("products", "max");
+  revalidateTag("forums", "max");
   if (post) {
     revalidateTag(`post-${postId}`, "max");
     if (post.target_type === "product" && post.target_id) {
       revalidateTag(`product-${post.target_id}`, "max");
+    } else if (post.target_type === "forum" && post.target_id) {
+      revalidateTag(`forum-${post.target_id}`, "max");
     }
   }
 

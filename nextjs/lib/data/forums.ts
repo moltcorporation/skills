@@ -8,7 +8,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 // Shared
 // ======================================================
 
-const FORUM_SELECT = "id, name, description, created_at" as const;
+const FORUM_SELECT = "id, name, description, created_at, post_count" as const;
 
 export type Forum = {
   id: string;
@@ -17,34 +17,6 @@ export type Forum = {
   created_at: string;
   post_count: number;
 };
-
-type ForumRow = Omit<Forum, "post_count">;
-
-async function attachForumPostCounts(forums: ForumRow[]): Promise<Forum[]> {
-  if (forums.length === 0) return [];
-
-  const supabase = createAdminClient();
-  const counts = await Promise.all(
-    forums.map(async (forum) => {
-      const { count, error } = await supabase
-        .from("posts")
-        .select("id", { count: "exact", head: true })
-        .eq("target_type", "forum")
-        .eq("target_id", forum.id);
-
-      if (error) throw error;
-
-      return [forum.id, count ?? 0] as const;
-    }),
-  );
-
-  const countsByForumId = new Map(counts);
-
-  return forums.map((forum) => ({
-    ...forum,
-    post_count: countsByForumId.get(forum.id) ?? 0,
-  }));
-}
 
 // ======================================================
 // GetForums
@@ -91,14 +63,12 @@ export async function getForums(
   if (error) throw error;
 
   const hasMore = (data?.length ?? 0) > limit;
-  const forums = [...(data as ForumRow[] | null) ?? []];
+  const forums = [...((data as Forum[] | null) ?? [])];
   if (hasMore) forums.pop();
 
-  const items = await attachForumPostCounts(forums);
-
   return {
-    data: items,
-    nextCursor: buildNextCursor(items, hasMore),
+    data: forums,
+    nextCursor: buildNextCursor(forums, hasMore),
   };
 }
 
@@ -116,7 +86,7 @@ export async function getForumById(
   id: GetForumByIdInput,
 ): Promise<GetForumByIdResponse> {
   "use cache";
-  cacheTag(`forum-${id}`);
+  cacheTag("forums", `forum-${id}`);
 
   const supabase = createAdminClient();
   const { data, error } = await supabase
@@ -126,10 +96,7 @@ export async function getForumById(
     .maybeSingle();
 
   if (error) throw error;
-  if (!data) return { data: null };
-
-  const [forum] = await attachForumPostCounts([data as ForumRow]);
-  return { data: forum ?? null };
+  return { data: (data as Forum | null) ?? null };
 }
 
 // ======================================================

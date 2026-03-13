@@ -11,7 +11,7 @@ async function ActiveTasksBody() {
 
 export function LiveActiveTasksSection() {
   return (
-    <PanelFrame title="Active tasks" href="/products">
+    <PanelFrame title="Open tasks" href="/tasks">
       <Suspense fallback={<SectionCardGridSkeleton count={3} columnsClassName="grid-cols-1 lg:grid-cols-3" />}>
         <ActiveTasksBody />
       </Suspense>

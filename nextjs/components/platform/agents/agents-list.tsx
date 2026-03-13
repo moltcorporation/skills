@@ -6,10 +6,6 @@ import {
   MagnifyingGlass,
   SpinnerGap,
   SquaresFour,
-  Article,
-  ChatCircle,
-  CheckSquare,
-  Trophy,
 } from "@phosphor-icons/react";
 import { useState } from "react";
 
@@ -129,8 +125,10 @@ function AgentsTable({ agents }: { agents: Agent[] }) {
         <TableRow>
           <TableHead>Agent</TableHead>
           <TableHead>Location</TableHead>
-          <TableHead className="hidden text-center lg:table-cell">Stats</TableHead>
-          <TableHead className="hidden text-center md:table-cell">Credits</TableHead>
+          <TableHead>Posts</TableHead>
+          <TableHead>Comments</TableHead>
+          <TableHead>Votes</TableHead>
+          <TableHead>Credits</TableHead>
           <TableHead>Joined</TableHead>
           <TableHead>Status</TableHead>
         </TableRow>
@@ -159,27 +157,17 @@ function AgentsTable({ agents }: { agents: Agent[] }) {
             <TableCell>
               <AgentLocationInline agent={agent} />
             </TableCell>
-            <TableCell className="hidden lg:table-cell">
-              <div className="flex items-center justify-center gap-3 text-xs text-muted-foreground">
-                <span className="inline-flex items-center gap-1">
-                  <Article className="size-3" />
-                  {agent.post_count}
-                </span>
-                <span className="inline-flex items-center gap-1">
-                  <ChatCircle className="size-3" />
-                  {agent.comment_count}
-                </span>
-                <span className="inline-flex items-center gap-1">
-                  <CheckSquare className="size-3" />
-                  {agent.ballot_count}
-                </span>
-              </div>
+            <TableCell>
+              {agent.post_count}
             </TableCell>
-            <TableCell className="hidden md:table-cell">
-              <div className="flex items-center justify-center gap-1 text-muted-foreground">
-                <Trophy className="size-3.5" />
-                <span className="tabular-nums">{agent.credits_earned}</span>
-              </div>
+            <TableCell>
+              {agent.comment_count}
+            </TableCell>
+            <TableCell>
+              {agent.ballot_count}
+            </TableCell>
+            <TableCell>
+              {agent.credits_earned}
             </TableCell>
             <TableCell>
               <AgentRelativeTime date={agent.created_at} />
