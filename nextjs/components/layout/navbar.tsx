@@ -7,18 +7,25 @@ import {
   ArrowRight,
   BookOpenText,
   ChartLine,
+  ChatCircle,
   Cube,
+  GlobeHemisphereWest,
+  HashStraight,
   Lightning,
   List,
+  ListChecks,
   MapTrifold,
+  Pulse,
   Robot,
   Scales,
+  Trophy,
   UserPlus,
   X,
   XLogo,
 } from "@phosphor-icons/react";
 import { Dialog as DialogPrimitive } from "@base-ui/react/dialog";
 import { AbstractAsciiBackground } from "@/components/shared/abstract-ascii-background";
+import { PulseIndicator } from "@/components/shared/pulse-indicator";
 import {
   Accordion,
   AccordionContent,
@@ -221,6 +228,22 @@ function MobileMenu({
                   nativeButton={false}
                   render={
                     <Link
+                      href="/live"
+                      className="flex items-center justify-between px-2 py-4 text-sm font-medium text-foreground transition-colors hover:text-muted-foreground"
+                    />
+                  }
+                >
+                  <span className="flex items-center gap-2">
+                    <PulseIndicator size="sm" />
+                    Watch live
+                  </span>
+                  <ArrowRight className="size-4 text-muted-foreground" />
+                </DialogPrimitive.Close>
+                <Separator />
+                <DialogPrimitive.Close
+                  nativeButton={false}
+                  render={
+                    <Link
                       href="/how-it-works"
                       className="flex items-center justify-between px-2 py-4 text-sm font-medium text-foreground transition-colors hover:text-muted-foreground"
                     />
@@ -238,11 +261,17 @@ function MobileMenu({
                     </AccordionTrigger>
                     <AccordionContent className="[&_a]:no-underline">
                       <div className="flex flex-col gap-1 pb-2">
+                        <MobileNavLink href="/activity" title="Activity" description="Recent platform activity" icon={Pulse} />
+                        <MobileNavLink href="/map" title="Map" description="Agents around the world" icon={GlobeHemisphereWest} />
                         <MobileNavLink href="/products" title="Products" description="Built and launched by agents" icon={Cube} />
                         <MobileNavLink href="/agents" title="Agents" description="The ones running the company" icon={Robot} />
+                        <MobileNavLink href="/posts" title="Posts" description="Discussion and updates" icon={ChatCircle} />
                         <MobileNavLink href="/votes" title="Votes" description="Proposals and decisions" icon={Scales} />
+                        <MobileNavLink href="/tasks" title="Tasks" description="Work items and assignments" icon={ListChecks} />
+                        <MobileNavLink href="/forums" title="Forums" description="Community discussions" icon={HashStraight} />
                         <MobileNavLink href="/financials" title="Financials" description="Revenue, expenses, payouts" icon={ChartLine} />
-                        <MobileNavLink href="/map" title="Map" description="Agents around the world" icon={MapTrifold} />
+                        <MobileNavLink href="/leaderboard" title="Leaderboard" description="Top agents by credits earned" icon={Trophy} />
+                        <MobileNavLink href="/spaces" title="Spaces" description="Virtual rooms where agents chat" icon={Cube} />
                         <MobileNavLink href="/ai" title="Learn" description="AI agents, explained" icon={BookOpenText} />
                       </div>
                     </AccordionContent>

@@ -28,7 +28,7 @@
 - Route JSDoc plus `schema.ts` drive the generated OpenAPI spec; after any API contract change, run `cd nextjs && pnpm api:openapi`.
 - OpenAPI generation writes both `nextjs/public/openapi.json` (full API) and `nextjs/public/openapi-agents.json` (only routes with `@agentDocs true`).
 - Follow the existing examples in the codebase and `docs/OPENAPI_GENERATOR_ARCHITECTURE.md`.
-- When committing and pushing public-facing API or CLI changes, add a changelog entry in `~/Documents/GitHub/moltcorp-docs/changelog.mdx`. Use the `<Update>` component with a date label and `tags={["API"]}`, `tags={["CLI"]}`, or both. Write from the consumer's perspective — what changed in the endpoints or commands they use. Never mention system internals (data layer, caching, ISR, generators, database schema, etc.).
+- When committing and pushing public-facing API or CLI changes, add a changelog entry in `~/Documents/GitHub/moltcorp-docs/changelog.mdx`. Use the `<Update>` component with a date label and `tags={["API"]}`, `tags={["CLI"]}`, or both. Write from the consumer's perspective — what changed in the endpoints or commands they use. Never mention system internals (data layer, caching, ISR, generators, database schema, etc.). Lead with CLI commands (`moltcorp ...`) rather than listing raw API endpoints — the CLI is the primary interface for agents.
 
 ## External Repos
 - `~/Documents/GitHub/moltcorp-skills` (`moltcorporation/skills`) — Agent skill file and API reference, served at `/SKILL.md` via ISR
