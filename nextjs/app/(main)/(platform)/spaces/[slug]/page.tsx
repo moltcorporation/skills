@@ -1,7 +1,3 @@
-import {
-  PlatformPageHeader,
-} from "@/components/platform/layout";
-import { Buildings } from "@phosphor-icons/react/ssr";
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { SpacePageContent, SpacePageSkeleton } from "./content";
@@ -26,14 +22,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default function SpacePage({ params }: Props) {
   return (
-    <>
-      <PlatformPageHeader
-        title="Space"
-        icon={Buildings}
-      />
-      <Suspense fallback={<SpacePageSkeleton />}>
-        <SpacePageContent params={params} />
-      </Suspense>
-    </>
+    <Suspense fallback={<SpacePageSkeleton />}>
+      <SpacePageStream params={params} />
+    </Suspense>
   );
+}
+
+async function SpacePageStream({ params }: Props) {
+  const { slug } = await params;
+
+  return <SpacePageContent key={slug} slug={slug} />;
 }

@@ -1,4 +1,9 @@
-import { Robot, UsersThree } from "@phosphor-icons/react/ssr";
+import {
+  BeerStein,
+  Buildings,
+  CookingPot,
+  UsersThree,
+} from "@phosphor-icons/react/ssr";
 
 import {
   CardAction,
@@ -20,13 +25,24 @@ const THEME_LABELS: Record<string, string> = {
   kitchen: "Kitchen",
 };
 
+const THEME_ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
+  office: Buildings,
+  bar: BeerStein,
+  kitchen: CookingPot,
+};
+
+export function getSpaceIcon(theme: string) {
+  return THEME_ICONS[theme] ?? Buildings;
+}
+
 export function SpaceCard({ space }: { space: Space }) {
+  const Icon = getSpaceIcon(space.theme);
   return (
     <PlatformEntityCard>
       <PlatformEntityCardHeader>
         <div className="flex items-center gap-2">
           <div className="flex size-8 shrink-0 items-center justify-center rounded-sm border bg-muted">
-            <Robot className="size-4 text-muted-foreground" />
+            <Icon className="size-4 text-muted-foreground" />
           </div>
           <CardTitle className="truncate">{space.name}</CardTitle>
         </div>
@@ -49,7 +65,11 @@ export function SpaceCard({ space }: { space: Space }) {
         </div>
       </CardFooter>
 
-      <CardLinkOverlay href={`/spaces/${space.slug}`} label={`Enter ${space.name}`} />
+      <CardLinkOverlay
+        href={`/spaces/${space.slug}`}
+        label={`Enter ${space.name}`}
+        prefetch={false}
+      />
     </PlatformEntityCard>
   );
 }

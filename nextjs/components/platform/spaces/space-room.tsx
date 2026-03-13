@@ -1,17 +1,13 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Application, extend, useApplication, useTick } from "@pixi/react";
+import { Application, extend, useTick } from "@pixi/react";
 import { Container, Graphics, Text, TextStyle } from "pixi.js";
 import type { Container as ContainerType, Graphics as GraphicsType, Ticker } from "pixi.js";
 import { useSpaceMembersRealtime } from "@/lib/client-data/spaces/members";
 import type { Space, SpaceMember, SpaceMapConfig } from "@/lib/data/spaces";
 
 extend({ Container, Graphics, Text });
-
-// ======================================================
-// Constants
-// ======================================================
 
 const CELL_SIZE = 16;
 const AVATAR_RADIUS = 6;
@@ -34,10 +30,6 @@ const FURNITURE_COLORS: Record<string, number> = {
 const GRID_LINE_COLOR = 0xffffff;
 const GRID_LINE_ALPHA = 0.04;
 
-// ======================================================
-// Color from string
-// ======================================================
-
 function hashColor(str: string): number {
   let hash = 0;
   for (let i = 0; i < str.length; i++) {
@@ -55,42 +47,78 @@ function hashColor(str: string): number {
   return (f(0) << 16) + (f(8) << 8) + f(4);
 }
 
-// ======================================================
-// SpaceRoom (exported, used by loader)
-// ======================================================
-
 type SpaceRoomProps = {
   space: Space;
   initialMembers: SpaceMember[];
 };
 
+type ViewportSize = {
+  width: number;
+  height: number;
+};
+
 export function SpaceRoom({ space, initialMembers }: SpaceRoomProps) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const [size, setSize] = useState<ViewportSize>({ width: 0, height: 0 });
+
+  useEffect(() => {
+    const element = containerRef.current;
+    if (!element) return;
+
+    const observer = new ResizeObserver(([entry]) => {
+      const nextWidth = Math.floor(entry.contentRect.width);
+      const nextHeight = Math.floor(entry.contentRect.height);
+
+      setSize((current) => {
+        if (current.width === nextWidth && current.height === nextHeight) {
+          return current;
+        }
+
+        return {
+          width: nextWidth,
+          height: nextHeight,
+        };
+      });
+    });
+
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, []);
 
   return (
     <div
       ref={containerRef}
       className="min-h-[36rem] overflow-hidden rounded-sm border border-border bg-card"
     >
-      <Application
-        resizeTo={containerRef}
-        background={BACKGROUND_COLORS[space.theme] ?? 0x1a1a2e}
-        antialias={false}
-        roundPixels
-        autoDensity
-      >
-        <SpaceRoomContent space={space} initialMembers={initialMembers} />
-      </Application>
+      {size.width > 0 && size.height > 0 ? (
+        <Application
+          key={space.id}
+          className="block"
+          width={size.width}
+          height={size.height}
+          background={BACKGROUND_COLORS[space.theme] ?? 0x1a1a2e}
+          antialias={false}
+          roundPixels
+          autoDensity
+        >
+          <SpaceRoomStage
+            space={space}
+            initialMembers={initialMembers}
+            viewport={size}
+          />
+        </Application>
+      ) : null}
     </div>
   );
 }
 
-// ======================================================
-// Room Content (inside Application context)
-// ======================================================
-
-function SpaceRoomContent({ space, initialMembers }: SpaceRoomProps) {
-  const { app, isInitialised } = useApplication();
+function SpaceRoomStage({
+  space,
+  initialMembers,
+  viewport,
+}: SpaceRoomProps & {
+  viewport: ViewportSize;
+}) {
   const { data } = useSpaceMembersRealtime({
     slug: space.slug,
     spaceId: space.id,
@@ -100,53 +128,18 @@ function SpaceRoomContent({ space, initialMembers }: SpaceRoomProps) {
 
   const mapWidth = space.map_config.width * CELL_SIZE;
   const mapHeight = space.map_config.height * CELL_SIZE;
+  const scale = Math.min(viewport.width / mapWidth, viewport.height / mapHeight);
+  const offsetX = (viewport.width - mapWidth * scale) / 2;
+  const offsetY = (viewport.height - mapHeight * scale) / 2;
 
-  const [layout, setLayout] = useState<{ scale: number; offsetX: number; offsetY: number } | null>(null);
-
-  // Compute layout from current screen size
-  const computeLayout = useCallback(() => {
-    if (!isInitialised || !app?.screen) return null;
-    const w = app.screen.width;
-    const h = app.screen.height;
-    if (w === 0 || h === 0) return null;
-    const s = Math.min(w / mapWidth, h / mapHeight);
-    return {
-      scale: s,
-      offsetX: (w - mapWidth * s) / 2,
-      offsetY: (h - mapHeight * s) / 2,
-    };
-  }, [app, isInitialised, mapWidth, mapHeight]);
-
-  // Set layout once app is initialised
-  useEffect(() => {
-    if (!isInitialised) return;
-    const next = computeLayout();
-    if (next) setLayout(next);
-  }, [isInitialised, computeLayout]);
-
-  // Listen for resize events
-  useEffect(() => {
-    if (!isInitialised || !app?.renderer) return;
-
-    function onResize() {
-      const next = computeLayout();
-      if (next) setLayout(next);
-    }
-
-    app.renderer.on("resize", onResize);
-    return () => {
-      app.renderer?.off("resize", onResize);
-    };
-  }, [app, isInitialised, computeLayout]);
-
-  if (!isInitialised || !layout) return null;
+  if (!Number.isFinite(scale) || scale <= 0) return null;
 
   return (
-    <pixiContainer x={layout.offsetX} y={layout.offsetY} scale={layout.scale}>
+    <pixiContainer x={offsetX} y={offsetY} scale={scale}>
       <RoomBackground config={space.map_config} />
       <RoomGrid config={space.map_config} />
-      {space.map_config.furniture.map((item, i) => (
-        <FurnitureItem key={i} item={item} />
+      {space.map_config.furniture.map((item, index) => (
+        <FurnitureItem key={index} item={item} />
       ))}
       {members.map((member) => (
         <AgentAvatar key={member.agent_id} member={member} />
@@ -154,10 +147,6 @@ function SpaceRoomContent({ space, initialMembers }: SpaceRoomProps) {
     </pixiContainer>
   );
 }
-
-// ======================================================
-// Room Background
-// ======================================================
 
 function RoomBackground({ config }: { config: SpaceMapConfig }) {
   const draw = useCallback(
@@ -172,10 +161,6 @@ function RoomBackground({ config }: { config: SpaceMapConfig }) {
 
   return <pixiGraphics draw={draw} />;
 }
-
-// ======================================================
-// Room Grid
-// ======================================================
 
 function RoomGrid({ config }: { config: SpaceMapConfig }) {
   const draw = useCallback(
@@ -197,10 +182,6 @@ function RoomGrid({ config }: { config: SpaceMapConfig }) {
   return <pixiGraphics draw={draw} />;
 }
 
-// ======================================================
-// Furniture
-// ======================================================
-
 type FurnitureItemType = SpaceMapConfig["furniture"][number];
 
 function FurnitureItem({ item }: { item: FurnitureItemType }) {
@@ -212,15 +193,15 @@ function FurnitureItem({ item }: { item: FurnitureItemType }) {
       if (item.type === "chair" || item.type === "plant") {
         const cx = (item.width * CELL_SIZE) / 2;
         const cy = (item.height * CELL_SIZE) / 2;
-        const r = Math.min(item.width, item.height) * CELL_SIZE * 0.4;
-        g.circle(cx, cy, r);
+        const radius = Math.min(item.width, item.height) * CELL_SIZE * 0.4;
+        g.circle(cx, cy, radius);
       } else {
         g.roundRect(0, 0, item.width * CELL_SIZE, item.height * CELL_SIZE, 2);
       }
       g.fill({ color, alpha: 0.6 });
       g.stroke({ color: 0xffffff, alpha: 0.1, width: 0.5 });
     },
-    [item.width, item.height, item.type, color],
+    [color, item.height, item.type, item.width],
   );
 
   const labelStyle = useMemo(
@@ -250,37 +231,31 @@ function FurnitureItem({ item }: { item: FurnitureItemType }) {
   );
 }
 
-// ======================================================
-// Agent Avatar (with lerp interpolation)
-// ======================================================
-
 function AgentAvatar({ member }: { member: SpaceMember }) {
   const targetX = member.x * CELL_SIZE + CELL_SIZE / 2;
   const targetY = member.y * CELL_SIZE + CELL_SIZE / 2;
   const containerRef = useRef<ContainerType>(null);
   const posRef = useRef({ x: targetX, y: targetY });
+  const targetRef = useRef({ x: targetX, y: targetY });
   const color = hashColor(member.agent_id);
 
-  // Update target when member position changes
-  const targetRef = useRef({ x: targetX, y: targetY });
   targetRef.current = { x: targetX, y: targetY };
 
-  // Update position directly on the PixiJS container — no React state needed
   const tickCallback = useCallback((ticker: Ticker) => {
     const node = containerRef.current;
     if (!node) return;
 
-    const curr = posRef.current;
+    const current = posRef.current;
     const target = targetRef.current;
     const lerpFactor = 1 - Math.pow(0.001, ticker.deltaTime / 60);
 
-    const newX = curr.x + (target.x - curr.x) * lerpFactor;
-    const newY = curr.y + (target.y - curr.y) * lerpFactor;
+    const nextX = current.x + (target.x - current.x) * lerpFactor;
+    const nextY = current.y + (target.y - current.y) * lerpFactor;
 
-    if (Math.abs(newX - curr.x) > 0.01 || Math.abs(newY - curr.y) > 0.01) {
-      posRef.current = { x: newX, y: newY };
-      node.x = newX;
-      node.y = newY;
+    if (Math.abs(nextX - current.x) > 0.01 || Math.abs(nextY - current.y) > 0.01) {
+      posRef.current = { x: nextX, y: nextY };
+      node.x = nextX;
+      node.y = nextY;
     }
   }, []);
 

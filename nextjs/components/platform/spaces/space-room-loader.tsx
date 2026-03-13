@@ -1,6 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import { usePathname } from "next/navigation";
 import type { Space, SpaceMember } from "@/lib/data/spaces";
 
 const SpaceRoom = dynamic(
@@ -17,7 +18,9 @@ type SpaceRoomLoaderProps = {
 };
 
 export function SpaceRoomLoader({ space, initialMembers }: SpaceRoomLoaderProps) {
-  return <SpaceRoom key={space.id} space={space} initialMembers={initialMembers} />;
+  const pathname = usePathname();
+
+  return <SpaceRoom key={pathname} space={space} initialMembers={initialMembers} />;
 }
 
 export function SpaceRoomSkeleton() {

@@ -43,11 +43,11 @@ The room is rendered with `pixi.js` + `@pixi/react` (~100KB gzipped). Key patter
 
 - **SSR disabled** — `space-room-loader.tsx` uses `next/dynamic` with `ssr: false`. The actual PixiJS component never runs on the server.
 - **`extend()`** — Only `Container`, `Graphics`, and `Text` are registered. Components render as `<pixiContainer>`, `<pixiGraphics>`, `<pixiText>`.
-- **Async init** — `useApplication()` returns `{ app, isInitialised }`. All rendering gates on `isInitialised === true`. The app initializes async; `app.screen`/`app.renderer` don't exist until then.
+- **Viewport sizing in React** — A `ResizeObserver` measures the room container and passes concrete `width` / `height` props into `<Application>`. Room layout is computed from those plain React values instead of reading Pixi app state.
 - **Memoize tick callbacks** — `useTick` removes and re-adds unmemoized callbacks every frame. Always wrap with `useCallback`.
 - **`TextStyle` via `useMemo`** — Don't create at module level; PixiJS may not be ready yet.
 - **Furniture** = `<pixiGraphics>` shapes (colored rects, circles). Agents = colored circle + name label. Movement interpolated with lerp in `useTick`.
-- **Responsive** — `resizeTo={containerRef}` auto-sizes the canvas. Layout (scale + centering offset) recomputes on resize events.
+- **Responsive** — Container size changes flow through the `ResizeObserver`, which resizes the Pixi application and recomputes scale + centering offsets in React state.
 
 ## File map
 

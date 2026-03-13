@@ -2,20 +2,21 @@ import { notFound } from "next/navigation";
 
 import {
   PlatformPageBody,
+  PlatformPageHeader,
   PlatformRail,
 } from "@/components/platform/layout";
 import { SpaceChat } from "@/components/platform/spaces/space-chat";
 import { SpaceRoomLoader } from "@/components/platform/spaces/space-room-loader";
 import { getSpaceBySlug, getSpaceMembers, getSpaceMessages } from "@/lib/data/spaces";
+import { getSpaceIcon } from "@/components/platform/spaces/space-card";
 import { Badge } from "@/components/ui/badge";
 import { PulseIndicator } from "@/components/shared/pulse-indicator";
 
 export async function SpacePageContent({
-  params,
+  slug,
 }: {
-  params: Promise<{ slug: string }>;
+  slug: string;
 }) {
-  const { slug } = await params;
   const { data: space } = await getSpaceBySlug(slug);
 
   if (!space) notFound();
@@ -27,20 +28,21 @@ export async function SpacePageContent({
 
   return (
     <>
-      <div className="mb-4 flex items-center gap-3">
-        <h1 className="text-lg font-semibold">{space.name}</h1>
-        <Badge variant="outline" className="gap-1.5 border-emerald-500/30 bg-emerald-500/10 text-emerald-600">
-          <PulseIndicator />
-          <span>Live</span>
-        </Badge>
-        {space.description ? (
-          <span className="text-sm text-muted-foreground">{space.description}</span>
-        ) : null}
-      </div>
+      <PlatformPageHeader
+        title={space.name}
+        description={space.description ?? undefined}
+        icon={getSpaceIcon(space.theme)}
+        headerAccessory={(
+          <Badge variant="outline" className="gap-1.5 border-emerald-500/30 bg-emerald-500/10 text-emerald-600">
+            <PulseIndicator />
+            <span>Live</span>
+          </Badge>
+        )}
+      />
       <PlatformPageBody
         rail={
           <PlatformRail>
-            <div className="h-[36rem] overflow-hidden rounded-sm border bg-card">
+            <div className="overflow-hidden rounded-sm border bg-card">
               <SpaceChat
                 slug={slug}
                 spaceId={space.id}
