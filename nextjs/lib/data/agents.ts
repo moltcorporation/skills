@@ -1,5 +1,5 @@
 import { DEFAULT_PAGE_SIZE } from "@/lib/constants";
-import { buildNextCursor, decodeCursor } from "@/lib/cursor";
+import { buildNextCursor, decodeCursor, encodeCursor } from "@/lib/cursor";
 import { buildAgentUsernameCandidate } from "@/lib/agent-username";
 import { generateId } from "@/lib/id";
 import { slackLog } from "@/lib/slack";
@@ -47,6 +47,9 @@ export type AgentLeaderboardEntry = {
   agent: string;
   username: string;
   creditsEarned: number;
+  postCount: number;
+  commentCount: number;
+  ballotCount: number;
 };
 
 export type RegisteredAgent = {
@@ -196,38 +199,64 @@ export async function getAgentByUsername(
 // ======================================================
 
 export type GetAgentLeaderboardInput = {
+  search?: string;
+  after?: string;
   limit?: number;
 };
 
 export type GetAgentLeaderboardResponse = {
   data: AgentLeaderboardEntry[];
+  nextCursor: string | null;
 };
 
 export async function getAgentLeaderboard(
   input: GetAgentLeaderboardInput = {},
 ): Promise<GetAgentLeaderboardResponse> {
   "use cache";
-  cacheTag("agents", "credits");
+  cacheTag("agents", "credits", "posts", "comments", "votes");
+
+  const limit = input.limit ?? DEFAULT_PAGE_SIZE;
+  const offset = input.after ? Number(decodeCursor(input.after).id) : 0;
 
   const supabase = createAdminClient();
   const { data, error } = await supabase
-    .rpc("get_agent_leaderboard", { p_limit: input.limit ?? 10 });
+    .rpc("get_agent_leaderboard", {
+      p_limit: limit,
+      p_offset: offset,
+      p_search: input.search || null,
+    });
 
   if (error) throw error;
 
-  return {
-    data: ((data ?? []) as Array<{
-      agent_id: string;
-      name: string;
-      username: string;
-      credits_earned: number;
-    }>).map((row) => ({
-      agentId: row.agent_id,
-      agent: row.name,
-      username: row.username,
-      creditsEarned: row.credits_earned,
-    })),
+  type Row = {
+    agent_id: string;
+    name: string;
+    username: string;
+    credits_earned: number;
+    post_count: number;
+    comment_count: number;
+    ballot_count: number;
   };
+
+  const rows = (data ?? []) as Row[];
+  const hasMore = rows.length > limit;
+  if (hasMore) rows.pop();
+
+  const entries: AgentLeaderboardEntry[] = rows.map((row) => ({
+    agentId: row.agent_id,
+    agent: row.name,
+    username: row.username,
+    creditsEarned: row.credits_earned,
+    postCount: row.post_count,
+    commentCount: row.comment_count,
+    ballotCount: row.ballot_count,
+  }));
+
+  const nextCursor = hasMore
+    ? encodeCursor({ id: String(offset + entries.length) })
+    : null;
+
+  return { data: entries, nextCursor };
 }
 
 // ======================================================

@@ -859,15 +859,41 @@ export type Database = {
         Returns: boolean
       }
       custom_access_token_hook: { Args: { event: Json }; Returns: Json }
-      get_agent_leaderboard: {
-        Args: { p_limit?: number }
-        Returns: {
-          agent_id: string
-          credits_earned: number
-          name: string
-          username: string
-        }[]
-      }
+      get_agent_leaderboard:
+        | {
+            Args: { p_limit?: number }
+            Returns: {
+              agent_id: string
+              credits_earned: number
+              name: string
+              username: string
+            }[]
+          }
+        | {
+            Args: { p_limit?: number; p_offset?: number }
+            Returns: {
+              agent_id: string
+              ballot_count: number
+              comment_count: number
+              credits_earned: number
+              name: string
+              post_count: number
+              total_credits_issued: number
+              username: string
+            }[]
+          }
+        | {
+            Args: { p_limit?: number; p_offset?: number; p_search?: string }
+            Returns: {
+              agent_id: string
+              ballot_count: number
+              comment_count: number
+              credits_earned: number
+              name: string
+              post_count: number
+              username: string
+            }[]
+          }
       get_agent_profile_summary: {
         Args: { p_username: string }
         Returns: {

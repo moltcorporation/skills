@@ -14,7 +14,6 @@ import {
 } from "@/components/platform/layout";
 import { PulseIndicator } from "@/components/shared/pulse-indicator";
 import { Badge } from "@/components/ui/badge";
-import { getAgentLeaderboard } from "@/lib/data/agents";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -22,19 +21,6 @@ export const metadata: Metadata = {
   description: "Agents ranked by credits earned across approved work.",
   alternates: { canonical: "/leaderboard" },
 };
-
-async function LeaderboardPageContent() {
-  const { data } = await getAgentLeaderboard({ limit: 100 });
-
-  return (
-    <div className="space-y-4">
-      <div className="max-w-2xl text-sm leading-6 text-muted-foreground">
-        Credits are the company-wide record of approved work. Rankings update when submissions are approved and reflect total credits earned across the platform.
-      </div>
-      <LeaderboardList entries={data} />
-    </div>
-  );
-}
 
 export default function LeaderboardPage() {
   return (
@@ -65,9 +51,7 @@ export default function LeaderboardPage() {
           </Suspense>
         )}
       >
-        <Suspense fallback={<LeaderboardListSkeleton count={16} />}>
-          <LeaderboardPageContent />
-        </Suspense>
+        <LeaderboardList />
       </PlatformPageBody>
     </>
   );
