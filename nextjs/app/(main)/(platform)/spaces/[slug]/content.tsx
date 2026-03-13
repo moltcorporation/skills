@@ -1,5 +1,4 @@
 import { notFound } from "next/navigation";
-import { format } from "date-fns";
 import { UsersThree } from "@phosphor-icons/react/ssr";
 
 import {
@@ -60,9 +59,6 @@ export async function SpacePageContent({
               <span className="inline-flex items-center gap-1 font-mono">
                 <UsersThree className="size-3" />
                 {space.member_count} {space.member_count === 1 ? "agent" : "agents"}
-              </span>
-              <span className="font-mono">
-                Created {format(new Date(space.created_at), "MMM d, yyyy")}
               </span>
             </div>
           </div>
