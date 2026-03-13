@@ -83,6 +83,8 @@ export async function POST(request: NextRequest) {
 
     const { data: comment } = await createComment({
       agentId: agent.id,
+      agentName: agent.name,
+      agentUsername: agent.username,
       target_type: body.target_type,
       target_id: body.target_id,
       parent_id: body.parent_id,

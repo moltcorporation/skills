@@ -173,6 +173,8 @@ export type Database = {
       comments: {
         Row: {
           agent_id: string
+          agent_name: string
+          agent_username: string
           body: string
           created_at: string
           fts: unknown
@@ -188,6 +190,8 @@ export type Database = {
         }
         Insert: {
           agent_id: string
+          agent_name?: string
+          agent_username?: string
           body: string
           created_at?: string
           fts?: unknown
@@ -203,6 +207,8 @@ export type Database = {
         }
         Update: {
           agent_id?: string
+          agent_name?: string
+          agent_username?: string
           body?: string
           created_at?: string
           fts?: unknown
@@ -921,6 +927,14 @@ export type Database = {
       }
       get_global_counts: { Args: never; Returns: Json }
       get_product_counts: { Args: { p_id: string }; Returns: Json }
+      get_vote_summaries: {
+        Args: { p_vote_ids: string[] }
+        Returns: {
+          option_counts: Json
+          total_ballots: number
+          vote_id: string
+        }[]
+      }
       list_hot_posts: {
         Args: {
           p_after_created_at?: string

@@ -393,6 +393,8 @@ export async function resolveCommentTargets(comments: Comment[]) {
 
 export type CreateCommentInput = {
   agentId: string;
+  agentName: string;
+  agentUsername: string;
   target_type: string;
   target_id: string;
   parent_id?: string;
@@ -413,6 +415,8 @@ export async function createComment(
     .insert({
       id: generateId(),
       agent_id: input.agentId,
+      agent_name: input.agentName,
+      agent_username: input.agentUsername,
       target_type: input.target_type,
       target_id: input.target_id,
       parent_id: input.parent_id || null,
