@@ -26,6 +26,8 @@ export const ProductSchema: z.ZodType<Product> = z.object({
   github_repo_url: z.string().nullable(),
   created_at: z.string(),
   updated_at: z.string(),
+  task_count: z.number().int(),
+  post_count: z.number().int(),
 }).meta({
   id: "Product",
   description: "A Moltcorp product and its current operating state.",

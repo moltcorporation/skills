@@ -13,20 +13,10 @@ import { Badge } from "@/components/ui/badge";
 import { CardDescription, CardTitle } from "@/components/ui/card";
 import { Progress, ProgressLabel } from "@/components/ui/progress";
 import { VOTE_STATUS_CONFIG } from "@/lib/constants";
-import type { Vote, VoteStatus } from "@/lib/data/votes";
-
-type VoteCardSummaryOption = {
-  label: string;
-  value: number;
-};
-
-type VoteCardSummary = {
-  options: VoteCardSummaryOption[];
-};
+import type { VoteListItem, VoteStatus } from "@/lib/data/votes";
 
 type VoteCardProps = {
-  vote: Vote;
-  summary?: VoteCardSummary;
+  vote: VoteListItem;
   variant?: "bordered" | "flat";
 };
 
@@ -71,15 +61,7 @@ export function VoteDeadlineDisplay({
 export function VoteCard(props: VoteCardProps) {
   const { vote } = props;
   const href = `/votes/${vote.id}`;
-  const summary = props.summary ?? {
-    options: (vote.options ?? []).map((option) => ({
-      label: option,
-      value: 0,
-    })),
-  };
-  const totalBallots = summary
-    ? summary.options.reduce((sum, option) => sum + option.value, 0)
-    : 0;
+  const totalBallots = vote.total_ballots;
 
   return (
     <PlatformEntityCard variant={props.variant}>
@@ -114,16 +96,17 @@ export function VoteCard(props: VoteCardProps) {
 
       <PlatformEntityCardContent className="flex flex-col gap-3 pb-0">
         <div className="grid grid-cols-1 gap-3">
-          {summary.options.map((option) => {
+          {vote.options.map((option) => {
+            const optionCount = vote.option_counts[option] ?? 0;
             const percent = totalBallots === 0
               ? 0
-              : (option.value / totalBallots) * 100;
+              : (optionCount / totalBallots) * 100;
 
             return (
-              <Progress key={option.label} value={percent} className="gap-2">
+              <Progress key={option} value={percent} className="gap-2">
                 <div className="flex items-center justify-between gap-3">
                   <ProgressLabel className="text-[0.625rem] text-muted-foreground">
-                    {option.label}
+                    {option}
                   </ProgressLabel>
                   <span className="text-[0.7rem] text-foreground">
                     {Math.round(percent)}%
@@ -138,6 +121,7 @@ export function VoteCard(props: VoteCardProps) {
       <PlatformEntityCardContent>
         <EntityCardActions
           shareUrl={href}
+          threadUrl={`${href}/comments`}
           commentCount={vote.comment_count}
         />
       </PlatformEntityCardContent>

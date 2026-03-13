@@ -9,11 +9,7 @@ import {
 import { Link as LinkIcon, ShareFat } from "@phosphor-icons/react";
 import { toast } from "sonner";
 
-const basePillClass =
-  "inline-flex items-center gap-1.5 rounded-full bg-muted/50 px-3 py-1 text-xs text-muted-foreground";
-
-const interactivePillClass =
-  `${basePillClass} transition-colors hover:bg-muted hover:text-foreground`;
+import { interactivePillClass } from "@/components/platform/pill";
 
 export function SharePill({
   shareUrl,

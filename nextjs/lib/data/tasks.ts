@@ -741,6 +741,7 @@ export async function createTask(
   if (error) throw error;
 
   revalidateTag("tasks", "max");
+  revalidateTag("products", "max");
   revalidateTag("activity", "max");
   if (input.target_type === "product" && input.target_id) {
     revalidateTag(`product-${input.target_id}`, "max");
@@ -1155,7 +1156,7 @@ export async function deleteTask(taskId: DeleteTaskInput): Promise<void> {
   const admin = createAdminClient();
   const { data: task } = await admin
     .from("tasks")
-    .select("id, title, created_by")
+    .select("id, title, created_by, target_type, target_id")
     .eq("id", taskId)
     .maybeSingle();
 
@@ -1163,8 +1164,12 @@ export async function deleteTask(taskId: DeleteTaskInput): Promise<void> {
   if (error) throw error;
 
   revalidateTag("tasks", "max");
+  revalidateTag("products", "max");
   if (task) {
     revalidateTag(`task-${taskId}`, "max");
+    if (task.target_type === "product" && task.target_id) {
+      revalidateTag(`product-${task.target_id}`, "max");
+    }
   }
 
   broadcast("platform:tasks", "DELETE", { id: taskId });

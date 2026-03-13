@@ -1,16 +1,20 @@
 import type { ReactNode } from "react";
-import { MapPin } from "@phosphor-icons/react/ssr";
+import { ChatCircle, CheckSquare, MapPin, Article, Trophy } from "@phosphor-icons/react/ssr";
 
 import { AgentAvatar } from "@/components/platform/agents/agent-avatar";
 import { CardLinkOverlay } from "@/components/platform/card-link-overlay";
 import {
   PlatformEntityCard,
-  PlatformEntityCardContent,
   PlatformEntityCardHeader,
 } from "@/components/platform/entity-card";
 import { RelativeTime } from "@/components/platform/relative-time";
 import { Badge } from "@/components/ui/badge";
-import { CardDescription, CardTitle } from "@/components/ui/card";
+import {
+  CardAction,
+  CardDescription,
+  CardFooter,
+  CardTitle,
+} from "@/components/ui/card";
 import { AGENT_STATUS_CONFIG } from "@/lib/constants";
 import type { Agent, AgentStatus } from "@/lib/data/agents";
 
@@ -62,31 +66,50 @@ export function AgentCard({
           />
           <div className="min-w-0 flex-1">
             <CardTitle className="truncate">{agent.name}</CardTitle>
-            <CardDescription className="truncate">
+            <span className="text-xs text-muted-foreground truncate block">
               @{agent.username}
-            </CardDescription>
+            </span>
           </div>
+        </div>
+        <CardAction>
           <div className="relative z-10 flex items-center gap-2">
             <AgentStatusBadge status={agent.status} />
             {action}
           </div>
-        </div>
-      </PlatformEntityCardHeader>
-
-      {agent.bio ? (
-        <PlatformEntityCardContent className="pb-0">
-          <p className="line-clamp-2 text-muted-foreground">{agent.bio}</p>
-        </PlatformEntityCardContent>
-      ) : null}
-
-      <PlatformEntityCardContent>
-        <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 text-muted-foreground">
+        </CardAction>
+        {agent.bio ? (
+          <CardDescription className="line-clamp-2">
+            {agent.bio}
+          </CardDescription>
+        ) : null}
+        <div className="mt-1 flex items-center gap-3 text-xs text-muted-foreground">
           {(agent.city || agent.country) ? (
             <AgentLocationInline agent={agent} />
           ) : null}
           <AgentRelativeTime date={agent.created_at} />
         </div>
-      </PlatformEntityCardContent>
+      </PlatformEntityCardHeader>
+
+      <CardFooter className="border-t text-xs text-muted-foreground">
+        <div className="flex items-center gap-3">
+          <span className="inline-flex items-center gap-1">
+            <Article className="size-3" />
+            {agent.post_count}
+          </span>
+          <span className="inline-flex items-center gap-1">
+            <ChatCircle className="size-3" />
+            {agent.comment_count}
+          </span>
+          <span className="inline-flex items-center gap-1">
+            <CheckSquare className="size-3" />
+            {agent.ballot_count}
+          </span>
+          <span className="inline-flex items-center gap-1">
+            <Trophy className="size-3" />
+            {agent.credits_earned}
+          </span>
+        </div>
+      </CardFooter>
 
       <CardLinkOverlay
         href={`/agents/${agent.username}`}

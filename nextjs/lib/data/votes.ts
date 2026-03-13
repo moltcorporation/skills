@@ -7,6 +7,7 @@ import { slackLog } from "@/lib/slack";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { broadcast } from "@/lib/supabase/broadcast";
 import { createClient } from "@/lib/supabase/server";
+import type { Json } from "@/lib/supabase/database.types";
 import { cacheTag, revalidateTag } from "next/cache";
 
 // ======================================================
@@ -66,6 +67,11 @@ export type VoteWithTally = {
   tally: Record<string, number>;
 };
 
+export type VoteListItem = Vote & {
+  total_ballots: number;
+  option_counts: Record<string, number>;
+};
+
 export type Ballot = {
   id: string;
   vote_id: string;
@@ -88,6 +94,12 @@ export type VoteBallotState = {
   options: VoteOption[];
 };
 
+type VoteSummaryRow = {
+  vote_id: string;
+  total_ballots: number;
+  option_counts: Json;
+};
+
 function normalizeVoteOptions(options: unknown): string[] {
   // `votes.options` is stored as jsonb, so the DAL validates it before exposing
   // the app-level `VoteOption[]` contract to the rest of the codebase.
@@ -96,6 +108,42 @@ function normalizeVoteOptions(options: unknown): string[] {
   }
 
   return options as VoteOption[];
+}
+
+function normalizeOptionCounts(optionCounts: unknown): Record<string, number> {
+  if (!optionCounts || typeof optionCounts !== "object" || Array.isArray(optionCounts)) {
+    return {};
+  }
+
+  return Object.fromEntries(
+    Object.entries(optionCounts).flatMap(([choice, count]) => {
+      if (typeof count !== "number") return [];
+      return [[choice, count]];
+    }),
+  );
+}
+
+async function getVoteSummaries(voteIds: string[]) {
+  if (voteIds.length === 0) {
+    return new Map<string, { total_ballots: number; option_counts: Record<string, number> }>();
+  }
+
+  const supabase = createAdminClient();
+  const { data, error } = await supabase.rpc("get_vote_summaries", {
+    p_vote_ids: voteIds,
+  });
+
+  if (error) throw error;
+
+  return new Map(
+    (((data as VoteSummaryRow[] | null) ?? [])).map((row) => [
+      row.vote_id,
+      {
+        total_ballots: row.total_ballots,
+        option_counts: normalizeOptionCounts(row.option_counts),
+      },
+    ]),
+  );
 }
 
 // ======================================================
@@ -112,7 +160,7 @@ export type GetVotesInput = {
 };
 
 export type GetVotesResponse = {
-  data: Vote[];
+  data: VoteListItem[];
   nextCursor: string | null;
 };
 
@@ -189,10 +237,20 @@ export async function getVotes(
       options: normalizeVoteOptions(vote.options),
     }),
   );
+  const summaries = await getVoteSummaries(items.map((vote) => vote.id));
+  const votesWithSummary = items.map((vote) => {
+    const summary = summaries.get(vote.id);
+
+    return {
+      ...vote,
+      total_ballots: summary?.total_ballots ?? 0,
+      option_counts: summary?.option_counts ?? {},
+    };
+  });
 
   return {
-    data: items,
-    nextCursor: buildNextCursor(items, hasMore, (vote) =>
+    data: votesWithSummary,
+    nextCursor: buildNextCursor(votesWithSummary, hasMore, (vote) =>
       orderAllVotes
         ? [vote.status === "open" ? 1 : 0, Date.parse(vote.created_at)]
         : [Date.parse(vote.created_at)],
@@ -217,26 +275,26 @@ export async function getVoteDetail(
   cacheTag(`vote-${id}`);
 
   const supabase = createAdminClient();
-  const [voteResult, ballotsResult] = await Promise.all([
+  const [voteResult, summaries] = await Promise.all([
     supabase.from("votes").select(VOTE_SELECT).eq("id", id).maybeSingle(),
-    supabase.from("ballots").select("choice").eq("vote_id", id),
+    getVoteSummaries([id]),
   ]);
 
   if (voteResult.error) throw voteResult.error;
-  if (ballotsResult.error) throw ballotsResult.error;
   if (!voteResult.data) return { data: null };
 
-  const tally: Record<string, number> = {};
-  for (const ballot of ballotsResult.data ?? []) {
-    tally[ballot.choice] = (tally[ballot.choice] ?? 0) + 1;
-  }
+  const vote = {
+    ...(voteResult.data as Omit<Vote, "options"> & { options: unknown }),
+    options: normalizeVoteOptions(voteResult.data.options),
+  };
+  const summary = summaries.get(id);
+  const tally = Object.fromEntries(
+    vote.options.map((option) => [option, summary?.option_counts[option] ?? 0]),
+  );
 
   return {
     data: {
-      vote: {
-        ...(voteResult.data as Omit<Vote, "options"> & { options: unknown }),
-        options: normalizeVoteOptions(voteResult.data.options),
-      },
+      vote,
       tally,
     },
   };
@@ -553,7 +611,7 @@ export type GetAgentCreatedVotesInput = {
 };
 
 export type GetAgentCreatedVotesResponse = {
-  data: Vote[];
+  data: VoteListItem[];
   nextCursor: string | null;
 };
 
@@ -707,6 +765,7 @@ export async function castBallot(
 
   if (error) throw error;
 
+  revalidateTag("agents", "max");
   revalidateTag(`vote-${input.voteId}`, "max");
   revalidateTag(`ballots-${input.voteId}`, "max");
   revalidateTag("ballots", "max");

@@ -60,6 +60,7 @@ export function TaskCard({ task, variant }: { task: Task; variant?: "bordered" |
       <PlatformEntityCardContent>
         <EntityCardActions
           shareUrl={`/tasks/${task.id}`}
+          threadUrl={`/tasks/${task.id}/comments`}
           commentCount={task.comment_count}
         />
       </PlatformEntityCardContent>

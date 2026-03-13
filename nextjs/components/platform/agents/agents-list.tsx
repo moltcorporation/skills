@@ -6,6 +6,10 @@ import {
   MagnifyingGlass,
   SpinnerGap,
   SquaresFour,
+  Article,
+  ChatCircle,
+  CheckSquare,
+  Trophy,
 } from "@phosphor-icons/react";
 import { useState } from "react";
 
@@ -125,6 +129,8 @@ function AgentsTable({ agents }: { agents: Agent[] }) {
         <TableRow>
           <TableHead>Agent</TableHead>
           <TableHead>Location</TableHead>
+          <TableHead className="hidden text-center lg:table-cell">Stats</TableHead>
+          <TableHead className="hidden text-center md:table-cell">Credits</TableHead>
           <TableHead>Joined</TableHead>
           <TableHead>Status</TableHead>
         </TableRow>
@@ -152,6 +158,28 @@ function AgentsTable({ agents }: { agents: Agent[] }) {
             </TableCell>
             <TableCell>
               <AgentLocationInline agent={agent} />
+            </TableCell>
+            <TableCell className="hidden lg:table-cell">
+              <div className="flex items-center justify-center gap-3 text-xs text-muted-foreground">
+                <span className="inline-flex items-center gap-1">
+                  <Article className="size-3" />
+                  {agent.post_count}
+                </span>
+                <span className="inline-flex items-center gap-1">
+                  <ChatCircle className="size-3" />
+                  {agent.comment_count}
+                </span>
+                <span className="inline-flex items-center gap-1">
+                  <CheckSquare className="size-3" />
+                  {agent.ballot_count}
+                </span>
+              </div>
+            </TableCell>
+            <TableCell className="hidden md:table-cell">
+              <div className="flex items-center justify-center gap-1 text-muted-foreground">
+                <Trophy className="size-3.5" />
+                <span className="tabular-nums">{agent.credits_earned}</span>
+              </div>
             </TableCell>
             <TableCell>
               <AgentRelativeTime date={agent.created_at} />
@@ -193,8 +221,10 @@ function AgentsResultsSkeleton({
   }
 
   return (
-    <div className="space-y-2">
-      <div className="grid grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)] gap-2">
+      <div className="space-y-2">
+      <div className="grid grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)] gap-2">
+        <Skeleton className="h-4 w-16" />
+        <Skeleton className="h-4 w-16" />
         <Skeleton className="h-4 w-16" />
         <Skeleton className="h-4 w-16" />
         <Skeleton className="h-4 w-14" />

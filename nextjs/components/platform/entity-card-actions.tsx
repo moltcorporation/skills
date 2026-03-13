@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import {
   ThumbsUp,
   ThumbsDown,
@@ -9,15 +8,9 @@ import {
   ExclamationMark,
   ChatCircle,
 } from "@phosphor-icons/react";
-import type { ComponentType } from "react";
 
+import { Pill, type Reaction } from "@/components/platform/pill";
 import { SharePill } from "@/components/platform/share-pill";
-
-type Reaction = {
-  key: string;
-  icon: ComponentType<{ className?: string }>;
-  count: number;
-};
 
 type ReactionCounts = {
   thumbs_up: number;
@@ -38,11 +31,6 @@ export function EntityCardActions({
   reactions?: ReactionCounts;
   commentCount: number;
 }) {
-  const pillClass =
-    "inline-flex items-center gap-1.5 rounded-full bg-muted/50 px-3 py-1 text-xs text-muted-foreground";
-  const interactivePillClass =
-    "inline-flex items-center gap-1.5 rounded-full bg-muted/50 px-3 py-1 text-xs text-muted-foreground transition-colors hover:bg-muted hover:text-foreground";
-
   const allReactions: Reaction[] | null = reactions
     ? [
         { key: "thumbs_up", icon: ThumbsUp, count: reactions.thumbs_up },
@@ -61,44 +49,20 @@ export function EntityCardActions({
       {allReactions ? (
         visible.length > 0 ? (
           visible.map((r) => (
-            threadUrl ? (
-              <Link key={r.key} href={threadUrl} className={interactivePillClass}>
-                <r.icon className="size-3.5" />
-                <span>{r.count}</span>
-              </Link>
-            ) : (
-              <div key={r.key} className={pillClass}>
-                <r.icon className="size-3.5" />
-                <span>{r.count}</span>
-              </div>
-            )
+            <Pill key={r.key} icon={r.icon} href={threadUrl}>
+              <span>{r.count}</span>
+            </Pill>
           ))
         ) : (
-          threadUrl ? (
-            <Link href={threadUrl} className={interactivePillClass}>
-              <ThumbsUp className="size-3.5" />
-              <span>{totalReactions}</span>
-            </Link>
-          ) : (
-            <div className={pillClass}>
-              <ThumbsUp className="size-3.5" />
-              <span>{totalReactions}</span>
-            </div>
-          )
+          <Pill icon={ThumbsUp} href={threadUrl}>
+            <span>{totalReactions}</span>
+          </Pill>
         )
       ) : null}
 
-      {threadUrl ? (
-        <Link href={threadUrl} className={interactivePillClass}>
-          <ChatCircle className="size-3.5" />
-          <span>{commentCount}</span>
-        </Link>
-      ) : (
-        <div className={pillClass}>
-          <ChatCircle className="size-3.5" />
-          <span>{commentCount}</span>
-        </div>
-      )}
+      <Pill icon={ChatCircle} href={threadUrl}>
+        <span>{commentCount}</span>
+      </Pill>
 
       <SharePill shareUrl={shareUrl} />
     </div>

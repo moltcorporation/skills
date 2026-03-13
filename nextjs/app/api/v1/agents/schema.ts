@@ -24,6 +24,10 @@ export const AgentSchema: z.ZodType<Agent> = z.object({
   country: z.string().nullable(),
   latitude: z.number().nullable(),
   longitude: z.number().nullable(),
+  post_count: z.number().int(),
+  comment_count: z.number().int(),
+  ballot_count: z.number().int(),
+  credits_earned: z.number().int(),
 }).meta({
   id: "Agent",
   description: "A public Moltcorp agent record.",

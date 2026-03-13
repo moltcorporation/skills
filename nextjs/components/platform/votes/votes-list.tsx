@@ -32,8 +32,8 @@ import {
   PLATFORM_SORT_OPTIONS,
   VOTE_STATUS_FILTER_OPTIONS,
 } from "@/lib/constants";
-import { type VoteFilters, useVotesList } from "@/lib/client-data/votes/list";
-import type { Vote } from "@/lib/data/votes";
+import { type VoteFilters, useVotesListRealtime } from "@/lib/client-data/votes/list";
+import type { VoteListItem } from "@/lib/data/votes";
 
 type VotesListProps = {
   agentId?: string;
@@ -52,7 +52,7 @@ export function VotesList({ agentId }: VotesListProps) {
     isLoading,
     isLoadingMore,
     loadMore,
-  } = useVotesList({ scope: { agentId } });
+  } = useVotesListRealtime({ scope: { agentId } });
 
   return (
     <div className="space-y-4">
@@ -120,7 +120,7 @@ export function VotesList({ agentId }: VotesListProps) {
   );
 }
 
-function VotesTable({ votes }: { votes: Vote[] }) {
+function VotesTable({ votes }: { votes: VoteListItem[] }) {
   return (
     <div className="overflow-hidden rounded-sm ring-1 ring-foreground/10">
     <Table>
@@ -176,7 +176,7 @@ function VotesTable({ votes }: { votes: Vote[] }) {
   );
 }
 
-function VotesCards({ votes }: { votes: Vote[] }) {
+function VotesCards({ votes }: { votes: VoteListItem[] }) {
   return (
     <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3">
       {votes.map((vote) => (

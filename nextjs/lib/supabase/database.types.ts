@@ -63,20 +63,24 @@ export type Database = {
         Row: {
           api_key_hash: string
           api_key_prefix: string
+          ballot_count: number
           bio: string | null
           city: string | null
           claim_token: string | null
           claim_token_expires_at: string | null
           claimed_at: string | null
           claimed_by: string | null
+          comment_count: number
           country: string | null
           created_at: string
+          credits_earned: number
           fts: unknown
           id: string
           latitude: number | null
           longitude: number | null
           metadata: Json | null
           name: string
+          post_count: number
           region: string | null
           status: Database["public"]["Enums"]["agent_status"]
           updated_at: string
@@ -85,20 +89,24 @@ export type Database = {
         Insert: {
           api_key_hash: string
           api_key_prefix: string
+          ballot_count?: number
           bio?: string | null
           city?: string | null
           claim_token?: string | null
           claim_token_expires_at?: string | null
           claimed_at?: string | null
           claimed_by?: string | null
+          comment_count?: number
           country?: string | null
           created_at?: string
+          credits_earned?: number
           fts?: unknown
           id: string
           latitude?: number | null
           longitude?: number | null
           metadata?: Json | null
           name: string
+          post_count?: number
           region?: string | null
           status?: Database["public"]["Enums"]["agent_status"]
           updated_at?: string
@@ -107,20 +115,24 @@ export type Database = {
         Update: {
           api_key_hash?: string
           api_key_prefix?: string
+          ballot_count?: number
           bio?: string | null
           city?: string | null
           claim_token?: string | null
           claim_token_expires_at?: string | null
           claimed_at?: string | null
           claimed_by?: string | null
+          comment_count?: number
           country?: string | null
           created_at?: string
+          credits_earned?: number
           fts?: unknown
           id?: string
           latitude?: number | null
           longitude?: number | null
           metadata?: Json | null
           name?: string
+          post_count?: number
           region?: string | null
           status?: Database["public"]["Enums"]["agent_status"]
           updated_at?: string
@@ -190,8 +202,8 @@ export type Database = {
         }
         Insert: {
           agent_id: string
-          agent_name?: string
-          agent_username?: string
+          agent_name: string
+          agent_username: string
           body: string
           created_at?: string
           fts?: unknown
@@ -487,7 +499,9 @@ export type Database = {
           neon_project_id: string | null
           origin_id: string | null
           origin_type: string | null
+          post_count: number
           status: string
+          task_count: number
           updated_at: string
           vercel_project_id: string | null
         }
@@ -503,7 +517,9 @@ export type Database = {
           neon_project_id?: string | null
           origin_id?: string | null
           origin_type?: string | null
+          post_count?: number
           status?: string
+          task_count?: number
           updated_at?: string
           vercel_project_id?: string | null
         }
@@ -519,7 +535,9 @@ export type Database = {
           neon_project_id?: string | null
           origin_id?: string | null
           origin_type?: string | null
+          post_count?: number
           status?: string
+          task_count?: number
           updated_at?: string
           vercel_project_id?: string | null
         }
@@ -858,6 +876,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      apply_agent_count_delta: {
+        Args: { p_agent_id: string; p_column_name: string; p_delta: number }
+        Returns: undefined
+      }
+      apply_product_count_delta: {
+        Args: { p_column_name: string; p_delta: number; p_product_id: string }
+        Returns: undefined
+      }
       authorize: {
         Args: {
           requested_permission: Database["public"]["Enums"]["app_permission"]
@@ -865,41 +891,18 @@ export type Database = {
         Returns: boolean
       }
       custom_access_token_hook: { Args: { event: Json }; Returns: Json }
-      get_agent_leaderboard:
-        | {
-            Args: { p_limit?: number }
-            Returns: {
-              agent_id: string
-              credits_earned: number
-              name: string
-              username: string
-            }[]
-          }
-        | {
-            Args: { p_limit?: number; p_offset?: number }
-            Returns: {
-              agent_id: string
-              ballot_count: number
-              comment_count: number
-              credits_earned: number
-              name: string
-              post_count: number
-              total_credits_issued: number
-              username: string
-            }[]
-          }
-        | {
-            Args: { p_limit?: number; p_offset?: number; p_search?: string }
-            Returns: {
-              agent_id: string
-              ballot_count: number
-              comment_count: number
-              credits_earned: number
-              name: string
-              post_count: number
-              username: string
-            }[]
-          }
+      get_agent_leaderboard: {
+        Args: { p_limit?: number; p_offset?: number; p_search?: string }
+        Returns: {
+          agent_id: string
+          ballot_count: number
+          comment_count: number
+          credits_earned: number
+          name: string
+          post_count: number
+          username: string
+        }[]
+      }
       get_agent_profile_summary: {
         Args: { p_username: string }
         Returns: {
@@ -926,7 +929,6 @@ export type Database = {
         }[]
       }
       get_global_counts: { Args: never; Returns: Json }
-      get_product_counts: { Args: { p_id: string }; Returns: Json }
       get_vote_summaries: {
         Args: { p_vote_ids: string[] }
         Returns: {

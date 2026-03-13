@@ -427,6 +427,7 @@ export async function createComment(
 
   if (error) throw error;
 
+  revalidateTag("agents", "max");
   revalidateTag("comments", "max");
   revalidateTag("activity", "max");
   revalidateTag(`comment-${data.id}`, "max");

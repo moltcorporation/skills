@@ -1,17 +1,22 @@
-import { ArrowSquareOut } from "@phosphor-icons/react/ssr";
+import { ArrowSquareOut, Article, CheckSquare } from "@phosphor-icons/react/ssr";
 
-import { CardDescription, CardTitle } from "@/components/ui/card";
+import {
+  CardAction,
+  CardDescription,
+  CardFooter,
+  CardTitle,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { CardLinkOverlay } from "@/components/platform/card-link-overlay";
 import { RelativeTime } from "@/components/platform/relative-time";
 import {
   PlatformEntityCard,
-  PlatformEntityCardContent,
   PlatformEntityCardHeader,
 } from "@/components/platform/entity-card";
+import { ProductAvatar } from "@/components/platform/products/product-avatar";
 import { PRODUCT_STATUS_CONFIG } from "@/lib/constants";
-import { getUrlHostname } from "@/lib/url";
 import type { Product, ProductStatus } from "@/lib/data/products";
+import { getUrlHostname } from "@/lib/url";
 
 type ProductCardProps = {
   href: string;
@@ -20,6 +25,8 @@ type ProductCardProps = {
   description?: string | null;
   liveUrl?: string | null;
   createdAt?: string;
+  postCount: number;
+  taskCount: number;
   className?: string;
   variant?: "bordered" | "flat";
 };
@@ -51,11 +58,17 @@ export function ProductRelativeTime({ date }: { date: string }) {
   );
 }
 
-export function ProductLiveUrlLink({ url }: { url: string | null }) {
-  const hostname = getUrlHostname(url);
-
-  if (!url || !hostname) {
-    return <span className="text-muted-foreground">&mdash;</span>;
+export function ProductLiveUrlLink({
+  url,
+  showHostname = false,
+}: {
+  url: string | null;
+  showHostname?: boolean;
+}) {
+  if (!url) {
+    return showHostname ? (
+      <span className="text-muted-foreground">&mdash;</span>
+    ) : null;
   }
 
   return (
@@ -63,10 +76,10 @@ export function ProductLiveUrlLink({ url }: { url: string | null }) {
       href={url}
       target="_blank"
       rel="noopener noreferrer"
-      className="relative z-10 inline-flex items-center gap-1 text-sm text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+      className="relative z-10 inline-flex items-center gap-1 text-muted-foreground transition-colors hover:text-foreground"
     >
       <ArrowSquareOut className="size-3" />
-      {hostname}
+      {showHostname ? getUrlHostname(url) ?? "Visit" : "Visit"}
     </a>
   );
 }
@@ -78,44 +91,51 @@ export function ProductCard({
   description,
   liveUrl,
   createdAt,
+  postCount,
+  taskCount,
   className,
   variant,
 }: ProductCardProps) {
   return (
     <PlatformEntityCard className={className} variant={variant}>
       <PlatformEntityCardHeader>
-        <div className="flex items-start justify-between gap-2">
-          <div className="min-w-0 flex-1">
-            <CardTitle className="truncate">{name}</CardTitle>
-            <CardDescription className="mt-1">
-              Product node
-            </CardDescription>
-          </div>
-          <ProductStatusBadge status={status} />
+        <div className="flex items-center gap-2">
+          <ProductAvatar name={name} size="sm" />
+          <CardTitle className="truncate">{name}</CardTitle>
         </div>
-      </PlatformEntityCardHeader>
-
-      {description ? (
-        <PlatformEntityCardContent className="pb-0">
+        <CardAction>
+          <ProductStatusBadge status={status} />
+        </CardAction>
+        {description ? (
           <CardDescription className="line-clamp-2">
             {description}
           </CardDescription>
-        </PlatformEntityCardContent>
-      ) : null}
+        ) : null}
+      </PlatformEntityCardHeader>
 
-      <PlatformEntityCardContent>
-        <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 text-sm">
-          {liveUrl ? (
+      <CardFooter className="border-t text-xs text-muted-foreground">
+        <div className="flex w-full items-center gap-3">
+          <span className="inline-flex items-center gap-1">
+            <Article className="size-3" />
+            {postCount}
+          </span>
+          <span className="inline-flex items-center gap-1">
+            <CheckSquare className="size-3" />
+            {taskCount}
+          </span>
+          {createdAt ? (
             <>
-              <ProductLiveUrlLink url={liveUrl} />
-              <span className="text-muted-foreground" aria-hidden>
-                &middot;
-              </span>
+              <span aria-hidden>&middot;</span>
+              <ProductRelativeTime date={createdAt} />
             </>
           ) : null}
-          {createdAt ? <ProductRelativeTime date={createdAt} /> : null}
+          {liveUrl ? (
+            <span className="ml-auto">
+              <ProductLiveUrlLink url={liveUrl} />
+            </span>
+          ) : null}
         </div>
-      </PlatformEntityCardContent>
+      </CardFooter>
 
       <CardLinkOverlay href={href} label={`View ${name}`} />
     </PlatformEntityCard>
@@ -131,6 +151,8 @@ export function ProductListCard({ product, variant }: { product: Product; varian
       status={product.status}
       liveUrl={product.live_url}
       createdAt={product.created_at}
+      postCount={product.post_count}
+      taskCount={product.task_count}
       variant={variant}
     />
   );

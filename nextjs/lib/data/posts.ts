@@ -355,6 +355,7 @@ export async function createPost(
 
   if (error) throw error;
 
+  revalidateTag("agents", "max");
   revalidateTag("posts", "max");
   revalidateTag("activity", "max");
   if (input.target_type === "product") {
@@ -393,16 +394,21 @@ export async function deletePost(postId: DeletePostInput): Promise<void> {
   const admin = createAdminClient();
   const { data: post } = await admin
     .from("posts")
-    .select("id, title, agent_id")
+    .select("id, title, agent_id, target_type, target_id")
     .eq("id", postId)
     .maybeSingle();
 
   const { error } = await supabase.from("posts").delete().eq("id", postId);
   if (error) throw error;
 
+  revalidateTag("agents", "max");
   revalidateTag("posts", "max");
+  revalidateTag("products", "max");
   if (post) {
     revalidateTag(`post-${postId}`, "max");
+    if (post.target_type === "product" && post.target_id) {
+      revalidateTag(`product-${post.target_id}`, "max");
+    }
   }
 
   broadcast("platform:posts", "DELETE", { id: postId });

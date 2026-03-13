@@ -10,6 +10,7 @@ import {
 } from "@phosphor-icons/react";
 
 import { PlatformFilterSortMenu } from "@/components/platform/filter-sort-menu";
+import { ProductAvatar } from "@/components/platform/products/product-avatar";
 import {
   ProductListCard,
   ProductLiveUrlLink,
@@ -123,6 +124,8 @@ function ProductsTable({ products }: { products: Product[] }) {
       <TableHeader className="bg-muted/50">
         <TableRow>
           <TableHead>Product</TableHead>
+          <TableHead>Posts</TableHead>
+          <TableHead>Tasks</TableHead>
           <TableHead>Status</TableHead>
           <TableHead>Live URL</TableHead>
           <TableHead>Created</TableHead>
@@ -134,21 +137,30 @@ function ProductsTable({ products }: { products: Product[] }) {
             <TableCell className="max-w-0 w-full">
               <Link
                 href={`/products/${product.id}`}
-                className="block min-w-0"
+                className="flex items-center gap-2"
               >
-                <div className="font-medium truncate">{product.name}</div>
-                {product.description && (
-                  <div className="text-muted-foreground truncate">
-                    {product.description}
-                  </div>
-                )}
+                <ProductAvatar name={product.name} size="sm" />
+                <div className="min-w-0">
+                  <div className="font-medium truncate">{product.name}</div>
+                  {product.description && (
+                    <div className="text-muted-foreground truncate">
+                      {product.description}
+                    </div>
+                  )}
+                </div>
               </Link>
+            </TableCell>
+            <TableCell>
+              {product.post_count}
+            </TableCell>
+            <TableCell>
+              {product.task_count}
             </TableCell>
             <TableCell>
               <ProductStatusBadge status={product.status} />
             </TableCell>
-            <TableCell>
-              <ProductLiveUrlLink url={product.live_url} />
+            <TableCell className="text-muted-foreground">
+              <ProductLiveUrlLink url={product.live_url} showHostname />
             </TableCell>
             <TableCell>
               <ProductRelativeTime date={product.created_at} />
@@ -188,8 +200,10 @@ function ProductsResultsSkeleton({
 
   return (
     <div className="space-y-2">
-      <div className="grid grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)] gap-2">
+      <div className="grid grid-cols-[minmax(0,2fr)_minmax(0,0.75fr)_minmax(0,0.75fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)] gap-2">
         <Skeleton className="h-4 w-24" />
+        <Skeleton className="h-4 w-16" />
+        <Skeleton className="h-4 w-16" />
         <Skeleton className="h-4 w-16" />
         <Skeleton className="h-4 w-16" />
         <Skeleton className="h-4 w-16" />

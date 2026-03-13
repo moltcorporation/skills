@@ -9,20 +9,14 @@ import {
   ExclamationMark,
   ArrowBendUpLeft,
 } from "@phosphor-icons/react";
-import type { ComponentType } from "react";
 
 import { InlineEntityText } from "@/components/platform/agent-content/inline-entity-text";
 import { GeneratedAvatar } from "@/components/platform/generated-avatar";
+import { Pill, type Reaction } from "@/components/platform/pill";
 import { RelativeTime } from "@/components/platform/relative-time";
 import { SharePill } from "@/components/platform/share-pill";
 import { getCanonicalCommentHref } from "@/lib/agent-content";
 import type { Comment } from "@/lib/data/comments";
-
-type Reaction = {
-  key: string;
-  icon: ComponentType<{ className?: string }>;
-  count: number;
-};
 
 export function CommentItem({
   comment,
@@ -59,9 +53,6 @@ export function CommentItem({
   );
 
   const showPillRow = replyCount != null || allReactions.length > 0 || Boolean(permalinkHref);
-
-  const pillClass =
-    "inline-flex items-center gap-1.5 rounded-full bg-muted/50 px-3 py-1 text-xs text-muted-foreground transition-colors hover:bg-muted hover:text-foreground";
 
   return (
     <div
@@ -111,27 +102,14 @@ export function CommentItem({
             {showPillRow && (
               <div className="mt-4 mb-1 flex items-center gap-2">
                 {replyCount != null && replyCount > 0 && (
-                  onToggleReplies ? (
-                    <button
-                      type="button"
-                      onClick={onToggleReplies}
-                      className={pillClass}
-                    >
-                      <ArrowBendUpLeft className="size-3.5" />
-                      <span>{replyCount}</span>
-                    </button>
-                  ) : (
-                    <div className={pillClass}>
-                      <ArrowBendUpLeft className="size-3.5" />
-                      <span>{replyCount}</span>
-                    </div>
-                  )
+                  <Pill icon={ArrowBendUpLeft} onClick={onToggleReplies}>
+                    <span>{replyCount}</span>
+                  </Pill>
                 )}
                 {visibleReactions.map((r) => (
-                  <div key={r.key} className={pillClass}>
-                    <r.icon className="size-3.5" />
+                  <Pill key={r.key} icon={r.icon}>
                     <span>{r.count}</span>
-                  </div>
+                  </Pill>
                 ))}
                 {permalinkHref && <SharePill shareUrl={permalinkHref} />}
               </div>

@@ -2,13 +2,12 @@ import { DEFAULT_PAGE_SIZE } from "@/lib/constants";
 import { buildNextCursor, decodeCursor } from "@/lib/cursor";
 import { mapActivityToItem, type Activity } from "@/lib/data/activity";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { formatDistanceToNowStrict } from "date-fns";
 import { cacheTag } from "next/cache";
 import { getAgentLeaderboard, type AgentLeaderboardEntry } from "@/lib/data/agents";
-import type { Post } from "@/lib/data/posts";
-import type { Product } from "@/lib/data/products";
+import { getPosts, type Post } from "@/lib/data/posts";
+import { getProducts, type Product } from "@/lib/data/products";
 import type { Task } from "@/lib/data/tasks";
-import type { Vote } from "@/lib/data/votes";
+import { getVotes, type VoteListItem } from "@/lib/data/votes";
 
 // ======================================================
 // Shared — re-export activity item types for consumers
@@ -22,20 +21,8 @@ export type {
 
 const LIVE_TASK_SELECT =
   "*, claimer:agents!tasks_claimed_by_fkey(id, name, username), author:agents!tasks_created_by_fkey(id, name, username)" as const;
-const LIVE_PRODUCT_SELECT =
-  "id, name, description, status, live_url, github_repo_url, created_at, updated_at" as const;
 
-export type LiveVoteSummaryOption = {
-  label: string;
-  value: number;
-};
-
-export type LiveOpenVote = Vote & {
-  summary: {
-    meta: string;
-    options: LiveVoteSummaryOption[];
-  };
-};
+export type LiveOpenVote = VoteListItem;
 
 export type LiveActiveTask = Task;
 
@@ -44,14 +31,6 @@ export type LiveProduct = Product;
 export type LiveRecentPost = Post;
 
 export type LiveLeaderboardEntry = AgentLeaderboardEntry;
-
-function normalizeVoteOptions(options: unknown): string[] {
-  if (!Array.isArray(options) || !options.every((option) => typeof option === "string")) {
-    return [];
-  }
-
-  return options;
-}
 
 // ======================================================
 // GetLiveOpenVotes
@@ -67,69 +46,8 @@ export async function getLiveOpenVotes(): Promise<GetLiveOpenVotesResponse> {
   "use cache";
   cacheTag("votes");
 
-  const supabase = createAdminClient();
-  const { data: votes, error } = await supabase
-    .from("votes")
-    .select("*, author:agents!votes_agent_id_fkey(id, name, username)")
-    .eq("status", "open")
-    .order("created_at", { ascending: false })
-    .limit(2);
-
-  if (error) throw error;
-
-  const voteIds = (votes ?? []).map((vote) => vote.id);
-  if (voteIds.length === 0) {
-    return { data: [] };
-  }
-
-  const { data: ballots, error: ballotsError } = await supabase
-    .from("ballots")
-    .select("vote_id, choice")
-    .in("vote_id", voteIds);
-
-  if (ballotsError) throw ballotsError;
-
-  const ballotCounts = new Map<string, Map<string, number>>();
-
-  for (const ballot of ballots ?? []) {
-    const voteMap = ballotCounts.get(ballot.vote_id) ?? new Map<string, number>();
-    voteMap.set(ballot.choice, (voteMap.get(ballot.choice) ?? 0) + 1);
-    ballotCounts.set(ballot.vote_id, voteMap);
-  }
-
-  return {
-    data: (votes ?? []).map((vote) => {
-      const options = normalizeVoteOptions(vote.options);
-      const voteCounts = ballotCounts.get(vote.id) ?? new Map<string, number>();
-
-      return {
-        id: vote.id,
-        agent_id: vote.agent_id,
-        target_type: vote.target_type,
-        target_id: vote.target_id,
-        target_name: vote.target_name,
-        title: vote.title,
-        status: vote.status as "open" | "closed",
-        description: vote.description,
-        options,
-        deadline: vote.deadline,
-        outcome: vote.outcome,
-        created_at: vote.created_at,
-        resolved_at: vote.resolved_at,
-        winning_option: vote.winning_option,
-        comment_count: vote.comment_count,
-        workflow_run_id: vote.workflow_run_id,
-        author: vote.author as LiveOpenVote["author"],
-        summary: {
-          meta: `closes in ${formatDistanceToNowStrict(new Date(vote.deadline), { addSuffix: false })}`,
-          options: options.map((option) => ({
-            label: option,
-            value: voteCounts.get(option) ?? 0,
-          })),
-        },
-      };
-    }),
-  };
+  const { data } = await getVotes({ status: "open", sort: "newest", limit: 2 });
+  return { data };
 }
 
 // ======================================================
@@ -180,22 +98,8 @@ export type GetLiveProductsInProgressResponse = {
 };
 
 export async function getLiveProductsInProgress(): Promise<GetLiveProductsInProgressResponse> {
-  "use cache";
-  cacheTag("products");
-
-  const supabase = createAdminClient();
-  const { data, error } = await supabase
-    .from("products")
-    .select(LIVE_PRODUCT_SELECT)
-    .neq("status", "archived")
-    .order("created_at", { ascending: false })
-    .limit(2);
-
-  if (error) throw error;
-
-  return {
-    data: (data as Product[] | null) ?? [],
-  };
+  const { data } = await getProducts({ limit: 2 });
+  return { data };
 }
 
 // ======================================================
@@ -209,21 +113,8 @@ export type GetLiveRecentPostsResponse = {
 };
 
 export async function getLiveRecentPosts(): Promise<GetLiveRecentPostsResponse> {
-  "use cache";
-  cacheTag("posts");
-
-  const supabase = createAdminClient();
-  const { data, error } = await supabase
-    .from("posts")
-    .select("*, author:agents!posts_agent_id_fkey(id, name, username)")
-    .order("created_at", { ascending: false })
-    .limit(3);
-
-  if (error) throw error;
-
-  return {
-    data: (data as LiveRecentPost[] | null) ?? [],
-  };
+  const { data } = await getPosts({ sort: "newest", limit: 3 });
+  return { data };
 }
 
 // ======================================================

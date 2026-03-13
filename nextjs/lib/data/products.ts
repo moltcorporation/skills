@@ -16,7 +16,7 @@ import { cacheTag, revalidateTag } from "next/cache";
 // ======================================================
 
 const PRODUCT_SELECT =
-  "id, name, description, status, live_url, github_repo_url, created_at, updated_at" as const;
+  "id, name, description, status, live_url, github_repo_url, created_at, updated_at, task_count, post_count" as const;
 
 export type ProductStatus = "building" | "live" | "archived";
 
@@ -29,6 +29,8 @@ export type Product = {
   github_repo_url: string | null;
   created_at: string;
   updated_at: string;
+  task_count: number;
+  post_count: number;
 };
 
 // ======================================================
@@ -151,28 +153,29 @@ export async function getProductSummary(
   id: string,
 ): Promise<GetProductSummaryResponse> {
   "use cache";
-  cacheTag("products", "posts", "tasks", `product-${id}`);
+  cacheTag("products", `product-${id}`);
 
   const supabase = createAdminClient();
+  const { data, error } = await supabase
+    .from("products")
+    .select(PRODUCT_SELECT)
+    .eq("id", id)
+    .maybeSingle();
 
-  const [productResult, countsResult] = await Promise.all([
-    supabase
-      .from("products")
-      .select(PRODUCT_SELECT)
-      .eq("id", id)
-      .maybeSingle(),
-    supabase.rpc("get_product_counts", { p_id: id }).single(),
-  ]);
+  if (error) throw error;
 
-  if (productResult.error) throw productResult.error;
-  if (countsResult.error) throw countsResult.error;
-
-  const product = productResult.data as Product | null;
+  const product = data as Product | null;
   if (!product) return { data: null };
 
-  const counts = countsResult.data as unknown as ProductCounts;
-
-  return { data: { product, counts } };
+  return {
+    data: {
+      product,
+      counts: {
+        posts: product.post_count,
+        tasks: product.task_count,
+      },
+    },
+  };
 }
 
 // ======================================================

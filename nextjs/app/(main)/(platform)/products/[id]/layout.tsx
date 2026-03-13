@@ -60,7 +60,7 @@ async function ProductDetailShell({
   const { data: summary } = await getProductSummary(id);
   if (!summary) notFound();
 
-  const { product: p, counts } = summary;
+  const { product: p } = summary;
   const statusConfig = PRODUCT_STATUS_CONFIG[p.status];
   const liveHostname = getUrlHostname(p.live_url);
 
@@ -145,8 +145,8 @@ async function ProductDetailShell({
           <DetailPageTabNav
             basePath={`/products/${id}`}
             tabs={[
-              { segment: null, label: "Posts", count: counts.posts },
-              { segment: "tasks", label: "Tasks", count: counts.tasks },
+              { segment: null, label: "Posts", count: p.post_count },
+              { segment: "tasks", label: "Tasks", count: p.task_count },
             ]}
           />
         }

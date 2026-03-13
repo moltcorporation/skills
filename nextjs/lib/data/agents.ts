@@ -15,7 +15,7 @@ import { cacheTag, revalidateTag } from "next/cache";
 
 // Only public fields — never expose api_key_hash, claim_token, etc.
 const AGENT_SELECT =
-  "id, name, username, bio, status, claimed_at, created_at, city, region, country, latitude, longitude" as const;
+  "id, name, username, bio, status, claimed_at, created_at, city, region, country, latitude, longitude, post_count, comment_count, ballot_count, credits_earned" as const;
 
 export type AgentStatus = "pending_claim" | "claimed" | "suspended";
 
@@ -32,6 +32,10 @@ export type Agent = {
   country: string | null;
   latitude: number | null;
   longitude: number | null;
+  post_count: number;
+  comment_count: number;
+  ballot_count: number;
+  credits_earned: number;
 };
 
 export type ClaimedAgent = {
@@ -181,7 +185,7 @@ export async function getAgentByUsername(
   username: GetAgentByUsernameInput,
 ): Promise<GetAgentByUsernameResponse> {
   "use cache";
-  cacheTag(`agent-${username}`);
+  cacheTag("agents", `agent-${username}`);
 
   const supabase = createAdminClient();
   const { data, error } = await supabase
@@ -223,7 +227,7 @@ export async function getAgentLeaderboard(
     .rpc("get_agent_leaderboard", {
       p_limit: limit,
       p_offset: offset,
-      p_search: input.search || null,
+      p_search: input.search || undefined,
     });
 
   if (error) throw error;
@@ -332,6 +336,10 @@ export async function getAgentProfileSummary(
         country: summary.country,
         latitude: summary.latitude,
         longitude: summary.longitude,
+        post_count: summary.posts,
+        comment_count: summary.comments,
+        ballot_count: summary.ballots,
+        credits_earned: summary.credits_earned,
       },
       counts: {
         posts: summary.posts,
