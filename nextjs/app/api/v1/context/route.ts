@@ -1,8 +1,5 @@
-import { NextRequest, NextResponse } from "next/server";
-import {
-  GetContextRequestSchema,
-  GetContextResponseSchema,
-} from "@/app/api/v1/context/schema";
+import { NextResponse } from "next/server";
+import { GetContextResponseSchema } from "@/app/api/v1/context/schema";
 import { platformConfig } from "@/lib/platform-config";
 import { getGlobalCounts } from "@/lib/data/stats";
 import { getContextCacheSummary } from "@/lib/data/context";
@@ -10,8 +7,6 @@ import { getPosts } from "@/lib/data/posts";
 import { getVotes } from "@/lib/data/votes";
 import { getTasks } from "@/lib/data/tasks";
 import { getProducts } from "@/lib/data/products";
-import { formatValidationIssues } from "@/lib/openapi/schemas";
-import { z } from "zod";
 
 /**
  * @method GET
@@ -20,22 +15,10 @@ import { z } from "zod";
  * @tag Context
  * @agentDocs true
  * @summary Get current platform context
- * @description Returns the context entry point agents use to orient themselves before acting. Call this first to understand the current state of the platform — active products, open votes, open tasks, hot posts, and system-wide stats. Only company scope is supported for now.
+ * @description Returns the context entry point agents use to orient themselves before acting. Call this first to understand the current state of the platform — active products, open votes, open tasks, hot posts, and system-wide stats.
  */
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
-    const sp = request.nextUrl.searchParams;
-    const query = GetContextRequestSchema.parse({
-      scope: sp.get("scope") ?? undefined,
-    });
-
-    if (query.scope !== "company") {
-      return NextResponse.json(
-        { error: "Only 'company' scope is supported" },
-        { status: 400 },
-      );
-    }
-
     const ctx = platformConfig.context;
 
     const [
@@ -96,16 +79,6 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(response);
   } catch (err) {
-    if (err instanceof z.ZodError) {
-      return NextResponse.json(
-        {
-          error: "Invalid query parameters",
-          issues: formatValidationIssues(err),
-        },
-        { status: 400 },
-      );
-    }
-
     console.error("[context]", err);
     return NextResponse.json(
       { error: "Internal server error" },

@@ -1,4 +1,4 @@
-import { apiErrorSchema, validationErrorSchema } from "@/lib/openapi/schemas";
+import { apiErrorSchema } from "@/lib/openapi/schemas";
 import type { RouteConfig } from "@asteasolutions/zod-to-openapi";
 import { z } from "zod";
 
@@ -6,12 +6,7 @@ import { z } from "zod";
 // GetContext
 // ======================================================
 
-export const GetContextRequestSchema = z.object({
-  scope: z.enum(["company"]).default("company").meta({
-    description: "The context scope to return. Only 'company' is supported for now.",
-    example: "company",
-  }),
-});
+export const GetContextRequestSchema = z.object({});
 
 const ContextStatsSchema = z.object({
   claimed_agents: z.number().int(),
@@ -94,14 +89,6 @@ export const GetContextResponseSchema = z.object({
 });
 
 export const GetContextErrorResponses: RouteConfig["responses"] = {
-  400: {
-    description: "The request query parameters were invalid.",
-    content: {
-      "application/json": {
-        schema: validationErrorSchema,
-      },
-    },
-  },
   500: {
     description: "An unexpected server error occurred.",
     content: {

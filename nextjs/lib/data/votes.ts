@@ -125,14 +125,25 @@ export async function getVotes(
   const limit = opts.limit ?? DEFAULT_PAGE_SIZE;
   const sort = opts.sort ?? "newest";
   const ascending = sort === "oldest";
+  const orderAllVotes = !opts.status;
   const supabase = createAdminClient();
 
   let query = supabase
     .from("votes")
     .select(VOTE_SELECT)
+    .order("status", { ascending: false })
     .order("created_at", { ascending })
     .order("id", { ascending })
     .limit(limit + 1);
+
+  if (!orderAllVotes) {
+    query = supabase
+      .from("votes")
+      .select(VOTE_SELECT)
+      .order("created_at", { ascending })
+      .order("id", { ascending })
+      .limit(limit + 1);
+  }
 
   if (opts.agentId) query = query.eq("agent_id", opts.agentId);
   if (opts.status) query = query.eq("status", opts.status);
@@ -140,14 +151,29 @@ export async function getVotes(
     query = query.textSearch("fts", opts.search, { type: "websearch", config: "english" });
   if (opts.after) {
     const { id, v } = decodeCursor(opts.after);
-    const createdAt = v?.[0];
+    const createdAt = orderAllVotes ? v?.[1] : v?.[0];
 
     if (createdAt != null) {
-      const comparator = ascending ? "gt" : "lt";
       const createdAtIso = new Date(createdAt).toISOString();
-      query = query.or(
-        `created_at.${comparator}.${createdAtIso},and(created_at.eq.${createdAtIso},id.${comparator}.${id})`,
-      );
+
+      if (orderAllVotes) {
+        const status = v?.[0] === 1 ? "open" : "closed";
+        const createdAtComparator = ascending ? "gt" : "lt";
+        const idComparator = ascending ? "gt" : "lt";
+
+        query = query.or(
+          [
+            `status.lt.${status}`,
+            `and(status.eq.${status},created_at.${createdAtComparator}.${createdAtIso})`,
+            `and(status.eq.${status},created_at.eq.${createdAtIso},id.${idComparator}.${id})`,
+          ].join(","),
+        );
+      } else {
+        const comparator = ascending ? "gt" : "lt";
+        query = query.or(
+          `created_at.${comparator}.${createdAtIso},and(created_at.eq.${createdAtIso},id.${comparator}.${id})`,
+        );
+      }
     }
   }
 
@@ -166,7 +192,11 @@ export async function getVotes(
 
   return {
     data: items,
-    nextCursor: buildNextCursor(items, hasMore, (vote) => [Date.parse(vote.created_at)]),
+    nextCursor: buildNextCursor(items, hasMore, (vote) =>
+      orderAllVotes
+        ? [vote.status === "open" ? 1 : 0, Date.parse(vote.created_at)]
+        : [Date.parse(vote.created_at)],
+    ),
   };
 }
 
