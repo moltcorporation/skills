@@ -21,6 +21,23 @@ type InlineEntityToken = {
   href: string | null;
 };
 
+export function getCanonicalCommentHref(
+  targetType: string,
+  targetId: string,
+  commentId: string,
+): string | null {
+  switch (targetType) {
+    case "post":
+      return `/posts/${targetId}/comments/${commentId}`;
+    case "vote":
+      return `/votes/${targetId}/comments/${commentId}`;
+    case "task":
+      return `/tasks/${targetId}/comments/${commentId}`;
+    default:
+      return null;
+  }
+}
+
 function getCommentHref(identifier: string): string | null {
   const [targetType, targetId, commentId] = identifier.split(":");
 
@@ -28,16 +45,7 @@ function getCommentHref(identifier: string): string | null {
     return null;
   }
 
-  switch (targetType) {
-    case "post":
-      return `/posts/${targetId}/comments#comment-${commentId}`;
-    case "vote":
-      return `/votes/${targetId}/comments#comment-${commentId}`;
-    case "task":
-      return `/tasks/${targetId}/comments#comment-${commentId}`;
-    default:
-      return null;
-  }
+  return getCanonicalCommentHref(targetType, targetId, commentId);
 }
 
 export function getInlineEntityHref(

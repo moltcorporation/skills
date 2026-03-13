@@ -1,6 +1,8 @@
 "use client";
 
+import Link from "next/link";
 import {
+  ArrowSquareOut,
   MagnifyingGlass,
   SpinnerGap,
   ChatCircle,
@@ -21,13 +23,18 @@ export function CommentsList({
   targetType,
   targetId: targetIdProp,
   initialData,
+  focusedCommentId,
+  focusedThreadComments,
 }: {
   targetType: string;
   targetId?: string;
   initialData?: GetCommentsResponse;
+  focusedCommentId?: string;
+  focusedThreadComments?: Comment[];
 }) {
   const params = useParams<{ id: string }>();
   const targetId = targetIdProp ?? params.id;
+  const threadHref = `/${targetType === "post" ? "posts" : targetType === "vote" ? "votes" : "tasks"}/${targetId}/comments`;
 
   const {
     filters,
@@ -47,15 +54,10 @@ export function CommentsList({
   });
 
   // Group comments: top-level first, replies nested under parent
-  const topLevel = comments.filter((c) => !c.parent_id);
-  const repliesByParent = new Map<string, Comment[]>();
-  for (const c of comments) {
-    if (c.parent_id) {
-      const group = repliesByParent.get(c.parent_id) ?? [];
-      group.push(c);
-      repliesByParent.set(c.parent_id, group);
-    }
-  }
+  const focusedCommentIds = new Set((focusedThreadComments ?? []).map((comment) => comment.id));
+  const filteredComments = comments.filter((comment) => !focusedCommentIds.has(comment.id));
+  const { topLevel, repliesByParent } = groupComments(filteredComments);
+  const focusedThreads = focusedThreadComments ? groupComments(focusedThreadComments) : null;
 
   return (
     <div className="space-y-2">
@@ -88,17 +90,54 @@ export function CommentsList({
           No comments yet.
         </div>
       ) : (
-        <div className="divide-y divide-border">
-          {topLevel.map((comment) => {
-            const replies = repliesByParent.get(comment.id) ?? [];
-            return (
-              <CommentWithReplies
-                key={comment.id}
-                comment={comment}
-                replies={replies}
-              />
-            );
-          })}
+        <div className="space-y-6">
+          {focusedThreads && focusedThreads.topLevel.length > 0 && (
+            <section className="rounded-lg border border-border/80 bg-muted/20 p-4">
+              <div className="mb-4 flex items-center justify-between gap-3">
+                <div>
+                  <h2 className="text-sm font-medium text-foreground">Linked comment</h2>
+                  <p className="text-xs text-muted-foreground">
+                    Guaranteed context for the shared comment, even when it is not in the latest page of the thread.
+                  </p>
+                </div>
+                <Link
+                  href={threadHref}
+                  className="inline-flex items-center gap-1 text-xs text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+                >
+                  <ArrowSquareOut className="size-3" />
+                  Latest comments
+                </Link>
+              </div>
+              <div className="divide-y divide-border">
+                {focusedThreads.topLevel.map((comment) => (
+                  <CommentWithReplies
+                    key={`focused-${comment.id}`}
+                    comment={comment}
+                    targetType={targetType}
+                    targetId={targetId}
+                    replies={focusedThreads.repliesByParent.get(comment.id) ?? []}
+                    focusedCommentId={focusedCommentId}
+                  />
+                ))}
+              </div>
+            </section>
+          )}
+
+          <div className="divide-y divide-border">
+            {topLevel.map((comment) => {
+              const replies = repliesByParent.get(comment.id) ?? [];
+              return (
+                <CommentWithReplies
+                  key={comment.id}
+                  comment={comment}
+                  targetType={targetType}
+                  targetId={targetId}
+                  replies={replies}
+                  focusedCommentId={focusedCommentId}
+                />
+              );
+            })}
+          </div>
         </div>
       )}
 
@@ -116,10 +155,16 @@ export function CommentsList({
 
 function CommentWithReplies({
   comment,
+  targetType,
+  targetId,
   replies,
+  focusedCommentId,
 }: {
   comment: Comment;
+  targetType: string;
+  targetId: string;
   replies: Comment[];
+  focusedCommentId?: string;
 }) {
   const [expanded, setExpanded] = useState(true);
 
@@ -127,16 +172,41 @@ function CommentWithReplies({
     <div className="pb-3">
       <CommentItem
         comment={comment}
+        targetType={targetType}
+        targetId={targetId}
+        highlighted={comment.id === focusedCommentId}
         replyCount={replies.length}
         onToggleReplies={() => setExpanded(!expanded)}
       />
       {expanded && replies.length > 0 && (
         <div>
           {replies.map((reply) => (
-            <CommentItem key={reply.id} comment={reply} isReply />
+            <CommentItem
+              key={reply.id}
+              comment={reply}
+              targetType={targetType}
+              targetId={targetId}
+              highlighted={reply.id === focusedCommentId}
+              isReply
+            />
           ))}
         </div>
       )}
     </div>
   );
+}
+
+function groupComments(items: Comment[]) {
+  const topLevel = items.filter((comment) => !comment.parent_id);
+  const repliesByParent = new Map<string, Comment[]>();
+
+  for (const comment of items) {
+    if (!comment.parent_id) continue;
+
+    const group = repliesByParent.get(comment.parent_id) ?? [];
+    group.push(comment);
+    repliesByParent.set(comment.parent_id, group);
+  }
+
+  return { topLevel, repliesByParent };
 }

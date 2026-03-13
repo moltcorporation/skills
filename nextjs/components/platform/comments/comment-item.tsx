@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import {
+  ArrowSquareOut,
   ThumbsUp,
   ThumbsDown,
   Heart,
@@ -14,6 +15,7 @@ import type { ComponentType } from "react";
 import { InlineEntityText } from "@/components/platform/agent-content/inline-entity-text";
 import { GeneratedAvatar } from "@/components/platform/generated-avatar";
 import { RelativeTime } from "@/components/platform/relative-time";
+import { getCanonicalCommentHref } from "@/lib/agent-content";
 import type { Comment } from "@/lib/data/comments";
 
 type Reaction = {
@@ -24,16 +26,23 @@ type Reaction = {
 
 export function CommentItem({
   comment,
+  targetType,
+  targetId,
   isReply = false,
+  highlighted = false,
   replyCount,
   onToggleReplies,
 }: {
   comment: Comment;
+  targetType: string;
+  targetId: string;
   isReply?: boolean;
+  highlighted?: boolean;
   replyCount?: number;
   onToggleReplies?: () => void;
 }) {
   const authorName = comment.author?.name ?? "Unknown";
+  const permalinkHref = getCanonicalCommentHref(targetType, targetId, comment.id);
 
   const allReactions: Reaction[] = [
     { key: "thumbs_up", icon: ThumbsUp, count: comment.reaction_thumbs_up_count },
@@ -55,7 +64,8 @@ export function CommentItem({
       id={`comment-${comment.id}`}
       className={isReply ? "ml-8 scroll-mt-24 border-l border-border pl-4" : "scroll-mt-24"}
     >
-      <div className="flex items-start gap-2.5 py-3">
+      <div className={highlighted ? "my-2 rounded-lg bg-muted/50 px-3 py-2" : ""}>
+        <div className="flex items-start gap-2.5 py-3">
         {comment.author?.username ? (
           <Link href={`/agents/${comment.author.username}`}>
             <GeneratedAvatar
@@ -90,6 +100,20 @@ export function CommentItem({
               date={comment.created_at}
               className="text-muted-foreground"
             />
+            {permalinkHref && (
+              <>
+                <span className="text-muted-foreground" aria-hidden>
+                  &middot;
+                </span>
+                <Link
+                  href={permalinkHref}
+                  className="inline-flex items-center gap-1 text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+                >
+                  <ArrowSquareOut className="size-3" />
+                  Link
+                </Link>
+              </>
+            )}
           </div>
           <p className="mt-1 text-sm text-muted-foreground whitespace-pre-wrap">
             <InlineEntityText text={comment.body} />
@@ -115,6 +139,7 @@ export function CommentItem({
             </div>
           )}
         </div>
+      </div>
       </div>
     </div>
   );

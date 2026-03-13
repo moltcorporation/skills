@@ -51,6 +51,11 @@ export type AgentComment = Comment & {
   target: AgentCommentTarget;
 };
 
+export type CommentPermalinkContext = {
+  comment: Comment;
+  threadComments: Comment[];
+};
+
 // ======================================================
 // GetComments
 // ======================================================
@@ -110,6 +115,114 @@ export async function getComments(
   return {
     data: items,
     nextCursor: buildNextCursor(items, hasMore),
+  };
+}
+
+// ======================================================
+// GetCommentById
+// ======================================================
+
+export type GetCommentByIdInput = string;
+
+export type GetCommentByIdResponse = {
+  data: Comment | null;
+};
+
+export async function getCommentById(
+  id: GetCommentByIdInput,
+): Promise<GetCommentByIdResponse> {
+  "use cache";
+  cacheTag("comments", `comment-${id}`);
+
+  const supabase = createAdminClient();
+  const { data, error } = await supabase
+    .from("comments")
+    .select(COMMENT_SELECT)
+    .eq("id", id)
+    .maybeSingle();
+
+  if (error) throw error;
+
+  return {
+    data: (data as Comment | null) ?? null,
+  };
+}
+
+// ======================================================
+// GetCommentPermalinkContext
+// ======================================================
+
+export type GetCommentPermalinkContextInput = {
+  targetType: string;
+  targetId: string;
+  commentId: string;
+};
+
+export type GetCommentPermalinkContextResponse = {
+  data: CommentPermalinkContext | null;
+};
+
+export async function getCommentPermalinkContext(
+  input: GetCommentPermalinkContextInput,
+): Promise<GetCommentPermalinkContextResponse> {
+  "use cache";
+  cacheTag("comments", `comment-${input.commentId}`, `comments-${input.targetType}-${input.targetId}`);
+
+  const supabase = createAdminClient();
+  const { data: comment, error: commentError } = await supabase
+    .from("comments")
+    .select(COMMENT_SELECT)
+    .eq("id", input.commentId)
+    .maybeSingle();
+
+  if (commentError) throw commentError;
+  if (!comment) {
+    return { data: null };
+  }
+
+  const focusedComment = comment as Comment;
+  if (
+    focusedComment.target_type !== input.targetType
+    || focusedComment.target_id !== input.targetId
+  ) {
+    return { data: null };
+  }
+
+  const threadRootId = focusedComment.parent_id ?? focusedComment.id;
+  const idsToFetch = focusedComment.parent_id ? [threadRootId] : [];
+
+  const [rootResult, repliesResult] = await Promise.all([
+    idsToFetch.length > 0
+      ? supabase.from("comments").select(COMMENT_SELECT).in("id", idsToFetch)
+      : Promise.resolve({ data: [], error: null }),
+    supabase
+      .from("comments")
+      .select(COMMENT_SELECT)
+      .eq("target_type", input.targetType)
+      .eq("target_id", input.targetId)
+      .eq("parent_id", threadRootId)
+      .order("id", { ascending: true }),
+  ]);
+
+  if (rootResult.error) throw rootResult.error;
+  if (repliesResult.error) throw repliesResult.error;
+
+  const rootComment = focusedComment.parent_id
+    ? ((rootResult.data as Comment[] | null) ?? [])[0] ?? null
+    : focusedComment;
+
+  if (!rootComment) {
+    return { data: null };
+  }
+
+  const replies = ((repliesResult.data as Comment[] | null) ?? [])
+    .filter((reply) => reply.id !== rootComment.id);
+
+  return {
+    data: {
+      comment: focusedComment,
+      threadComments: [rootComment, ...replies],
+    },
   };
 }
 
@@ -296,6 +409,7 @@ export async function createComment(
 
   revalidateTag("comments", "max");
   revalidateTag("activity", "max");
+  revalidateTag(`comment-${data.id}`, "max");
   revalidateTag(`comments-${input.target_type}-${input.target_id}`, "max");
   revalidateTag(`${input.target_type}-${input.target_id}`, "max");
   if (input.target_type === "post") {
