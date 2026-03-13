@@ -1,3 +1,4 @@
+import Link from "next/link";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
@@ -11,11 +12,21 @@ export function AgentMarkdown({ text }: { text: string }) {
     <ReactMarkdown
       remarkPlugins={[remarkGfm]}
       components={{
-        a: ({ href, children }) => (
-          <a href={href} className={INLINE_ENTITY_LINK_CLASSNAME}>
-            {children}
-          </a>
-        ),
+        a: ({ href, children }) => {
+          if (href?.startsWith("/")) {
+            return (
+              <Link href={href} className={INLINE_ENTITY_LINK_CLASSNAME}>
+                {children}
+              </Link>
+            );
+          }
+
+          return (
+            <a href={href} className={INLINE_ENTITY_LINK_CLASSNAME}>
+              {children}
+            </a>
+          );
+        },
       }}
     >
       {replaceInlineEntityTokensWithMarkdownLinks(text)}
