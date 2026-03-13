@@ -1,11 +1,6 @@
 "use client";
 
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import Link from "next/link";
 import {
   ThumbsUp,
   ThumbsDown,
@@ -13,11 +8,10 @@ import {
   SmileyWink,
   ExclamationMark,
   ChatCircle,
-  ShareFat,
-  Link as LinkIcon,
 } from "@phosphor-icons/react";
 import type { ComponentType } from "react";
-import { toast } from "sonner";
+
+import { SharePill } from "@/components/platform/share-pill";
 
 type Reaction = {
   key: string;
@@ -35,10 +29,12 @@ type ReactionCounts = {
 
 export function EntityCardActions({
   shareUrl,
+  threadUrl,
   reactions,
   commentCount,
 }: {
   shareUrl: string;
+  threadUrl?: string;
   reactions?: ReactionCounts;
   commentCount: number;
 }) {
@@ -65,47 +61,46 @@ export function EntityCardActions({
       {allReactions ? (
         visible.length > 0 ? (
           visible.map((r) => (
-            <div key={r.key} className={pillClass}>
-              <r.icon className="size-3.5" />
-              <span>{r.count}</span>
-            </div>
+            threadUrl ? (
+              <Link key={r.key} href={threadUrl} className={interactivePillClass}>
+                <r.icon className="size-3.5" />
+                <span>{r.count}</span>
+              </Link>
+            ) : (
+              <div key={r.key} className={pillClass}>
+                <r.icon className="size-3.5" />
+                <span>{r.count}</span>
+              </div>
+            )
           ))
         ) : (
-          <div className={pillClass}>
-            <ThumbsUp className="size-3.5" />
-            <span>{totalReactions}</span>
-          </div>
+          threadUrl ? (
+            <Link href={threadUrl} className={interactivePillClass}>
+              <ThumbsUp className="size-3.5" />
+              <span>{totalReactions}</span>
+            </Link>
+          ) : (
+            <div className={pillClass}>
+              <ThumbsUp className="size-3.5" />
+              <span>{totalReactions}</span>
+            </div>
+          )
         )
       ) : null}
 
-      <div className={pillClass}>
-        <ChatCircle className="size-3.5" />
-        <span>{commentCount}</span>
-      </div>
+      {threadUrl ? (
+        <Link href={threadUrl} className={interactivePillClass}>
+          <ChatCircle className="size-3.5" />
+          <span>{commentCount}</span>
+        </Link>
+      ) : (
+        <div className={pillClass}>
+          <ChatCircle className="size-3.5" />
+          <span>{commentCount}</span>
+        </div>
+      )}
 
-      <DropdownMenu>
-        <DropdownMenuTrigger
-          render={
-            <button className={interactivePillClass}>
-              <ShareFat className="size-3.5" />
-              <span>Share</span>
-            </button>
-          }
-        />
-        <DropdownMenuContent align="start">
-          <DropdownMenuItem
-            onClick={() => {
-              navigator.clipboard.writeText(
-                `${window.location.origin}${shareUrl}`,
-              );
-              toast.success("Link copied to clipboard");
-            }}
-          >
-            <LinkIcon className="size-4" />
-            Copy link
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+      <SharePill shareUrl={shareUrl} />
     </div>
   );
 }

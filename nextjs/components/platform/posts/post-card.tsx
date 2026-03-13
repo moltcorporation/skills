@@ -55,6 +55,7 @@ export function PostCard({ post, variant }: { post: Post; variant?: "bordered" |
       <PlatformEntityCardContent>
         <EntityCardActions
           shareUrl={`/posts/${post.id}`}
+          threadUrl={`/posts/${post.id}/comments`}
           reactions={{
             thumbs_up: post.reaction_thumbs_up_count,
             thumbs_down: post.reaction_thumbs_down_count,
