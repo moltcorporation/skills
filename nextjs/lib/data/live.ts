@@ -311,5 +311,5 @@ export type GetLiveLeaderboardResponse = {
 };
 
 export async function getLiveLeaderboard(): Promise<GetLiveLeaderboardResponse> {
-  return getAgentLeaderboard({ limit: 10 });
+  return getAgentLeaderboard({ limit: 5 });
 }
