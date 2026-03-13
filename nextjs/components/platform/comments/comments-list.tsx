@@ -1,14 +1,12 @@
 "use client";
 
-import Link from "next/link";
 import {
-  ArrowSquareOut,
   MagnifyingGlass,
   SpinnerGap,
   ChatCircle,
 } from "@phosphor-icons/react";
 import { useParams } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { CommentItem } from "@/components/platform/comments/comment-item";
 import { CommentsListSkeleton } from "@/components/platform/comments/comments-list-skeleton";
@@ -34,7 +32,6 @@ export function CommentsList({
 }) {
   const params = useParams<{ id: string }>();
   const targetId = targetIdProp ?? params.id;
-  const threadHref = `/${targetType === "post" ? "posts" : targetType === "vote" ? "votes" : "tasks"}/${targetId}/comments`;
 
   const {
     filters,
@@ -53,11 +50,21 @@ export function CommentsList({
     initialData,
   });
 
-  // Group comments: top-level first, replies nested under parent
-  const focusedCommentIds = new Set((focusedThreadComments ?? []).map((comment) => comment.id));
-  const filteredComments = comments.filter((comment) => !focusedCommentIds.has(comment.id));
-  const { topLevel, repliesByParent } = groupComments(filteredComments);
-  const focusedThreads = focusedThreadComments ? groupComments(focusedThreadComments) : null;
+  const hasScrolledToFocusedComment = useRef(false);
+  const mergedComments = mergeFocusedComments(comments, focusedThreadComments);
+  const { topLevel, repliesByParent } = groupComments(mergedComments);
+
+  useEffect(() => {
+    if (!focusedCommentId || hasScrolledToFocusedComment.current) return;
+
+    const element = document.getElementById(`comment-${focusedCommentId}`);
+    if (!element) return;
+
+    hasScrolledToFocusedComment.current = true;
+    requestAnimationFrame(() => {
+      element.scrollIntoView({ block: "center" });
+    });
+  }, [focusedCommentId, mergedComments]);
 
   return (
     <div className="space-y-2">
@@ -90,54 +97,20 @@ export function CommentsList({
           No comments yet.
         </div>
       ) : (
-        <div className="space-y-6">
-          {focusedThreads && focusedThreads.topLevel.length > 0 && (
-            <section className="rounded-lg border border-border/80 bg-muted/20 p-4">
-              <div className="mb-4 flex items-center justify-between gap-3">
-                <div>
-                  <h2 className="text-sm font-medium text-foreground">Linked comment</h2>
-                  <p className="text-xs text-muted-foreground">
-                    Guaranteed context for the shared comment, even when it is not in the latest page of the thread.
-                  </p>
-                </div>
-                <Link
-                  href={threadHref}
-                  className="inline-flex items-center gap-1 text-xs text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
-                >
-                  <ArrowSquareOut className="size-3" />
-                  Latest comments
-                </Link>
-              </div>
-              <div className="divide-y divide-border">
-                {focusedThreads.topLevel.map((comment) => (
-                  <CommentWithReplies
-                    key={`focused-${comment.id}`}
-                    comment={comment}
-                    targetType={targetType}
-                    targetId={targetId}
-                    replies={focusedThreads.repliesByParent.get(comment.id) ?? []}
-                    focusedCommentId={focusedCommentId}
-                  />
-                ))}
-              </div>
-            </section>
-          )}
-
-          <div className="divide-y divide-border">
-            {topLevel.map((comment) => {
-              const replies = repliesByParent.get(comment.id) ?? [];
-              return (
-                <CommentWithReplies
-                  key={comment.id}
-                  comment={comment}
-                  targetType={targetType}
-                  targetId={targetId}
-                  replies={replies}
-                  focusedCommentId={focusedCommentId}
-                />
-              );
-            })}
-          </div>
+        <div className="divide-y divide-border">
+          {topLevel.map((comment) => {
+            const replies = repliesByParent.get(comment.id) ?? [];
+            return (
+              <CommentWithReplies
+                key={comment.id}
+                comment={comment}
+                targetType={targetType}
+                targetId={targetId}
+                replies={replies}
+                focusedCommentId={focusedCommentId}
+              />
+            );
+          })}
         </div>
       )}
 
@@ -209,4 +182,24 @@ function groupComments(items: Comment[]) {
   }
 
   return { topLevel, repliesByParent };
+}
+
+function mergeFocusedComments(
+  comments: Comment[],
+  focusedThreadComments?: Comment[],
+) {
+  if (!focusedThreadComments || focusedThreadComments.length === 0) {
+    return comments;
+  }
+
+  const existingIds = new Set(comments.map((comment) => comment.id));
+  const missingFocusedComments = focusedThreadComments.filter(
+    (comment) => !existingIds.has(comment.id),
+  );
+
+  if (missingFocusedComments.length === 0) {
+    return comments;
+  }
+
+  return [...comments, ...missingFocusedComments];
 }
