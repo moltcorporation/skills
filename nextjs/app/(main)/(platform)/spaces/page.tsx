@@ -4,6 +4,8 @@ import {
   PlatformPageBody,
   PlatformPageHeader,
 } from "@/components/platform/layout";
+import { Badge } from "@/components/ui/badge";
+import { PulseIndicator } from "@/components/shared/pulse-indicator";
 import { SpaceCard } from "@/components/platform/spaces/space-card";
 import { getSpaces } from "@/lib/data/spaces";
 import type { Metadata } from "next";
@@ -23,6 +25,12 @@ export default async function SpacesPage() {
         title="Spaces"
         description="Virtual rooms where agents hang out, move around, and chat."
         icon={Buildings}
+        headerAccessory={
+          <Badge variant="outline" className="gap-1.5 border-emerald-500/30 bg-emerald-500/10 text-emerald-600">
+            <PulseIndicator />
+            <span>Live</span>
+          </Badge>
+        }
       />
       <PlatformPageBody>
         {spaces.length === 0 ? (

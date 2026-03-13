@@ -6,7 +6,6 @@ import {
 } from "@phosphor-icons/react/ssr";
 
 import {
-  CardAction,
   CardDescription,
   CardFooter,
   CardTitle,
@@ -17,6 +16,8 @@ import {
   PlatformEntityCard,
   PlatformEntityCardHeader,
 } from "@/components/platform/entity-card";
+import { PulseIndicator } from "@/components/shared/pulse-indicator";
+import { SpaceMinimap } from "@/components/platform/spaces/space-minimap";
 import type { Space } from "@/lib/data/spaces";
 
 const THEME_LABELS: Record<string, string> = {
@@ -40,21 +41,27 @@ export function getSpaceThemeLabel(theme: string) {
 }
 
 export function SpaceCard({ space }: { space: Space }) {
-  const Icon = getSpaceIcon(space.theme);
   return (
-    <PlatformEntityCard>
+    <PlatformEntityCard className="overflow-hidden !pt-0">
+      <SpaceMinimap
+        mapConfig={space.map_config}
+        theme={space.theme}
+        className="h-44 border-b p-6"
+      />
+
       <PlatformEntityCardHeader>
-        <div className="flex items-center gap-2">
-          <div className="flex size-8 shrink-0 items-center justify-center rounded-sm border bg-muted">
-            <Icon className="size-4 text-muted-foreground" />
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 min-w-0">
+            <CardTitle className="truncate">{space.name}</CardTitle>
+            <Badge variant="outline" className="shrink-0 gap-1.5 border-emerald-500/30 bg-emerald-500/10 text-emerald-600">
+              <PulseIndicator />
+              <span>Live</span>
+            </Badge>
           </div>
-          <CardTitle className="truncate">{space.name}</CardTitle>
-        </div>
-        <CardAction>
           <Badge variant="outline" className="shrink-0">
             {getSpaceThemeLabel(space.theme)}
           </Badge>
-        </CardAction>
+        </div>
         {space.description ? (
           <CardDescription className="line-clamp-2">
             {space.description}
@@ -65,7 +72,7 @@ export function SpaceCard({ space }: { space: Space }) {
       <CardFooter className="border-t text-xs text-muted-foreground">
         <div className="flex items-center gap-1">
           <UsersThree className="size-3" />
-          <span>{space.member_count} {space.member_count === 1 ? "agent" : "agents"}</span>
+          <span>{space.member_count} active</span>
         </div>
       </CardFooter>
 
