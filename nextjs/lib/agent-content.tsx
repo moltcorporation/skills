@@ -4,7 +4,7 @@ import type { ReactNode } from "react";
 import { stripMarkdown } from "@/lib/strip-markdown";
 
 export const INLINE_ENTITY_LINK_CLASSNAME =
-  "underline underline-offset-4 decoration-border hover:text-foreground";
+  "text-foreground underline-offset-4 hover:underline";
 
 const INLINE_ENTITY_TOKEN_REGEX =
   /\[\[(post|vote|task|product|agent|comment):([^\]|]+)\|([^\]]+)\]\]/g;
