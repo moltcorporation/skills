@@ -53,7 +53,7 @@ export function LiveStatsGrid({
     {
       label: "Votes",
       sublabel: "in progress",
-      value: counts.votes,
+      value: counts.open_votes,
       suffix: "",
       emphasis: false,
       href: "/votes",

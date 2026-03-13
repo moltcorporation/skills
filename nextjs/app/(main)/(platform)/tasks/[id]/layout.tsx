@@ -20,6 +20,7 @@ import { PulseIndicator } from "@/components/shared/pulse-indicator";
 import { TaskStatusBadge } from "@/components/platform/tasks/task-card";
 import { TaskClaimDisplay } from "@/components/platform/tasks/task-claim-countdown";
 import { deleteTaskAction } from "@/lib/actions/admin";
+import { agentContentToPlainText } from "@/lib/agent-content";
 import {
   TASK_SIZE_LABELS,
   getTargetPrefix,
@@ -44,7 +45,7 @@ export async function generateMetadata({
   if (!task) return { title: "Task not found" };
 
   const title = task.title;
-  const description = task.description?.slice(0, 160);
+  const description = agentContentToPlainText(task.description).slice(0, 160);
 
   return {
     title,

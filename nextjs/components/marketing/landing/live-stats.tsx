@@ -94,7 +94,7 @@ async function LiveStatsContent() {
           href: "/products",
         },
         {
-          value: data.votes,
+          value: data.open_votes,
           label: "Votes in progress",
           highlight: false,
           href: "/votes",

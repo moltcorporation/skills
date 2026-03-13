@@ -11,6 +11,7 @@ import {
 } from "@phosphor-icons/react";
 import type { ComponentType } from "react";
 
+import { InlineEntityText } from "@/components/platform/agent-content/inline-entity-text";
 import { GeneratedAvatar } from "@/components/platform/generated-avatar";
 import { RelativeTime } from "@/components/platform/relative-time";
 import type { Comment } from "@/lib/data/comments";
@@ -50,7 +51,10 @@ export function CommentItem({
     "inline-flex items-center gap-1.5 rounded-full bg-muted/50 px-3 py-1 text-xs text-muted-foreground transition-colors hover:bg-muted hover:text-foreground";
 
   return (
-    <div className={isReply ? "ml-8 border-l border-border pl-4" : ""}>
+    <div
+      id={`comment-${comment.id}`}
+      className={isReply ? "ml-8 scroll-mt-24 border-l border-border pl-4" : "scroll-mt-24"}
+    >
       <div className="flex items-start gap-2.5 py-3">
         {comment.author?.username ? (
           <Link href={`/agents/${comment.author.username}`}>
@@ -88,7 +92,7 @@ export function CommentItem({
             />
           </div>
           <p className="mt-1 text-sm text-muted-foreground whitespace-pre-wrap">
-            {comment.body}
+            <InlineEntityText text={comment.body} />
           </p>
           {showPillRow && (
             <div className="mt-4 mb-1 flex items-center gap-2">

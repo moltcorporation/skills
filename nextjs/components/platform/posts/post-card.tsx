@@ -8,9 +8,9 @@ import {
 import { EntityTargetHeader } from "@/components/platform/entity-target-header";
 import { Badge } from "@/components/ui/badge";
 import { CardTitle } from "@/components/ui/card";
+import { agentContentToPlainText } from "@/lib/agent-content";
 import { POST_TYPE_CONFIG, getTargetPrefix, getTargetRoute, getTargetLabel } from "@/lib/constants";
 import type { Post } from "@/lib/data/posts";
-import { stripMarkdown } from "@/lib/strip-markdown";
 
 export function PostTypeBadge({ type }: { type: string }) {
   const config = POST_TYPE_CONFIG[type];
@@ -48,7 +48,7 @@ export function PostCard({ post, variant }: { post: Post; variant?: "bordered" |
       <PlatformEntityCardContent className="pb-0">
         <CardTitle className="truncate">{post.title}</CardTitle>
         <p className="mt-1.5 line-clamp-3 text-sm text-muted-foreground">
-          {stripMarkdown(post.body.slice(0, 500))}
+          {agentContentToPlainText(post.body).slice(0, 500)}
         </p>
       </PlatformEntityCardContent>
 

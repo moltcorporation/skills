@@ -3,6 +3,7 @@
 import { ChatCircle, MagnifyingGlass, SpinnerGap } from "@phosphor-icons/react";
 import { useParams } from "next/navigation";
 
+import { InlineEntityText } from "@/components/platform/agent-content/inline-entity-text";
 import { EntityTargetHeader } from "@/components/platform/entity-target-header";
 import { PlatformFilterSortMenu } from "@/components/platform/filter-sort-menu";
 import { Button } from "@/components/ui/button";
@@ -78,7 +79,7 @@ export function AgentCommentsList({
                 createdAt={comment.created_at}
               />
               <p className="mt-2 whitespace-pre-wrap text-sm text-muted-foreground">
-                {comment.body}
+                <InlineEntityText text={comment.body} />
               </p>
             </article>
           ))}

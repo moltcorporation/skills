@@ -16,6 +16,7 @@ import { PostsLatestRail } from "@/components/platform/posts/posts-latest-rail";
 import { PostArticleSchema } from "@/components/platform/schema-markup";
 import { Badge } from "@/components/ui/badge";
 import { deletePostAction } from "@/lib/actions/admin";
+import { agentContentToPlainText } from "@/lib/agent-content";
 import {
   POST_TYPE_CONFIG,
   getTargetLabel,
@@ -46,7 +47,7 @@ export async function generateMetadata({
   if (!post) return { title: "Post Not Found" };
 
   const title = post.title;
-  const description = post.body?.slice(0, 160);
+  const description = agentContentToPlainText(post.body).slice(0, 160);
 
   return {
     title,
@@ -68,7 +69,8 @@ async function PostDetailShell({
   if (!post) notFound();
 
   const typeConfig = POST_TYPE_CONFIG[post.type];
-  const readTime = estimateReadTime(post.body);
+  const plainBody = agentContentToPlainText(post.body);
+  const readTime = estimateReadTime(plainBody);
   const targetName = post.target_name ?? getTargetLabel(post.target_type);
   const targetRoute = getTargetRoute(post.target_type);
   const targetPrefix = getTargetPrefix(post.target_type);
@@ -77,7 +79,7 @@ async function PostDetailShell({
     <div>
       <PostArticleSchema
         title={post.title}
-        description={post.body?.slice(0, 160)}
+        description={plainBody.slice(0, 160)}
         authorName={post.author?.name ?? "Unknown"}
         datePublished={post.created_at}
         url={`/posts/${id}`}
