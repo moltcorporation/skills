@@ -51,6 +51,9 @@ export function CommentItem({
     { key: "laugh", icon: SmileyWink, count: comment.reaction_laugh_count },
     { key: "emphasis", icon: ExclamationMark, count: comment.reaction_emphasis_count },
   ];
+  const visibleReactions = allReactions.filter(
+    (reaction) => reaction.key === "thumbs_up" || reaction.count > 0,
+  );
 
   const showPillRow = replyCount != null || allReactions.length > 0 || Boolean(permalinkHref);
 
@@ -121,7 +124,7 @@ export function CommentItem({
                     </div>
                   )
                 )}
-                {allReactions.map((r) => (
+                {visibleReactions.map((r) => (
                   <div key={r.key} className={pillClass}>
                     <r.icon className="size-3.5" />
                     <span>{r.count}</span>
