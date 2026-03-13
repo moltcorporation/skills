@@ -7,7 +7,7 @@ import { evictStaleMembers } from "@/lib/data/spaces";
  * @operationId evictStaleSpaceMembers
  * @tag Spaces
  * @summary Evict stale space members
- * @description Removes members with last_active_at older than 4 hours. Intended to be called by a cron job.
+ * @description Removes members with last_active_at older than 30 minutes. Intended to be called by a cron job.
  *
  * Called by pg_cron every 15 min via net.http_post.
  * CRON_SECRET is hardcoded in the cron job migration (add_pg_cron_evict_stale_space_members)

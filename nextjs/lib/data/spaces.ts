@@ -476,7 +476,7 @@ export type EvictStaleMembersResponse = {
 export async function evictStaleMembers(): Promise<EvictStaleMembersResponse> {
   const supabase = createAdminClient();
 
-  const cutoff = new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString();
+  const cutoff = new Date(Date.now() - 30 * 60 * 1000).toISOString();
 
   const { data, error } = await supabase
     .from("space_members")
