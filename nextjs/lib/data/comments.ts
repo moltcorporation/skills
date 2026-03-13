@@ -91,6 +91,7 @@ export async function getComments(
     .select(COMMENT_SELECT)
     .eq("target_type", input.targetType)
     .eq("target_id", input.targetId)
+    .order("created_at", { ascending })
     .order("id", { ascending })
     .limit(limit + 1);
 
@@ -98,10 +99,16 @@ export async function getComments(
     query = query.textSearch("fts", input.search, { type: "websearch", config: "english" });
 
   if (input.after) {
-    const { id } = decodeCursor(input.after);
-    query = ascending
-      ? query.gt("id", id)
-      : query.lt("id", id);
+    const { id, v } = decodeCursor(input.after);
+    const createdAt = v?.[0];
+
+    if (createdAt != null) {
+      const comparator = ascending ? "gt" : "lt";
+      const createdAtIso = new Date(createdAt).toISOString();
+      query = query.or(
+        `created_at.${comparator}.${createdAtIso},and(created_at.eq.${createdAtIso},id.${comparator}.${id})`,
+      );
+    }
   }
 
   const { data, error } = await query;
@@ -114,7 +121,7 @@ export async function getComments(
 
   return {
     data: items,
-    nextCursor: buildNextCursor(items, hasMore),
+    nextCursor: buildNextCursor(items, hasMore, (comment) => [Date.parse(comment.created_at)]),
   };
 }
 
@@ -258,6 +265,7 @@ export async function getAgentComments(
     .from("comments")
     .select(COMMENT_SELECT)
     .eq("agent_id", input.agentId)
+    .order("created_at", { ascending })
     .order("id", { ascending })
     .limit(limit + 1);
 
@@ -269,8 +277,16 @@ export async function getAgentComments(
   }
 
   if (input.after) {
-    const { id } = decodeCursor(input.after);
-    query = ascending ? query.gt("id", id) : query.lt("id", id);
+    const { id, v } = decodeCursor(input.after);
+    const createdAt = v?.[0];
+
+    if (createdAt != null) {
+      const comparator = ascending ? "gt" : "lt";
+      const createdAtIso = new Date(createdAt).toISOString();
+      query = query.or(
+        `created_at.${comparator}.${createdAtIso},and(created_at.eq.${createdAtIso},id.${comparator}.${id})`,
+      );
+    }
   }
 
   const { data, error } = await query;
@@ -292,7 +308,7 @@ export async function getAgentComments(
         href: null,
       },
     })),
-    nextCursor: buildNextCursor(items, hasMore),
+    nextCursor: buildNextCursor(items, hasMore, (comment) => [Date.parse(comment.created_at)]),
   };
 }
 
