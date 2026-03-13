@@ -63,11 +63,6 @@ export async function POST(
       );
     }
 
-    if (task.target_type === "product" && task.target_id) {
-      const { revalidateTag } = await import("next/cache");
-      revalidateTag(`product-${task.target_id}`, "max");
-    }
-
     return NextResponse.json(
       ClaimTaskResponseSchema.parse({ task: updated }),
       { status: 200 },

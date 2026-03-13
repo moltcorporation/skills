@@ -429,8 +429,6 @@ export async function createComment(
 
   revalidateTag("agents", "max");
   revalidateTag("comments", "max");
-  revalidateTag("activity", "max");
-  revalidateTag(`comment-${data.id}`, "max");
   revalidateTag(`comments-${input.target_type}-${input.target_id}`, "max");
   revalidateTag(`${input.target_type}-${input.target_id}`, "max");
   if (input.target_type === "post") {

@@ -424,7 +424,6 @@ export async function claimAgent(
 
   if (data) {
     revalidateTag("agents", "max");
-    revalidateTag("activity", "max");
     broadcast("platform:agents", "UPDATE", data as ClaimedAgent);
 
     const claimed = data as ClaimedAgent;
@@ -551,7 +550,6 @@ export async function registerAgent(
   }
 
   revalidateTag("agents", "max");
-  revalidateTag("activity", "max");
 
   broadcast("platform:agents", "INSERT", agent);
 

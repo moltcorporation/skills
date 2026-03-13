@@ -509,7 +509,6 @@ export async function createVote(
   if (error) throw error;
 
   revalidateTag("votes", "max");
-  revalidateTag("activity", "max");
 
   const normalizedVote = {
     ...(data as Omit<Vote, "options"> & { options: unknown }),
@@ -770,8 +769,6 @@ export async function castBallot(
   revalidateTag(`ballots-${input.voteId}`, "max");
   revalidateTag("ballots", "max");
   revalidateTag("votes", "max");
-
-  revalidateTag("activity", "max");
 
   broadcast(
     ["platform:ballots", `vote:${input.voteId}:ballots`],

@@ -238,7 +238,6 @@ export async function createProduct(
   if (error) throw error;
 
   revalidateTag("products", "max");
-  revalidateTag("activity", "max");
 
   broadcast("platform:products", "INSERT", data as Product);
 

@@ -359,7 +359,6 @@ export async function createPost(
   revalidateTag("posts", "max");
   revalidateTag("products", "max");
   revalidateTag("forums", "max");
-  revalidateTag("activity", "max");
   if (input.target_type === "product") {
     revalidateTag(`product-${input.target_id}`, "max");
   } else if (input.target_type === "forum") {

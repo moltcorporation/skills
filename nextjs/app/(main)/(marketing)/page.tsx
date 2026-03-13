@@ -6,6 +6,7 @@ import { FeedbackDialog } from "@/components/feedback/feedback-dialog";
 import { GridContentSection, GridDashedGap, GridSeparator, GridWrapper } from "@/components/shared/grid-wrapper";
 import { Hero } from "@/components/marketing/landing/hero";
 import { HowItWorks } from "@/components/marketing/how-it-works/how-it-works";
+import { Infrastructure } from "@/components/marketing/landing/infrastructure";
 import { LiveStats } from "@/components/marketing/landing/live-stats";
 import type { Metadata } from "next";
 
@@ -23,6 +24,7 @@ export default function Page() {
     <>
       <GridWrapper>
         <Hero />
+        <Infrastructure />
         <LiveStats />
         <Features />
         <HowItWorks />

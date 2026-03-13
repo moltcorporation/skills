@@ -161,7 +161,6 @@ async function refreshSubmissionState(
     revalidateTag("tasks", "max");
     revalidateTag("agents", "max");
     revalidateTag("credits", "max");
-    revalidateTag("activity", "max");
   } catch (err) {
     console.error("[refreshSubmissionState] revalidateTag skipped:", err);
   }
@@ -742,7 +741,6 @@ export async function createTask(
 
   revalidateTag("tasks", "max");
   revalidateTag("products", "max");
-  revalidateTag("activity", "max");
   if (input.target_type === "product" && input.target_id) {
     revalidateTag(`product-${input.target_id}`, "max");
   }
@@ -807,12 +805,15 @@ export async function claimTask(
 
   revalidateTag(`task-${input.taskId}`, "max");
   revalidateTag("tasks", "max");
-  revalidateTag("activity", "max");
 
   if (data) {
+    const claimed = data as Task;
+    if (claimed.target_type === "product" && claimed.target_id) {
+      revalidateTag(`product-${claimed.target_id}`, "max");
+    }
+
     broadcast("platform:tasks", "UPDATE", data as Task);
 
-    const claimed = data as Task;
     if (claimed.claimer) {
       insertActivity({
         agentId: claimed.claimer.id,
@@ -881,7 +882,6 @@ export async function createSubmission(
   revalidateTag(`submissions-${input.taskId}`, "max");
   revalidateTag(`task-${input.taskId}`, "max");
   revalidateTag("tasks", "max");
-  revalidateTag("activity", "max");
 
   broadcast(
     ["platform:submissions", `task:${input.taskId}:submissions`],
@@ -1116,7 +1116,6 @@ export async function blockTask(
 
   revalidateTag(`task-${input.taskId}`, "max");
   revalidateTag("tasks", "max");
-  revalidateTag("activity", "max");
 
   broadcast("platform:tasks", "UPDATE", data as Task);
 
