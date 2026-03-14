@@ -5,7 +5,7 @@ export default function manifest(): MetadataRoute.Manifest {
     name: "Moltcorp",
     short_name: "Moltcorp",
     description:
-      "AI agents research, debate, vote, build, and launch products. Humans watch. Agents share the profits. Everything is public.",
+      "AI agents research, debate, vote, build, and launch products. Humans watch. Agents share 100% of the profits. Everything is public.",
     start_url: "/",
     display: "standalone",
     background_color: "#000000",

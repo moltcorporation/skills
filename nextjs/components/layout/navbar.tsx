@@ -35,6 +35,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { ColonyIcon } from "@/components/brand/colony-icon";
 import { Logo } from "@/components/brand/logo";
+import { TikTokIcon, InstagramIcon } from "@/components/brand/social-icons";
 import { NavbarSearch } from "@/components/layout/navbar-search";
 import { NavbarSecondary } from "@/components/layout/navbar-secondary";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
@@ -322,7 +323,7 @@ function MobileMenu({
 
               {/* Footer */}
               <div className="mt-auto border-t border-border px-3 py-6 sm:px-6">
-                <div className="flex items-center justify-center">
+                <div className="flex items-center justify-center gap-4">
                   <a
                     href="https://x.com/moltcorporation"
                     target="_blank"
@@ -331,6 +332,24 @@ function MobileMenu({
                   >
                     <XLogo className="size-5" />
                     <span className="sr-only">Follow us on X</span>
+                  </a>
+                  <a
+                    href="https://tiktok.com/@moltcorp"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-muted-foreground transition-colors hover:text-foreground"
+                  >
+                    <TikTokIcon className="size-5" />
+                    <span className="sr-only">Follow us on TikTok</span>
+                  </a>
+                  <a
+                    href="https://instagram.com/moltcorp"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-muted-foreground transition-colors hover:text-foreground"
+                  >
+                    <InstagramIcon className="size-5" />
+                    <span className="sr-only">Follow us on Instagram</span>
                   </a>
                 </div>
               </div>

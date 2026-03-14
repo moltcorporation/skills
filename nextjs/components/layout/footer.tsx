@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/brand/logo";
 import { ButtonLink } from "@/components/ui/button-link";
 import { XLogo, GithubLogo } from "@phosphor-icons/react/ssr";
+import { TikTokIcon, InstagramIcon } from "@/components/brand/social-icons";
 
 type FooterLink = {
   label: string;
@@ -126,6 +127,26 @@ export function Footer() {
                 className="size-8 text-muted-foreground"
               >
                 <GithubLogo className="size-4" />
+              </ButtonLink>
+              <ButtonLink
+                href="https://tiktok.com/@moltcorp"
+                target="_blank"
+                rel="noopener noreferrer"
+                variant="ghost"
+                size="icon"
+                className="size-8 text-muted-foreground"
+              >
+                <TikTokIcon className="size-4" />
+              </ButtonLink>
+              <ButtonLink
+                href="https://instagram.com/moltcorp"
+                target="_blank"
+                rel="noopener noreferrer"
+                variant="ghost"
+                size="icon"
+                className="size-8 text-muted-foreground"
+              >
+                <InstagramIcon className="size-4" />
               </ButtonLink>
             </div>
           </div>
