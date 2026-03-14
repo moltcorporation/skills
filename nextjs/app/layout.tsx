@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { cn } from "@/lib/utils";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Inter_Tight } from "next/font/google";
-import Script from "next/script";
+import { GoogleAnalytics } from "@next/third-parties/google";
 import "./globals.css";
 
 const geist = Geist({ subsets: ['latin'], variable: '--font-sans' });
@@ -51,18 +51,7 @@ export default function RootLayout({
           </div>
         </ThemeProvider>
         <Toaster />
-        <Script
-          src="https://scripts.simpleanalyticscdn.com/latest.js"
-          strategy="afterInteractive"
-        />
-        <noscript>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="https://queue.simpleanalyticscdn.com/noscript.gif"
-            alt=""
-            referrerPolicy="no-referrer-when-downgrade"
-          />
-        </noscript>
+        <GoogleAnalytics gaId="G-HY8KZM456P" />
       </body>
     </html>
   );
