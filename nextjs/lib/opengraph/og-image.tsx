@@ -507,6 +507,92 @@ export async function createIphoneWallpaperImage(): Promise<ImageResponse> {
   );
 }
 
+export async function createDesktopWallpaperNoLogoImage(): Promise<ImageResponse> {
+  const width = 3456;
+  const height = 2234;
+
+  const [asciiArt, fonts] = await Promise.all([
+    Promise.resolve(
+      generateAsciiArt("moltcorp-desktop-wallpaper", {
+        cols: 380,
+        rows: 130,
+      }),
+    ),
+    loadFonts(),
+  ]);
+
+  return new ImageResponse(
+    (
+      <div
+        style={{
+          width: "100%",
+          height: "100%",
+          display: "flex",
+          backgroundColor: "#0a0a0a",
+          position: "relative",
+        }}
+      >
+        <div
+          style={{
+            position: "absolute",
+            top: -140,
+            left: -120,
+            right: -200,
+            bottom: -140,
+            display: "flex",
+            color: "rgba(250, 250, 250, 0.12)",
+            fontSize: "18px",
+            lineHeight: "22px",
+            fontFamily: "Geist Mono",
+            fontWeight: 600,
+            whiteSpace: "pre",
+            overflow: "hidden",
+            transform: "scale(1.08)",
+          }}
+        >
+          {asciiArt}
+        </div>
+
+        <div
+          style={{
+            position: "absolute",
+            top: 56,
+            left: 56,
+            right: 56,
+            bottom: 56,
+            border: "1px solid rgba(250, 250, 250, 0.14)",
+            display: "flex",
+          }}
+        />
+
+        {[
+          { top: 53, left: 53 },
+          { top: 53, right: 53 },
+          { bottom: 53, left: 53 },
+          { bottom: 53, right: 53 },
+        ].map((pos, i) => (
+          <div
+            key={i}
+            style={{
+              position: "absolute",
+              width: 7,
+              height: 7,
+              borderRadius: "50%",
+              backgroundColor: "rgba(250, 250, 250, 0.22)",
+              ...pos,
+            }}
+          />
+        ))}
+      </div>
+    ),
+    {
+      width,
+      height,
+      fonts,
+    },
+  );
+}
+
 export async function createDesktopWallpaperImage(): Promise<ImageResponse> {
   const width = 3456;
   const height = 2234;
@@ -514,8 +600,8 @@ export async function createDesktopWallpaperImage(): Promise<ImageResponse> {
   const [asciiArt, fonts] = await Promise.all([
     Promise.resolve(
       generateAsciiArt("moltcorp-desktop-wallpaper", {
-        cols: 280,
-        rows: 110,
+        cols: 380,
+        rows: 130,
       }),
     ),
     loadFonts(),

@@ -1,5 +1,7 @@
 import { Resend } from "resend";
 import { NextResponse } from "next/server";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { slackLog } from "@/lib/slack";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -23,12 +25,20 @@ export async function POST(request: Request) {
       );
     }
 
-    await resend.emails.send({
-      from: "Waitlist <waitlist@moltcorporation.com>",
-      to: "stuart@stuartsworld.com",
-      subject: "New waitlist signup",
-      text: `New waitlist signup: ${email}`,
-    });
+    const admin = createAdminClient();
+
+    await Promise.all([
+      admin
+        .from("email_subscribers")
+        .upsert({ email, source: "landing_page" }, { onConflict: "email" }),
+      resend.emails.send({
+        from: "Waitlist <waitlist@moltcorporation.com>",
+        to: "stuart@stuartsworld.com",
+        subject: "New waitlist signup",
+        text: `New waitlist signup: ${email}`,
+      }),
+      slackLog(`📬 New email subscriber: ${email}`),
+    ]);
 
     return NextResponse.json({ success: true });
   } catch (err) {

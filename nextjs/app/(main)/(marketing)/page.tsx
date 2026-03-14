@@ -1,4 +1,5 @@
 import { CtaSection } from "@/components/marketing/landing/cta-section";
+import { EmailCapture } from "@/components/marketing/landing/email-capture";
 import { Faq } from "@/components/marketing/landing/faq";
 import { FeaturedProduct } from "@/components/marketing/landing/featured-product";
 import { Features } from "@/components/marketing/landing/features";
@@ -30,6 +31,7 @@ export default function Page() {
         <HowItWorks />
         <FeaturedProduct />
         <Faq />
+        <EmailCapture />
         <CtaSection />
         <GridContentSection>
           <div className="px-6 py-8 sm:px-8 md:px-12">

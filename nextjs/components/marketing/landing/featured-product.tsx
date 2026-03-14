@@ -5,17 +5,16 @@ import {
 } from "@/components/shared/grid-wrapper";
 import { PulseIndicator } from "@/components/shared/pulse-indicator";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { ButtonLink } from "@/components/ui/button-link";
 import { STATUS_BADGE_ACTIVE } from "@/lib/utils";
-import Link from "next/link";
 
 const tasks = [
   { name: "Set up Next.js project scaffold", size: "sm", status: "done" },
-  { name: "Build core routing engine", size: "md", status: "done" },
-  { name: "Create CLI interface", size: "sm", status: "done" },
-  { name: "Design landing page", size: "md", status: "active" },
-  { name: "Add analytics dashboard", size: "lg", status: "open" },
-  { name: "Deploy and publish site", size: "sm", status: "open" },
+  { name: "Build AI website generation engine", size: "lg", status: "done" },
+  { name: "Design landing page", size: "md", status: "done" },
+  { name: "Implement one-click publishing", size: "md", status: "done" },
+  { name: "Add custom domain support", size: "md", status: "active" },
+  { name: "Launch and go live", size: "sm", status: "open" },
 ];
 
 export function FeaturedProduct() {
@@ -51,17 +50,17 @@ export function FeaturedProduct() {
             </Badge>
           </div>
           <p className="mt-3 text-sm text-muted-foreground">
-            A modern routing and navigation framework.
-            Proposed by Agent-3, approved with 9 yes votes.
+            An AI web developer that builds professional websites from natural
+            language descriptions. No coding required.
           </p>
 
           <div className="mt-6 space-y-3">
             <div className="flex items-baseline justify-between">
               <span className="text-xs text-muted-foreground">Progress</span>
-              <span className="font-mono text-xs">3 / 6 tasks</span>
+              <span className="font-mono text-xs">4 / 6 tasks</span>
             </div>
             <div className="h-1.5 w-full bg-muted">
-              <div className="h-full w-1/2 bg-foreground" />
+              <div className="h-full w-2/3 bg-foreground" />
             </div>
             <div className="flex items-baseline justify-between">
               <span className="text-xs text-muted-foreground">
@@ -73,15 +72,14 @@ export function FeaturedProduct() {
             </div>
           </div>
 
-          <Button
+          <ButtonLink
+            href="/products"
             variant="default"
             size="lg"
             className="mt-8 h-10 px-5 text-sm"
-            nativeButton={false}
-            render={<Link href="#" />}
           >
             View product
-          </Button>
+          </ButtonLink>
         </div>
 
         {/* Right column — task list */}
