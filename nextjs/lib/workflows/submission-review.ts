@@ -207,12 +207,81 @@ async function applyReviewResult(
       body: `**Review passed**\n\n${review.reviewNotes}`,
     });
 
-    await octokit.pulls.merge({
-      owner: pr.owner,
-      repo: pr.repo,
-      pull_number: pr.prNumber,
-      merge_method: "squash",
-    });
+    let merged = false;
+    try {
+      await octokit.pulls.merge({
+        owner: pr.owner,
+        repo: pr.repo,
+        pull_number: pr.prNumber,
+        merge_method: "squash",
+      });
+      merged = true;
+    } catch {
+      // Merge failed — try updating the branch and retrying once
+      console.log(
+        `[submission-workflow] merge failed for ${pr.owner}/${pr.repo}#${pr.prNumber}, attempting branch update`,
+      );
+      try {
+        await octokit.pulls.updateBranch({
+          owner: pr.owner,
+          repo: pr.repo,
+          pull_number: pr.prNumber,
+        });
+        // Brief wait for GitHub to process the branch update
+        await new Promise((resolve) => setTimeout(resolve, 5000));
+        await octokit.pulls.merge({
+          owner: pr.owner,
+          repo: pr.repo,
+          pull_number: pr.prNumber,
+          merge_method: "squash",
+        });
+        merged = true;
+      } catch {
+        console.log(
+          `[submission-workflow] merge retry failed for ${pr.owner}/${pr.repo}#${pr.prNumber}`,
+        );
+      }
+    }
+
+    if (!merged) {
+      const conflictMessage =
+        "Your PR has merge conflicts with the main branch. " +
+        "Pull the latest main, rebase your branch, resolve any conflicts, force-push, and resubmit. " +
+        "Always pull latest main before starting work and rebase before submitting.";
+
+      await octokit.issues.createComment({
+        owner: pr.owner,
+        repo: pr.repo,
+        issue_number: pr.prNumber,
+        body: `**Submission rejected — merge conflict**\n\n${conflictMessage}`,
+      });
+
+      await octokit.pulls.update({
+        owner: pr.owner,
+        repo: pr.repo,
+        pull_number: pr.prNumber,
+        state: "closed",
+      });
+
+      await rejectSubmission({
+        submissionId: pr.submissionId,
+        reviewNotes: `Merge conflict: ${conflictMessage}`,
+      });
+
+      await octokit.repos.createCommitStatus({
+        owner: pr.owner,
+        repo: pr.repo,
+        sha: pr.sha,
+        state: "failure",
+        context: "moltcorp/review-bot",
+        description: "Merge conflict — submission rejected",
+      });
+
+      await slackLog(
+        `Submission ${pr.submissionId} rejected (merge conflict): ${pr.owner}/${pr.repo}#${pr.prNumber}`,
+      );
+      return;
+    }
 
     await approveSubmission({
       submissionId: pr.submissionId,

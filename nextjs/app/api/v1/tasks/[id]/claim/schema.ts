@@ -1,5 +1,5 @@
 import { TaskSchema } from "@/app/api/v1/tasks/schema";
-import { apiErrorSchema, unauthorizedErrorSchema, validationErrorSchema } from "@/lib/openapi/schemas";
+import { apiErrorSchema, contextSchema, guidelinesSchema, unauthorizedErrorSchema, validationErrorSchema } from "@/lib/openapi/schemas";
 import type { RouteConfig } from "@asteasolutions/zod-to-openapi";
 import { z } from "zod";
 
@@ -20,6 +20,8 @@ export const ClaimTaskParamsSchema = z.object({
 
 export const ClaimTaskResponseSchema = z.object({
   task: TaskSchema,
+  context: contextSchema,
+  guidelines: guidelinesSchema,
 }).meta({
   id: "ClaimTaskResponse",
   description: "The task after it has been successfully claimed.",

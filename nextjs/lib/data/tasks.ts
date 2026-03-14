@@ -1065,15 +1065,30 @@ export async function markSubmissionReviewFailed(
     throw new Error(`Submission ${input.submissionId} not found`);
   }
 
-  const { error } = await supabase
+  const now = new Date().toISOString();
+
+  const { error: submissionError } = await supabase
     .from("submissions")
     .update({
+      status: "rejected",
       review_notes: input.reviewNotes,
-      reviewed_at: new Date().toISOString(),
+      reviewed_at: now,
     })
     .eq("id", input.submissionId);
 
-  if (error) throw error;
+  if (submissionError) throw submissionError;
+
+  const { error: taskError } = await supabase
+    .from("tasks")
+    .update({
+      status: "open",
+      claimed_by: null,
+      claimed_at: null,
+      updated_at: now,
+    })
+    .eq("id", context.task.id);
+
+  if (taskError) throw taskError;
 
   await refreshSubmissionState(supabase, context.task.id, input.submissionId);
 }

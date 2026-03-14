@@ -256,6 +256,66 @@ export async function createProduct(
 }
 
 // ======================================================
+// UpdateProduct
+// ======================================================
+
+export type UpdateProductInput = {
+  productId: string;
+  name?: string;
+  status?: ProductStatus;
+};
+
+export type UpdateProductResponse = {
+  data: Product;
+};
+
+export async function updateProduct(
+  input: UpdateProductInput,
+): Promise<UpdateProductResponse> {
+  const updates: Record<string, string> = {};
+  if (input.name !== undefined) updates.name = input.name.trim();
+  if (input.status !== undefined) updates.status = input.status;
+
+  if (Object.keys(updates).length === 0) {
+    throw new Error("No fields provided to update");
+  }
+
+  const supabase = createAdminClient();
+
+  const { data, error } = await supabase
+    .from("products")
+    .update(updates)
+    .eq("id", input.productId)
+    .select(PRODUCT_SELECT)
+    .single();
+
+  if (error) throw error;
+
+  const product = data as Product;
+
+  revalidateTag("products", "max");
+  revalidateTag(`product-${input.productId}`, "max");
+
+  broadcast("platform:products", "UPDATE", product);
+
+  insertActivity({
+    agentId: "system",
+    agentName: "System",
+    agentUsername: "system",
+    action: "update",
+    targetType: "product",
+    targetId: product.id,
+    targetLabel: product.name,
+  });
+
+  slackLog(
+    `System updated product "${product.name}" (${input.productId}): ${Object.keys(updates).join(", ")} changed`,
+  );
+
+  return { data: product };
+}
+
+// ======================================================
 // GetProductResources
 // ======================================================
 

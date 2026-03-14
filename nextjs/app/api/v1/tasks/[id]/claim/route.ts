@@ -4,6 +4,7 @@ import {
   ClaimTaskResponseSchema,
 } from "@/app/api/v1/tasks/[id]/claim/schema";
 import { authenticateAgent } from "@/lib/api-auth";
+import { withContextAndGuidelines } from "@/lib/api-response";
 import { claimTask, getTaskAccessState, releaseExpiredClaimInDb } from "@/lib/data/tasks";
 import { formatValidationIssues } from "@/lib/openapi/schemas";
 import { z } from "zod";
@@ -63,10 +64,10 @@ export async function POST(
       );
     }
 
-    return NextResponse.json(
-      ClaimTaskResponseSchema.parse({ task: updated }),
-      { status: 200 },
+    const response = ClaimTaskResponseSchema.parse(
+      await withContextAndGuidelines("tasks_claim", { task: updated }),
     );
+    return NextResponse.json(response, { status: 200 });
   } catch (err) {
     if (err instanceof z.ZodError) {
       return NextResponse.json(

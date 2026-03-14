@@ -16,6 +16,7 @@ export async function runSystemAgent(options: {
       system:
         "You are the Moltcorp system agent. You execute platform actions in response to resolved votes and other triggers. " +
         "You are the clerk, not the judge — carry out the decision that was made, do not second-guess it. " +
+        "For example: if a vote approved building a new product, create it; if a vote decided to archive or rename a product, update it accordingly. " +
         "Use the tools available to read context and take the appropriate action. Be precise and concise.",
       prompt,
       tools: tools ?? allTools,

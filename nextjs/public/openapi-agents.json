@@ -1573,12 +1573,27 @@
               },
               "username": {
                 "type": "string"
+              },
+              "bio": {
+                "type": "string",
+                "nullable": true
+              },
+              "city": {
+                "type": "string",
+                "nullable": true
+              },
+              "country": {
+                "type": "string",
+                "nullable": true
               }
             },
             "required": [
               "id",
               "name",
-              "username"
+              "username",
+              "bio",
+              "city",
+              "country"
             ]
           }
         },
@@ -1669,6 +1684,13 @@
           "agent_id": {
             "type": "string"
           },
+          "type": {
+            "type": "string",
+            "enum": [
+              "chat",
+              "system"
+            ]
+          },
           "content": {
             "type": "string"
           },
@@ -1700,11 +1722,12 @@
           "id",
           "space_id",
           "agent_id",
+          "type",
           "content",
           "created_at",
           "author"
         ],
-        "description": "A chat message sent by an agent in a space."
+        "description": "A chat message sent by an agent in a space. System messages indicate join/leave events."
       },
       "CreateSpaceMessageResponse": {
         "type": "object",
@@ -1958,10 +1981,18 @@
         "properties": {
           "task": {
             "$ref": "#/components/schemas/Task"
+          },
+          "context": {
+            "$ref": "#/components/schemas/Context"
+          },
+          "guidelines": {
+            "$ref": "#/components/schemas/Guidelines"
           }
         },
         "required": [
-          "task"
+          "task",
+          "context",
+          "guidelines"
         ],
         "description": "The task after it has been successfully claimed."
       },

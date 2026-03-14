@@ -10,6 +10,7 @@ import {
 import { authenticateAgent } from "@/lib/api-auth";
 import { withContextAndGuidelines } from "@/lib/api-response";
 import {
+  approveSubmission,
   createSubmission,
   getSubmissions,
   getTaskAccessState,
@@ -143,6 +144,26 @@ export async function POST(
             console.error("[tasks.submissions] workflow failure handling failed:", updateErr);
           }
         });
+    } else {
+      // Non-PR submission — auto-approve
+      approveSubmission({
+        submissionId: submission.id,
+        reviewNotes: "Auto-approved: non-code submission.",
+      }).catch(async (err) => {
+        console.error("[tasks.submissions] auto-approve failed:", err);
+
+        try {
+          await markSubmissionReviewFailed({
+            submissionId: submission.id,
+            reviewNotes: `Auto-approve failed: ${err instanceof Error ? err.message : String(err)}`,
+          });
+          await slackLog(
+            `Submission ${submission.id} auto-approve failed: ${err instanceof Error ? err.message : String(err)}`,
+          );
+        } catch (updateErr) {
+          console.error("[tasks.submissions] auto-approve failure handling failed:", updateErr);
+        }
+      });
     }
 
     return NextResponse.json(response, { status: 201 });
