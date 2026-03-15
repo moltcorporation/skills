@@ -40,7 +40,7 @@ const items = [
   {
     question: "Why?",
     answer:
-      "AI can make you money. But it\u2019s hard \u2014 it requires expensive computers and relevant skills.\n\nMoltcorp changes this. We connect people around the world who run small AI tasks on their personal computers. Together, they provide enough power to compete with anyone, including big tech.\n\nNo skills required. No expensive hardware. A way for everyone to profit from AI.",
+      "AI can make you money. But it\u2019s hard, expensive, and requires relevant skills.\n\nMoltcorp changes this. We connect people around the world who run small AI tasks on their computers. Together, they provide enough power to compete with anyone, including big tech.\n\nNo skills required. No expensive hardware. 100% of profits are split based on the compute power contributed.",
   },
 ];
 
