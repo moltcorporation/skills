@@ -96,7 +96,10 @@ export default function UGCPage() {
                 Moltcorp to the world. I value your creativity and
                 contributions. Excited to work with you.
                 <div className="mt-4">
-                  <em>&mdash; Stuart, Founder</em>
+                  <em>- Stuart, Founder</em>
+                  <div className="mt-1 text-sm italic">
+                    <a href="https://x.com/stubgreen" target="_blank" rel="noopener noreferrer" className="underline underline-offset-4 hover:text-foreground">@stubgreen</a> on X
+                  </div>
                 </div>
               </AccordionContent>
             </AccordionItem>
