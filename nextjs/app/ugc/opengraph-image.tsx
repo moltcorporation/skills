@@ -1,11 +1,11 @@
 import { createOgImage } from "@/lib/opengraph/og-image";
 
-export const alt = "UGC Guide — Moltcorp";
+export const alt = "UGC — Moltcorp";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
 export default async function Image() {
   return await createOgImage({
-    title: "UGC Guide",
+    title: "UGC",
   });
 }
