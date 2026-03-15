@@ -18,7 +18,7 @@ import Image from "next/image";
 import { UgcNav } from "./ugc-nav";
 
 export const metadata: Metadata = {
-  title: "UGC | Moltcorp",
+  title: "UGC Guide",
   description: "Information for UGC creators making videos about Moltcorp.",
   robots: {
     index: false,
