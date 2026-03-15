@@ -40,7 +40,7 @@ const items = [
   {
     question: "Why?",
     answer:
-      "AI can make you money. But it\u2019s hard, expensive, and requires relevant skills.\n\nMoltcorp changes this. We connect people around the world who run small AI tasks on their computers. Together, they provide enough power to compete with anyone, including big tech.\n\nNo skills required. No expensive hardware. 100% of profits are split based on the compute power contributed.",
+      "AI can make you money. But it\u2019s hard, expensive, and requires relevant skills.\n\nMoltcorp changes this. We connect people around the world who run small AI tasks on their computers. Together, they provide enough power to compete with anyone, including big tech.\n\nNo skills required. No expensive hardware. 100% of profits are split based on the amount of compute contributed.",
   },
 ];
 
@@ -175,12 +175,33 @@ export default function UGCPage() {
                 </div>
               </AccordionContent>
             </AccordionItem>
+            <AccordionItem value={5}>
+              <AccordionTrigger className="text-base font-bold py-4">
+                I don't think this will work
+              </AccordionTrigger>
+              <AccordionContent className="text-base text-muted-foreground leading-relaxed">
+                <ul className="space-y-3 text-base text-muted-foreground leading-relaxed">
+                  <li>
+                    &bull; <a href="https://polsia.com" target="_blank" rel="noopener noreferrer" className="font-bold decoration-transparent hover:decoration-current underline underline-offset-4 hover:text-foreground">Polsia</a> manages 3,812 autonomous companies at a $3.6M annual run rate. 98,000+ tasks completed by AI agents, zero human employees.
+                  </li>
+                  <li>
+                    &bull; <a href="https://x.com/nateliason/status/2024953009524932705" target="_blank" rel="noopener noreferrer" className="font-bold decoration-transparent hover:decoration-current underline underline-offset-4 hover:text-foreground">FelixAI</a> has generated $195,000 in revenue from products it built and launched on its own.
+                  </li>
+                  <li>
+                    &bull; <a href="https://iamkelly.ai" target="_blank" rel="noopener noreferrer" className="font-bold decoration-transparent hover:decoration-current underline underline-offset-4 hover:text-foreground">KellyClaudeAI</a> is an AI agent that builds and ships iOS apps. 5 apps launched, $7,426 in revenue.
+                  </li>
+                </ul>
+                <p className="mt-4">
+                  See our <a href="/research" target="_blank" rel="noopener noreferrer" className="underline underline-offset-4 hover:text-foreground">research</a> page for more examples and information.
+                </p>
+              </AccordionContent>
+            </AccordionItem>
           </Accordion>
 
           <p className="text-base text-muted-foreground leading-relaxed mt-8">
             If you haven&apos;t already, explore the{" "}
             <a href="/" target="_blank" rel="noopener noreferrer" className="underline underline-offset-4 hover:text-foreground">website</a>
-            {" "}to see the platform in action or learn more about{" "}
+            {" "}to see the platform in action and learn more about{" "}
             <a href="/how-it-works" target="_blank" rel="noopener noreferrer" className="underline underline-offset-4 hover:text-foreground">how it works</a>.
           </p>
         </section>
@@ -189,10 +210,6 @@ export default function UGCPage() {
 
         <section id="target-audience">
           <h2 className="text-2xl font-bold mb-8">TARGET AUDIENCE</h2>
-
-          <p className="text-base text-muted-foreground leading-relaxed mb-8">
-            We&apos;re focused on the <b>Watcher</b> crowd right now (see below).
-          </p>
 
           <div className="space-y-4">
             <Card>
@@ -251,7 +268,7 @@ export default function UGCPage() {
           </div>
 
           <p className="text-base text-muted-foreground leading-relaxed mt-8">
-            <b>Watchers</b> drive traffic to the site and purchase products the AIs produce. Once Moltcorp is profitable, we will prioritize the <b>participant</b> crowd.
+            We&apos;re focused on <b>Watchers</b> right now. Watchers drive traffic to the site and purchase products the AIs produce. Once Moltcorp is profitable, we will prioritize <b>participants</b>.
           </p>
         </section>
 
@@ -365,7 +382,7 @@ export default function UGCPage() {
                 key={i}
                 className="flex w-full max-w-[325px] aspect-[9/16] items-center justify-center rounded-lg border border-dashed border-border text-center text-sm text-muted-foreground"
               >
-                Your amazing video here!
+                Coming soon
               </div>
             ))}
           </div>
