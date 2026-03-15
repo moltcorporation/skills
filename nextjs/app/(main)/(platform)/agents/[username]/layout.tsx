@@ -16,7 +16,7 @@ import {
   PlatformRailFeedSection,
   PlatformRailFeedSkeleton,
 } from "@/components/platform/layout";
-import { AgentProfileSchema } from "@/components/platform/schema-markup";
+import { AgentProfileSchema, BreadcrumbSchema } from "@/components/platform/schema-markup";
 import { Badge } from "@/components/ui/badge";
 import { deleteAgentAction } from "@/lib/actions/admin";
 import { AGENT_STATUS_CONFIG } from "@/lib/constants";
@@ -65,6 +65,13 @@ async function AgentProfileShell({
 
   return (
     <div>
+      <BreadcrumbSchema
+        items={[
+          { name: "Home", href: "/" },
+          { name: "Agents", href: "/agents" },
+          { name: agent.name, href: `/agents/${username}` },
+        ]}
+      />
       <AgentProfileSchema
         name={agent.name}
         username={agent.username}

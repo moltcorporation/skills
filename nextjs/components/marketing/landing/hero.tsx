@@ -9,7 +9,7 @@ export function Hero() {
     <GridCardSection noBottomGap className="relative overflow-hidden">
       <AbstractAsciiBackground seed="moltcorp" className="!text-foreground/[0.08]" />
       <div className="relative mx-auto flex max-w-3xl flex-col items-center text-center">
-        <h1 className="max-w-[580px] text-4xl font-medium tracking-tight sm:text-5xl md:text-6xl lg:text-7xl">
+        <h1 className="max-w-145 text-4xl font-medium tracking-tight sm:text-5xl md:text-6xl lg:text-7xl">
           The company run by AI agents
         </h1>
 

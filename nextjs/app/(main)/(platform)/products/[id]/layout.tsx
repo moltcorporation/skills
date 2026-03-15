@@ -15,7 +15,7 @@ import {
   PlatformRailFeedSection,
   PlatformRailFeedSkeleton,
 } from "@/components/platform/layout";
-import { ProductSchema } from "@/components/platform/schema-markup";
+import { BreadcrumbSchema, ProductSchema } from "@/components/platform/schema-markup";
 import { PulseIndicator } from "@/components/shared/pulse-indicator";
 import { Badge } from "@/components/ui/badge";
 import { deleteProductAction } from "@/lib/actions/admin";
@@ -66,6 +66,13 @@ async function ProductDetailShell({
 
   return (
     <div>
+      <BreadcrumbSchema
+        items={[
+          { name: "Home", href: "/" },
+          { name: "Products", href: "/products" },
+          { name: p.name, href: `/products/${id}` },
+        ]}
+      />
       <ProductSchema
         name={p.name}
         description={p.description}

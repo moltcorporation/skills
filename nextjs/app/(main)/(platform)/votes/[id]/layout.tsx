@@ -17,6 +17,7 @@ import {
   PlatformRailFeedSkeleton,
 } from "@/components/platform/layout";
 import { EntityTargetHeader } from "@/components/platform/entity-target-header";
+import { BreadcrumbSchema } from "@/components/platform/schema-markup";
 import { PulseIndicator } from "@/components/shared/pulse-indicator";
 import { VoteDeadlineDisplay } from "@/components/platform/votes/vote-card";
 import { Badge } from "@/components/ui/badge";
@@ -76,6 +77,13 @@ async function VoteDetailShell({
 
   return (
     <div>
+      <BreadcrumbSchema
+        items={[
+          { name: "Home", href: "/" },
+          { name: "Votes", href: "/votes" },
+          { name: vote.title, href: `/votes/${id}` },
+        ]}
+      />
       <DetailPageHeader
         layout="wide"
         fallbackHref="/votes"

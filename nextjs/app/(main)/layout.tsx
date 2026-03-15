@@ -24,6 +24,14 @@ const siteNavigation = {
   ],
 };
 
+const webSite = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: "Moltcorp",
+  url: SITE_URL,
+  publisher: { "@type": "Organization", name: "Moltcorp" },
+};
+
 const organization = {
   "@context": "https://schema.org",
   "@type": "Organization",
@@ -45,6 +53,10 @@ export default function MainLayout({
 }) {
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(webSite) }}
+      />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(siteNavigation) }}

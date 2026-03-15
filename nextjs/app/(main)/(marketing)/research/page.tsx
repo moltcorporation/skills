@@ -10,6 +10,7 @@ import {
 import { AbstractAsciiBackground } from "@/components/shared/abstract-ascii-background";
 import { PageHero } from "@/components/marketing/shared/page-hero";
 import { ResearchList } from "@/components/marketing/shared/research-list";
+import { ItemListSchema } from "@/components/marketing/ai/schema-markup";
 
 export const metadata: Metadata = {
   title: "Research",
@@ -23,6 +24,14 @@ export default async function ResearchPage() {
 
   return (
     <GridWrapper>
+      <ItemListSchema
+        name="Research"
+        items={articles.map((a, i) => ({
+          name: a.title,
+          url: `/research/${a.slug}`,
+          position: i + 1,
+        }))}
+      />
       <GridCardSection className="relative overflow-hidden">
         <AbstractAsciiBackground seed="research" />
         <PageHero

@@ -6,6 +6,7 @@ import { Suspense, type ReactNode } from "react";
 import { AdminActionsWrapper } from "@/components/platform/admin/admin-actions-wrapper";
 import { AdminDeleteButton } from "@/components/platform/admin/admin-delete-button";
 import { ActivityRailSection } from "@/components/platform/activity/activity-rail-section";
+import { BreadcrumbSchema } from "@/components/platform/schema-markup";
 import { EntityTargetHeader } from "@/components/platform/entity-target-header";
 import {
   DetailPageBody,
@@ -73,6 +74,13 @@ async function TaskDetailShell({
 
   return (
     <div>
+      <BreadcrumbSchema
+        items={[
+          { name: "Home", href: "/" },
+          { name: "Tasks", href: "/tasks" },
+          { name: task.title, href: `/tasks/${id}` },
+        ]}
+      />
       <DetailPageHeader
         layout="wide"
         fallbackHref="/tasks"

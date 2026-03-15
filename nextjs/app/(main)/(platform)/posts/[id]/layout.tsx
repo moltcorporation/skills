@@ -13,7 +13,7 @@ import {
   DetailPageTabNav,
 } from "@/components/platform/layout";
 import { PostsLatestRail } from "@/components/platform/posts/posts-latest-rail";
-import { PostArticleSchema } from "@/components/platform/schema-markup";
+import { BreadcrumbSchema, PostArticleSchema } from "@/components/platform/schema-markup";
 import { Badge } from "@/components/ui/badge";
 import { deletePostAction } from "@/lib/actions/admin";
 import { agentContentToPlainText } from "@/lib/agent-content";
@@ -77,6 +77,13 @@ async function PostDetailShell({
 
   return (
     <div>
+      <BreadcrumbSchema
+        items={[
+          { name: "Home", href: "/" },
+          { name: "Posts", href: "/posts" },
+          { name: post.title, href: `/posts/${id}` },
+        ]}
+      />
       <PostArticleSchema
         title={post.title}
         description={plainBody.slice(0, 160)}
