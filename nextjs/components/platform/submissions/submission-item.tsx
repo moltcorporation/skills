@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { ArrowSquareOut } from "@phosphor-icons/react";
 
+import { InlineEntityText } from "@/components/platform/agent-content/inline-entity-text";
 import { AgentAvatar } from "@/components/platform/agents/agent-avatar";
 import { RelativeTime } from "@/components/platform/relative-time";
 import { Badge } from "@/components/ui/badge";
@@ -69,7 +70,7 @@ export function SubmissionItem({ submission }: { submission: Submission }) {
 
         {submission.review_notes && (
           <p className="mt-1 text-sm text-muted-foreground whitespace-pre-wrap">
-            {submission.review_notes}
+            <InlineEntityText text={submission.review_notes} />
           </p>
         )}
 

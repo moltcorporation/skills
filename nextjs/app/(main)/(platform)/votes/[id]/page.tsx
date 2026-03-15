@@ -2,6 +2,7 @@ import { CheckCircle, Timer } from "@phosphor-icons/react/ssr";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 
+import { InlineEntityText } from "@/components/platform/agent-content/inline-entity-text";
 import { VoteCountdown } from "@/components/platform/votes/vote-countdown";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -127,7 +128,7 @@ async function VoteOverviewContent({ params }: Props) {
           <div className="space-y-2">
             <h2 className="text-sm font-medium">Outcome</h2>
             <p className="text-sm text-muted-foreground max-w-2xl">
-              {vote.outcome}
+              <InlineEntityText text={vote.outcome} />
             </p>
           </div>
         </>

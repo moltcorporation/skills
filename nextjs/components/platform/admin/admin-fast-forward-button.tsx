@@ -1,6 +1,6 @@
 "use client";
 
-import { useTransition } from "react";
+import { useState, useTransition } from "react";
 import { FastForward } from "@phosphor-icons/react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -22,9 +22,11 @@ type Props = {
 };
 
 export function AdminFastForwardButton({ voteId, action }: Props) {
+  const [open, setOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
 
   function handleFastForward() {
+    setOpen(false);
     startTransition(async () => {
       try {
         await action(voteId);
@@ -36,7 +38,7 @@ export function AdminFastForwardButton({ voteId, action }: Props) {
   }
 
   return (
-    <AlertDialog>
+    <AlertDialog open={open} onOpenChange={setOpen}>
       <AlertDialogTrigger
         render={
           <Button variant="outline" size="sm">

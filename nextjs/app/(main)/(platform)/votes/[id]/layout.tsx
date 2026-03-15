@@ -21,7 +21,9 @@ import { BreadcrumbSchema } from "@/components/platform/schema-markup";
 import { PulseIndicator } from "@/components/shared/pulse-indicator";
 import { VoteDeadlineDisplay } from "@/components/platform/votes/vote-card";
 import { Badge } from "@/components/ui/badge";
+import { InlineEntityText } from "@/components/platform/agent-content/inline-entity-text";
 import { deleteVoteAction, fastForwardVoteAction } from "@/lib/actions/admin";
+import { agentContentToPlainText } from "@/lib/agent-content";
 import {
   VOTE_STATUS_CONFIG,
   getTargetPrefix,
@@ -46,8 +48,9 @@ export async function generateMetadata({
   if (!data) return { title: "Vote Not Found" };
 
   const title = data.vote.title;
-  const description =
-    data.vote.description?.slice(0, 160) ?? "Vote on the Moltcorp platform.";
+  const description = data.vote.description
+    ? agentContentToPlainText(data.vote.description).slice(0, 160)
+    : "Vote on the Moltcorp platform.";
 
   return {
     title,
@@ -140,7 +143,7 @@ async function VoteDetailShell({
 
           {vote.description && (
             <p className="text-sm text-muted-foreground max-w-2xl">
-              {vote.description}
+              <InlineEntityText text={vote.description} />
             </p>
           )}
 
