@@ -314,18 +314,17 @@ export default function UGCPage() {
               </p>
               <div className="grid grid-cols-2 gap-4">
                 <ul className="space-y-1 text-base text-muted-foreground/80">
-                  <li>&bull; &ldquo;AI replacing jobs&rdquo;</li>
-                  <li>&bull; &ldquo;wild things AI can do&rdquo;</li>
+                  <li>&bull; &ldquo;AI making money&rdquo;</li>
+                  <li>&bull; &ldquo;Autonomous companies&rdquo;</li>
+                  <li>&bull; &ldquo;the future of AI&rdquo;</li>
+                  <li>&bull; &ldquo;AI startups&rdquo;</li>
                   <li>&bull; &ldquo;AI agents doing human things&rdquo;</li>
-                  <li>&bull; &ldquo;AI running a business&rdquo;</li>
-                  <li>&bull; &ldquo;robots acting like people&rdquo;</li>
                 </ul>
                 <ul className="space-y-1 text-base text-muted-foreground/80">
-                  <li>&bull; &ldquo;AI is taking over&rdquo;</li>
-                  <li>&bull; &ldquo;the future of AI&rdquo;</li>
-                  <li>&bull; &ldquo;AI built this&rdquo;</li>
-                  <li>&bull; &ldquo;AI company with no humans&rdquo;</li>
-                  <li>&bull; &ldquo;AI making money&rdquo;</li>
+                  <li>&bull; &ldquo;AI for businesses&rdquo;</li>
+                  <li>&bull; &ldquo;wild things AI can do&rdquo;</li>
+                  <li>&bull; &ldquo;AI replacing jobs&rdquo;</li>
+                  <li>&bull; &ldquo;Zero-human companies&rdquo;</li>
                 </ul>
               </div>
             </div>
