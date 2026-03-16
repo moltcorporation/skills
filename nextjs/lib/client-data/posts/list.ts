@@ -35,11 +35,11 @@ function getPostSort(sort?: string): PostSortValue {
   if (sort === "top") return "hot";
   if (sort === "new") return "newest";
   if (sort === "newest" || sort === "oldest") return sort;
-  return "hot";
+  return "newest";
 }
 
 export function getDefaultPostFilters(): PostFilters {
-  return { search: "", type: "all", sort: "hot" };
+  return { search: "", type: "all", sort: "newest" };
 }
 
 export function getPostFiltersFromSearchParams(
@@ -61,7 +61,7 @@ export function buildPostsListKey(
 
   if (filters.search) params.set("search", filters.search);
   if (filters.type !== "all") params.set("type", filters.type);
-  if (filters.sort !== "hot") params.set("sort", filters.sort);
+  if (filters.sort !== "newest") params.set("sort", filters.sort);
   if (scope.agentUsername) params.set("agent_username", scope.agentUsername);
   if (scope.targetType) params.set("target_type", scope.targetType);
   if (scope.targetId) params.set("target_id", scope.targetId);

@@ -308,14 +308,14 @@ export async function joinSpace(
   }
 
   if (member.agent) {
-    const { data: space } = await supabase.from("spaces").select("name").eq("id", input.spaceId).single();
+    const { data: space } = await supabase.from("spaces").select("name, slug").eq("id", input.spaceId).single();
     insertActivity({
       agentId: input.agentId,
       agentName: member.agent.name,
       agentUsername: member.agent.username,
       action: "join",
       targetType: "space",
-      targetId: input.spaceId,
+      targetId: space?.slug ?? input.spaceId,
       targetLabel: space?.name ?? "",
     });
   }
@@ -387,14 +387,14 @@ export async function leaveSpace(
     }
 
     if (agent) {
-      const { data: space } = await supabase.from("spaces").select("name").eq("id", input.spaceId).single();
+      const { data: space } = await supabase.from("spaces").select("name, slug").eq("id", input.spaceId).single();
       insertActivity({
         agentId: input.agentId,
         agentName: agent.name,
         agentUsername: agent.username,
         action: "leave",
         targetType: "space",
-        targetId: input.spaceId,
+        targetId: space?.slug ?? input.spaceId,
         targetLabel: space?.name ?? "",
       });
     }
@@ -490,14 +490,14 @@ export async function createSpaceMessage(
   broadcast(`space:${input.spaceId}:messages`, "INSERT", message);
 
   if (message.author) {
-    const { data: space } = await supabase.from("spaces").select("name").eq("id", input.spaceId).single();
+    const { data: space } = await supabase.from("spaces").select("name, slug").eq("id", input.spaceId).single();
     insertActivity({
       agentId: input.agentId,
       agentName: message.author.name,
       agentUsername: message.author.username,
       action: "message",
       targetType: "space",
-      targetId: input.spaceId,
+      targetId: space?.slug ?? input.spaceId,
       targetLabel: space?.name ?? "",
     });
   }
