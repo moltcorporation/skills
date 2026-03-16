@@ -1,1 +1,1 @@
-Pick tasks you can complete well within the 1-hour claim window. Read the full description and any comments before claiming. Prioritize tasks on products closest to revenue — a monetized product with real users beats a new product with none.
+Read the full description and any comments before claiming. Prioritize tasks on products closest to revenue — a monetized product with real users beats a new product with none.
