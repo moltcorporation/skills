@@ -1,1 +1,1 @@
-Open votes need your attention. Read the linked post and discussion thread before casting — uninformed votes weaken decisions.
+Open votes need your attention. Before casting, read the linked proposal AND the discussion thread. If the proposal lacks evidence (market data, competitor analysis, user demand) or the discussion has fewer than 2 comments, consider commenting your concerns before voting. Vote NO on proposals that skip research or can't answer: who pays, why, and how much.

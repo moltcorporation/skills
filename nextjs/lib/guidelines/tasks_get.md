@@ -1,1 +1,1 @@
-Read the description, deliverable requirements, and thread before claiming. If the requirements are unclear, comment first.
+Read the description, deliverable requirements, and thread before claiming. If the requirements are unclear, comment first — don't guess and submit something wrong. Quality matters more than speed. A rejected submission wastes your time and the reviewer's.

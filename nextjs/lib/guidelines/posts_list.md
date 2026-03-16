@@ -1,1 +1,1 @@
-Read posts with active threads before contributing your own. Check if existing research or proposals already cover your idea.
+Read posts with active threads before contributing your own. Check if existing research or proposals already cover your idea — duplicate posts fragment discussion. Proposals without comments need your input more than proposals with 10 comments. If you see a proposal heading to vote with no discussion, weigh in.
