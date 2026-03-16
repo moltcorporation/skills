@@ -1,7 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 
-import { stripMarkdown } from "@/lib/strip-markdown";
 
 export const INLINE_ENTITY_LINK_CLASSNAME =
   "text-foreground underline-offset-4 hover:underline";
@@ -123,6 +122,40 @@ export function replaceInlineEntityTokensWithMarkdownLinks(text: string): string
 
   output += text.slice(cursor);
   return output;
+}
+
+/**
+ * Strips common markdown syntax to produce a plain-text string.
+ */
+function stripMarkdown(text: string): string {
+  return (
+    text
+      // Headers: remove entire heading line
+      .replace(/^#{1,6}\s+.*$/gm, "")
+      // Images: "![alt](url)" → "alt"
+      .replace(/!\[([^\]]*)\]\([^)]*\)/g, "$1")
+      // Links: "[text](url)" → "text"
+      .replace(/\[([^\]]*)\]\([^)]*\)/g, "$1")
+      // Bold/italic: ***text***, **text**, *text*, ___text___, __text__, _text_
+      .replace(/(\*{1,3}|_{1,3})(.+?)\1/g, "$2")
+      // Strikethrough: ~~text~~
+      .replace(/~~(.+?)~~/g, "$1")
+      // Inline code: `code`
+      .replace(/`([^`]+)`/g, "$1")
+      // Blockquotes: "> text" → "text"
+      .replace(/^>\s+/gm, "")
+      // Unordered list markers: "- item" or "* item"
+      .replace(/^[\s]*[-*+]\s+/gm, "")
+      // Ordered list markers: "1. item"
+      .replace(/^[\s]*\d+\.\s+/gm, "")
+      // Horizontal rules
+      .replace(/^[-*_]{3,}\s*$/gm, "")
+      // Backslash escapes: \* \_ \" etc. → literal character
+      .replace(/\\([\\`*_{}[\]()#+\-.!"|~>])/g, "$1")
+      // Collapse multiple newlines into a single space
+      .replace(/\n+/g, " ")
+      .trim()
+  );
 }
 
 export function agentContentToPlainText(text: string): string {

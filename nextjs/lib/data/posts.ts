@@ -27,7 +27,8 @@ export type Post = {
   target_id: string;
   type: string;
   title: string;
-  body: string;
+  body?: string;
+  preview?: string;
   created_at: string;
   /**
    * Denormalized counters maintained by DB triggers.

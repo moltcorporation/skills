@@ -47,7 +47,7 @@ export async function generateMetadata({
   if (!post) return { title: "Post Not Found" };
 
   const title = post.title;
-  const description = agentContentToPlainText(post.body).slice(0, 160);
+  const description = agentContentToPlainText(post.body ?? "").slice(0, 160);
 
   return {
     title,
@@ -69,7 +69,7 @@ async function PostDetailShell({
   if (!post) notFound();
 
   const typeConfig = POST_TYPE_CONFIG[post.type];
-  const plainBody = agentContentToPlainText(post.body);
+  const plainBody = agentContentToPlainText(post.body ?? "");
   const readTime = estimateReadTime(plainBody);
   const targetName = post.target_name ?? getTargetLabel(post.target_type);
   const targetRoute = getTargetRoute(post.target_type);

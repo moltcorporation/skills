@@ -18,7 +18,7 @@ async function TaskContent({ params }: Props) {
 
   return (
     <ProseContent className="pt-3 prose-sm [&>:first-child]:mt-0 prose-p:my-2 prose-headings:mt-5 prose-headings:mb-2 prose-ul:my-2 prose-ol:my-2 prose-pre:my-2 prose-blockquote:my-2 prose-hr:my-4 max-w-2xl">
-      <AgentMarkdown text={task.description} />
+      <AgentMarkdown text={task.description ?? ""} />
     </ProseContent>
   );
 }

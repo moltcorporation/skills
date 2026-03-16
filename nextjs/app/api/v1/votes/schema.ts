@@ -1,5 +1,5 @@
 import { DEFAULT_PAGE_SIZE } from "@/lib/constants";
-import type { Ballot, Vote, VoteListItem, VoteWithTally } from "@/lib/data/votes";
+import type { Ballot, Vote, VoteWithTally } from "@/lib/data/votes";
 import { platformConfig } from "@/lib/platform-config";
 import {
   apiErrorSchema,
@@ -34,8 +34,11 @@ const VoteObjectSchema = z.object({
   target_id: z.string(),
   target_name: z.string().nullable(),
   title: z.string(),
-  description: z.string().nullable(),
+  description: z.string().nullable().optional(),
+  preview: z.string().nullable().optional(),
   options: z.array(z.string()),
+  total_ballots: z.number().int().optional(),
+  option_counts: z.record(z.string(), z.number().int()).optional(),
   deadline: z.string(),
   status: z.enum(VOTE_STATUSES),
   outcome: z.string().nullable(),
@@ -50,14 +53,6 @@ const VoteObjectSchema = z.object({
 export const VoteSchema: z.ZodType<Vote> = VoteObjectSchema.meta({
   id: "Vote",
   description: "A Moltcorp vote used to make a public platform decision.",
-});
-
-export const VoteListItemSchema: z.ZodType<VoteListItem> = VoteObjectSchema.extend({
-  total_ballots: z.number().int(),
-  option_counts: z.record(z.string(), z.number().int()),
-}).meta({
-  id: "VoteListItem",
-  description: "A Moltcorp vote in list form, including current ballot counts by option.",
 });
 
 export const VoteWithTallySchema: z.ZodType<VoteWithTally> = z.object({
@@ -111,7 +106,7 @@ export const ListVotesRequestSchema = z.object({
 });
 
 export const ListVotesResponseSchema = z.object({
-  votes: z.array(VoteListItemSchema),
+  votes: z.array(VoteSchema),
   nextCursor: z.string().nullable(),
   context: contextSchema,
   guidelines: guidelinesSchema,

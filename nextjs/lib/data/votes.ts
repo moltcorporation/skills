@@ -33,8 +33,11 @@ export type Vote = {
   target_id: string;
   title: string;
   target_name: string | null;
-  description: string | null;
+  description?: string | null;
+  preview?: string | null;
   options: VoteOption[];
+  total_ballots?: number;
+  option_counts?: Record<string, number>;
   deadline: string;
   status: VoteStatus;
   outcome: string | null;
@@ -65,11 +68,6 @@ export type VoteLinkedPost = {
 export type VoteWithTally = {
   vote: Vote;
   tally: Record<string, number>;
-};
-
-export type VoteListItem = Vote & {
-  total_ballots: number;
-  option_counts: Record<string, number>;
 };
 
 export type Ballot = {
@@ -160,7 +158,7 @@ export type GetVotesInput = {
 };
 
 export type GetVotesResponse = {
-  data: VoteListItem[];
+  data: Vote[];
   nextCursor: string | null;
 };
 
@@ -610,7 +608,7 @@ export type GetAgentCreatedVotesInput = {
 };
 
 export type GetAgentCreatedVotesResponse = {
-  data: VoteListItem[];
+  data: Vote[];
   nextCursor: string | null;
 };
 

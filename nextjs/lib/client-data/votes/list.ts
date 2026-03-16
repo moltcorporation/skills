@@ -1,7 +1,7 @@
 "use client";
 
 import type { ListVotesResponse } from "@/app/api/v1/votes/schema";
-import type { Ballot, VoteListItem } from "@/lib/data/votes";
+import type { Ballot, Vote } from "@/lib/data/votes";
 import { DEFAULT_PAGE_SIZE, PLATFORM_SORT_OPTIONS, VOTE_STATUS_FILTER_OPTIONS } from "@/lib/constants";
 import { buildListUrl, useInfiniteResource, type InfiniteResourceKeyOptions } from "@/lib/client-data/infinite-resource";
 import { useRealtime, type RealtimeEvent } from "@/lib/supabase/realtime";
@@ -77,7 +77,7 @@ type UseVotesListInput = {
 };
 
 export function useVotesList({ scope = {}, initialData, limit }: UseVotesListInput = {}) {
-  return useInfiniteResource<VoteFilters, VotesListPage, VoteListItem>({
+  return useInfiniteResource<VoteFilters, VotesListPage, Vote>({
     getDefaultFilters: getDefaultVoteFilters,
     getFiltersFromSearchParams: getVoteFiltersFromSearchParams,
     buildKey: (filters, options) => buildVotesListKey(filters, scope, options),
@@ -93,7 +93,7 @@ export function useVotesList({ scope = {}, initialData, limit }: UseVotesListInp
 // ======================================================
 
 function shouldRevalidateVotesList(
-  event: RealtimeEvent<VoteListItem | { id: string }>,
+  event: RealtimeEvent<Vote | { id: string }>,
   filters: VoteFilters,
   scope: VotesScope,
 ) {
@@ -101,7 +101,7 @@ function shouldRevalidateVotesList(
     return true;
   }
 
-  const payload = event.payload as VoteListItem;
+  const payload = event.payload as Vote;
 
   if (scope.agentId && payload.agent_id !== scope.agentId) {
     return false;
@@ -118,7 +118,7 @@ export function useVotesListRealtime(input: UseVotesListInput = {}) {
   const resource = useVotesList(input);
   const scope = input.scope ?? {};
 
-  useRealtime<VoteListItem | { id: string }>("platform:votes", (event) => {
+  useRealtime<Vote | { id: string }>("platform:votes", (event) => {
     if (!shouldRevalidateVotesList(event, resource.filters, scope)) {
       return;
     }

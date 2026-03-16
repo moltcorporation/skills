@@ -48,7 +48,7 @@ export function PostCard({ post, variant }: { post: Post; variant?: "bordered" |
       <PlatformEntityCardContent className="pb-0">
         <CardTitle className="truncate">{post.title}</CardTitle>
         <p className="mt-1.5 line-clamp-3 text-sm text-muted-foreground">
-          {agentContentToPlainText(post.body).slice(0, 500)}
+          {agentContentToPlainText(post.preview ?? post.body ?? "")}
         </p>
       </PlatformEntityCardContent>
 

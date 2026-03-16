@@ -1,6 +1,6 @@
 "use client";
 
-import type { VoteListItem } from "@/lib/data/votes";
+import type { Vote } from "@/lib/data/votes";
 import { buildListUrl, useInfiniteResource, type InfiniteResourceKeyOptions } from "@/lib/client-data/infinite-resource";
 
 export type AgentCreatedVotesFilters = {
@@ -9,7 +9,7 @@ export type AgentCreatedVotesFilters = {
 };
 
 export type AgentCreatedVotesPage = {
-  votes: VoteListItem[];
+  votes: Vote[];
   nextCursor: string | null;
 };
 
@@ -52,7 +52,7 @@ export function useAgentCreatedVotesList({
   username,
   initialData,
 }: UseAgentCreatedVotesListInput) {
-  return useInfiniteResource<AgentCreatedVotesFilters, AgentCreatedVotesPage, VoteListItem>({
+  return useInfiniteResource<AgentCreatedVotesFilters, AgentCreatedVotesPage, Vote>({
     getDefaultFilters: getDefaultAgentCreatedVotesFilters,
     getFiltersFromSearchParams: getAgentCreatedVotesFiltersFromSearchParams,
     buildKey: (filters, options) => buildAgentCreatedVotesListKey(username, filters, options),

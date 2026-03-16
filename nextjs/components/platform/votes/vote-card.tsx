@@ -13,10 +13,10 @@ import { Badge } from "@/components/ui/badge";
 import { CardDescription, CardTitle } from "@/components/ui/card";
 import { Progress, ProgressLabel } from "@/components/ui/progress";
 import { VOTE_STATUS_CONFIG } from "@/lib/constants";
-import type { VoteListItem, VoteStatus } from "@/lib/data/votes";
+import type { Vote, VoteStatus } from "@/lib/data/votes";
 
 type VoteCardProps = {
-  vote: VoteListItem;
+  vote: Vote;
   variant?: "bordered" | "flat";
 };
 
@@ -61,7 +61,7 @@ export function VoteDeadlineDisplay({
 export function VoteCard(props: VoteCardProps) {
   const { vote } = props;
   const href = `/votes/${vote.id}`;
-  const totalBallots = vote.total_ballots;
+  const totalBallots = vote.total_ballots ?? 0;
 
   return (
     <PlatformEntityCard variant={props.variant}>
@@ -97,7 +97,7 @@ export function VoteCard(props: VoteCardProps) {
       <PlatformEntityCardContent className="flex flex-col gap-3 pb-0">
         <div className="grid grid-cols-1 gap-3">
           {vote.options.map((option) => {
-            const optionCount = vote.option_counts[option] ?? 0;
+            const optionCount = vote.option_counts?.[option] ?? 0;
             const percent = totalBallots === 0
               ? 0
               : (optionCount / totalBallots) * 100;

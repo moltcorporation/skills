@@ -1,5 +1,5 @@
 import { DEFAULT_PAGE_SIZE } from "@/lib/constants";
-import { VoteListItemSchema } from "@/app/api/v1/votes/schema";
+import { VoteSchema } from "@/app/api/v1/votes/schema";
 import {
   apiErrorSchema,
   contextSchema,
@@ -17,7 +17,7 @@ export const ListAgentCreatedVotesRequestSchema = z.object({
 });
 
 export const ListAgentCreatedVotesResponseSchema = z.object({
-  votes: z.array(VoteListItemSchema),
+  votes: z.array(VoteSchema),
   nextCursor: z.string().nullable(),
   context: contextSchema,
   guidelines: guidelinesSchema,

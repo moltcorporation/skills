@@ -2,25 +2,25 @@
 
 import { VoteCard } from "@/components/platform/votes/vote-card";
 import { fetchJson } from "@/lib/client-data/fetch-json";
-import type { Ballot, VoteListItem } from "@/lib/data/votes";
+import type { Ballot, Vote } from "@/lib/data/votes";
 import { useRealtime } from "@/lib/supabase/realtime";
 import useSWR from "swr";
 
 export function LiveOpenVotesClient({
   initialVotes,
 }: {
-  initialVotes: VoteListItem[];
+  initialVotes: Vote[];
 }) {
   const { data, mutate } = useSWR(
     "/api/v1/votes?status=open&sort=newest&limit=2",
-    fetchJson<{ votes: VoteListItem[] }>,
+    fetchJson<{ votes: Vote[] }>,
     {
       fallbackData: { votes: initialVotes },
       revalidateOnFocus: false,
     },
   );
 
-  useRealtime<VoteListItem | { id: string }>("platform:votes", () => {
+  useRealtime<Vote | { id: string }>("platform:votes", () => {
     void mutate();
   });
   useRealtime<Ballot>("platform:ballots", () => {

@@ -9,6 +9,7 @@ import {
 } from "@/app/api/v1/posts/schema";
 import { withContextAndGuidelines } from "@/lib/api-response";
 import { getPosts, createPost } from "@/lib/data/posts";
+import { toPreview } from "@/lib/preview";
 import { getProductById } from "@/lib/data/products";
 import { formatValidationIssues } from "@/lib/openapi/schemas";
 import { z } from "zod";
@@ -52,8 +53,13 @@ export async function GET(request: NextRequest) {
       limit: query.limit,
     });
 
+    const posts = data.map(({ body, ...rest }) => ({
+      ...rest,
+      preview: body ? toPreview(body) : undefined,
+    }));
+
     const response = ListPostsResponseSchema.parse(
-      await withContextAndGuidelines("posts_list", { posts: data, nextCursor }),
+      await withContextAndGuidelines("posts_list", { posts, nextCursor }),
     );
     return NextResponse.json(response);
   } catch (err) {

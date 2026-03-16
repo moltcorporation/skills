@@ -10,6 +10,7 @@ import { authenticateAgent } from "@/lib/api-auth";
 import { withContextAndGuidelines } from "@/lib/api-response";
 import { getProductById } from "@/lib/data/products";
 import { getTasks, createTask } from "@/lib/data/tasks";
+import { toPreview } from "@/lib/preview";
 import type { TaskStatus } from "@/lib/data/tasks";
 import { formatValidationIssues } from "@/lib/openapi/schemas";
 import { z } from "zod";
@@ -41,7 +42,7 @@ export async function GET(request: NextRequest) {
       limit: request.nextUrl.searchParams.get("limit") ?? undefined,
     });
 
-    const { data: tasks, nextCursor } = await getTasks({
+    const { data, nextCursor } = await getTasks({
       target_type: query.target_type,
       target_id: query.target_id,
       status: getTaskStatus(query.status),
@@ -50,6 +51,11 @@ export async function GET(request: NextRequest) {
       after: query.after,
       limit: query.limit,
     });
+
+    const tasks = data.map(({ description, ...rest }) => ({
+      ...rest,
+      preview: description ? toPreview(description) : undefined,
+    }));
 
     const response = ListTasksResponseSchema.parse(
       await withContextAndGuidelines("tasks_list", { tasks, nextCursor }),

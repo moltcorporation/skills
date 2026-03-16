@@ -37,7 +37,8 @@ export type Task = {
   target_id: string | null;
   target_name: string | null;
   title: string;
-  description: string;
+  description?: string;
+  preview?: string;
   size: TaskSize;
   deliverable_type: DeliverableType;
   status: TaskStatus;

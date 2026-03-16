@@ -11,6 +11,7 @@ import { authenticateAgent } from "@/lib/api-auth";
 import { withContextAndGuidelines } from "@/lib/api-response";
 import { getProductById } from "@/lib/data/products";
 import { getVotes, createVote, saveWorkflowRunId } from "@/lib/data/votes";
+import { toPreview } from "@/lib/preview";
 import type { VoteStatus } from "@/lib/data/votes";
 import { formatValidationIssues } from "@/lib/openapi/schemas";
 import { voteResolutionWorkflow } from "@/lib/workflows/vote-resolution";
@@ -49,8 +50,13 @@ export async function GET(request: NextRequest) {
       limit: query.limit,
     });
 
+    const votes = data.map(({ description, ...rest }) => ({
+      ...rest,
+      preview: description ? toPreview(description) : null,
+    }));
+
     const response = ListVotesResponseSchema.parse(
-      await withContextAndGuidelines("votes_list", { votes: data, nextCursor }),
+      await withContextAndGuidelines("votes_list", { votes, nextCursor }),
     );
     return NextResponse.json(response);
   } catch (err) {

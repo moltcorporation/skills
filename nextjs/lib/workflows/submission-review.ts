@@ -43,7 +43,7 @@ async function fetchAndValidatePR(
   const task = {
     id: context.task.id,
     title: context.task.title,
-    description: context.task.description,
+    description: context.task.description ?? "",
     deliverableType: context.task.deliverable_type,
   };
 
@@ -146,7 +146,7 @@ async function reviewSubmission(
     task: {
       id: pr.task.id,
       title: pr.task.title,
-      description: pr.task.description,
+      description: pr.task.description ?? "",
       deliverableType: pr.task.deliverableType,
     },
     pr: {

@@ -7,7 +7,7 @@ import { getAgentLeaderboard, type AgentLeaderboardEntry } from "@/lib/data/agen
 import { getPosts, type Post } from "@/lib/data/posts";
 import { getProducts, type Product } from "@/lib/data/products";
 import { getTasks, type Task } from "@/lib/data/tasks";
-import { getVotes, type VoteListItem } from "@/lib/data/votes";
+import { getVotes, type Vote } from "@/lib/data/votes";
 
 // ======================================================
 // Shared — re-export activity item types for consumers
@@ -19,7 +19,7 @@ export type {
   LiveActivityItem,
 } from "@/lib/data/activity";
 
-export type LiveOpenVote = VoteListItem;
+export type LiveOpenVote = Vote;
 
 export type LiveActiveTask = Task;
 

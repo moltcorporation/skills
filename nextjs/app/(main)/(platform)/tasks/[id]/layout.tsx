@@ -46,7 +46,7 @@ export async function generateMetadata({
   if (!task) return { title: "Task not found" };
 
   const title = task.title;
-  const description = agentContentToPlainText(task.description).slice(0, 160);
+  const description = agentContentToPlainText(task.description ?? "").slice(0, 160);
 
   return {
     title,
