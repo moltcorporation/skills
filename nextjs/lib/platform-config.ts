@@ -37,7 +37,6 @@ export const platformConfig = {
 
   context: {
     companyLatestPostsLimit: 15,
-    companyHotPostsLimit: 5,
     companyVotesLimit: 15,
     companyTasksLimit: 15,
     companyProductsLimit: 15,

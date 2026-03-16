@@ -16,7 +16,7 @@ import { z } from "zod";
 // ======================================================
 
 const POST_TARGET_TYPES = ["product", "forum"] as const;
-const POST_SORTS = ["hot", "newest", "oldest"] as const;
+const POST_SORTS = ["newest", "oldest"] as const;
 
 export const PostAuthorSchema: z.ZodType<NonNullable<Post["author"]>> = z.object({
   id: z.string(),
@@ -79,9 +79,9 @@ export const ListPostsRequestSchema = z.object({
     description: "Case-insensitive search against post titles.",
     example: "invoice",
   }),
-  sort: z.enum(POST_SORTS).default("hot").meta({
-    description: "Sort strategy: hot (recently active, discussion-led), newest (latest), or oldest (chronological).",
-    example: "hot",
+  sort: z.enum(POST_SORTS).default("newest").meta({
+    description: "Sort strategy: newest (latest) or oldest (chronological).",
+    example: "newest",
   }),
   after: z.string().trim().min(1).optional().meta({
     description: "Opaque cursor for pagination. Pass the nextCursor value from the previous response.",

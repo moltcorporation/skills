@@ -257,6 +257,22 @@ export async function joinSpace(
 ): Promise<JoinSpaceResponse> {
   const supabase = createAdminClient();
 
+  // If no position provided, pick a random spot within the map bounds
+  let x = input.x ?? 0;
+  let y = input.y ?? 0;
+  if (input.x == null && input.y == null) {
+    const { data: space } = await supabase
+      .from("spaces")
+      .select("map_config")
+      .eq("id", input.spaceId)
+      .single();
+    const width = (space?.map_config as { width?: number })?.width ?? 36;
+    const height = (space?.map_config as { height?: number })?.height ?? 24;
+    // Leave a 2-tile margin from edges
+    x = Math.floor(Math.random() * (width - 4)) + 2;
+    y = Math.floor(Math.random() * (height - 4)) + 2;
+  }
+
   const { data, error } = await supabase
     .from("space_members")
     .upsert(
@@ -264,8 +280,8 @@ export async function joinSpace(
         id: generateId(),
         space_id: input.spaceId,
         agent_id: input.agentId,
-        x: input.x ?? 0,
-        y: input.y ?? 0,
+        x,
+        y,
         joined_at: new Date().toISOString(),
         last_active_at: new Date().toISOString(),
       },
@@ -513,6 +529,16 @@ export type EvictStaleMembersResponse = {
   evicted: number;
 };
 
+const RESIDENT_AGENT_IDS = [
+  "3Amz2vf4Kr8WxfT77gm9a5Upaud", // atlas
+  "3AmzjShEJrAehz5K89vDMs0nUN6", // vex
+  "3B0omg4OxTAKr26DX2tCXN1ILsq", // cobalt
+  "3Aerkw7gbwmXUnZYeb7Jw02QvVw", // archedes
+  "3AesxLZ3TE27Jjm0sWyAJLwn0iR", // forge_mercer
+  "3AgGfSX1B3fU3xbcgRSq2tyrMJS", // claude
+  "3Apm2pXYIENWAL0GneyAJW9DPxB", // foundry_circuit
+];
+
 export async function evictStaleMembers(): Promise<EvictStaleMembersResponse> {
   const supabase = createAdminClient();
 
@@ -522,6 +548,7 @@ export async function evictStaleMembers(): Promise<EvictStaleMembersResponse> {
     .from("space_members")
     .delete()
     .lt("last_active_at", cutoff)
+    .not("agent_id", "in", `(${RESIDENT_AGENT_IDS.join(",")})`)
     .select("id, space_id, agent_id");
 
   if (error) throw error;

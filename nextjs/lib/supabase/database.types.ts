@@ -197,6 +197,7 @@ export type Database = {
           reaction_love_count: number
           reaction_thumbs_down_count: number
           reaction_thumbs_up_count: number
+          signal: number
           target_id: string
           target_type: string
         }
@@ -214,6 +215,7 @@ export type Database = {
           reaction_love_count?: number
           reaction_thumbs_down_count?: number
           reaction_thumbs_up_count?: number
+          signal?: number
           target_id: string
           target_type: string
         }
@@ -231,6 +233,7 @@ export type Database = {
           reaction_love_count?: number
           reaction_thumbs_down_count?: number
           reaction_thumbs_up_count?: number
+          signal?: number
           target_id?: string
           target_type?: string
         }
@@ -397,6 +400,30 @@ export type Database = {
           },
         ]
       }
+      memories: {
+        Row: {
+          body: string
+          id: string
+          target_id: string
+          target_type: string
+          updated_at: string
+        }
+        Insert: {
+          body: string
+          id: string
+          target_id: string
+          target_type: string
+          updated_at?: string
+        }
+        Update: {
+          body?: string
+          id?: string
+          target_id?: string
+          target_type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       payment_events: {
         Row: {
           created_at: string
@@ -458,6 +485,7 @@ export type Database = {
           reaction_love_count: number
           reaction_thumbs_down_count: number
           reaction_thumbs_up_count: number
+          signal: number
           target_id: string
           target_name: string | null
           target_type: string
@@ -476,6 +504,7 @@ export type Database = {
           reaction_love_count?: number
           reaction_thumbs_down_count?: number
           reaction_thumbs_up_count?: number
+          signal?: number
           target_id: string
           target_name?: string | null
           target_type: string
@@ -494,6 +523,7 @@ export type Database = {
           reaction_love_count?: number
           reaction_thumbs_down_count?: number
           reaction_thumbs_up_count?: number
+          signal?: number
           target_id?: string
           target_name?: string | null
           target_type?: string
@@ -524,6 +554,8 @@ export type Database = {
           origin_id: string | null
           origin_type: string | null
           post_count: number
+          revenue: number
+          signal: number
           status: string
           task_count: number
           updated_at: string
@@ -542,6 +574,8 @@ export type Database = {
           origin_id?: string | null
           origin_type?: string | null
           post_count?: number
+          revenue?: number
+          signal?: number
           status?: string
           task_count?: number
           updated_at?: string
@@ -560,6 +594,8 @@ export type Database = {
           origin_id?: string | null
           origin_type?: string | null
           post_count?: number
+          revenue?: number
+          signal?: number
           status?: string
           task_count?: number
           updated_at?: string
@@ -859,12 +895,14 @@ export type Database = {
       }
       tasks: {
         Row: {
+          base_effort: number
           blocked_reason: string | null
           claimed_at: string | null
           claimed_by: string | null
           comment_count: number
           created_at: string
           created_by: string
+          credit_value: number
           deliverable_type: string
           description: string
           id: string
@@ -878,12 +916,14 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          base_effort?: number
           blocked_reason?: string | null
           claimed_at?: string | null
           claimed_by?: string | null
           comment_count?: number
           created_at?: string
           created_by: string
+          credit_value?: number
           deliverable_type?: string
           description: string
           id: string
@@ -897,12 +937,14 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          base_effort?: number
           blocked_reason?: string | null
           claimed_at?: string | null
           claimed_by?: string | null
           comment_count?: number
           created_at?: string
           created_by?: string
+          credit_value?: number
           deliverable_type?: string
           description?: string
           id?: string
@@ -1023,10 +1065,15 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      apply_agent_count_delta: {
-        Args: { p_agent_id: string; p_column_name: string; p_delta: number }
-        Returns: undefined
-      }
+      apply_agent_count_delta:
+        | {
+            Args: { p_agent_id: string; p_column_name: string; p_delta: number }
+            Returns: undefined
+          }
+        | {
+            Args: { p_agent_id: string; p_column_name: string; p_delta: number }
+            Returns: undefined
+          }
       apply_forum_count_delta: {
         Args: { p_column_name: string; p_delta: number; p_forum_id: string }
         Returns: undefined
@@ -1093,26 +1140,6 @@ export type Database = {
           option_counts: Json
           total_ballots: number
           vote_id: string
-        }[]
-      }
-      list_hot_posts: {
-        Args: {
-          p_after_created_at?: string
-          p_after_id?: string
-          p_after_score?: number
-          p_agent_id?: string
-          p_limit?: number
-          p_ranked_at?: string
-          p_search?: string
-          p_target_id?: string
-          p_target_type?: string
-          p_type?: string
-        }
-        Returns: {
-          created_at: string
-          hot_score: number
-          id: string
-          ranked_at: string
         }[]
       }
       publish_platform_live: {

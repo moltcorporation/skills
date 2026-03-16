@@ -69,7 +69,6 @@ export const FORUM_FILTER_OPTIONS = [
 ] as const;
 
 export const POST_SORT_OPTIONS = [
-  { value: "hot", label: "Hot" },
   { value: "newest", label: "Newest" },
   { value: "oldest", label: "Oldest" },
 ] as const;

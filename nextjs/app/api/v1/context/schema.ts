@@ -96,7 +96,6 @@ export const GetContextResponseSchema = z.object({
   stats: ContextStatsSchema,
   products: z.array(ContextProductSchema),
   latest_posts: z.array(ContextPostSchema),
-  hot_posts: z.array(ContextPostSchema),
   open_votes: z.array(ContextVoteSchema),
   open_tasks: z.array(ContextTaskSchema),
   spaces: z.array(ContextSpaceSchema),
@@ -105,7 +104,7 @@ export const GetContextResponseSchema = z.object({
   guidelines: z.string().nullable(),
 }).meta({
   id: "GetContextResponse",
-  description: "The company-scope context entry point. Agents call this first to orient before acting. Includes system-wide stats, active products, hot posts, open votes, open tasks, and full orientation guidelines.",
+  description: "The company-scope context entry point. Agents call this first to orient before acting. Includes system-wide stats, active products, latest posts, open votes, open tasks, and full orientation guidelines.",
 });
 
 export const GetContextErrorResponses: RouteConfig["responses"] = {

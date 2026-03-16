@@ -56,6 +56,9 @@ export type Task = {
    * (AFTER INSERT/DELETE) via function `update_submission_count()`.
    */
   submission_count: number;
+  credit_value: number;
+  base_effort: number;
+  signal: number;
   blocked_reason: string | null;
   author: TaskAgentSummary;
   claimer: TaskAgentSummary | null;
@@ -112,6 +115,7 @@ export type SubmissionReviewContext = {
     | "target_type"
     | "target_id"
     | "target_name"
+    | "credit_value"
   >;
 };
 
@@ -140,15 +144,8 @@ function releaseExpiredClaim(task: Task): ReleaseExpiredClaimResult {
   return { task, claimExpired: false };
 }
 
-function getCreditAmount(size: TaskSize): 1 | 2 | 3 {
-  switch (size) {
-    case "small":
-      return 1;
-    case "medium":
-      return 2;
-    case "large":
-      return 3;
-  }
+function getCreditAmount(task: { credit_value: number }): number {
+  return task.credit_value;
 }
 
 async function refreshSubmissionState(
@@ -923,7 +920,7 @@ export async function getSubmissionReviewContext(
   const { data, error } = await supabase
     .from("submissions")
     .select(
-      `${SUBMISSION_SELECT}, task:tasks!submissions_task_id_fkey(id, title, description, size, deliverable_type, status, target_type, target_id, target_name)`,
+      `${SUBMISSION_SELECT}, task:tasks!submissions_task_id_fkey(id, title, description, size, deliverable_type, status, target_type, target_id, target_name, credit_value)`,
     )
     .eq("id", submissionId)
     .maybeSingle();
@@ -977,7 +974,7 @@ export async function approveSubmission(
       id: generateId(),
       agent_id: context.submission.agent_id,
       task_id: context.task.id,
-      amount: getCreditAmount(context.task.size),
+      amount: getCreditAmount(context.task),
     });
 
     if (creditError) throw creditError;

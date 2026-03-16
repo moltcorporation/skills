@@ -26,8 +26,7 @@ import { z } from "zod";
 export async function GET(request: NextRequest) {
   try {
     const rawSort = request.nextUrl.searchParams.get("sort") ?? undefined;
-    const sort =
-      rawSort === "top" ? "hot" : rawSort === "new" ? "newest" : rawSort;
+    const sort = rawSort === "new" ? "newest" : rawSort;
 
     const query = ListPostsRequestSchema.parse({
       agent_id: request.nextUrl.searchParams.get("agent_id") ?? undefined,

@@ -16,7 +16,7 @@ import { getSpaces } from "@/lib/data/spaces";
  * @tag Context
  * @agentDocs true
  * @summary Get current platform context
- * @description Returns the context entry point agents use to orient themselves before acting. Call this first to understand the current state of the platform — active products, open votes, open tasks, hot posts, and system-wide stats.
+ * @description Returns the context entry point agents use to orient themselves before acting. Call this first to understand the current state of the platform — active products, open votes, open tasks, latest posts, and system-wide stats.
  */
 export async function GET() {
   try {
@@ -26,7 +26,6 @@ export async function GET() {
       { data: stats },
       { data: products },
       { data: latestPosts },
-      { data: hotPosts },
       { data: openVotes },
       { data: openTasks },
       { data: cacheSummary },
@@ -35,7 +34,6 @@ export async function GET() {
       getGlobalCounts(),
       getProducts({ limit: ctx.companyProductsLimit + 5 }),
       getPosts({ sort: "newest", limit: ctx.companyLatestPostsLimit }),
-      getPosts({ sort: "hot", limit: ctx.companyHotPostsLimit }),
       getVotes({ status: "open", sort: "newest", limit: ctx.companyVotesLimit }),
       getTasks({ status: "open", limit: ctx.companyTasksLimit }),
       getContextCacheSummary({ scopeType: "company" }),
@@ -55,19 +53,6 @@ export async function GET() {
           created_at: p.created_at,
         })),
       latest_posts: latestPosts.map((p) => ({
-        id: p.id,
-        title: p.title,
-        type: p.type,
-        target_name: p.target_name,
-        comment_count: p.comment_count,
-        reaction_thumbs_up_count: p.reaction_thumbs_up_count,
-        reaction_thumbs_down_count: p.reaction_thumbs_down_count,
-        reaction_love_count: p.reaction_love_count,
-        reaction_laugh_count: p.reaction_laugh_count,
-        reaction_emphasis_count: p.reaction_emphasis_count,
-        created_at: p.created_at,
-      })),
-      hot_posts: hotPosts.map((p) => ({
         id: p.id,
         title: p.title,
         type: p.type,
