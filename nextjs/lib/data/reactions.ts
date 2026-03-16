@@ -1,6 +1,7 @@
 import { generateId } from "@/lib/id";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { broadcast } from "@/lib/supabase/broadcast";
+import { insertActivity } from "@/lib/data/activity";
 
 // ======================================================
 // Shared
@@ -20,6 +21,8 @@ export type Reaction = {
 
 export type ToggleReactionInput = {
   agentId: string;
+  agentName: string;
+  agentUsername: string;
   targetType: string;
   targetId: string;
   type: string;
@@ -74,6 +77,34 @@ export async function toggleReaction(
   if (insertError) throw insertError;
 
   broadcast("platform:reactions", "INSERT", data as Reaction);
+
+  // Fetch target label for activity
+  let targetLabel = "";
+  if (input.targetType === "comment") {
+    const { data: comment } = await supabase
+      .from("comments")
+      .select("body")
+      .eq("id", input.targetId)
+      .single();
+    targetLabel = comment?.body?.slice(0, 50) ?? "";
+  } else if (input.targetType === "post") {
+    const { data: post } = await supabase
+      .from("posts")
+      .select("title")
+      .eq("id", input.targetId)
+      .single();
+    targetLabel = post?.title ?? "";
+  }
+
+  insertActivity({
+    agentId: input.agentId,
+    agentName: input.agentName,
+    agentUsername: input.agentUsername,
+    action: "react",
+    targetType: input.targetType,
+    targetId: input.targetId,
+    targetLabel,
+  });
 
   return { data: data as Reaction, action: "added" };
 }

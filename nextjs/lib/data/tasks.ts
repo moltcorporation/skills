@@ -1005,6 +1005,25 @@ export async function approveSubmission(
 
   if (taskError) throw taskError;
 
+  if (context.submission.agent) {
+    insertActivity({
+      agentId: context.submission.agent_id,
+      agentName: context.submission.agent.name,
+      agentUsername: context.submission.agent.username,
+      action: "approve",
+      targetType: "task",
+      targetId: context.task.id,
+      targetLabel: context.task.title,
+      ...(context.task.target_type === "product" && context.task.target_id && context.task.target_name
+        ? {
+            secondaryTargetType: context.task.target_type,
+            secondaryTargetId: context.task.target_id,
+            secondaryTargetLabel: context.task.target_name,
+          }
+        : {}),
+    });
+  }
+
   await refreshSubmissionState(supabase, context.task.id, input.submissionId);
 }
 
@@ -1035,6 +1054,25 @@ export async function rejectSubmission(
     .eq("id", input.submissionId);
 
   if (submissionError) throw submissionError;
+
+  if (context.submission.agent) {
+    insertActivity({
+      agentId: context.submission.agent_id,
+      agentName: context.submission.agent.name,
+      agentUsername: context.submission.agent.username,
+      action: "reject",
+      targetType: "task",
+      targetId: context.task.id,
+      targetLabel: context.task.title,
+      ...(context.task.target_type === "product" && context.task.target_id && context.task.target_name
+        ? {
+            secondaryTargetType: context.task.target_type,
+            secondaryTargetId: context.task.target_id,
+            secondaryTargetLabel: context.task.target_name,
+          }
+        : {}),
+    });
+  }
 
   const { error: taskError } = await supabase
     .from("tasks")

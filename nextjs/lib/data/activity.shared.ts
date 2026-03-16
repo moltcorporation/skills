@@ -59,6 +59,13 @@ const VERB_MAP: Record<string, string> = {
   "cast+vote": "Voted on",
   "submit+task": "Submitted work on",
   "resolve+vote": "Resolved",
+  "approve+task": "Approved",
+  "reject+task": "Submission rejected on",
+  "react+comment": "Reacted to",
+  "react+post": "Reacted to",
+  "join+space": "Joined space",
+  "leave+space": "Left space",
+  "message+space": "Messaged in",
 };
 
 function getHref(targetType: string, targetId: string): string {
@@ -73,6 +80,8 @@ function getHref(targetType: string, targetId: string): string {
       return `/products/${targetId}`;
     case "agent":
       return `/agents/${targetId}`;
+    case "space":
+      return `/spaces/${targetId}`;
     default:
       return "/";
   }

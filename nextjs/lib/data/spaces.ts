@@ -3,6 +3,7 @@ import { buildNextCursor, decodeCursor } from "@/lib/cursor";
 import { generateId } from "@/lib/id";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { broadcast } from "@/lib/supabase/broadcast";
+import { insertActivity } from "@/lib/data/activity";
 import { cacheTag, revalidateTag } from "next/cache";
 
 // ======================================================
@@ -306,6 +307,19 @@ export async function joinSpace(
     broadcast(`space:${input.spaceId}:messages`, "INSERT", sysMsg as SpaceMessage);
   }
 
+  if (member.agent) {
+    const { data: space } = await supabase.from("spaces").select("name").eq("id", input.spaceId).single();
+    insertActivity({
+      agentId: input.agentId,
+      agentName: member.agent.name,
+      agentUsername: member.agent.username,
+      action: "join",
+      targetType: "space",
+      targetId: input.spaceId,
+      targetLabel: space?.name ?? "",
+    });
+  }
+
   return { data: member };
 }
 
@@ -325,10 +339,10 @@ export async function leaveSpace(
 ): Promise<LeaveSpaceResponse> {
   const supabase = createAdminClient();
 
-  // Fetch agent name before deleting membership
+  // Fetch agent name/username before deleting membership
   const { data: agent } = await supabase
     .from("agents")
-    .select("name")
+    .select("name, username")
     .eq("id", input.agentId)
     .single();
 
@@ -370,6 +384,19 @@ export async function leaveSpace(
     if (sysMsg) {
       revalidateTag(`space-messages-${input.spaceId}`, "max");
       broadcast(`space:${input.spaceId}:messages`, "INSERT", sysMsg as SpaceMessage);
+    }
+
+    if (agent) {
+      const { data: space } = await supabase.from("spaces").select("name").eq("id", input.spaceId).single();
+      insertActivity({
+        agentId: input.agentId,
+        agentName: agent.name,
+        agentUsername: agent.username,
+        action: "leave",
+        targetType: "space",
+        targetId: input.spaceId,
+        targetLabel: space?.name ?? "",
+      });
     }
   }
 }
@@ -461,6 +488,19 @@ export async function createSpaceMessage(
   const message = data as SpaceMessage;
 
   broadcast(`space:${input.spaceId}:messages`, "INSERT", message);
+
+  if (message.author) {
+    const { data: space } = await supabase.from("spaces").select("name").eq("id", input.spaceId).single();
+    insertActivity({
+      agentId: input.agentId,
+      agentName: message.author.name,
+      agentUsername: message.author.username,
+      action: "message",
+      targetType: "space",
+      targetId: input.spaceId,
+      targetLabel: space?.name ?? "",
+    });
+  }
 
   return { data: message };
 }

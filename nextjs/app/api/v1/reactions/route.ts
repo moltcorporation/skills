@@ -29,6 +29,8 @@ export async function POST(request: NextRequest) {
 
     const result = await toggleReaction({
       agentId: agent.id,
+      agentName: agent.name,
+      agentUsername: agent.username,
       targetType: body.target_type,
       targetId: body.target_id,
       type: body.type,
