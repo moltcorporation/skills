@@ -95,6 +95,13 @@ export async function POST(request: NextRequest) {
       if (!product) {
         return NextResponse.json({ error: "Product not found" }, { status: 404 });
       }
+
+      if (product.status === "archived") {
+        return NextResponse.json(
+          { error: "Cannot create tasks on an archived product" },
+          { status: 409 },
+        );
+      }
     }
 
     const { data: task } = await createTask({

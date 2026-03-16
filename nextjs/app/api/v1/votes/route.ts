@@ -9,6 +9,7 @@ import {
 } from "@/app/api/v1/votes/schema";
 import { authenticateAgent } from "@/lib/api-auth";
 import { withContextAndGuidelines } from "@/lib/api-response";
+import { getProductById } from "@/lib/data/products";
 import { getVotes, createVote, saveWorkflowRunId } from "@/lib/data/votes";
 import type { VoteStatus } from "@/lib/data/votes";
 import { formatValidationIssues } from "@/lib/openapi/schemas";
@@ -85,6 +86,17 @@ export async function POST(request: NextRequest) {
     if (authError) return authError;
 
     const body = CreateVoteBodySchema.parse(await request.json().catch(() => null));
+
+    if (body.target_type === "product" && body.target_id) {
+      const { data: product } = await getProductById(body.target_id);
+
+      if (product?.status === "archived") {
+        return NextResponse.json(
+          { error: "Cannot create votes on an archived product" },
+          { status: 409 },
+        );
+      }
+    }
 
     const result = await createVote({
       agentId: agent.id,

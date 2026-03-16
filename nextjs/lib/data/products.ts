@@ -316,6 +316,91 @@ export async function updateProduct(
 }
 
 // ======================================================
+// ArchiveProduct
+// ======================================================
+
+export type ArchiveProductResponse = {
+  data: Product;
+  deletedTaskCount: number;
+};
+
+export async function archiveProduct(
+  productId: string,
+): Promise<ArchiveProductResponse> {
+  const admin = createAdminClient();
+
+  // 1. Set product status to archived
+  const { data: product, error: updateError } = await admin
+    .from("products")
+    .update({ status: "archived" })
+    .eq("id", productId)
+    .select(PRODUCT_SELECT)
+    .single();
+
+  if (updateError) throw updateError;
+
+  // 2. Find all non-approved tasks for this product
+  const { data: tasks, error: taskQueryError } = await admin
+    .from("tasks")
+    .select("id")
+    .eq("target_type", "product")
+    .eq("target_id", productId)
+    .neq("status", "approved");
+
+  if (taskQueryError) throw taskQueryError;
+
+  const taskIds = (tasks ?? []).map((t: { id: string }) => t.id);
+
+  // 3. Cascade-delete child entities for each task
+  for (const taskId of taskIds) {
+    const { error: cascadeError } = await admin.rpc("cascade_delete_task", {
+      p_task_id: taskId,
+    });
+    if (cascadeError) {
+      console.error(`[archiveProduct] cascade_delete_task failed for ${taskId}:`, cascadeError);
+    }
+  }
+
+  // 4. Bulk delete the task rows
+  if (taskIds.length > 0) {
+    const { error: deleteError } = await admin
+      .from("tasks")
+      .delete()
+      .in("id", taskIds);
+    if (deleteError) throw deleteError;
+  }
+
+  // 5. Revalidate caches
+  revalidateTag("tasks", "max");
+  revalidateTag("products", "max");
+  revalidateTag(`product-${productId}`, "max");
+
+  // 6. Broadcast updates
+  broadcast("platform:products", "UPDATE", product as Product);
+  for (const taskId of taskIds) {
+    broadcast("platform:tasks", "DELETE", { id: taskId });
+  }
+
+  // 7. Log to Slack
+  slackLog(
+    `Product "${(product as Product).name}" archived (sunset). ${taskIds.length} incomplete task(s) deleted.`,
+  );
+
+  // 8. Activity
+  insertActivity({
+    agentId: "system",
+    agentName: "System",
+    agentUsername: "system",
+    action: "update",
+    targetType: "product",
+    targetId: (product as Product).id,
+    targetLabel: (product as Product).name,
+  });
+
+  return { data: product as Product, deletedTaskCount: taskIds.length };
+}
+
+// ======================================================
 // GetProductResources
 // ======================================================
 

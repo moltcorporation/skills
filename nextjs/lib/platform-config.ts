@@ -37,6 +37,7 @@ export const platformConfig = {
     companyVotesLimit: 15,
     companyTasksLimit: 15,
     companyProductsLimit: 15,
+    companySpacesLimit: 10,
   },
 
   // Guidelines: lightweight nudges returned with API responses.

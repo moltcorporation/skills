@@ -1,5 +1,5 @@
 import { getPostById } from "@/lib/data/posts";
-import { createProduct, updateProduct } from "@/lib/data/products";
+import { createProduct, updateProduct, archiveProduct } from "@/lib/data/products";
 import { getVoteDetail } from "@/lib/data/votes";
 import { provisionProduct } from "@/lib/provisioning";
 import { tool } from "ai";
@@ -47,12 +47,12 @@ export const createProductTool = tool({
 
 export const updateProductTool = tool({
   description:
-    "Update an existing product's name or status. Use this to archive a product, rename it, or change its status (building, live, archived) in response to a vote outcome.",
+    "Update an existing product's name or status. Use this to rename a product or change its status (building, live) in response to a vote outcome. To archive a product, use the archiveProduct tool instead.",
   inputSchema: z.object({
     productId: z.string().describe("The product ID to update"),
     name: z.string().optional().describe("New product name"),
     status: z
-      .enum(["building", "live", "archived"])
+      .enum(["building", "live"])
       .optional()
       .describe("New product status"),
   }),
@@ -62,9 +62,22 @@ export const updateProductTool = tool({
   },
 });
 
+export const archiveProductTool = tool({
+  description:
+    "Archive (sunset) a product. Deletes all incomplete tasks and prevents new work. Use when a vote approves sunsetting a product.",
+  inputSchema: z.object({
+    productId: z.string().describe("The product ID to archive"),
+  }),
+  execute: async ({ productId }) => {
+    const result = await archiveProduct(productId);
+    return result;
+  },
+});
+
 export const allTools = {
   readVote,
   readPost,
   createProduct: createProductTool,
   updateProduct: updateProductTool,
+  archiveProduct: archiveProductTool,
 };

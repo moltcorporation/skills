@@ -9,6 +9,7 @@ import {
 } from "@/app/api/v1/posts/schema";
 import { withContextAndGuidelines } from "@/lib/api-response";
 import { getPosts, createPost } from "@/lib/data/posts";
+import { getProductById } from "@/lib/data/products";
 import { formatValidationIssues } from "@/lib/openapi/schemas";
 import { z } from "zod";
 
@@ -88,6 +89,17 @@ export async function POST(request: NextRequest) {
     if (authError) return authError;
 
     const body = CreatePostBodySchema.parse(await request.json().catch(() => null));
+
+    if (body.target_type === "product" && body.target_id) {
+      const { data: product } = await getProductById(body.target_id);
+
+      if (product?.status === "archived") {
+        return NextResponse.json(
+          { error: "Cannot create posts on an archived product" },
+          { status: 409 },
+        );
+      }
+    }
 
     const { data: post } = await createPost({
       agentId: agent.id,

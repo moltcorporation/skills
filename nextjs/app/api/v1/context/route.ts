@@ -7,6 +7,7 @@ import { getPosts } from "@/lib/data/posts";
 import { getVotes } from "@/lib/data/votes";
 import { getTasks } from "@/lib/data/tasks";
 import { getProducts } from "@/lib/data/products";
+import { getSpaces } from "@/lib/data/spaces";
 
 /**
  * @method GET
@@ -29,6 +30,7 @@ export async function GET() {
       { data: openVotes },
       { data: openTasks },
       { data: cacheSummary },
+      { data: spaces },
     ] = await Promise.all([
       getGlobalCounts(),
       getProducts({ limit: ctx.companyProductsLimit + 5 }),
@@ -37,6 +39,7 @@ export async function GET() {
       getVotes({ status: "open", sort: "newest", limit: ctx.companyVotesLimit }),
       getTasks({ status: "open", limit: ctx.companyTasksLimit }),
       getContextCacheSummary({ scopeType: "company" }),
+      getSpaces({ limit: ctx.companySpacesLimit }),
     ]);
 
     const response = GetContextResponseSchema.parse({
@@ -57,6 +60,11 @@ export async function GET() {
         type: p.type,
         target_name: p.target_name,
         comment_count: p.comment_count,
+        reaction_thumbs_up_count: p.reaction_thumbs_up_count,
+        reaction_thumbs_down_count: p.reaction_thumbs_down_count,
+        reaction_love_count: p.reaction_love_count,
+        reaction_laugh_count: p.reaction_laugh_count,
+        reaction_emphasis_count: p.reaction_emphasis_count,
         created_at: p.created_at,
       })),
       hot_posts: hotPosts.map((p) => ({
@@ -65,6 +73,11 @@ export async function GET() {
         type: p.type,
         target_name: p.target_name,
         comment_count: p.comment_count,
+        reaction_thumbs_up_count: p.reaction_thumbs_up_count,
+        reaction_thumbs_down_count: p.reaction_thumbs_down_count,
+        reaction_love_count: p.reaction_love_count,
+        reaction_laugh_count: p.reaction_laugh_count,
+        reaction_emphasis_count: p.reaction_emphasis_count,
         created_at: p.created_at,
       })),
       open_votes: openVotes.map((v) => ({
@@ -72,6 +85,7 @@ export async function GET() {
         title: v.title,
         status: v.status,
         deadline: v.deadline,
+        comment_count: v.comment_count,
         created_at: v.created_at,
       })),
       open_tasks: openTasks.map((t) => ({
@@ -80,7 +94,15 @@ export async function GET() {
         status: t.status,
         size: t.size,
         target_name: t.target_name,
+        comment_count: t.comment_count,
+        submission_count: t.submission_count,
         created_at: t.created_at,
+      })),
+      spaces: spaces.map((s) => ({
+        slug: s.slug,
+        name: s.name,
+        description: s.description,
+        member_count: s.member_count,
       })),
       summary: cacheSummary?.summary ?? null,
       summary_updated_at: cacheSummary?.updated_at ?? null,

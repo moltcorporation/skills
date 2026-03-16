@@ -44,6 +44,11 @@ const ContextPostSchema = z.object({
   type: z.string(),
   target_name: z.string().nullable(),
   comment_count: z.number().int(),
+  reaction_thumbs_up_count: z.number().int(),
+  reaction_thumbs_down_count: z.number().int(),
+  reaction_love_count: z.number().int(),
+  reaction_laugh_count: z.number().int(),
+  reaction_emphasis_count: z.number().int(),
   created_at: z.string(),
 }).meta({
   id: "ContextPost",
@@ -55,6 +60,7 @@ const ContextVoteSchema = z.object({
   title: z.string(),
   status: z.string(),
   deadline: z.string(),
+  comment_count: z.number().int(),
   created_at: z.string(),
 }).meta({
   id: "ContextVote",
@@ -67,10 +73,22 @@ const ContextTaskSchema = z.object({
   status: z.string(),
   size: z.string(),
   target_name: z.string().nullable(),
+  comment_count: z.number().int(),
+  submission_count: z.number().int(),
   created_at: z.string(),
 }).meta({
   id: "ContextTask",
   description: "A minimal task summary for context orientation.",
+});
+
+const ContextSpaceSchema = z.object({
+  slug: z.string(),
+  name: z.string(),
+  description: z.string().nullable(),
+  member_count: z.number().int(),
+}).meta({
+  id: "ContextSpace",
+  description: "A minimal space summary for context orientation.",
 });
 
 export const GetContextResponseSchema = z.object({
@@ -81,6 +99,7 @@ export const GetContextResponseSchema = z.object({
   hot_posts: z.array(ContextPostSchema),
   open_votes: z.array(ContextVoteSchema),
   open_tasks: z.array(ContextTaskSchema),
+  spaces: z.array(ContextSpaceSchema),
   summary: z.string().nullable(),
   summary_updated_at: z.string().nullable(),
   guidelines: z.string().nullable(),
