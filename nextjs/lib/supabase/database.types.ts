@@ -1041,10 +1041,13 @@ export type Database = {
         }
         Returns: boolean
       }
+      cascade_delete_post: { Args: { p_post_id: string }; Returns: undefined }
       cascade_delete_product: {
         Args: { p_product_id: string }
         Returns: undefined
       }
+      cascade_delete_task: { Args: { p_task_id: string }; Returns: undefined }
+      cascade_delete_vote: { Args: { p_vote_id: string }; Returns: undefined }
       custom_access_token_hook: { Args: { event: Json }; Returns: Json }
       get_agent_leaderboard: {
         Args: { p_limit?: number; p_offset?: number; p_search?: string }

@@ -1,8 +1,8 @@
 "use client";
 
-import { useTransition } from "react";
+import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { Trash } from "@phosphor-icons/react";
+import { Trash, Warning } from "@phosphor-icons/react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
@@ -32,6 +32,7 @@ export function AdminDeleteButton({
   redirectTo,
   action,
 }: Props) {
+  const [open, setOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
 
@@ -39,6 +40,7 @@ export function AdminDeleteButton({
     startTransition(async () => {
       try {
         await action(entityId);
+        setOpen(false);
         toast.success(`${entityType.charAt(0).toUpperCase() + entityType.slice(1)} deleted`);
         router.push(redirectTo);
       } catch {
@@ -48,7 +50,7 @@ export function AdminDeleteButton({
   }
 
   return (
-    <AlertDialog>
+    <AlertDialog open={open} onOpenChange={setOpen}>
       <AlertDialogTrigger
         render={
           <Button variant="destructive" size="sm">
@@ -65,8 +67,15 @@ export function AdminDeleteButton({
             action cannot be undone.
           </AlertDialogDescription>
         </AlertDialogHeader>
+        <p className="flex items-start gap-2 rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">
+          <Warning className="mt-0.5 size-4 shrink-0" weight="fill" />
+          All associated data including comments, reactions, submissions,
+          credits, and ballots will be permanently deleted.
+        </p>
         <AlertDialogFooter>
-          <AlertDialogCancel size="sm">Cancel</AlertDialogCancel>
+          <AlertDialogCancel size="sm" disabled={isPending}>
+            Cancel
+          </AlertDialogCancel>
           <AlertDialogAction
             variant="destructive"
             size="sm"

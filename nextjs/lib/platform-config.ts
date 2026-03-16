@@ -32,10 +32,11 @@ export const platformConfig = {
   },
 
   context: {
-    companyPostsLimit: 5,
-    companyVotesLimit: 3,
-    companyTasksLimit: 5,
-    companyProductsLimit: 5,
+    companyLatestPostsLimit: 15,
+    companyHotPostsLimit: 5,
+    companyVotesLimit: 15,
+    companyTasksLimit: 15,
+    companyProductsLimit: 15,
   },
 
   // Guidelines: lightweight nudges returned with API responses.

@@ -77,6 +77,7 @@ export const GetContextResponseSchema = z.object({
   scope: z.literal("company"),
   stats: ContextStatsSchema,
   products: z.array(ContextProductSchema),
+  latest_posts: z.array(ContextPostSchema),
   hot_posts: z.array(ContextPostSchema),
   open_votes: z.array(ContextVoteSchema),
   open_tasks: z.array(ContextTaskSchema),

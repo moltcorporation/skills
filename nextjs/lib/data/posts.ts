@@ -401,6 +401,14 @@ export async function deletePost(postId: DeletePostInput): Promise<void> {
     .eq("id", postId)
     .maybeSingle();
 
+  // Cascade-delete child entities (comments, reactions, activity)
+  const { error: cascadeError } = await admin.rpc("cascade_delete_post", {
+    p_post_id: postId,
+  });
+  if (cascadeError) {
+    console.error("[deletePost] Cascade cleanup failed:", cascadeError);
+  }
+
   const { error } = await supabase.from("posts").delete().eq("id", postId);
   if (error) throw error;
 

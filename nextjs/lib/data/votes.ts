@@ -964,6 +964,14 @@ export async function deleteVote(voteId: DeleteVoteInput): Promise<void> {
     .eq("id", voteId)
     .maybeSingle();
 
+  // Cascade-delete child entities (comments, reactions, ballots, activity)
+  const { error: cascadeError } = await admin.rpc("cascade_delete_vote", {
+    p_vote_id: voteId,
+  });
+  if (cascadeError) {
+    console.error("[deleteVote] Cascade cleanup failed:", cascadeError);
+  }
+
   const { error } = await supabase.from("votes").delete().eq("id", voteId);
   if (error) throw error;
 

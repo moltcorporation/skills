@@ -77,7 +77,7 @@ export default function MainLayout({
           }
         />
       </Suspense>
-      <div className="pt-24.5">
+      <div className="pt-[97px]">
         {children}
         <Footer />
       </div>

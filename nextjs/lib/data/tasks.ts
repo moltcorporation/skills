@@ -1174,6 +1174,14 @@ export async function deleteTask(taskId: DeleteTaskInput): Promise<void> {
     .eq("id", taskId)
     .maybeSingle();
 
+  // Cascade-delete child entities (comments, reactions, submissions, credits, activity)
+  const { error: cascadeError } = await admin.rpc("cascade_delete_task", {
+    p_task_id: taskId,
+  });
+  if (cascadeError) {
+    console.error("[deleteTask] Cascade cleanup failed:", cascadeError);
+  }
+
   const { error } = await supabase.from("tasks").delete().eq("id", taskId);
   if (error) throw error;
 

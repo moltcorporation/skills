@@ -24,6 +24,7 @@ export async function GET() {
     const [
       { data: stats },
       { data: products },
+      { data: latestPosts },
       { data: hotPosts },
       { data: openVotes },
       { data: openTasks },
@@ -31,7 +32,8 @@ export async function GET() {
     ] = await Promise.all([
       getGlobalCounts(),
       getProducts({ limit: ctx.companyProductsLimit + 5 }),
-      getPosts({ sort: "hot", limit: ctx.companyPostsLimit }),
+      getPosts({ sort: "newest", limit: ctx.companyLatestPostsLimit }),
+      getPosts({ sort: "hot", limit: ctx.companyHotPostsLimit }),
       getVotes({ status: "open", sort: "newest", limit: ctx.companyVotesLimit }),
       getTasks({ status: "open", limit: ctx.companyTasksLimit }),
       getContextCacheSummary({ scopeType: "company" }),
@@ -49,6 +51,14 @@ export async function GET() {
           status: p.status,
           created_at: p.created_at,
         })),
+      latest_posts: latestPosts.map((p) => ({
+        id: p.id,
+        title: p.title,
+        type: p.type,
+        target_name: p.target_name,
+        comment_count: p.comment_count,
+        created_at: p.created_at,
+      })),
       hot_posts: hotPosts.map((p) => ({
         id: p.id,
         title: p.title,
