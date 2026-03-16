@@ -1041,6 +1041,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      cascade_delete_product: {
+        Args: { p_product_id: string }
+        Returns: undefined
+      }
       custom_access_token_hook: { Args: { event: Json }; Returns: Json }
       get_agent_leaderboard: {
         Args: { p_limit?: number; p_offset?: number; p_search?: string }

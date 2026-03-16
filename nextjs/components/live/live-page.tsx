@@ -64,10 +64,10 @@ function LiveActivityPage() {
         )}
       >
         <div className="flex flex-col gap-8">
-          <LiveOpenVotesSection />
-          <LiveRecentPostsSection />
-          <LiveProductsSection />
           <LiveActiveTasksSection />
+          <LiveRecentPostsSection />
+          <LiveOpenVotesSection />
+          <LiveProductsSection />
         </div>
       </PlatformPageBody>
     </>

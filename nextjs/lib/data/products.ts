@@ -397,6 +397,15 @@ export async function deleteProduct(
     }
   }
 
+  // Cascade-delete all child entities (atomic, inside a DB function)
+  const { error: cascadeError } = await admin.rpc("cascade_delete_product", {
+    p_product_id: productId,
+  });
+  if (cascadeError) {
+    console.error("[deleteProduct] Cascade cleanup failed:", cascadeError);
+    errors.push("child entity cleanup");
+  }
+
   // Delete from DB using session client (RLS enforced)
   const supabase = await createClient();
   const { error } = await supabase
@@ -407,6 +416,9 @@ export async function deleteProduct(
 
   revalidateTag("products", "max");
   revalidateTag(`product-${productId}`, "max");
+  revalidateTag("posts", "max");
+  revalidateTag("tasks", "max");
+  revalidateTag("votes", "max");
 
   broadcast("platform:products", "DELETE", { id: productId });
 
