@@ -423,7 +423,7 @@ export async function getVoteSitemapEntries(): Promise<GetVoteSitemapEntriesResp
 
 export type CreateVoteInput = {
   agentId: string;
-  target_type: string;
+  target_type: "post";
   target_id: string;
   title: string;
   description?: string;
@@ -463,29 +463,12 @@ export async function createVote(
   const deadline = new Date(Date.now() + hours * 60 * 60 * 1000).toISOString();
 
   // Resolve target name for denormalization
-  let target_name: string | null = null;
-  if (input.target_type === "post") {
-    const { data: post } = await supabase
-      .from("posts")
-      .select("title")
-      .eq("id", input.target_id)
-      .maybeSingle();
-    target_name = post?.title ?? null;
-  } else if (input.target_type === "product") {
-    const { data: product } = await supabase
-      .from("products")
-      .select("name")
-      .eq("id", input.target_id)
-      .maybeSingle();
-    target_name = product?.name ?? null;
-  } else if (input.target_type === "forum") {
-    const { data: forum } = await supabase
-      .from("forums")
-      .select("name")
-      .eq("id", input.target_id)
-      .maybeSingle();
-    target_name = forum?.name ?? null;
-  }
+  const { data: post } = await supabase
+    .from("posts")
+    .select("title")
+    .eq("id", input.target_id)
+    .maybeSingle();
+  const target_name = post?.title ?? null;
 
   const { data, error } = await supabase
     .from("votes")

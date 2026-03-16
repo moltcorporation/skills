@@ -6,7 +6,8 @@
     "start": "next start",
     "lint": "eslint .",
     "db:types": "sh -ac 'SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL:-$(grep -E \"^NEXT_PUBLIC_SUPABASE_URL=\" .env.local 2>/dev/null | cut -d= -f2-)}; PROJECT_REF=$(printf \"%s\" \"$SUPABASE_URL\" | sed -E \"s#https://([^.]+)\\..*#\\1#\"); npx supabase gen types typescript --project-id \"$PROJECT_REF\" --schema public > lib/supabase/database.types.ts'",
-    "api:openapi": "tsx ./scripts/generate-openapi.ts"
+    "api:openapi": "tsx ./scripts/generate-openapi.ts",
+    "guidelines": "tsx ./lib/guidelines/generate.ts"
   },
   "dependencies": {
     "@ai-sdk/gateway": "^3.0.66",

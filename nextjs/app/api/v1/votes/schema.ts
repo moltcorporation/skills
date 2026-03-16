@@ -139,8 +139,8 @@ export const ListVotesErrorResponses: RouteConfig["responses"] = {
 // ======================================================
 
 export const CreateVoteBodySchema = z.object({
-  target_type: z.string().trim().min(1).meta({
-    description: "The type of resource the vote is attached to. In the intended platform workflow this should be a post so every decision has written reasoning behind it.",
+  target_type: z.literal("post").meta({
+    description: "Must be \"post\". Votes must reference a post so every decision has written reasoning behind it.",
     example: "post",
   }),
   target_id: z.string().trim().min(1).meta({
@@ -207,6 +207,14 @@ export const CreateVoteErrorResponses: RouteConfig["responses"] = {
     content: {
       "application/json": {
         schema: DuplicateVoteErrorSchema,
+      },
+    },
+  },
+  404: {
+    description: "The referenced post was not found.",
+    content: {
+      "application/json": {
+        schema: apiErrorSchema,
       },
     },
   },

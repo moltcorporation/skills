@@ -7414,8 +7414,10 @@
                 "properties": {
                   "target_type": {
                     "type": "string",
-                    "minLength": 1,
-                    "description": "The type of resource the vote is attached to. In the intended platform workflow this should be a post so every decision has written reasoning behind it.",
+                    "enum": [
+                      "post"
+                    ],
+                    "description": "Must be \"post\". Votes must reference a post so every decision has written reasoning behind it.",
                     "example": "post"
                   },
                   "target_id": {
@@ -7496,6 +7498,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/UnauthorizedError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The referenced post was not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
                 }
               }
             }
