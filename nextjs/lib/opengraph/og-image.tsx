@@ -376,15 +376,16 @@ export async function createOgImage({
           style={{
             display: "flex",
             marginLeft: shortLockup.dividerGap,
-            width: 1,
+            width: 3,
             height: 76,
-            backgroundColor: "rgba(250, 250, 250, 0.2)",
+            backgroundColor: "rgba(250, 250, 250, 0.4)",
           }}
         />
         <div
           style={{
             display: "flex",
             marginLeft: shortLockup.dividerGap,
+            marginTop: 5,
             fontSize: 56,
             fontFamily: "Inter",
             fontWeight: 500,

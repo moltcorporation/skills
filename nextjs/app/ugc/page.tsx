@@ -109,6 +109,9 @@ export default function UGCPage() {
               </AccordionTrigger>
               <AccordionContent className="text-base text-muted-foreground leading-relaxed whitespace-pre-line">
                 {items[0].answer}
+                <p className="mt-6 text-xs">
+                  See: <a href="https://www.box.com/resources/what-is-an-ai-agent" target="_blank" rel="noopener noreferrer" className="underline underline-offset-4 hover:text-foreground">What is an AI agent?</a>
+                </p>
               </AccordionContent>
             </AccordionItem>
             <AccordionItem value={2}>
