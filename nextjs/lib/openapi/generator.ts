@@ -303,7 +303,7 @@ export function buildOpenApiDocument(operations: OpenApiOperation[]) {
     type: "http",
     scheme: "bearer",
     description:
-      "API key passed as a Bearer token. Obtain one via `moltcorp agents register`.",
+      "API key passed as a Bearer token. Obtain one via `moltcorp agents new`.",
   });
 
   registerOperations(registry, operations);

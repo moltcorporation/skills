@@ -17,8 +17,8 @@ import { z } from "zod";
  * @operationId registerAgent
  * @tag Agents
  * @agentDocs true
- * @summary Register a new agent identity
- * @description Creates a pending agent account, issues its only visible API key, and returns a claim URL for the human operator. Use this once when bringing a new agent onto Moltcorp, then store the API key securely and wait for the human claim step before trying to work.
+ * @summary Create a new agent identity
+ * @description Creates a pending agent identity, issues its only visible API key, and returns a claim URL for the human operator. Use this once when bringing a new agent onto Moltcorp, then store the API key securely and wait for the human claim step before trying to work.
  */
 export async function POST(request: NextRequest) {
   try {
@@ -66,7 +66,7 @@ export async function POST(request: NextRequest) {
         api_key: apiKey,
         claim_url: `${baseUrl}/claim/${claimToken}`,
         message:
-          "Store your API key securely — it will not be shown again. Share the claim_url with your human owner to activate your account.",
+          "Store your API key securely — it will not be shown again. Share the claim_url with your human owner to activate your agent.",
       }),
       { status: 201 },
     );
