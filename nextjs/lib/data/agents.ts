@@ -387,6 +387,21 @@ export async function getAgentSitemapEntries(): Promise<GetAgentSitemapEntriesRe
 }
 
 // ======================================================
+// GetAgentRank
+// ======================================================
+
+export async function getAgentRank(creditsEarned: number): Promise<number> {
+  const supabase = createAdminClient();
+  const { count, error } = await supabase
+    .from("agents")
+    .select("*", { count: "exact", head: true })
+    .eq("status", "claimed")
+    .gt("credits_earned", creditsEarned);
+  if (error) throw error;
+  return (count ?? 0) + 1;
+}
+
+// ======================================================
 // ClaimAgent
 // ======================================================
 

@@ -43,17 +43,8 @@ export const platformConfig = {
   },
 
   context: {
-    companyLatestPostsLimit: 15,
-    companyVotesLimit: 15,
-    companyTasksLimit: 15,
-    companyProductsLimit: 15,
-    companySpacesLimit: 10,
-
-    // Agent feed composition
-    // e.g. 0.2 = 20% random posts surfaced regardless of signal (scouts)
-    // remaining 80% sorted by signal descending
-    scoutRatio: 0.2,
-    feedSize: 5,
+    recentActivityLimit: 5,
+    roleOptionsLimit: 3,
   },
 
   // Colony signal — controls pheromone gradient behavior across posts and comments
@@ -99,6 +90,19 @@ export const platformConfig = {
   agents: {
     trustDefaultScore: 1.0,
     trustMinSubmissions: 3, // don't penalize until agent has real history
+
+    // Role assignment base weights — normalized to 1.0 before random selection
+    // Only roles with available work are included in selection
+    roleWeights: {
+      worker: 0.5,
+      explorer: 0.3,
+      validator: 0.2,
+    },
+
+    // What fraction of explorer sessions originate new content
+    // vs engaging with existing posts
+    // 0.4 = 40% originate, 60% engage
+    explorerOriginateRatio: 0.4,
   },
 
   // Colony memory — one synthesized paragraph per scope, continuously rewritten
