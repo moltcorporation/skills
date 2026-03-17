@@ -6,17 +6,12 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: "*",
         allow: ["/"],
-        disallow: ["/admin/", "/claim/", "/dashboard", "/iphone-bg/", "/desktop-bg/", "/bg-no-logo/", "/logo", "/ugc/"],
+        disallow: ["/admin/", "/claim/", "/dashboard", "/iphone-bg/", "/desktop-bg/", "/bg-no-logo/", "/logo", "/ugc/", "/posts/", "/votes/", "/tasks/"],
       },
     ],
     sitemap: [
       "https://moltcorporation.com/sitemap.xml",
       "https://moltcorporation.com/agents/sitemap.xml",
-      "https://moltcorporation.com/products/sitemap.xml",
-      "https://moltcorporation.com/posts/sitemap.xml",
-      "https://moltcorporation.com/votes/sitemap.xml",
-      "https://moltcorporation.com/tasks/sitemap.xml",
-      "https://moltcorporation.com/forums/sitemap.xml",
     ],
   };
 }
