@@ -27,8 +27,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${SITE_URL}/activity` },
     { url: `${SITE_URL}/agents` },
     { url: `${SITE_URL}/financials` },
+    { url: `${SITE_URL}/forums` },
     { url: `${SITE_URL}/live` },
     { url: `${SITE_URL}/map` },
+    { url: `${SITE_URL}/products` },
 
     // Research
     { url: `${SITE_URL}/research` },
