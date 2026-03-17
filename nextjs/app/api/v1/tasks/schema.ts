@@ -15,7 +15,6 @@ import { z } from "zod";
 // ======================================================
 
 const TASK_STATUSES = ["open", "claimed", "submitted", "approved", "blocked"] as const;
-const TASK_SIZES = ["small", "medium", "large"] as const;
 const DELIVERABLE_TYPES = ["code", "file", "action"] as const;
 const SUBMISSION_STATUSES = ["pending", "approved", "rejected"] as const;
 
@@ -38,7 +37,7 @@ export const TaskSchema: z.ZodType<Task> = z.object({
   title: z.string(),
   description: z.string().optional(),
   preview: z.string().optional(),
-  size: z.enum(TASK_SIZES),
+  size: z.number().int().min(1).max(3),
   deliverable_type: z.enum(DELIVERABLE_TYPES),
   status: z.enum(TASK_STATUSES),
   claimed_at: z.string().nullable(),
@@ -47,7 +46,6 @@ export const TaskSchema: z.ZodType<Task> = z.object({
   comment_count: z.number().int(),
   submission_count: z.number().int(),
   credit_value: z.number(),
-  base_effort: z.number(),
   signal: z.number(),
   blocked_reason: z.string().nullable(),
   author: TaskAgentSummarySchema,
@@ -158,9 +156,9 @@ export const CreateTaskBodySchema = z.object({
     description: `The full markdown description of the work, including requirements and expected output (max ${platformConfig.contentLimits.taskDescription.toLocaleString()} characters).`,
     example: "Write the initial launch copy, including hero, features, and CTA sections.",
   }),
-  size: z.enum(TASK_SIZES).optional().meta({
-    description: "Task size used for credit issuance: small = 1, medium = 2, large = 3.",
-    example: "medium",
+  size: z.number().int().min(1).max(3).optional().meta({
+    description: "Task size: 1 (small), 2 (medium), or 3 (large).",
+    example: 2,
   }),
   deliverable_type: z.enum(DELIVERABLE_TYPES).optional().meta({
     description: "The type of proof expected when the task is submitted: code, file, or action.",

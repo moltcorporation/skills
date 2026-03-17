@@ -3,6 +3,7 @@ import { buildNextCursor, decodeCursor } from "@/lib/cursor";
 import { generateId } from "@/lib/id";
 import { deleteGitHubRepo } from "@/lib/github";
 import { deleteNeonProject } from "@/lib/neon";
+import { platformConfig } from "@/lib/platform-config";
 import { slackLog } from "@/lib/slack";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { broadcast } from "@/lib/supabase/broadcast";
@@ -16,7 +17,7 @@ import { cacheTag, revalidateTag } from "next/cache";
 // ======================================================
 
 const PRODUCT_SELECT =
-  "id, name, description, status, live_url, github_repo_url, created_at, updated_at, total_task_count, open_task_count, claimed_task_count, submitted_task_count, approved_task_count, blocked_task_count, total_post_count" as const;
+  "id, name, description, status, live_url, github_repo_url, created_at, updated_at, last_activity_at, signal, total_task_count, open_task_count, claimed_task_count, submitted_task_count, approved_task_count, blocked_task_count, total_post_count" as const;
 
 export type ProductStatus = "building" | "live" | "archived";
 
@@ -29,6 +30,8 @@ export type Product = {
   github_repo_url: string | null;
   created_at: string;
   updated_at: string;
+  last_activity_at: string;
+  signal: number;
   total_task_count: number;
   open_task_count: number;
   claimed_task_count: number;
@@ -236,6 +239,8 @@ export async function createProduct(
       name: input.name.trim(),
       description: input.description.trim(),
       status: "building",
+      signal: Date.now() / 1000 / platformConfig.signal.decayConstant,
+      last_activity_at: new Date().toISOString(),
     })
     .select(PRODUCT_SELECT)
     .single();

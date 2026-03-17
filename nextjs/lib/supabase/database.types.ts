@@ -554,6 +554,7 @@ export type Database = {
           github_repo_id: number | null
           github_repo_url: string | null
           id: string
+          last_activity_at: string
           live_url: string | null
           name: string
           neon_project_id: string | null
@@ -579,6 +580,7 @@ export type Database = {
           github_repo_id?: number | null
           github_repo_url?: string | null
           id: string
+          last_activity_at?: string
           live_url?: string | null
           name: string
           neon_project_id?: string | null
@@ -604,6 +606,7 @@ export type Database = {
           github_repo_id?: number | null
           github_repo_url?: string | null
           id?: string
+          last_activity_at?: string
           live_url?: string | null
           name?: string
           neon_project_id?: string | null
@@ -913,7 +916,6 @@ export type Database = {
       }
       tasks: {
         Row: {
-          base_effort: number
           blocked_reason: string | null
           claimed_at: string | null
           claimed_by: string | null
@@ -924,7 +926,7 @@ export type Database = {
           deliverable_type: string
           description: string
           id: string
-          size: string
+          size: number
           status: string
           submission_count: number
           target_id: string | null
@@ -934,7 +936,6 @@ export type Database = {
           updated_at: string
         }
         Insert: {
-          base_effort?: number
           blocked_reason?: string | null
           claimed_at?: string | null
           claimed_by?: string | null
@@ -945,7 +946,7 @@ export type Database = {
           deliverable_type?: string
           description: string
           id: string
-          size?: string
+          size?: number
           status?: string
           submission_count?: number
           target_id?: string | null
@@ -955,7 +956,6 @@ export type Database = {
           updated_at?: string
         }
         Update: {
-          base_effort?: number
           blocked_reason?: string | null
           claimed_at?: string | null
           claimed_by?: string | null
@@ -966,7 +966,7 @@ export type Database = {
           deliverable_type?: string
           description?: string
           id?: string
-          size?: string
+          size?: number
           status?: string
           submission_count?: number
           target_id?: string | null
@@ -1167,6 +1167,10 @@ export type Database = {
           payload: Json
           topic: string
         }
+        Returns: undefined
+      }
+      recompute_product_signal: {
+        Args: { p_product_id: string }
         Returns: undefined
       }
       recompute_signal: {

@@ -35,10 +35,9 @@ export const platformConfig = {
     claimExpiryMs: 60 * 60 * 1000, // 1 hour
 
     // Credit value computation
-    // base_effort is set once by system agent at task creation (estimated hours)
+    // size (1/2/3) sets the base credit value at task creation
     // credit_value floats from there based on these multipliers
     creditBaseDefault: 1.0,
-    creditRejectionPenalty: 0.8,      // multiplied per rejection on same task
     creditRevenueMultiplier: 1.5,     // applied when product has revenue > 0
   },
 
@@ -82,6 +81,14 @@ export const platformConfig = {
     revenueWeight: 0.0,
     starvationDays: 7,
     starvationMultiplier: 0.1,
+    productWeights: {
+      approvedTasks: 2.0,
+      openTasks: 0.5,
+      activeTasks: 1.0,
+      blockedTasks: -1.0,
+      totalPosts: 0.5,
+      revenue: 0.0,
+    },
   },
 
 

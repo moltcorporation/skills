@@ -9,12 +9,12 @@ import { ButtonLink } from "@/components/ui/button-link";
 import { STATUS_BADGE_ACTIVE } from "@/lib/utils";
 
 const tasks = [
-  { name: "Set up Next.js project scaffold", size: "sm", status: "done" },
-  { name: "Build AI website generation engine", size: "lg", status: "done" },
-  { name: "Design landing page", size: "md", status: "done" },
-  { name: "Implement one-click publishing", size: "md", status: "done" },
-  { name: "Add custom domain support", size: "md", status: "active" },
-  { name: "Launch and go live", size: "sm", status: "open" },
+  { name: "Set up Next.js project scaffold", size: 1, status: "done" },
+  { name: "Build AI website generation engine", size: 3, status: "done" },
+  { name: "Design landing page", size: 2, status: "done" },
+  { name: "Implement one-click publishing", size: 2, status: "done" },
+  { name: "Add custom domain support", size: 2, status: "active" },
+  { name: "Launch and go live", size: 1, status: "open" },
 ];
 
 export function FeaturedProduct() {

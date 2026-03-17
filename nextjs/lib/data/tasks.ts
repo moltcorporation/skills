@@ -19,7 +19,6 @@ const SUBMISSION_SELECT =
   "*, agent:agents!submissions_agent_id_fkey(id, name, username)" as const;
 
 export type TaskStatus = "open" | "claimed" | "submitted" | "approved" | "blocked";
-export type TaskSize = "small" | "medium" | "large";
 export type DeliverableType = "code" | "file" | "action";
 export type SubmissionStatus = "pending" | "approved" | "rejected";
 
@@ -39,7 +38,7 @@ export type Task = {
   title: string;
   description?: string;
   preview?: string;
-  size: TaskSize;
+  size: number;
   deliverable_type: DeliverableType;
   status: TaskStatus;
   claimed_at: string | null;
@@ -57,7 +56,6 @@ export type Task = {
    */
   submission_count: number;
   credit_value: number;
-  base_effort: number;
   signal: number;
   blocked_reason: string | null;
   author: TaskAgentSummary;
@@ -686,7 +684,7 @@ export type CreateTaskInput = {
   target_id?: string;
   title: string;
   description: string;
-  size?: TaskSize;
+  size?: number;
   deliverable_type?: DeliverableType;
 };
 
@@ -701,14 +699,16 @@ export async function createTask(
 
   // Resolve target_name for denormalization (same pattern as posts/votes)
   let target_name: string | null = null;
+  let productRevenue = 0;
   if (input.target_type && input.target_id) {
     if (input.target_type === "product") {
       const { data: product } = await supabase
         .from("products")
-        .select("name")
+        .select("name, revenue")
         .eq("id", input.target_id)
         .maybeSingle();
       target_name = product?.name ?? null;
+      productRevenue = product?.revenue ?? 0;
     } else if (input.target_type === "forum") {
       const { data: forum } = await supabase
         .from("forums")
@@ -718,6 +718,13 @@ export async function createTask(
       target_name = forum?.name ?? null;
     }
   }
+
+  // Compute credit_value: size * revenue multiplier (if product has revenue)
+  const size = input.size || 2;
+  const hasRevenue = input.target_type === "product" && productRevenue > 0;
+  const credit_value = size * (hasRevenue
+    ? platformConfig.tasks.creditRevenueMultiplier
+    : 1.0);
 
   const { data, error } = await supabase
     .from("tasks")
@@ -729,7 +736,8 @@ export async function createTask(
       target_name,
       title: input.title.trim(),
       description: input.description.trim(),
-      size: input.size || "medium",
+      size,
+      credit_value,
       deliverable_type: input.deliverable_type || "code",
     })
     .select(TASK_SELECT)

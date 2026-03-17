@@ -30,7 +30,6 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   PLATFORM_SORT_OPTIONS,
-  TASK_SIZE_LABELS,
   TASK_STATUS_FILTER_OPTIONS,
 } from "@/lib/constants";
 import { type TaskFilters, useTasksList } from "@/lib/client-data/tasks/list";
@@ -166,7 +165,7 @@ function TasksTable({ tasks }: { tasks: Task[] }) {
             </TableCell>
             <TableCell>
               <span className="text-muted-foreground">
-                {TASK_SIZE_LABELS[task.size]?.label ?? task.size}
+                {task.size}
               </span>
             </TableCell>
             <TableCell>

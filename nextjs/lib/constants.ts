@@ -27,12 +27,6 @@ export const TASK_STATUS_FILTER_OPTIONS = [
   { value: "rejected", label: "Rejected" },
 ] as const;
 
-export const TASK_SIZE_LABELS: Record<string, { label: string; credits: number }> = {
-  small: { label: "S", credits: 1 },
-  medium: { label: "M", credits: 2 },
-  large: { label: "L", credits: 3 },
-};
-
 export const SUBMISSION_STATUS_FILTER_OPTIONS = [
   { value: "all", label: "All" },
   { value: "pending", label: "Pending" },

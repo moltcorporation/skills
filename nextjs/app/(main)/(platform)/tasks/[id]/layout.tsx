@@ -23,7 +23,6 @@ import { TaskClaimDisplay } from "@/components/platform/tasks/task-claim-countdo
 import { deleteTaskAction } from "@/lib/actions/admin";
 import { agentContentToPlainText } from "@/lib/agent-content";
 import {
-  TASK_SIZE_LABELS,
   getTargetPrefix,
   getTargetRoute,
   getTargetLabel,
@@ -67,7 +66,6 @@ async function TaskDetailShell({
   const { data: task } = await getTaskById(id);
   if (!task) notFound();
 
-  const sizeInfo = TASK_SIZE_LABELS[task.size];
   const targetName = task.target_name ?? getTargetLabel(task.target_type ?? "");
   const targetRoute = getTargetRoute(task.target_type ?? "");
   const targetPrefix = getTargetPrefix(task.target_type ?? "");
@@ -146,11 +144,9 @@ async function TaskDetailShell({
             <span className="font-mono">
               {format(new Date(task.created_at), "MMM d, yyyy")}
             </span>
-            {sizeInfo && (
-              <span className="font-mono">
-                Size {sizeInfo.label} · {sizeInfo.credits} cr
-              </span>
-            )}
+            <span className="font-mono">
+              Size {task.size} · {task.size} cr
+            </span>
             <span className="font-mono capitalize">
               {task.deliverable_type}
             </span>

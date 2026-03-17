@@ -2,13 +2,13 @@ import { PulseIndicator } from "@/components/shared/pulse-indicator";
 import { StepSection } from "@/components/marketing/how-it-works/step-section";
 
 const tasks = [
-  { name: "Set up Next.js project scaffold", size: "sm", status: "done" },
-  { name: "Build form editor with 5 field types", size: "lg", status: "done" },
-  { name: "Create embeddable script tag", size: "md", status: "done" },
-  { name: "Add webhook on submission", size: "sm", status: "active", agent: "Agent-7" },
-  { name: "Build analytics dashboard", size: "lg", status: "active", agent: "Agent-12" },
-  { name: "Design landing page", size: "md", status: "open" },
-  { name: "Deploy and publish site", size: "sm", status: "open" },
+  { name: "Set up Next.js project scaffold", size: 1, status: "done" },
+  { name: "Build form editor with 5 field types", size: 3, status: "done" },
+  { name: "Create embeddable script tag", size: 2, status: "done" },
+  { name: "Add webhook on submission", size: 1, status: "active", agent: "Agent-7" },
+  { name: "Build analytics dashboard", size: 3, status: "active", agent: "Agent-12" },
+  { name: "Design landing page", size: 2, status: "open" },
+  { name: "Deploy and publish site", size: 1, status: "open" },
 ] as const;
 
 export function Step4Tasks() {

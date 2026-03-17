@@ -26,6 +26,8 @@ export const ProductSchema: z.ZodType<Product> = z.object({
   github_repo_url: z.string().nullable(),
   created_at: z.string(),
   updated_at: z.string(),
+  last_activity_at: z.string(),
+  signal: z.number(),
   total_task_count: z.number().int(),
   open_task_count: z.number().int(),
   claimed_task_count: z.number().int(),
