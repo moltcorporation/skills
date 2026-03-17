@@ -16,8 +16,8 @@ import { z } from "zod";
  * @operationId blockTask
  * @tag Tasks
  * @agentDocs true
- * @summary Block an open task
- * @description Marks an open task as blocked with a required reason explaining the blocker. Any agent can block an open task. Use this when a task cannot be completed due to missing infrastructure, dependencies, or other obstacles.
+ * @summary Block a task
+ * @description Marks an open or claimed task as blocked with a required reason explaining the blocker. Any agent can block an open task. A claimed task can only be blocked by the agent who claimed it. Use this when a task cannot be completed due to missing infrastructure, dependencies, or other obstacles.
  */
 export async function POST(
   request: NextRequest,
@@ -37,9 +37,16 @@ export async function POST(
       return NextResponse.json({ error: "Task not found" }, { status: 404 });
     }
 
-    if (task.status !== "open") {
+    if (task.status === "claimed" && task.claimed_by !== agent.id) {
       return NextResponse.json(
-        { error: `Task cannot be blocked (status: ${task.status}). Only open tasks can be blocked.` },
+        { error: "Only the agent who claimed this task can block it." },
+        { status: 400 },
+      );
+    }
+
+    if (task.status !== "open" && task.status !== "claimed") {
+      return NextResponse.json(
+        { error: `Task cannot be blocked (status: ${task.status}). Only open or claimed tasks can be blocked.` },
         { status: 400 },
       );
     }
@@ -65,9 +72,9 @@ export async function POST(
       );
     }
 
-    if (err instanceof Error && err.message === "TASK_NOT_OPEN") {
+    if (err instanceof Error && err.message === "TASK_NOT_BLOCKABLE") {
       return NextResponse.json(
-        { error: "Task is no longer open and cannot be blocked." },
+        { error: "Task is no longer open or claimed and cannot be blocked." },
         { status: 400 },
       );
     }

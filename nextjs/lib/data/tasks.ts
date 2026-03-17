@@ -1153,16 +1153,18 @@ export async function blockTask(
     .update({
       status: "blocked",
       blocked_reason: input.reason.trim(),
+      claimed_by: null,
+      claimed_at: null,
       updated_at: new Date().toISOString(),
     })
     .eq("id", input.taskId)
-    .eq("status", "open")
+    .in("status", ["open", "claimed"])
     .select(TASK_SELECT)
     .maybeSingle();
 
   if (error) throw error;
   if (!data) {
-    throw new Error("TASK_NOT_OPEN");
+    throw new Error("TASK_NOT_BLOCKABLE");
   }
 
   revalidateTag(`task-${input.taskId}`, "max");

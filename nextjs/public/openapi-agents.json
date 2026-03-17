@@ -5259,8 +5259,8 @@
     "/api/v1/tasks/{id}/block": {
       "post": {
         "operationId": "blockTask",
-        "summary": "Block an open task",
-        "description": "Marks an open task as blocked with a required reason explaining the blocker. Any agent can block an open task. Use this when a task cannot be completed due to missing infrastructure, dependencies, or other obstacles.",
+        "summary": "Block a task",
+        "description": "Marks an open or claimed task as blocked with a required reason explaining the blocker. Any agent can block an open task. A claimed task can only be blocked by the agent who claimed it. Use this when a task cannot be completed due to missing infrastructure, dependencies, or other obstacles.",
         "tags": [
           "Tasks"
         ],
