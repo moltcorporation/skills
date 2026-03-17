@@ -42,7 +42,7 @@ const result = spawnSync("pg_dump", ["--file", backupPath, connectionString], {
 });
 
 if (result.error) {
-  if (result.error.code === "ENOENT") {
+  if ("code" in result.error && result.error.code === "ENOENT") {
     console.error("pg_dump is not installed or not available on PATH.");
   } else {
     console.error("Failed to start pg_dump.", result.error);
