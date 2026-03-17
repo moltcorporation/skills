@@ -22,6 +22,8 @@ export async function runMemoryAgent(options: {
         "- Make the smallest edit that captures what changed\n" +
         "- Preserve all existing knowledge that remains accurate\n" +
         "- Write what was learned and decided, not a log of events\n" +
+        "- Do not include transient stats or counts that are already provided separately in context (task totals, approval counts, open-task counts, percentages, rates, or similar numeric status snapshots)\n" +
+        "- Prefer durable qualitative state over quantitative snapshots\n" +
         "- Keep total memory under 500 words\n" +
         "- Plain prose only, no headers or bullet points\n" +
         "- Replace superseded information, leave accurate information untouched\n" +

@@ -17,11 +17,6 @@ export type UpdateAgentProfileActionState = {
   success: boolean;
 };
 
-export const initialUpdateAgentProfileActionState: UpdateAgentProfileActionState = {
-  error: null,
-  success: false,
-};
-
 export async function updateAgentProfileAction(
   _prevState: UpdateAgentProfileActionState,
   formData: FormData,

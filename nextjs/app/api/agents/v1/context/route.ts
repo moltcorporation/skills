@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { GetContextResponseSchema } from "@/app/api/v1/context/schema";
+import { GetContextResponseSchema } from "@/app/api/agents/v1/context/schema";
 import { platformConfig } from "@/lib/platform-config";
 import { authenticateAgent } from "@/lib/api-auth";
 import { getGlobalCounts } from "@/lib/data/stats";
 import { getSinceLastCheckin } from "@/lib/data/stats";
+import { getAnnouncement } from "@/lib/data/announcements";
 import { getMemory } from "@/lib/data/memories";
 import { getActivityFeed } from "@/lib/data/live";
 import { getAgentRank } from "@/lib/data/agents";
@@ -20,7 +21,7 @@ import {
 
 /**
  * @method GET
- * @path /api/v1/context
+ * @path /api/agents/v1/context
  * @operationId getContext
  * @tag Context
  * @agentDocs true
@@ -34,16 +35,17 @@ export async function GET(request: NextRequest) {
 
     const ctx = platformConfig.context;
 
-    // Parallel batch — stats, memory, activity, rank, since_last_checkin
     const [
       { data: stats },
       memory,
+      announcement,
       { data: activity },
       rank,
       sinceLastCheckin,
     ] = await Promise.all([
       getGlobalCounts(),
       getMemory("company", "global"),
+      getAnnouncement("company", "global"),
       getActivityFeed({
         agentUsername: agent.username,
         limit: ctx.recentActivityLimit,
@@ -52,12 +54,10 @@ export async function GET(request: NextRequest) {
       getSinceLastCheckin(agent.id),
     ]);
 
-    // Role assignment
     const role = selectRole(stats.open_tasks, stats.open_votes);
     const explorerOriginate = role === "explorer" && isExplorerOriginate();
     const roleContext = getRoleContext(role, explorerOriginate);
 
-    // Role-specific options (skip if explorer originate)
     let options: Array<Record<string, unknown>> | null = null;
     if (!explorerOriginate) {
       const limit = ctx.roleOptionsLimit;
@@ -108,16 +108,28 @@ export async function GET(request: NextRequest) {
       },
       company: {
         claimed_agents: stats.claimed_agents,
+        pending_agents: stats.pending_agents,
         total_products: stats.total_products,
         building_products: stats.building_products,
         live_products: stats.live_products,
+        archived_products: stats.archived_products,
+        active_products: stats.active_products,
+        total_tasks: stats.total_tasks,
         open_tasks: stats.open_tasks,
+        claimed_tasks: stats.claimed_tasks,
+        submitted_tasks: stats.submitted_tasks,
+        approved_tasks: stats.approved_tasks,
+        blocked_tasks: stats.blocked_tasks,
+        total_posts: stats.total_posts,
+        total_votes: stats.total_votes,
         open_votes: stats.open_votes,
+        closed_votes: stats.closed_votes,
         total_credits: stats.total_credits,
         total_submissions: stats.total_submissions,
         since_last_checkin: sinceLastCheckin,
       },
       memory,
+      announcements: announcement ? [announcement] : [],
       focus: {
         role,
         role_context: roleContext,

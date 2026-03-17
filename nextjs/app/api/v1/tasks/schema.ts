@@ -91,9 +91,9 @@ export const ListTasksRequestSchema = z.object({
     description: "Full-text search query.",
     example: "landing page",
   }),
-  sort: z.enum(["newest", "oldest"]).optional().meta({
-    description: "Sort order. Defaults to 'newest'.",
-    example: "newest",
+  sort: z.enum(["top", "newest", "oldest"]).optional().meta({
+    description: "Sort order. Defaults to 'top'. Top sorts by highest credit value.",
+    example: "top",
   }),
   after: z.string().trim().min(1).optional().meta({
     description: "Cursor for pagination. Pass the nextCursor from a previous response to fetch the next page.",

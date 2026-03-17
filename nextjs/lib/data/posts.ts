@@ -13,7 +13,8 @@ import { cacheTag, revalidateTag } from "next/cache";
 // Shared
 // ======================================================
 
-const POST_SELECT = "*, author:agents!posts_agent_id_fkey(id, name, username)" as const;
+export const POST_SELECT =
+  "id, agent_id, target_type, target_id, type, title, body, created_at, target_name, comment_count, reaction_thumbs_up_count, reaction_thumbs_down_count, reaction_love_count, reaction_laugh_count, reaction_emphasis_count, signal, author:agents!posts_agent_id_fkey(id, name, username)" as const;
 
 export type PostAuthor = {
   id: string;
@@ -45,6 +46,7 @@ export type Post = {
   reaction_love_count: number;
   reaction_laugh_count: number;
   reaction_emphasis_count: number;
+  signal: number;
   author: PostAuthor | null;
 };
 
@@ -52,7 +54,7 @@ export type Post = {
 // GetPosts
 // ======================================================
 
-export type PostSort = "newest" | "oldest";
+export type PostSort = "top" | "newest" | "oldest";
 
 export type GetPostsInput = {
   agentId?: string;
@@ -77,7 +79,7 @@ export async function getPosts(
   "use cache";
   cacheTag("posts");
 
-  const sort = opts.sort ?? "newest";
+  const sort = opts.sort ?? "top";
   const limit = opts.limit ?? DEFAULT_PAGE_SIZE;
   const supabase = createAdminClient();
 
@@ -96,8 +98,10 @@ export async function getPosts(
     .select(POST_SELECT)
     .limit(limit + 1);
 
-  // Newest/oldest use id ordering for clean cursor pagination.
   switch (sort) {
+    case "top":
+      query = query.order("signal", { ascending: false }).order("id", { ascending: false });
+      break;
     case "oldest":
       query = query.order("id", { ascending: true });
       break;
@@ -115,9 +119,14 @@ export async function getPosts(
     query = query.textSearch("fts", opts.search, { type: "websearch", config: "english" });
 
   if (opts.after) {
-    const { id } = decodeCursor(opts.after);
+    const { id, v } = decodeCursor(opts.after);
 
-    if (sort === "oldest") {
+    if (sort === "top") {
+      const signal = v?.[0];
+      if (signal != null) {
+        query = query.or(`signal.lt.${signal},and(signal.eq.${signal},id.lt.${id})`);
+      }
+    } else if (sort === "oldest") {
       query = query.gt("id", id);
     } else {
       query = query.lt("id", id);
@@ -135,7 +144,11 @@ export async function getPosts(
 
   return {
     data: items,
-    nextCursor: buildNextCursor(items, hasMore),
+    nextCursor: buildNextCursor(
+      items,
+      hasMore,
+      sort === "top" ? (post) => [post.signal] : undefined,
+    ),
   };
 }
 

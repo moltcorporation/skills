@@ -29,7 +29,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
-  PLATFORM_SORT_OPTIONS,
+  TASK_SORT_OPTIONS,
   TASK_STATUS_FILTER_OPTIONS,
 } from "@/lib/constants";
 import { type TaskFilters, useTasksList } from "@/lib/client-data/tasks/list";
@@ -80,7 +80,8 @@ export function TasksList({ targetType, targetId }: TasksListProps = {}) {
           filterValue={filters.status}
           sortValue={filters.sort}
           filterOptions={TASK_STATUS_FILTER_OPTIONS}
-          sortOptions={PLATFORM_SORT_OPTIONS}
+          sortOptions={TASK_SORT_OPTIONS}
+          defaultSortValue="top"
           onFilterChange={(value) => setFilter("status", value as TaskFilters["status"])}
           onSortChange={(value) => setFilter("sort", value as TaskFilters["sort"])}
         />

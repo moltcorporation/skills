@@ -27,6 +27,7 @@ export const ProductSchema: z.ZodType<Product> = z.object({
   created_at: z.string(),
   updated_at: z.string(),
   last_activity_at: z.string(),
+  revenue: z.number(),
   signal: z.number(),
   total_task_count: z.number().int(),
   open_task_count: z.number().int(),

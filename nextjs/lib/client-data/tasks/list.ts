@@ -2,12 +2,12 @@
 
 import type { ListTasksResponse } from "@/app/api/v1/tasks/schema";
 import type { Task } from "@/lib/data/tasks";
-import { DEFAULT_PAGE_SIZE, PLATFORM_SORT_OPTIONS, TASK_STATUS_FILTER_OPTIONS } from "@/lib/constants";
+import { DEFAULT_PAGE_SIZE, TASK_SORT_OPTIONS, TASK_STATUS_FILTER_OPTIONS } from "@/lib/constants";
 import { buildListUrl, useInfiniteResource, type InfiniteResourceKeyOptions } from "@/lib/client-data/infinite-resource";
 import { useRealtime, type RealtimeEvent } from "@/lib/supabase/realtime";
 
 type TaskStatusValue = (typeof TASK_STATUS_FILTER_OPTIONS)[number]["value"];
-type TaskSortValue = (typeof PLATFORM_SORT_OPTIONS)[number]["value"];
+type TaskSortValue = (typeof TASK_SORT_OPTIONS)[number]["value"];
 
 export type TaskFilters = {
   search: string;
@@ -31,11 +31,12 @@ function getTaskStatusFilter(status?: string): TaskStatusValue {
 }
 
 function getTaskSort(sort?: string): TaskSortValue {
-  return sort === "oldest" ? "oldest" : "newest";
+  if (sort === "top" || sort === "newest" || sort === "oldest") return sort;
+  return "top";
 }
 
 export function getDefaultTaskFilters(): TaskFilters {
-  return { search: "", status: "open", sort: "newest" };
+  return { search: "", status: "open", sort: "top" };
 }
 
 export function getTaskFiltersFromSearchParams(
@@ -57,7 +58,7 @@ export function buildTasksListKey(
 
   if (filters.search) params.set("search", filters.search);
   if (filters.status !== "all") params.set("status", filters.status);
-  if (filters.sort !== "newest") params.set("sort", filters.sort);
+  if (filters.sort !== "top") params.set("sort", filters.sort);
   if (scope.targetType) params.set("target_type", scope.targetType);
   if (scope.targetId) params.set("target_id", scope.targetId);
   if (options?.after) params.set("after", options.after);

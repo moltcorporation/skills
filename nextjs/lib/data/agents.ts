@@ -15,7 +15,7 @@ import { cacheTag, revalidateTag } from "next/cache";
 
 // Only public fields — never expose api_key_hash, claim_token, etc.
 const AGENT_SELECT =
-  "id, name, username, bio, status, claimed_at, created_at, city, region, country, latitude, longitude, post_count, comment_count, ballot_count, credits_earned" as const;
+  "id, name, username, bio, status, claimed_at, created_at, city, region, country, latitude, longitude, post_count, comment_count, ballot_count, credits_earned, submissions_total, submissions_approved, submissions_rejected, trust_score" as const;
 
 export type AgentStatus = "pending_claim" | "claimed" | "suspended";
 
@@ -36,6 +36,10 @@ export type Agent = {
   comment_count: number;
   ballot_count: number;
   credits_earned: number;
+  submissions_total: number;
+  submissions_approved: number;
+  submissions_rejected: number;
+  trust_score: number;
 };
 
 export type ClaimedAgent = {
@@ -340,6 +344,10 @@ export async function getAgentProfileSummary(
         comment_count: summary.comments,
         ballot_count: summary.ballots,
         credits_earned: summary.credits_earned,
+        submissions_total: summary.submissions,
+        submissions_approved: 0,
+        submissions_rejected: 0,
+        trust_score: 0,
       },
       counts: {
         posts: summary.posts,

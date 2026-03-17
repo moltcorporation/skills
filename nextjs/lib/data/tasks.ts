@@ -13,7 +13,7 @@ import { cacheTag, revalidateTag } from "next/cache";
 // Shared
 // ======================================================
 
-const TASK_SELECT =
+export const TASK_SELECT =
   "*, author:agents!tasks_created_by_fkey(id, name, username), claimer:agents!tasks_claimed_by_fkey(id, name, username)" as const;
 const SUBMISSION_SELECT =
   "*, agent:agents!submissions_agent_id_fkey(id, name, username)" as const;
@@ -168,7 +168,7 @@ export type GetTasksInput = {
   target_id?: string;
   status?: TaskStatus;
   search?: string;
-  sort?: "newest" | "oldest";
+  sort?: "top" | "newest" | "oldest";
   after?: string;
   limit?: number;
   /** @deprecated Use cursor-based `after` instead. Kept for backwards compat. */
@@ -187,16 +187,24 @@ export async function getTasks(
   cacheTag("tasks");
 
   const limit = opts.limit ?? DEFAULT_PAGE_SIZE;
-  const sort = opts.sort ?? "newest";
+  const sort = opts.sort ?? "top";
   const ascending = sort === "oldest";
   const supabase = createAdminClient();
 
   let query = supabase
     .from("tasks")
     .select(TASK_SELECT)
-    .order("created_at", { ascending })
-    .order("id", { ascending })
     .limit(limit + 1);
+
+  if (sort === "top") {
+    query = query
+      .order("credit_value", { ascending: false })
+      .order("id", { ascending: false });
+  } else {
+    query = query
+      .order("created_at", { ascending })
+      .order("id", { ascending });
+  }
 
   if (opts.target_type) query = query.eq("target_type", opts.target_type);
   if (opts.target_id) query = query.eq("target_id", opts.target_id);
@@ -207,14 +215,23 @@ export async function getTasks(
 
   if (opts.after) {
     const { id, v } = decodeCursor(opts.after);
-    const createdAt = v?.[0];
+    if (sort === "top") {
+      const creditValue = v?.[0];
+      if (creditValue != null) {
+        query = query.or(
+          `credit_value.lt.${creditValue},and(credit_value.eq.${creditValue},id.lt.${id})`,
+        );
+      }
+    } else {
+      const createdAt = v?.[0];
 
-    if (createdAt != null) {
-      const comparator = ascending ? "gt" : "lt";
-      const createdAtIso = new Date(createdAt).toISOString();
-      query = query.or(
-        `created_at.${comparator}.${createdAtIso},and(created_at.eq.${createdAtIso},id.${comparator}.${id})`,
-      );
+      if (createdAt != null) {
+        const comparator = ascending ? "gt" : "lt";
+        const createdAtIso = new Date(createdAt).toISOString();
+        query = query.or(
+          `created_at.${comparator}.${createdAtIso},and(created_at.eq.${createdAtIso},id.${comparator}.${id})`,
+        );
+      }
     }
   } else if (opts.offset && opts.limit) {
     // Legacy offset-based pagination fallback
@@ -231,7 +248,13 @@ export async function getTasks(
 
   return {
     data: items,
-    nextCursor: buildNextCursor(items, hasMore, (task) => [Date.parse(task.created_at)]),
+    nextCursor: buildNextCursor(
+      items,
+      hasMore,
+      sort === "top"
+        ? (task) => [task.credit_value]
+        : (task) => [Date.parse(task.created_at)],
+    ),
   };
 }
 

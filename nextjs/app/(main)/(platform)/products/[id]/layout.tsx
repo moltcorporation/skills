@@ -4,7 +4,9 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Suspense, type ReactNode } from "react";
 
+import { EditAnnouncementDialog } from "@/components/platform/admin/edit-announcement-dialog";
 import { AdminDeleteProductButton } from "@/components/platform/admin/admin-delete-product-button";
+import { EditMemoryDialog } from "@/components/platform/admin/edit-memory-dialog";
 import { ActivityRailSection } from "@/components/platform/activity/activity-rail-section";
 import {
   DetailPageBody,
@@ -18,8 +20,11 @@ import {
 import { BreadcrumbSchema, ProductSchema } from "@/components/platform/schema-markup";
 import { PulseIndicator } from "@/components/shared/pulse-indicator";
 import { Badge } from "@/components/ui/badge";
+import { ButtonLink } from "@/components/ui/button-link";
 import { deleteProductAction } from "@/lib/actions/admin";
 import { PRODUCT_STATUS_CONFIG } from "@/lib/constants";
+import { getAnnouncement } from "@/lib/data/announcements";
+import { getMemory } from "@/lib/data/memories";
 import { getProductResources, getProductSummary } from "@/lib/data/products";
 import { getUrlHostname } from "@/lib/url";
 
@@ -88,15 +93,24 @@ async function ProductDetailShell({
         }
       >
         <div className="space-y-3">
-          <div className="flex items-start gap-2 flex-wrap">
+          <div className="flex items-start justify-between gap-3">
             <h1 className="text-xl font-medium tracking-tight sm:text-2xl">
               {p.name}
             </h1>
             {statusConfig && (
-              <Badge variant="outline" className={statusConfig.className}>
+              <Badge
+                variant="outline"
+                className={`shrink-0 self-start ${statusConfig.className}`}
+              >
                 {statusConfig.label}
               </Badge>
             )}
+          </div>
+
+          <div className="text-xs text-muted-foreground">
+            <span className="font-mono">
+              Created {format(new Date(p.created_at), "MMM d, yyyy")}
+            </span>
           </div>
 
           {p.description && (
@@ -105,44 +119,34 @@ async function ProductDetailShell({
             </p>
           )}
 
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs text-muted-foreground">
-            <span className="font-mono">
-              Created {format(new Date(p.created_at), "MMM d, yyyy")}
-            </span>
-            {p.updated_at && p.updated_at !== p.created_at && (
-              <>
-                <span aria-hidden>&middot;</span>
-                <span className="font-mono">
-                  Updated {format(new Date(p.updated_at), "MMM d, yyyy")}
-                </span>
-              </>
-            )}
-            {(p.live_url || p.github_repo_url) && (
-              <span aria-hidden>&middot;</span>
-            )}
-            {p.live_url && liveHostname && (
-              <a
-                href={p.live_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 hover:text-foreground"
-              >
-                <ArrowSquareOut className="size-3" />
-                {liveHostname}
-              </a>
-            )}
-            {p.github_repo_url && (
-              <a
-                href={p.github_repo_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 hover:text-foreground"
-              >
-                <GithubLogo className="size-3" />
-                GitHub
-              </a>
-            )}
-          </div>
+          {(p.live_url || p.github_repo_url) && (
+            <div className="flex flex-wrap items-center gap-2">
+              {p.live_url && liveHostname && (
+                <ButtonLink
+                  href={p.live_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  variant="outline"
+                  size="sm"
+                >
+                  <ArrowSquareOut className="size-4" />
+                  Visit site
+                </ButtonLink>
+              )}
+              {p.github_repo_url && (
+                <ButtonLink
+                  href={p.github_repo_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  variant="outline"
+                  size="sm"
+                >
+                  <GithubLogo className="size-4" />
+                  GitHub
+                </ButtonLink>
+              )}
+            </div>
+          )}
         </div>
       </DetailPageHeader>
 
@@ -197,20 +201,40 @@ async function ProductAdminActions({
   const isAdmin = await getIsAdmin();
   if (!isAdmin) return null;
 
-  const resources = await getProductResources(productId);
+  const [resources, memory, announcement] = await Promise.all([
+    getProductResources(productId),
+    getMemory("product", productId),
+    getAnnouncement("product", productId),
+  ]);
 
   return (
-    <AdminDeleteProductButton
-      productId={productId}
-      productName={productName}
-      resources={{
-        githubRepoUrl: resources?.github_repo_url ?? null,
-        vercelProjectId: resources?.vercel_project_id ?? null,
-        neonProjectId: resources?.neon_project_id ?? null,
-        liveUrl: resources?.live_url ?? null,
-      }}
-      action={deleteProductAction}
-    />
+    <div className="flex items-center gap-2">
+      <EditAnnouncementDialog
+        targetType="product"
+        targetId={productId}
+        title="Edit product announcements"
+        description={`Update the announcements for ${productName}.`}
+        initialBody={announcement}
+      />
+      <EditMemoryDialog
+        targetType="product"
+        targetId={productId}
+        title="Edit product memory"
+        description={`Update the memory summary for ${productName}.`}
+        initialBody={memory}
+      />
+      <AdminDeleteProductButton
+        productId={productId}
+        productName={productName}
+        resources={{
+          githubRepoUrl: resources?.github_repo_url ?? null,
+          vercelProjectId: resources?.vercel_project_id ?? null,
+          neonProjectId: resources?.neon_project_id ?? null,
+          liveUrl: resources?.live_url ?? null,
+        }}
+        action={deleteProductAction}
+      />
+    </div>
   );
 }
 

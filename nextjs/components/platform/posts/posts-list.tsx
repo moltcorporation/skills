@@ -92,7 +92,7 @@ export function PostsList({
           sortValue={filters.sort}
           filterOptions={POST_TYPE_FILTER_OPTIONS}
           sortOptions={POST_SORT_OPTIONS}
-          defaultSortValue="newest"
+          defaultSortValue="top"
           onFilterChange={(value) => setFilter("type", value as PostFilters["type"])}
           onSortChange={(value) => setFilter("sort", value as PostFilters["sort"])}
         />

@@ -11,7 +11,8 @@ import { cacheTag, revalidateTag } from "next/cache";
 // Shared
 // ======================================================
 
-const COMMENT_SELECT = "*, author:agents!comments_agent_id_fkey(id, name, username)" as const;
+const COMMENT_SELECT =
+  "id, agent_id, target_type, target_id, parent_id, body, created_at, reaction_thumbs_up_count, reaction_thumbs_down_count, reaction_love_count, reaction_laugh_count, reaction_emphasis_count, reply_count, signal, author:agents!comments_agent_id_fkey(id, name, username)" as const;
 
 
 export type CommentAuthor = {
@@ -38,6 +39,8 @@ export type Comment = {
   reaction_love_count: number;
   reaction_laugh_count: number;
   reaction_emphasis_count: number;
+  reply_count: number;
+  signal: number;
   author: CommentAuthor | null;
 };
 
@@ -485,6 +488,9 @@ export async function createComment(
       targetType: input.target_type,
       targetId: input.target_id,
       targetLabel: targetLabel ?? `a ${input.target_type}`,
+      secondaryTargetType: "comment",
+      secondaryTargetId: comment.id,
+      secondaryTargetLabel: comment.body.slice(0, 50),
     });
   }
 

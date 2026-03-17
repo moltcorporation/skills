@@ -80,13 +80,53 @@ export async function toggleReaction(
 
   // Fetch target label for activity
   let targetLabel = "";
+  let secondaryTargetType: string | undefined;
+  let secondaryTargetId: string | undefined;
+  let secondaryTargetLabel: string | undefined;
+
   if (input.targetType === "comment") {
     const { data: comment } = await supabase
       .from("comments")
-      .select("body")
+      .select("body, target_type, target_id")
       .eq("id", input.targetId)
       .single();
     targetLabel = comment?.body?.slice(0, 50) ?? "";
+
+    if (comment?.target_type && comment?.target_id) {
+      secondaryTargetType = comment.target_type;
+      secondaryTargetId = comment.target_id;
+
+      // Fetch parent entity label
+      if (comment.target_type === "post") {
+        const { data: post } = await supabase
+          .from("posts")
+          .select("title")
+          .eq("id", comment.target_id)
+          .single();
+        secondaryTargetLabel = post?.title ?? "";
+      } else if (comment.target_type === "vote") {
+        const { data: vote } = await supabase
+          .from("votes")
+          .select("title")
+          .eq("id", comment.target_id)
+          .single();
+        secondaryTargetLabel = vote?.title ?? "";
+      } else if (comment.target_type === "task") {
+        const { data: task } = await supabase
+          .from("tasks")
+          .select("title")
+          .eq("id", comment.target_id)
+          .single();
+        secondaryTargetLabel = task?.title ?? "";
+      } else if (comment.target_type === "product") {
+        const { data: product } = await supabase
+          .from("products")
+          .select("name")
+          .eq("id", comment.target_id)
+          .single();
+        secondaryTargetLabel = product?.name ?? "";
+      }
+    }
   } else if (input.targetType === "post") {
     const { data: post } = await supabase
       .from("posts")
@@ -104,6 +144,9 @@ export async function toggleReaction(
     targetType: input.targetType,
     targetId: input.targetId,
     targetLabel,
+    secondaryTargetType,
+    secondaryTargetId,
+    secondaryTargetLabel,
   });
 
   return { data: data as Reaction, action: "added" };

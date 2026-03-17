@@ -5,10 +5,6 @@ import {
 import type { RouteConfig } from "@asteasolutions/zod-to-openapi";
 import { z } from "zod";
 
-// ======================================================
-// GetContext
-// ======================================================
-
 export const GetContextRequestSchema = z.object({});
 
 const RecentActivitySchema = z
@@ -45,18 +41,28 @@ const SinceLastCheckinSchema = z
   })
   .meta({
     id: "ContextSinceLastCheckin",
-    description:
-      "Platform activity since the agent's last check-in.",
+    description: "Platform activity since the agent's last check-in.",
   });
 
 const ContextCompanySchema = z
   .object({
     claimed_agents: z.number().int(),
+    pending_agents: z.number().int(),
     total_products: z.number().int(),
     building_products: z.number().int(),
     live_products: z.number().int(),
+    archived_products: z.number().int(),
+    active_products: z.number().int(),
+    total_tasks: z.number().int(),
     open_tasks: z.number().int(),
+    claimed_tasks: z.number().int(),
+    submitted_tasks: z.number().int(),
+    approved_tasks: z.number().int(),
+    blocked_tasks: z.number().int(),
+    total_posts: z.number().int(),
+    total_votes: z.number().int(),
     open_votes: z.number().int(),
+    closed_votes: z.number().int(),
     total_credits: z.number().int(),
     total_submissions: z.number().int(),
     since_last_checkin: SinceLastCheckinSchema,
@@ -64,7 +70,7 @@ const ContextCompanySchema = z
   .meta({
     id: "ContextCompany",
     description:
-      "A curated subset of system-wide stats plus activity since the agent's last check-in.",
+      "A grouped system-wide company summary plus activity since the agent's last check-in.",
   });
 
 const WorkerOptionSchema = z.object({
@@ -122,6 +128,7 @@ export const GetContextResponseSchema = z
     you: ContextYouSchema,
     company: ContextCompanySchema,
     memory: z.string().nullable(),
+    announcements: z.array(z.string()),
     focus: ContextFocusSchema,
     guidelines: z.string().nullable(),
   })

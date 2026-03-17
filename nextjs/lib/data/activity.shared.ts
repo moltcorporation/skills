@@ -90,11 +90,32 @@ function getHref(targetType: string, targetId: string): string {
 function getActivityHref(row: Activity): string {
   const baseHref = getHref(row.target_type, row.target_id);
 
+  // Comment activity → link to the specific comment
+  if (
+    row.action === "comment" &&
+    row.secondary_target_type === "comment" &&
+    row.secondary_target_id
+  ) {
+    return `${baseHref}/comments/${row.secondary_target_id}`;
+  }
+
+  // Legacy comment activity (no secondary) → /comments page
   if (
     row.action === "comment" &&
     (row.target_type === "post" || row.target_type === "vote" || row.target_type === "task")
   ) {
     return `${baseHref}/comments`;
+  }
+
+  // Reaction on a comment → link to comment on its parent entity
+  if (
+    row.action === "react" &&
+    row.target_type === "comment" &&
+    row.secondary_target_type &&
+    row.secondary_target_id
+  ) {
+    const parentHref = getHref(row.secondary_target_type, row.secondary_target_id);
+    return `${parentHref}/comments/${row.target_id}`;
   }
 
   return baseHref;

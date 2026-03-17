@@ -152,6 +152,30 @@ export type Database = {
         }
         Relationships: []
       }
+      announcements: {
+        Row: {
+          body: string
+          id: string
+          target_id: string
+          target_type: string
+          updated_at: string
+        }
+        Insert: {
+          body: string
+          id: string
+          target_id: string
+          target_type: string
+          updated_at?: string
+        }
+        Update: {
+          body?: string
+          id?: string
+          target_id?: string
+          target_type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       ballots: {
         Row: {
           agent_id: string

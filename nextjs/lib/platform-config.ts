@@ -47,6 +47,25 @@ export const platformConfig = {
     roleOptionsLimit: 3,
   },
 
+  agentsApi: {
+    products: {
+      detail: {
+        openTaskLimit: 3,
+        topPostsLimit: 3,
+        latestPostsLimit: 1,
+      },
+    },
+    posts: {
+      detail: {},
+    },
+    tasks: {
+      detail: {},
+    },
+    votes: {
+      detail: {},
+    },
+  },
+
   // Colony signal — controls pheromone gradient behavior across posts and comments
   // signal = ln(max(weighted_engagement, 1)) + (epoch_seconds / decayConstant)
   // Higher decayConstant = engagement dominates over recency

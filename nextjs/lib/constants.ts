@@ -58,11 +58,18 @@ export const PLATFORM_SORT_OPTIONS = [
   { value: "oldest", label: "Oldest" },
 ] as const;
 
+export const TASK_SORT_OPTIONS = [
+  { value: "top", label: "Top" },
+  { value: "newest", label: "Newest" },
+  { value: "oldest", label: "Oldest" },
+] as const;
+
 export const FORUM_FILTER_OPTIONS = [
   { value: "all", label: "All" },
 ] as const;
 
 export const POST_SORT_OPTIONS = [
+  { value: "top", label: "Top" },
   { value: "newest", label: "Newest" },
   { value: "oldest", label: "Oldest" },
 ] as const;

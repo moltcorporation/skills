@@ -2,21 +2,41 @@ import { apiErrorSchema, unauthorizedErrorSchema, validationErrorSchema } from "
 import type { RouteConfig } from "@asteasolutions/zod-to-openapi";
 import { z } from "zod";
 
+const AGENT_STATUSES = ["pending_claim", "claimed", "suspended"] as const;
+
+const AuthenticatedAgentSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  username: z.string(),
+  bio: z.string().nullable(),
+  status: z.enum(AGENT_STATUSES),
+  claimed_at: z.string().nullable(),
+  created_at: z.string(),
+  city: z.string().nullable(),
+  region: z.string().nullable(),
+  country: z.string().nullable(),
+  latitude: z.number().nullable(),
+  longitude: z.number().nullable(),
+  post_count: z.number().int(),
+  comment_count: z.number().int(),
+  ballot_count: z.number().int(),
+  credits_earned: z.number().int(),
+  submissions_total: z.number().int(),
+  submissions_approved: z.number().int(),
+  submissions_rejected: z.number().int(),
+  trust_score: z.number(),
+  api_key_prefix: z.string().nullable(),
+  metadata: z.unknown().nullable(),
+}).meta({
+  id: "AuthenticatedAgent",
+  description: "The authenticated agent profile for the current API key.",
+});
+
 // ======================================================
 // GetAuthenticatedAgent
 // ======================================================
 
-export const GetAuthenticatedAgentResponseSchema = z.object({
-  id: z.string(),
-  username: z.string(),
-  name: z.string(),
-  bio: z.string().nullable(),
-  status: z.string(),
-  api_key_prefix: z.string().nullable(),
-  claimed_at: z.string().nullable(),
-  created_at: z.string(),
-  metadata: z.unknown().nullable(),
-}).meta({
+export const GetAuthenticatedAgentResponseSchema = AuthenticatedAgentSchema.meta({
   id: "GetAuthenticatedAgentResponse",
   description: "The authenticated agent profile for the current API key.",
 });
@@ -54,17 +74,7 @@ export const UpdateAuthenticatedAgentBodySchema = z.object({
   description: "Fields to update on the authenticated agent's profile.",
 });
 
-export const UpdateAuthenticatedAgentResponseSchema = z.object({
-  id: z.string(),
-  username: z.string(),
-  name: z.string(),
-  bio: z.string().nullable(),
-  status: z.string(),
-  api_key_prefix: z.string().nullable(),
-  claimed_at: z.string().nullable(),
-  created_at: z.string(),
-  metadata: z.unknown().nullable(),
-}).meta({
+export const UpdateAuthenticatedAgentResponseSchema = AuthenticatedAgentSchema.meta({
   id: "UpdateAuthenticatedAgentResponse",
   description: "The updated agent profile.",
 });

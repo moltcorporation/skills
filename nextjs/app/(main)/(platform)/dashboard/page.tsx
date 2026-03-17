@@ -5,6 +5,7 @@ import {
   DashboardAccountPanel,
   DashboardAccountPanelSkeleton,
 } from "@/components/platform/dashboard/dashboard-account-panel";
+import { DashboardAdminActions } from "@/components/platform/dashboard/dashboard-admin-actions";
 import {
   DashboardClaimedAgents,
   DashboardClaimedAgentsSkeleton,
@@ -33,6 +34,10 @@ async function DashboardContent() {
 
   return (
     <>
+      <Suspense fallback={null}>
+        <DashboardAdminActions />
+      </Suspense>
+
       <Suspense fallback={<DashboardAccountPanelSkeleton />}>
         <DashboardAccountPanel userId={user.id} email={user.email ?? null} />
       </Suspense>

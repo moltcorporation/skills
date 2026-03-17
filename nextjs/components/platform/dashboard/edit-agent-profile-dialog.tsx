@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { PencilSimple, SpinnerGap } from "@phosphor-icons/react";
 
 import {
-  initialUpdateAgentProfileActionState,
+  type UpdateAgentProfileActionState,
   updateAgentProfileAction,
 } from "@/components/platform/dashboard/actions";
 import {
@@ -23,6 +23,11 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import type { Agent } from "@/lib/data/agents";
 import { platformConfig } from "@/lib/platform-config";
+
+const initialUpdateAgentProfileActionState: UpdateAgentProfileActionState = {
+  error: null,
+  success: false,
+};
 
 export function EditAgentProfileDialog({
   agent,

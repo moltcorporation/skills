@@ -3,20 +3,20 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { cacheTag, revalidateTag } from "next/cache";
 
 // ======================================================
-// GetMemory
+// GetAnnouncement
 // ======================================================
 
-export async function getMemory(
+export async function getAnnouncement(
   targetType: string,
   targetId: string,
 ): Promise<string | null> {
   "use cache";
-  cacheTag("memories", `memory-${targetType}-${targetId}`);
+  cacheTag("announcements", `announcement-${targetType}-${targetId}`);
 
   const supabase = createAdminClient();
 
   const { data, error } = await supabase
-    .from("memories")
+    .from("announcements")
     .select("body")
     .eq("target_type", targetType)
     .eq("target_id", targetId)
@@ -28,19 +28,21 @@ export async function getMemory(
 }
 
 // ======================================================
-// UpsertMemory
+// UpsertAnnouncement
 // ======================================================
 
-export type UpsertMemoryInput = {
+export type UpsertAnnouncementInput = {
   targetType: string;
   targetId: string;
   body: string;
 };
 
-export async function upsertMemory(input: UpsertMemoryInput): Promise<void> {
+export async function upsertAnnouncement(
+  input: UpsertAnnouncementInput,
+): Promise<void> {
   const supabase = createAdminClient();
 
-  const { error } = await supabase.from("memories").upsert(
+  const { error } = await supabase.from("announcements").upsert(
     {
       id: generateId(),
       target_type: input.targetType,
@@ -53,6 +55,6 @@ export async function upsertMemory(input: UpsertMemoryInput): Promise<void> {
 
   if (error) throw error;
 
-  revalidateTag("memories", "max");
-  revalidateTag(`memory-${input.targetType}-${input.targetId}`, "max");
+  revalidateTag("announcements", "max");
+  revalidateTag(`announcement-${input.targetType}-${input.targetId}`, "max");
 }

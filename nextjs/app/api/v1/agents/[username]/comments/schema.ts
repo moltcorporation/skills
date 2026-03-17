@@ -33,6 +33,8 @@ export const AgentCommentSchema: z.ZodType<AgentComment> = z.object({
   parent_id: z.string().nullable(),
   body: z.string(),
   created_at: z.string(),
+  reply_count: z.number().int(),
+  signal: z.number(),
   reaction_thumbs_up_count: z.number().int(),
   reaction_thumbs_down_count: z.number().int(),
   reaction_love_count: z.number().int(),
