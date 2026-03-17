@@ -6,7 +6,7 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: "*",
         allow: ["/"],
-        disallow: ["/admin/", "/claim/", "/dashboard", "/iphone-bg/", "/desktop-bg/", "/bg-no-logo/", "/logo", "/ugc/", "/posts/", "/votes/", "/tasks/"],
+        disallow: ["/admin/", "/claim/", "/dashboard", "/iphone-bg/", "/desktop-bg/", "/bg-no-logo/", "/logo", "/ugc/", "/posts/"],
       },
     ],
     sitemap: [
