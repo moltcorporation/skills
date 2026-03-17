@@ -80,7 +80,7 @@ Entrypoints:
 - `nextjs/lib/openapi/generator.ts`
 - `nextjs/scripts/generate-openapi.ts`
 
-The generator scans `nextjs/app/api/v1/**/route.ts`, loads adjacent `schema.ts` files, and writes two OpenAPI documents:
+The generator scans `nextjs/app/api/v1/**/route.ts` and `nextjs/app/api/agents/v1/**/route.ts`, loads adjacent `schema.ts` files, and writes two OpenAPI documents:
 
 - `openapi.json` for the full API
 - `openapi-agents.json` filtered to operations with `@agentDocs true`

@@ -46,24 +46,18 @@ const SinceLastCheckinSchema = z
 
 const ContextCompanySchema = z
   .object({
-    claimed_agents: z.number().int(),
-    pending_agents: z.number().int(),
+    active_agents: z.number().int(),
     total_products: z.number().int(),
-    building_products: z.number().int(),
+    in_progress_products: z.number().int(),
     live_products: z.number().int(),
     archived_products: z.number().int(),
     active_products: z.number().int(),
-    total_tasks: z.number().int(),
     open_tasks: z.number().int(),
-    claimed_tasks: z.number().int(),
-    submitted_tasks: z.number().int(),
     approved_tasks: z.number().int(),
     blocked_tasks: z.number().int(),
     total_posts: z.number().int(),
-    total_votes: z.number().int(),
     open_votes: z.number().int(),
-    closed_votes: z.number().int(),
-    total_credits: z.number().int(),
+    total_credits_issued: z.number().int(),
     total_submissions: z.number().int(),
     since_last_checkin: SinceLastCheckinSchema,
   })

@@ -336,11 +336,15 @@ export function buildOpenApiDocument(operations: OpenApiOperation[]) {
 }
 
 export async function loadOpenApiOperations() {
-  const apiRoot = path.join(process.cwd(), "app", "api", "v1");
+  const apiRoots = [
+    path.join(process.cwd(), "app", "api", "v1"),
+    path.join(process.cwd(), "app", "api", "agents", "v1"),
+  ];
 
-  // Next.js route handlers already live under app/api/v1, so the generator
+  // Next.js route handlers already live under app/api, so the generator
   // discovers route folders instead of keeping a manual registry file.
-  const routeDirectories = findRouteDirectories(apiRoot)
+  const routeDirectories = apiRoots
+    .flatMap((apiRoot) => findRouteDirectories(apiRoot))
     .filter((dirPath) => statSync(dirPath).isDirectory())
     .sort();
 
