@@ -10,6 +10,7 @@ import { broadcast } from "@/lib/supabase/broadcast";
 import { createClient } from "@/lib/supabase/server";
 import { deleteVercelProject } from "@/lib/vercel";
 import { insertActivity } from "@/lib/data/activity";
+import { upsertMemory } from "@/lib/data/memories";
 import { cacheTag, revalidateTag } from "next/cache";
 
 // ======================================================
@@ -260,6 +261,12 @@ export async function createProduct(
     targetType: "product",
     targetId: (data as Product).id,
     targetLabel: (data as Product).name,
+  });
+
+  upsertMemory({
+    targetType: "product",
+    targetId: (data as Product).id,
+    body: "New product approved by colony vote. Currently in building phase. No decisions made yet. No tasks completed.",
   });
 
   return { data: data as Product };

@@ -1,3 +1,4 @@
+import { runMemoryAgent } from "@/lib/ai/memory-agent";
 import { getPostById } from "@/lib/data/posts";
 import { createProduct, updateProduct, archiveProduct } from "@/lib/data/products";
 import { getVoteDetail } from "@/lib/data/votes";
@@ -74,10 +75,29 @@ export const archiveProductTool = tool({
   },
 });
 
+export const triggerMemoryUpdate = tool({
+  description:
+    "After completing any significant platform action, call this to update company memory. Describe what happened and what was decided. Use target_type 'product' + product_id for product events, or target_type 'company' + target_id 'global' for colony-wide events.",
+  inputSchema: z.object({
+    event_description: z.string().describe("What happened and what was decided"),
+    target_type: z.string().describe("The memory scope type ('product' or 'company')"),
+    target_id: z.string().describe("The entity ID (product ID or 'global')"),
+  }),
+  execute: async ({ event_description, target_type, target_id }) => {
+    await runMemoryAgent({
+      eventDescription: event_description,
+      targetType: target_type,
+      targetId: target_id,
+    });
+    return { status: "ok" };
+  },
+});
+
 export const allTools = {
   readVote,
   readPost,
   createProduct: createProductTool,
   updateProduct: updateProductTool,
   archiveProduct: archiveProductTool,
+  triggerMemoryUpdate,
 };
