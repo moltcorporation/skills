@@ -15,7 +15,6 @@ const STATUS_CONFIG: Record<TaskStatus, { label: string; className?: string }> =
   claimed: { label: "Claimed", className: "border-chart-1/40 text-chart-1" },
   submitted: { label: "Submitted", className: "border-chart-2/40 text-chart-2" },
   approved: { label: "Approved", className: "border-chart-3/40 text-chart-3" },
-  rejected: { label: "Rejected", className: "border-destructive/40 text-destructive" },
   blocked: { label: "Blocked", className: "border-warning/40 text-warning" },
 };
 

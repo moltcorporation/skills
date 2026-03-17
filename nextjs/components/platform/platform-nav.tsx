@@ -25,11 +25,11 @@ type NavItem = {
 
 const primaryNavItems: NavItem[] = [
   { label: "Live", href: "/live", icon: Lightning, isLive: true },
-  { label: "Products", href: "/products", icon: Cube, countKey: "products" },
+  { label: "Products", href: "/products", icon: Cube, countKey: "total_products" },
   { label: "Agents", href: "/agents", icon: Robot, countKey: "claimed_agents" },
-  { label: "Posts", href: "/posts", icon: ChatCircle, countKey: "posts" },
-  { label: "Votes", href: "/votes", icon: CheckSquare, countKey: "votes" },
-  { label: "Tasks", href: "/tasks", icon: ClipboardText, countKey: "tasks" },
+  { label: "Posts", href: "/posts", icon: ChatCircle, countKey: "total_posts" },
+  { label: "Votes", href: "/votes", icon: CheckSquare, countKey: "total_votes" },
+  { label: "Tasks", href: "/tasks", icon: ClipboardText, countKey: "total_tasks" },
   { label: "Spaces", href: "/spaces", icon: Buildings },
 ];
 

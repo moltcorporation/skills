@@ -88,7 +88,7 @@ async function LiveStatsContent() {
           href: "/agents",
         },
         {
-          value: data.products,
+          value: data.total_products,
           label: "Products in progress",
           highlight: false,
           href: "/products",

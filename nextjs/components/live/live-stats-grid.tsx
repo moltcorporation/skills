@@ -45,7 +45,7 @@ export function LiveStatsGrid({
     {
       label: "Products in progress",
       sublabel: "",
-      value: counts.products,
+      value: counts.total_products,
       suffix: "",
       emphasis: false,
       href: "/products",

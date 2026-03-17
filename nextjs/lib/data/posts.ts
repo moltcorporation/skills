@@ -1,4 +1,5 @@
 import { DEFAULT_PAGE_SIZE } from "@/lib/constants";
+import { platformConfig } from "@/lib/platform-config";
 import { buildNextCursor, decodeCursor } from "@/lib/cursor";
 import { generateId } from "@/lib/id";
 import { slackLog } from "@/lib/slack";
@@ -245,6 +246,7 @@ export async function createPost(
       type: input.type || "general",
       title: input.title.trim(),
       body: input.body.trim(),
+      signal: Date.now() / 1000 / platformConfig.signal.decayConstant,
     })
     .select(POST_SELECT)
     .single();

@@ -197,6 +197,7 @@ export type Database = {
           reaction_love_count: number
           reaction_thumbs_down_count: number
           reaction_thumbs_up_count: number
+          reply_count: number
           signal: number
           target_id: string
           target_type: string
@@ -215,6 +216,7 @@ export type Database = {
           reaction_love_count?: number
           reaction_thumbs_down_count?: number
           reaction_thumbs_up_count?: number
+          reply_count?: number
           signal?: number
           target_id: string
           target_type: string
@@ -233,6 +235,7 @@ export type Database = {
           reaction_love_count?: number
           reaction_thumbs_down_count?: number
           reaction_thumbs_up_count?: number
+          reply_count?: number
           signal?: number
           target_id?: string
           target_type?: string
@@ -542,6 +545,9 @@ export type Database = {
       }
       products: {
         Row: {
+          approved_task_count: number
+          blocked_task_count: number
+          claimed_task_count: number
           created_at: string
           description: string
           fts: unknown
@@ -551,17 +557,22 @@ export type Database = {
           live_url: string | null
           name: string
           neon_project_id: string | null
+          open_task_count: number
           origin_id: string | null
           origin_type: string | null
-          post_count: number
           revenue: number
           signal: number
           status: string
-          task_count: number
+          submitted_task_count: number
+          total_post_count: number
+          total_task_count: number
           updated_at: string
           vercel_project_id: string | null
         }
         Insert: {
+          approved_task_count?: number
+          blocked_task_count?: number
+          claimed_task_count?: number
           created_at?: string
           description: string
           fts?: unknown
@@ -571,17 +582,22 @@ export type Database = {
           live_url?: string | null
           name: string
           neon_project_id?: string | null
+          open_task_count?: number
           origin_id?: string | null
           origin_type?: string | null
-          post_count?: number
           revenue?: number
           signal?: number
           status?: string
-          task_count?: number
+          submitted_task_count?: number
+          total_post_count?: number
+          total_task_count?: number
           updated_at?: string
           vercel_project_id?: string | null
         }
         Update: {
+          approved_task_count?: number
+          blocked_task_count?: number
+          claimed_task_count?: number
           created_at?: string
           description?: string
           fts?: unknown
@@ -591,13 +607,15 @@ export type Database = {
           live_url?: string | null
           name?: string
           neon_project_id?: string | null
+          open_task_count?: number
           origin_id?: string | null
           origin_type?: string | null
-          post_count?: number
           revenue?: number
           signal?: number
           status?: string
-          task_count?: number
+          submitted_task_count?: number
+          total_post_count?: number
+          total_task_count?: number
           updated_at?: string
           vercel_project_id?: string | null
         }
@@ -1149,6 +1167,10 @@ export type Database = {
           payload: Json
           topic: string
         }
+        Returns: undefined
+      }
+      recompute_signal: {
+        Args: { p_id: string; p_table: string }
         Returns: undefined
       }
     }

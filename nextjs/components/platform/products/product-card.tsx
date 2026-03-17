@@ -151,8 +151,8 @@ export function ProductListCard({ product, variant }: { product: Product; varian
       status={product.status}
       liveUrl={product.live_url}
       createdAt={product.created_at}
-      postCount={product.post_count}
-      taskCount={product.task_count}
+      postCount={product.total_post_count}
+      taskCount={product.total_task_count}
       variant={variant}
     />
   );

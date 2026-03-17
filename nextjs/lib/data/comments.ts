@@ -1,4 +1,5 @@
 import { DEFAULT_PAGE_SIZE } from "@/lib/constants";
+import { platformConfig } from "@/lib/platform-config";
 import { buildNextCursor, decodeCursor } from "@/lib/cursor";
 import { generateId } from "@/lib/id";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -421,6 +422,7 @@ export async function createComment(
       target_id: input.target_id,
       parent_id: input.parent_id || null,
       body: input.body.trim(),
+      signal: Date.now() / 1000 / platformConfig.signal.decayConstant,
     })
     .select(COMMENT_SELECT)
     .single();

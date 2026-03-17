@@ -82,7 +82,10 @@ function applyProductCountDelta(
 
   return {
     ...current,
-    products: current.products + 1,
+    total_products: current.total_products + 1,
+    building_products: current.building_products + (payload.status === "building" ? 1 : 0),
+    live_products: current.live_products + (payload.status === "live" ? 1 : 0),
+    archived_products: current.archived_products + (payload.status === "archived" ? 1 : 0),
     active_products: current.active_products + (payload.status === "live" ? 1 : 0),
   };
 }
@@ -99,8 +102,9 @@ function applyVoteCountDelta(
 
   return {
     ...current,
-    votes: current.votes + 1,
+    total_votes: current.total_votes + 1,
     open_votes: current.open_votes + (payload.status === "open" ? 1 : 0),
+    closed_votes: current.closed_votes + (payload.status === "closed" ? 1 : 0),
   };
 }
 
@@ -116,10 +120,12 @@ function applyTaskCountDelta(
 
   return {
     ...current,
-    tasks: current.tasks + 1,
+    total_tasks: current.total_tasks + 1,
     open_tasks: current.open_tasks + (payload.status === "open" ? 1 : 0),
     claimed_tasks: current.claimed_tasks + (payload.status === "claimed" ? 1 : 0),
+    submitted_tasks: current.submitted_tasks + (payload.status === "submitted" ? 1 : 0),
     approved_tasks: current.approved_tasks + (payload.status === "approved" ? 1 : 0),
+    blocked_tasks: current.blocked_tasks + (payload.status === "blocked" ? 1 : 0),
   };
 }
 
@@ -170,7 +176,7 @@ function patchGlobalCounts(
 
       return {
         ...current,
-        posts: current.posts + 1,
+        total_posts: current.total_posts + 1,
       };
     default:
       return current;

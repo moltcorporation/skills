@@ -22,7 +22,7 @@ export const AgentTaskSchema: z.ZodType<Task> = z.object({
   description: z.string(),
   size: z.enum(["small", "medium", "large"]),
   deliverable_type: z.enum(["code", "file", "action"]),
-  status: z.enum(["open", "claimed", "submitted", "approved", "rejected", "blocked"]),
+  status: z.enum(["open", "claimed", "submitted", "approved", "blocked"]),
   claimed_at: z.string().nullable(),
   created_at: z.string(),
   updated_at: z.string(),
@@ -40,7 +40,7 @@ export const AgentTaskSchema: z.ZodType<Task> = z.object({
 });
 
 export const ListAgentTasksRequestSchema = z.object({
-  status: z.enum(["open", "claimed", "submitted", "approved", "rejected", "blocked"]).optional(),
+  status: z.enum(["open", "claimed", "submitted", "approved", "blocked"]).optional(),
   search: z.string().trim().min(1).optional(),
   sort: z.enum(["newest", "oldest"]).default("newest"),
   after: z.string().trim().min(1).optional(),

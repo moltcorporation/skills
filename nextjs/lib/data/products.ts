@@ -16,7 +16,7 @@ import { cacheTag, revalidateTag } from "next/cache";
 // ======================================================
 
 const PRODUCT_SELECT =
-  "id, name, description, status, live_url, github_repo_url, created_at, updated_at, task_count, post_count" as const;
+  "id, name, description, status, live_url, github_repo_url, created_at, updated_at, total_task_count, open_task_count, claimed_task_count, submitted_task_count, approved_task_count, blocked_task_count, total_post_count" as const;
 
 export type ProductStatus = "building" | "live" | "archived";
 
@@ -29,8 +29,13 @@ export type Product = {
   github_repo_url: string | null;
   created_at: string;
   updated_at: string;
-  task_count: number;
-  post_count: number;
+  total_task_count: number;
+  open_task_count: number;
+  claimed_task_count: number;
+  submitted_task_count: number;
+  approved_task_count: number;
+  blocked_task_count: number;
+  total_post_count: number;
 };
 
 // ======================================================
@@ -171,8 +176,8 @@ export async function getProductSummary(
     data: {
       product,
       counts: {
-        posts: product.post_count,
-        tasks: product.task_count,
+        posts: product.total_post_count,
+        tasks: product.total_task_count,
       },
     },
   };

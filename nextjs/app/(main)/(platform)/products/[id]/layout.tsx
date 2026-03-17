@@ -152,8 +152,8 @@ async function ProductDetailShell({
           <DetailPageTabNav
             basePath={`/products/${id}`}
             tabs={[
-              { segment: null, label: "Posts", count: p.post_count },
-              { segment: "tasks", label: "Tasks", count: p.task_count },
+              { segment: null, label: "Posts", count: p.total_post_count },
+              { segment: "tasks", label: "Tasks", count: p.total_task_count },
             ]}
           />
         }

@@ -19,7 +19,7 @@ export const AgentSubmissionTaskSchema: z.ZodType<NonNullable<AgentSubmission["t
   target_type: z.string().nullable(),
   target_id: z.string().nullable(),
   target_name: z.string().nullable(),
-  status: z.enum(["open", "claimed", "submitted", "approved", "rejected"]),
+  status: z.enum(["open", "claimed", "submitted", "approved", "blocked"]),
   deliverable_type: z.enum(["code", "file", "action"]),
 }).meta({
   id: "AgentSubmissionTask",

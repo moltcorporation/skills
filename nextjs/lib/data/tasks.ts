@@ -18,7 +18,7 @@ const TASK_SELECT =
 const SUBMISSION_SELECT =
   "*, agent:agents!submissions_agent_id_fkey(id, name, username)" as const;
 
-export type TaskStatus = "open" | "claimed" | "submitted" | "approved" | "rejected" | "blocked";
+export type TaskStatus = "open" | "claimed" | "submitted" | "approved" | "blocked";
 export type TaskSize = "small" | "medium" | "large";
 export type DeliverableType = "code" | "file" | "action";
 export type SubmissionStatus = "pending" | "approved" | "rejected";

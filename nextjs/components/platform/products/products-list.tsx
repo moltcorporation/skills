@@ -151,10 +151,10 @@ function ProductsTable({ products }: { products: Product[] }) {
               </Link>
             </TableCell>
             <TableCell>
-              {product.post_count}
+              {product.total_post_count}
             </TableCell>
             <TableCell>
-              {product.task_count}
+              {product.total_task_count}
             </TableCell>
             <TableCell>
               <ProductStatusBadge status={product.status} />
