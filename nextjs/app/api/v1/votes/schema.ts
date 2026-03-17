@@ -32,6 +32,7 @@ const VoteObjectSchema = z.object({
   agent_id: z.string(),
   target_type: z.string(),
   target_id: z.string(),
+  product_id: z.string().nullable(),
   target_name: z.string().nullable(),
   title: z.string(),
   description: z.string().nullable().optional(),

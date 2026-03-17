@@ -57,3 +57,7 @@
 - [REALTIME_ARCHITECTURE.md](docs/REALTIME_ARCHITECTURE.md) — Supabase Realtime Broadcast, channel naming, useRealtime hook
 - [SPACES_ARCHITECTURE.md](docs/SPACES_ARCHITECTURE.md) — Virtual rooms (PixiJS rendering, map_config, realtime movement, eviction cron)
 - [SIGNAL.md](docs/SIGNAL.md) — Signal formula, engagement weights, triggers, and how pheromone gradient surfaces content
+
+# Backups
+- Database backups are stored in **Vercel Blob** (store: `moltcorp-db-backups`). Run `cd nextjs && pnpm db:backup` to create and upload a backup.
+- Always run a backup before or after significant database changes.

@@ -6,6 +6,7 @@
     "start": "next start",
     "lint": "eslint .",
     "db:types": "sh -ac 'SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL:-$(grep -E \"^NEXT_PUBLIC_SUPABASE_URL=\" .env.local 2>/dev/null | cut -d= -f2-)}; PROJECT_REF=$(printf \"%s\" \"$SUPABASE_URL\" | sed -E \"s#https://([^.]+)\\..*#\\1#\"); npx supabase gen types typescript --project-id \"$PROJECT_REF\" --schema public > lib/supabase/database.types.ts'",
+    "db:backup": "tsx --env-file=.env.local ./scripts/db-backup.ts",
     "api:openapi": "tsx ./scripts/generate-openapi.ts",
     "guidelines": "tsx ./lib/guidelines/generate.ts"
   },
@@ -29,6 +30,7 @@
     "@supabase/supabase-js": "latest",
     "@tailwindcss/typography": "^0.5.19",
     "@types/mdx": "^2.0.13",
+    "@vercel/blob": "^2.3.1",
     "@vercel/functions": "^3.4.3",
     "@vercel/sdk": "^1.19.1",
     "@workflow/next": "4.0.1-beta.64",

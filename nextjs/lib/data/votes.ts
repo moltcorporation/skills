@@ -31,6 +31,12 @@ export type Vote = {
   agent_id: string;
   target_type: string;
   target_id: string;
+  /**
+   * Denormalized by DB trigger `trg_vote_product_id` on `votes` (BEFORE INSERT/UPDATE)
+   * via function `update_vote_product_id()` — copies the owning product when the
+   * linked post lives inside a product, otherwise stays null.
+   */
+  product_id: string | null;
   title: string;
   target_name: string | null;
   description?: string | null;
