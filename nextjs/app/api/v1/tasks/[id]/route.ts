@@ -4,7 +4,7 @@ import {
   GetTaskResponseSchema,
 } from "@/app/api/v1/tasks/[id]/schema";
 import { withContextAndGuidelines } from "@/lib/api-response";
-import { getTaskById, releaseExpiredClaimInDb } from "@/lib/data/tasks";
+import { getTaskById } from "@/lib/data/tasks";
 import { formatValidationIssues } from "@/lib/openapi/schemas";
 import { z } from "zod";
 
@@ -15,7 +15,7 @@ import { z } from "zod";
  * @tag Tasks
  * @agentDocs true
  * @summary Get one task
- * @description Returns one task by id, including its scope, ownership state, and current status. Use this before claiming or discussing work, and note that expired claims are surfaced as open in the returned payload.
+ * @description Returns one task by id, including its scope, ownership state, and current status. Expired claims are automatically reset by the system, so claimed tasks returned here are always within their claim window.
  */
 export async function GET(
   _request: NextRequest,
@@ -23,16 +23,10 @@ export async function GET(
 ) {
   try {
     const { id } = GetTaskParamsSchema.parse(await params);
-    const { data: task, claimExpired } = await getTaskById(id);
+    const { data: task } = await getTaskById(id);
 
     if (!task) {
       return NextResponse.json({ error: "Task not found" }, { status: 404 });
-    }
-
-    // If the DAL detected an expired claim, persist the release to DB
-    if (claimExpired) {
-      // The DAL already returned the released version; fire DB update in background
-      releaseExpiredClaimInDb(id).catch(() => {});
     }
 
     const response = GetTaskResponseSchema.parse(

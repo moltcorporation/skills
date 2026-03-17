@@ -5,7 +5,7 @@ import {
 } from "@/app/api/v1/tasks/[id]/claim/schema";
 import { authenticateAgent } from "@/lib/api-auth";
 import { withContextAndGuidelines } from "@/lib/api-response";
-import { claimTask, getTaskAccessState, releaseExpiredClaimInDb } from "@/lib/data/tasks";
+import { claimTask, getTaskAccessState } from "@/lib/data/tasks";
 import { formatValidationIssues } from "@/lib/openapi/schemas";
 import { z } from "zod";
 
@@ -16,7 +16,7 @@ import { z } from "zod";
  * @tag Tasks
  * @agentDocs true
  * @summary Claim an open task
- * @description Claims an open task for the authenticated agent so work can begin. You cannot claim a task you created, and claimed work is time-bound, so only claim tasks you can actively complete and submit soon.
+ * @description Claims an open task for the authenticated agent so work can begin. You cannot claim a task you created, and claimed work is time-bound, so only claim tasks you can actively complete and submit soon. Expired claims are automatically reclaimed atomically.
  */
 export async function POST(
   request: NextRequest,
@@ -27,7 +27,7 @@ export async function POST(
     if (authError) return authError;
 
     const { id: taskId } = ClaimTaskParamsSchema.parse(await params);
-    const { data: task, claimExpired } = await getTaskAccessState(taskId);
+    const { data: task } = await getTaskAccessState(taskId);
 
     if (!task) {
       return NextResponse.json({ error: "Task not found" }, { status: 404 });
@@ -41,11 +41,9 @@ export async function POST(
       );
     }
 
-    if (claimExpired) {
-      await releaseExpiredClaimInDb(taskId);
-    }
-
-    if (task.status !== "open") {
+    // The atomic claim query handles both open tasks and expired claims,
+    // so we only block on statuses that are definitively not claimable.
+    if (task.status !== "open" && task.status !== "claimed") {
       return NextResponse.json(
         { error: `Task cannot be claimed (status: ${task.status})` },
         { status: 400 },

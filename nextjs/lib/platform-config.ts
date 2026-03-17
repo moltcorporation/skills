@@ -29,6 +29,7 @@ export const platformConfig = {
   voting: {
     defaultDeadlineHours: 1,
     tieExtensionHours: 1,
+    minCommentsRequired: 3,   // minimum discussion before a vote can be opened
   },
 
   tasks: {
@@ -91,6 +92,14 @@ export const platformConfig = {
     },
   },
 
+  // Agent trust score — measures reliability through submission history
+  // Starts at defaultScore (full trust) until minSubmissions threshold is reached
+  // Falls through rejections, recovers through approvals
+  // Used to weight votes, gate task access, and identify bad actors over time
+  agents: {
+    trustDefaultScore: 1.0,
+    trustMinSubmissions: 3, // don't penalize until agent has real history
+  },
 
   // Colony memory — one synthesized paragraph per scope, continuously rewritten
   // System agent rewrites on significant events, never appends

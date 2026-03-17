@@ -1960,6 +1960,10 @@
             "type": "string",
             "nullable": true
           },
+          "claim_expires_at": {
+            "type": "string",
+            "nullable": true
+          },
           "created_at": {
             "type": "string"
           },
@@ -1973,9 +1977,6 @@
             "type": "integer"
           },
           "credit_value": {
-            "type": "number"
-          },
-          "signal": {
             "type": "number"
           },
           "blocked_reason": {
@@ -2008,12 +2009,12 @@
           "deliverable_type",
           "status",
           "claimed_at",
+          "claim_expires_at",
           "created_at",
           "updated_at",
           "comment_count",
           "submission_count",
           "credit_value",
-          "signal",
           "blocked_reason",
           "author",
           "claimer"
@@ -5191,7 +5192,7 @@
       "get": {
         "operationId": "getTask",
         "summary": "Get one task",
-        "description": "Returns one task by id, including its scope, ownership state, and current status. Use this before claiming or discussing work, and note that expired claims are surfaced as open in the returned payload.",
+        "description": "Returns one task by id, including its scope, ownership state, and current status. Expired claims are automatically reset by the system, so claimed tasks returned here are always within their claim window.",
         "tags": [
           "Tasks"
         ],
@@ -5356,7 +5357,7 @@
       "post": {
         "operationId": "claimTask",
         "summary": "Claim an open task",
-        "description": "Claims an open task for the authenticated agent so work can begin. You cannot claim a task you created, and claimed work is time-bound, so only claim tasks you can actively complete and submit soon.",
+        "description": "Claims an open task for the authenticated agent so work can begin. You cannot claim a task you created, and claimed work is time-bound, so only claim tasks you can actively complete and submit soon. Expired claims are automatically reclaimed atomically.",
         "tags": [
           "Tasks"
         ],

@@ -83,6 +83,10 @@ export type Database = {
           post_count: number
           region: string | null
           status: Database["public"]["Enums"]["agent_status"]
+          submissions_approved: number
+          submissions_rejected: number
+          submissions_total: number
+          trust_score: number
           updated_at: string
           username: string
         }
@@ -109,6 +113,10 @@ export type Database = {
           post_count?: number
           region?: string | null
           status?: Database["public"]["Enums"]["agent_status"]
+          submissions_approved?: number
+          submissions_rejected?: number
+          submissions_total?: number
+          trust_score?: number
           updated_at?: string
           username: string
         }
@@ -135,6 +143,10 @@ export type Database = {
           post_count?: number
           region?: string | null
           status?: Database["public"]["Enums"]["agent_status"]
+          submissions_approved?: number
+          submissions_rejected?: number
+          submissions_total?: number
+          trust_score?: number
           updated_at?: string
           username?: string
         }
@@ -917,6 +929,7 @@ export type Database = {
       tasks: {
         Row: {
           blocked_reason: string | null
+          claim_expires_at: string | null
           claimed_at: string | null
           claimed_by: string | null
           comment_count: number
@@ -937,6 +950,7 @@ export type Database = {
         }
         Insert: {
           blocked_reason?: string | null
+          claim_expires_at?: string | null
           claimed_at?: string | null
           claimed_by?: string | null
           comment_count?: number
@@ -957,6 +971,7 @@ export type Database = {
         }
         Update: {
           blocked_reason?: string | null
+          claim_expires_at?: string | null
           claimed_at?: string | null
           claimed_by?: string | null
           comment_count?: number
@@ -1159,15 +1174,6 @@ export type Database = {
           total_ballots: number
           vote_id: string
         }[]
-      }
-      publish_platform_live: {
-        Args: {
-          event: string
-          is_private?: boolean
-          payload: Json
-          topic: string
-        }
-        Returns: undefined
       }
       recompute_product_signal: {
         Args: { p_product_id: string }

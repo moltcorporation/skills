@@ -42,6 +42,7 @@ export type Task = {
   deliverable_type: DeliverableType;
   status: TaskStatus;
   claimed_at: string | null;
+  claim_expires_at: string | null;
   created_at: string;
   updated_at: string;
   /**
@@ -56,7 +57,6 @@ export type Task = {
    */
   submission_count: number;
   credit_value: number;
-  signal: number;
   blocked_reason: string | null;
   author: TaskAgentSummary;
   claimer: TaskAgentSummary | null;
@@ -117,30 +117,6 @@ export type SubmissionReviewContext = {
   >;
 };
 
-type ReleaseExpiredClaimResult = {
-  task: Task;
-  claimExpired: boolean;
-};
-
-function releaseExpiredClaim(task: Task): ReleaseExpiredClaimResult {
-  if (task.status === "claimed" && task.claimed_at) {
-    const claimedAt = new Date(task.claimed_at).getTime();
-    if (Date.now() - claimedAt > platformConfig.tasks.claimExpiryMs) {
-      return {
-        task: {
-          ...task,
-          status: "open",
-          claimed_by: null,
-          claimed_at: null,
-          claimer: null,
-        },
-        claimExpired: true,
-      };
-    }
-  }
-
-  return { task, claimExpired: false };
-}
 
 function getCreditAmount(task: { credit_value: number }): number {
   return task.credit_value;
@@ -251,7 +227,7 @@ export async function getTasks(
   const hasMore = (data?.length ?? 0) > limit;
   if (hasMore) data!.pop();
 
-  const items = ((data as Task[] | null) ?? []).map((task) => releaseExpiredClaim(task).task);
+  const items = (data as Task[] | null) ?? [];
 
   return {
     data: items,
@@ -407,7 +383,6 @@ export type GetTaskByIdInput = string;
 
 export type GetTaskByIdResponse = {
   data: Task | null;
-  claimExpired: boolean;
 };
 
 export async function getTaskById(
@@ -424,10 +399,8 @@ export async function getTaskById(
     .maybeSingle();
 
   if (error) throw error;
-  if (!data) return { data: null, claimExpired: false };
 
-  const released = releaseExpiredClaim(data as Task);
-  return { data: released.task, claimExpired: released.claimExpired };
+  return { data: (data as Task | null) ?? null };
 }
 
 // ======================================================
@@ -466,7 +439,6 @@ export type GetTaskAccessStateInput = string;
 
 export type GetTaskAccessStateResponse = {
   data: TaskAccessState | null;
-  claimExpired: boolean;
 };
 
 export async function getTaskAccessState(
@@ -480,46 +452,10 @@ export async function getTaskAccessState(
     .maybeSingle();
 
   if (error) throw error;
-  if (!data) return { data: null, claimExpired: false };
 
-  const task = data as TaskAccessState;
-
-  if (task.status === "claimed" && task.claimed_at) {
-    const claimedAt = new Date(task.claimed_at).getTime();
-    if (Date.now() - claimedAt > platformConfig.tasks.claimExpiryMs) {
-      return {
-        data: {
-          ...task,
-          status: "open",
-          claimed_by: null,
-          claimed_at: null,
-        },
-        claimExpired: true,
-      };
-    }
-  }
-
-  return { data: task, claimExpired: false };
+  return { data: (data as TaskAccessState | null) ?? null };
 }
 
-// ======================================================
-// ReleaseExpiredClaimInDb
-// ======================================================
-
-export type ReleaseExpiredClaimInDbInput = string;
-
-export async function releaseExpiredClaimInDb(
-  taskId: ReleaseExpiredClaimInDbInput,
-): Promise<void> {
-  const supabase = createAdminClient();
-  const { error } = await supabase
-    .from("tasks")
-    .update({ status: "open", claimed_by: null, claimed_at: null })
-    .eq("id", taskId)
-    .eq("status", "claimed");
-
-  if (error) throw error;
-}
 
 // ======================================================
 // GetSubmissions
@@ -800,10 +736,11 @@ export async function claimTask(
       status: "claimed",
       claimed_by: input.agentId,
       claimed_at: new Date().toISOString(),
+      claim_expires_at: new Date(Date.now() + platformConfig.tasks.claimExpiryMs).toISOString(),
       updated_at: new Date().toISOString(),
     })
     .eq("id", input.taskId)
-    .eq("status", "open")
+    .or("status.eq.open,and(status.eq.claimed,claim_expires_at.lt.now())")
     .select(TASK_SELECT)
     .maybeSingle();
 
@@ -1085,6 +1022,7 @@ export async function rejectSubmission(
       status: "open",
       claimed_by: null,
       claimed_at: null,
+      claim_expires_at: null,
       updated_at: now,
     })
     .eq("id", context.task.id);
@@ -1128,6 +1066,7 @@ export async function markSubmissionReviewFailed(
       status: "open",
       claimed_by: null,
       claimed_at: null,
+      claim_expires_at: null,
       updated_at: now,
     })
     .eq("id", context.task.id);
@@ -1163,6 +1102,7 @@ export async function blockTask(
       blocked_reason: input.reason.trim(),
       claimed_by: null,
       claimed_at: null,
+      claim_expires_at: null,
       updated_at: new Date().toISOString(),
     })
     .eq("id", input.taskId)
