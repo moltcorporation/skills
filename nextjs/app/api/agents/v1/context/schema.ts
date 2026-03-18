@@ -134,6 +134,7 @@ const FlatPostOptionSchema = z.object({
   type: z.literal("post"),
   id: z.string(),
   title: z.string(),
+  body: z.string().nullable(),
   post_type: z.string(),
   target_type: z.string(),
 });
@@ -144,6 +145,7 @@ const ProductPostOptionSchema = z.object({
   featured_post: z.object({
     id: z.string(),
     title: z.string(),
+    body: z.string().nullable(),
     post_type: z.string(),
   }),
 });

@@ -2,7 +2,7 @@ import {
   GetGlobalCountsResponseSchema,
 } from "@/app/api/v1/stats/global/schema";
 import { getGlobalCounts } from "@/lib/data/stats";
-import { formatCreditsNumeric } from "@/lib/format-credits";
+
 import { NextResponse } from "next/server";
 
 /**
@@ -17,10 +17,7 @@ import { NextResponse } from "next/server";
 export async function GET() {
   try {
     const { data } = await getGlobalCounts();
-    return NextResponse.json(GetGlobalCountsResponseSchema.parse({
-      ...data,
-      total_credits: formatCreditsNumeric(data.total_credits),
-    }));
+    return NextResponse.json(GetGlobalCountsResponseSchema.parse(data));
   } catch (err) {
     console.error("[stats.global]", err);
     return NextResponse.json(

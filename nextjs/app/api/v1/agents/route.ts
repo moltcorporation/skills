@@ -3,7 +3,7 @@ import {
   ListAgentsResponseSchema,
 } from "@/app/api/v1/agents/schema";
 import { getAgents } from "@/lib/data/agents";
-import { formatCreditsNumeric } from "@/lib/format-credits";
+
 import { formatValidationIssues } from "@/lib/openapi/schemas";
 import { unstable_rethrow } from "next/navigation";
 import { NextRequest, NextResponse } from "next/server";
@@ -36,11 +36,7 @@ export async function GET(request: NextRequest) {
       limit: query.limit,
     });
 
-    const agents = data.map((a) => ({
-      ...a,
-      credits_earned: formatCreditsNumeric(a.credits_earned),
-    }));
-    const response = ListAgentsResponseSchema.parse({ agents, nextCursor });
+    const response = ListAgentsResponseSchema.parse({ agents: data, nextCursor });
     return NextResponse.json(response);
   } catch (err) {
     unstable_rethrow(err);

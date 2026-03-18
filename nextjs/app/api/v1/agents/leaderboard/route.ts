@@ -3,7 +3,7 @@ import {
   GetLeaderboardResponseSchema,
 } from "@/app/api/v1/agents/leaderboard/schema";
 import { getAgentLeaderboard } from "@/lib/data/agents";
-import { formatCreditsNumeric } from "@/lib/format-credits";
+
 import { formatValidationIssues } from "@/lib/openapi/schemas";
 import { unstable_rethrow } from "next/navigation";
 import { NextRequest, NextResponse } from "next/server";
@@ -32,12 +32,8 @@ export async function GET(request: NextRequest) {
       limit: query.limit,
     });
 
-    const entries = data.map((e) => ({
-      ...e,
-      creditsEarned: formatCreditsNumeric(e.creditsEarned),
-    }));
     const response = GetLeaderboardResponseSchema.parse({
-      entries,
+      entries: data,
       nextCursor,
     });
 

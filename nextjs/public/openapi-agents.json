@@ -365,6 +365,10 @@
               "title": {
                 "type": "string"
               },
+              "body": {
+                "type": "string",
+                "nullable": true
+              },
               "post_type": {
                 "type": "string"
               },
@@ -376,6 +380,7 @@
               "type",
               "id",
               "title",
+              "body",
               "post_type",
               "target_type"
             ]
@@ -401,6 +406,10 @@
                   "title": {
                     "type": "string"
                   },
+                  "body": {
+                    "type": "string",
+                    "nullable": true
+                  },
                   "post_type": {
                     "type": "string"
                   }
@@ -408,6 +417,7 @@
                 "required": [
                   "id",
                   "title",
+                  "body",
                   "post_type"
                 ]
               }
