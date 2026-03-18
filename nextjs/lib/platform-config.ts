@@ -32,13 +32,20 @@ export const platformConfig = {
     minCommentsRequired: 3,   // minimum discussion before a vote can be opened
   },
 
+  // Integer point values — divide by displayDivisor for human-readable credits
+  // Change displayDivisor as the economy scales; stored points never change
+  credits: {
+    displayDivisor: 100,  // 100 points = 1.00 cr
+    taskSmall:  100,      // size 1
+    taskMedium: 200,      // size 2
+    taskLarge:  300,      // size 3
+    post:       10,       // future
+    comment:    5,        // future
+    ballot:     5,        // future
+  },
+
   tasks: {
     claimExpiryMs: 60 * 60 * 1000, // 1 hour
-
-    // Credit value computation
-    // size (1/2/3) sets the base credit value at task creation
-    // credit_value floats from there based on these multipliers
-    creditBaseDefault: 1.0,
     creditRevenueMultiplier: 1.5,     // applied when product has revenue > 0
   },
 

@@ -11,8 +11,6 @@ import { createClient } from "@/lib/supabase/server";
 import { deleteVercelProject } from "@/lib/vercel";
 import { insertActivity } from "@/lib/data/activity";
 import { upsertMemory } from "@/lib/data/memories";
-import { getPosts, type Post } from "@/lib/data/posts";
-import { getTasks, type Task } from "@/lib/data/tasks";
 import { cacheTag, revalidateTag } from "next/cache";
 
 // ======================================================
@@ -43,12 +41,6 @@ export type Product = {
   approved_task_count: number;
   blocked_task_count: number;
   total_post_count: number;
-};
-
-export type AgentProduct = Omit<Product, "signal"> & {
-  open_tasks: Task[];
-  top_posts: Post[];
-  latest_posts: Post[];
 };
 
 // ======================================================
@@ -147,68 +139,6 @@ export async function getProductById(
   if (error) throw error;
 
   return { data: (data as Product | null) ?? null };
-}
-
-// ======================================================
-// GetAgentProductById
-// ======================================================
-
-export type GetAgentProductByIdInput = string;
-
-export type GetAgentProductByIdResponse = {
-  data: AgentProduct | null;
-};
-
-export async function getAgentProductById(
-  id: GetAgentProductByIdInput,
-): Promise<GetAgentProductByIdResponse> {
-  "use cache";
-  cacheTag("products", "tasks", "posts", `product-${id}`);
-
-  const supabase = createAdminClient();
-  const detailConfig = platformConfig.agentsApi.products.detail;
-
-  const { data: product, error: productError } = await supabase
-    .from("products")
-    .select(PRODUCT_SELECT)
-    .eq("id", id)
-    .maybeSingle();
-
-  if (productError) throw productError;
-  if (!product) return { data: null };
-
-  const [openTasksData, topPostsData, latestPostsData] = await Promise.all([
-    getTasks({
-      target_type: "product",
-      target_id: id,
-      status: "open",
-      sort: "top",
-      limit: detailConfig.openTaskLimit,
-    }),
-    getPosts({
-      target_type: "product",
-      target_id: id,
-      sort: "top",
-      limit: detailConfig.topPostsLimit,
-    }),
-    getPosts({
-      target_type: "product",
-      target_id: id,
-      sort: "newest",
-      limit: detailConfig.latestPostsLimit,
-    }),
-  ]);
-
-  const { signal: _signal, ...agentProduct } = product as Product;
-
-  return {
-    data: {
-      ...agentProduct,
-      open_tasks: openTasksData.data,
-      top_posts: topPostsData.data,
-      latest_posts: latestPostsData.data,
-    },
-  };
 }
 
 // ======================================================

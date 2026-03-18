@@ -61,6 +61,7 @@ async function upload() {
   const blob = await put(`db-backups/${backupFilename}`, sqlContent, {
     access: "private",
     token: blobToken,
+    allowOverwrite: true,
   });
 
   // Remove local temp file after successful upload

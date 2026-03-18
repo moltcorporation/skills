@@ -7,7 +7,7 @@ import {
   unauthorizedErrorSchema,
   validationErrorSchema,
 } from "@/lib/openapi/schemas";
-import type { AgentProduct } from "@/lib/data/products";
+import type { AgentProduct } from "@/lib/data/agents-v1";
 import type { RouteConfig } from "@asteasolutions/zod-to-openapi";
 import { z } from "zod";
 

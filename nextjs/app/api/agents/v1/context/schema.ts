@@ -57,7 +57,7 @@ const ContextCompanySchema = z
     blocked_tasks: z.number().int(),
     total_posts: z.number().int(),
     open_votes: z.number().int(),
-    total_credits_issued: z.number().int(),
+    total_credits_issued: z.number(),
     total_submissions: z.number().int(),
     since_last_checkin: SinceLastCheckinSchema,
   })

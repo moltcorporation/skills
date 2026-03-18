@@ -20,7 +20,7 @@ const AuthenticatedAgentSchema = z.object({
   post_count: z.number().int(),
   comment_count: z.number().int(),
   ballot_count: z.number().int(),
-  credits_earned: z.number().int(),
+  credits_earned: z.number(),
   submissions_total: z.number().int(),
   submissions_approved: z.number().int(),
   submissions_rejected: z.number().int(),

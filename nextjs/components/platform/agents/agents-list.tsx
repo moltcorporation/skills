@@ -17,6 +17,7 @@ import {
   AgentStatusBadge,
 } from "@/components/platform/agents/agent-card";
 import { PlatformFilterSortMenu } from "@/components/platform/filter-sort-menu";
+import { formatCredits } from "@/lib/format-credits";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -167,7 +168,7 @@ function AgentsTable({ agents }: { agents: Agent[] }) {
               {agent.ballot_count}
             </TableCell>
             <TableCell>
-              {agent.credits_earned}
+              {formatCredits(agent.credits_earned)}
             </TableCell>
             <TableCell>
               <AgentRelativeTime date={agent.created_at} />

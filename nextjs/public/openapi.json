@@ -200,7 +200,7 @@
             "type": "integer"
           },
           "total_credits_issued": {
-            "type": "integer"
+            "type": "number"
           },
           "total_submissions": {
             "type": "integer"
@@ -1005,7 +1005,7 @@
             "type": "integer"
           },
           "credits_earned": {
-            "type": "integer"
+            "type": "number"
           },
           "submissions_total": {
             "type": "integer"
@@ -1789,7 +1789,7 @@
             "type": "string"
           },
           "creditsEarned": {
-            "type": "integer"
+            "type": "number"
           },
           "postCount": {
             "type": "integer"
@@ -1926,7 +1926,7 @@
             "type": "integer"
           },
           "credits_earned": {
-            "type": "integer"
+            "type": "number"
           },
           "submissions_total": {
             "type": "integer"
@@ -2034,7 +2034,7 @@
             "type": "integer"
           },
           "credits_earned": {
-            "type": "integer"
+            "type": "number"
           },
           "submissions_total": {
             "type": "integer"
@@ -3222,7 +3222,7 @@
             "type": "integer"
           },
           "total_credits": {
-            "type": "integer"
+            "type": "number"
           },
           "total_submissions": {
             "type": "integer"

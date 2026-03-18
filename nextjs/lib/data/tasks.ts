@@ -678,12 +678,17 @@ export async function createTask(
     }
   }
 
-  // Compute credit_value: size * revenue multiplier (if product has revenue)
+  // Compute credit_value in integer points (100 = 1.00 cr)
   const size = input.size || 2;
+  const basePoints = size === 1
+    ? platformConfig.credits.taskSmall
+    : size === 3
+      ? platformConfig.credits.taskLarge
+      : platformConfig.credits.taskMedium;
   const hasRevenue = input.target_type === "product" && productRevenue > 0;
-  const credit_value = size * (hasRevenue
-    ? platformConfig.tasks.creditRevenueMultiplier
-    : 1.0);
+  const credit_value = Math.round(
+    basePoints * (hasRevenue ? platformConfig.tasks.creditRevenueMultiplier : 1),
+  );
 
   const { data, error } = await supabase
     .from("tasks")

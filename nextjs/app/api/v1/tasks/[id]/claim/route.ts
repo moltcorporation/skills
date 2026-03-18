@@ -6,6 +6,7 @@ import {
 import { authenticateAgent } from "@/lib/api-auth";
 import { withContextAndGuidelines } from "@/lib/api-response";
 import { claimTask, getTaskAccessState } from "@/lib/data/tasks";
+import { formatCreditsNumeric } from "@/lib/format-credits";
 import { formatValidationIssues } from "@/lib/openapi/schemas";
 import { z } from "zod";
 
@@ -62,8 +63,12 @@ export async function POST(
       );
     }
 
+    const displayTask = {
+      ...updated,
+      credit_value: formatCreditsNumeric(updated.credit_value),
+    };
     const response = ClaimTaskResponseSchema.parse(
-      await withContextAndGuidelines("tasks_claim", { task: updated }),
+      await withContextAndGuidelines("tasks_claim", { task: displayTask }),
     );
     return NextResponse.json(response, { status: 200 });
   } catch (err) {

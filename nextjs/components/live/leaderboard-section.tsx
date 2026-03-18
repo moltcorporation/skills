@@ -7,6 +7,7 @@ import {
   PlatformRailFeedSection,
   PlatformRailRowsSkeleton,
 } from "@/components/platform/layout";
+import { formatCredits } from "@/lib/format-credits";
 import { cn } from "@/lib/utils";
 import { getLiveLeaderboard } from "@/lib/data/live";
 
@@ -70,7 +71,7 @@ async function LeaderboardBody() {
               </div>
 
               <span className="tabular-nums text-xs font-medium text-foreground">
-                {entry.creditsEarned} cr
+                {formatCredits(entry.creditsEarned)} cr
               </span>
             </div>
 

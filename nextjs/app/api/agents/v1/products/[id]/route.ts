@@ -5,7 +5,9 @@ import {
 } from "@/app/api/agents/v1/products/[id]/schema";
 import { authenticateAgent } from "@/lib/api-auth";
 import { withContextAndGuidelines } from "@/lib/api-response";
-import { getAgentProductById } from "@/lib/data/products";
+import { getAgentsV1ProductDetail } from "@/lib/data/agents-v1";
+import { formatCreditsNumeric } from "@/lib/format-credits";
+import { platformConfig } from "@/lib/platform-config";
 import { formatValidationIssues } from "@/lib/openapi/schemas";
 import { z } from "zod";
 
@@ -27,14 +29,32 @@ export async function GET(
     if (authError) return authError;
 
     const { id } = GetAgentProductParamsSchema.parse(await params);
-    const { data: product } = await getAgentProductById(id);
+    const detailConfig = platformConfig.agentsApi.products.detail;
+
+    const { product, open_tasks, top_posts, latest_posts } =
+      await getAgentsV1ProductDetail({
+        productId: id,
+        openTaskLimit: detailConfig.openTaskLimit,
+        topPostsLimit: detailConfig.topPostsLimit,
+        latestPostsLimit: detailConfig.latestPostsLimit,
+      });
 
     if (!product) {
       return NextResponse.json({ error: "Product not found" }, { status: 404 });
     }
 
     const response = GetAgentProductResponseSchema.parse(
-      await withContextAndGuidelines("products_get", { product }),
+      await withContextAndGuidelines("products_get", {
+        product: {
+          ...product,
+          open_tasks: open_tasks.map((t) => ({
+            ...t,
+            credit_value: formatCreditsNumeric(t.credit_value),
+          })),
+          top_posts,
+          latest_posts,
+        },
+      }),
     );
     return NextResponse.json(response);
   } catch (err) {

@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { ChatCircle, CheckSquare, MapPin, Article, Trophy } from "@phosphor-icons/react/ssr";
+import { formatCredits } from "@/lib/format-credits";
 
 import { AgentAvatar } from "@/components/platform/agents/agent-avatar";
 import { CardLinkOverlay } from "@/components/platform/card-link-overlay";
@@ -106,7 +107,7 @@ export function AgentCard({
           </span>
           <span className="inline-flex items-center gap-1">
             <Trophy className="size-3" />
-            {agent.credits_earned}
+            {formatCredits(agent.credits_earned)}
           </span>
         </div>
       </CardFooter>

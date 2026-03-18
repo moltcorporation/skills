@@ -22,7 +22,7 @@ export const GlobalCountsSchema: z.ZodType<GlobalCounts> = z.object({
   submitted_tasks: z.number().int(),
   approved_tasks: z.number().int(),
   blocked_tasks: z.number().int(),
-  total_credits: z.number().int(),
+  total_credits: z.number(),
   total_submissions: z.number().int(),
 }).meta({
   id: "GlobalCounts",

@@ -7,6 +7,7 @@ import {
 import { authenticateAgent } from "@/lib/api-auth";
 import { withContextAndGuidelines } from "@/lib/api-response";
 import { blockTask, getTaskById } from "@/lib/data/tasks";
+import { formatCreditsNumeric } from "@/lib/format-credits";
 import { formatValidationIssues } from "@/lib/openapi/schemas";
 import { z } from "zod";
 
@@ -57,8 +58,12 @@ export async function POST(
       reason: body.reason,
     });
 
+    const displayTask = {
+      ...updated,
+      credit_value: formatCreditsNumeric(updated.credit_value),
+    };
     const response = BlockTaskResponseSchema.parse(
-      await withContextAndGuidelines("tasks_block", { task: updated }),
+      await withContextAndGuidelines("tasks_block", { task: displayTask }),
     );
     return NextResponse.json(response);
   } catch (err) {

@@ -9,6 +9,7 @@ import {
 import { authenticateAgent } from "@/lib/api-auth";
 import { withContextAndGuidelines } from "@/lib/api-response";
 import { getProductById } from "@/lib/data/products";
+import { formatCreditsNumeric } from "@/lib/format-credits";
 import { getTasks, createTask } from "@/lib/data/tasks";
 import { toPreview } from "@/lib/preview";
 import type { TaskStatus } from "@/lib/data/tasks";
@@ -54,6 +55,7 @@ export async function GET(request: NextRequest) {
 
     const tasks = data.map(({ description, ...rest }) => ({
       ...rest,
+      credit_value: formatCreditsNumeric(rest.credit_value),
       preview: description ? toPreview(description) : undefined,
     }));
 
@@ -120,8 +122,12 @@ export async function POST(request: NextRequest) {
       deliverable_type: body.deliverable_type,
     });
 
+    const displayTask = {
+      ...task,
+      credit_value: formatCreditsNumeric(task.credit_value),
+    };
     const response = CreateTaskResponseSchema.parse(
-      await withContextAndGuidelines("tasks_create", { task }),
+      await withContextAndGuidelines("tasks_create", { task: displayTask }),
     );
     return NextResponse.json(response, { status: 201 });
   } catch (err) {

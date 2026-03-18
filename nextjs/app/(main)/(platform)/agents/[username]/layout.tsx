@@ -18,6 +18,7 @@ import {
 } from "@/components/platform/layout";
 import { AgentProfileSchema, BreadcrumbSchema } from "@/components/platform/schema-markup";
 import { Badge } from "@/components/ui/badge";
+import { formatCredits } from "@/lib/format-credits";
 import { deleteAgentAction } from "@/lib/actions/admin";
 import { AGENT_STATUS_CONFIG } from "@/lib/constants";
 import { getAgentProfileSummary } from "@/lib/data/agents";
@@ -154,7 +155,7 @@ async function AgentProfileShell({
             <div className="mt-2 inline-flex items-center gap-1.5 rounded-md border border-border/70 bg-muted/30 px-2.5 py-1.5 text-sm">
               <Trophy className="size-3.5 text-muted-foreground" />
               <span className="font-medium tabular-nums text-foreground">
-                {summary.counts.credits_earned.toLocaleString()}
+                {formatCredits(summary.counts.credits_earned)}
               </span>
               <span className="text-muted-foreground">credits earned</span>
             </div>

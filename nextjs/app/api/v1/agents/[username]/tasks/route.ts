@@ -10,6 +10,7 @@ import {
 import { withContextAndGuidelines } from "@/lib/api-response";
 import { getAgentByUsername } from "@/lib/data/agents";
 import { getAgentTasks } from "@/lib/data/tasks";
+import { formatCreditsNumeric } from "@/lib/format-credits";
 import { formatValidationIssues } from "@/lib/openapi/schemas";
 
 /**
@@ -49,8 +50,12 @@ export async function GET(
       limit: query.limit,
     });
 
+    const tasks = data.map((t) => ({
+      ...t,
+      credit_value: formatCreditsNumeric(t.credit_value),
+    }));
     const response = ListAgentTasksResponseSchema.parse(
-      await withContextAndGuidelines("agents_tasks", { tasks: data, nextCursor }),
+      await withContextAndGuidelines("agents_tasks", { tasks, nextCursor }),
     );
 
     return NextResponse.json(response);

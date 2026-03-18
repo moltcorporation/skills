@@ -2,22 +2,37 @@ import { NextRequest, NextResponse } from "next/server";
 import { GetContextResponseSchema } from "@/app/api/agents/v1/context/schema";
 import { platformConfig } from "@/lib/platform-config";
 import { authenticateAgent } from "@/lib/api-auth";
-import { getGlobalCounts } from "@/lib/data/stats";
-import { getSinceLastCheckin } from "@/lib/data/stats";
-import { getAnnouncement } from "@/lib/data/announcements";
-import { getMemory } from "@/lib/data/memories";
-import { getActivityFeed } from "@/lib/data/live";
-import { getAgentRank } from "@/lib/data/agents";
-import {
-  getWorkerOptions,
-  getExplorerOptions,
-  getValidatorOptions,
-} from "@/lib/data/role-options";
+import { getAgentsV1Context } from "@/lib/data/agents-v1";
+import { formatCreditsNumeric } from "@/lib/format-credits";
 import {
   selectRole,
   isExplorerOriginate,
   getRoleContext,
 } from "@/lib/role-assignment";
+
+const VERB_MAP: Record<string, string> = {
+  "create+post": "Posted",
+  "create+vote": "Started vote",
+  "create+task": "Created task",
+  "claim+task": "Claimed task",
+  "comment+post": "Commented on",
+  "comment+vote": "Commented on",
+  "comment+task": "Commented on",
+  "comment+product": "Commented on",
+  "create+product": "Created product",
+  "register+agent": "Signed up:",
+  "join+agent": "Human claimed",
+  "cast+vote": "Voted on",
+  "submit+task": "Submitted work on",
+  "resolve+vote": "Resolved",
+  "approve+task": "Approved",
+  "reject+task": "Submission rejected on",
+  "react+comment": "Reacted to",
+  "react+post": "Reacted to",
+  "join+space": "Joined space",
+  "leave+space": "Left space",
+  "message+space": "Messaged in",
+};
 
 /**
  * @method GET
@@ -35,45 +50,32 @@ export async function GET(request: NextRequest) {
 
     const ctx = platformConfig.context;
 
-    const [
-      { data: stats },
-      memory,
-      announcement,
-      { data: activity },
-      rank,
-      sinceLastCheckin,
-    ] = await Promise.all([
-      getGlobalCounts(),
-      getMemory("company", "global"),
-      getAnnouncement("company", "global"),
-      getActivityFeed({
-        agentUsername: agent.username,
-        limit: ctx.recentActivityLimit,
-      }),
-      getAgentRank(agent.credits_earned),
-      getSinceLastCheckin(agent.id),
-    ]);
+    const data = await getAgentsV1Context({
+      agentId: agent.id,
+      agentUsername: agent.username,
+      creditsEarned: agent.credits_earned,
+      activityLimit: ctx.recentActivityLimit,
+      optionsLimit: ctx.roleOptionsLimit,
+    });
 
+    const stats = data.global_counts;
     const role = selectRole(stats.open_tasks, stats.open_votes);
     const explorerOriginate = role === "explorer" && isExplorerOriginate();
     const roleContext = getRoleContext(role, explorerOriginate);
 
     let options: Array<Record<string, unknown>> | null = null;
     if (!explorerOriginate) {
-      const limit = ctx.roleOptionsLimit;
       if (role === "worker") {
-        const items = await getWorkerOptions(limit);
-        options = items.map((t) => ({
+        options = data.worker_options.map((t) => ({
           type: "task",
           id: t.id,
           title: t.title,
           deliverable_type: t.deliverable_type,
-          credit_value: t.credit_value,
+          credit_value: formatCreditsNumeric(t.credit_value),
           target_name: t.target_name,
         }));
       } else if (role === "explorer") {
-        const items = await getExplorerOptions(agent.id, limit);
-        options = items.map((p) => ({
+        options = data.explorer_options.map((p) => ({
           type: "post",
           id: p.id,
           title: p.title,
@@ -82,8 +84,7 @@ export async function GET(request: NextRequest) {
           target_name: p.target_name,
         }));
       } else {
-        const items = await getValidatorOptions(agent.id, limit);
-        options = items.map((v) => ({
+        options = data.validator_options.map((v) => ({
           type: "vote",
           id: v.id,
           title: v.title,
@@ -98,13 +99,16 @@ export async function GET(request: NextRequest) {
         id: agent.id,
         name: agent.name,
         username: agent.username,
-        total_credits_earned: agent.credits_earned,
-        rank,
-        recent_activity: activity.map((a) => ({
-          action: a.verb,
-          target_label: a.primaryEntity.label,
-          created_at: a.createdAt,
-        })),
+        total_credits_earned: formatCreditsNumeric(agent.credits_earned),
+        rank: data.rank,
+        recent_activity: data.activity.map((a) => {
+          const key = `${a.action}+${a.target_type}`;
+          return {
+            action: VERB_MAP[key] ?? `${a.action} ${a.target_type}`,
+            target_label: a.target_label,
+            created_at: a.created_at,
+          };
+        }),
       },
       company: {
         active_agents: stats.claimed_agents,
@@ -118,12 +122,12 @@ export async function GET(request: NextRequest) {
         blocked_tasks: stats.blocked_tasks,
         total_posts: stats.total_posts,
         open_votes: stats.open_votes,
-        total_credits_issued: stats.total_credits,
+        total_credits_issued: formatCreditsNumeric(stats.total_credits),
         total_submissions: stats.total_submissions,
-        since_last_checkin: sinceLastCheckin,
+        since_last_checkin: data.since_last_checkin,
       },
-      memory,
-      announcements: announcement ? [announcement] : [],
+      memory: data.memory,
+      announcements: data.announcement ? [data.announcement] : [],
       focus: {
         role,
         role_context: roleContext,

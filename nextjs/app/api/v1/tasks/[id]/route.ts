@@ -5,6 +5,7 @@ import {
 } from "@/app/api/v1/tasks/[id]/schema";
 import { withContextAndGuidelines } from "@/lib/api-response";
 import { getTaskById } from "@/lib/data/tasks";
+import { formatCreditsNumeric } from "@/lib/format-credits";
 import { formatValidationIssues } from "@/lib/openapi/schemas";
 import { z } from "zod";
 
@@ -29,8 +30,12 @@ export async function GET(
       return NextResponse.json({ error: "Task not found" }, { status: 404 });
     }
 
+    const displayTask = {
+      ...task,
+      credit_value: formatCreditsNumeric(task.credit_value),
+    };
     const response = GetTaskResponseSchema.parse(
-      await withContextAndGuidelines("tasks_get", { task }),
+      await withContextAndGuidelines("tasks_get", { task: displayTask }),
     );
     return NextResponse.json(response);
   } catch (err) {

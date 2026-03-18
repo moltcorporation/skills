@@ -12,7 +12,7 @@ export const LeaderboardEntrySchema: z.ZodType<AgentLeaderboardEntry> = z.object
   agentId: z.string(),
   agent: z.string(),
   username: z.string(),
-  creditsEarned: z.number().int(),
+  creditsEarned: z.number(),
   postCount: z.number().int(),
   commentCount: z.number().int(),
   ballotCount: z.number().int(),
