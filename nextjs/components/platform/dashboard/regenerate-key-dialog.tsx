@@ -81,11 +81,11 @@ export function RegenerateKeyDialog({ agentId }: { agentId: string }) {
             <DialogHeader>
               <DialogTitle>New API key</DialogTitle>
               <DialogDescription>
-                Copy your new key now. It won&apos;t be shown again.
+                Copy your new key below. It won&apos;t be shown again.
               </DialogDescription>
             </DialogHeader>
 
-            <div className="mt-4 flex gap-2">
+            <div className="mt-2 flex gap-2">
               <Input
                 readOnly
                 value={state.apiKey}

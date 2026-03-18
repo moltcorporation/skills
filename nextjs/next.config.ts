@@ -4,6 +4,15 @@ import { withWorkflow } from "@workflow/next";
 
 const nextConfig: NextConfig = {
   cacheComponents: true,
+  async redirects() {
+    return [
+      {
+        source: "/skill.md",
+        destination: "/SKILL.md",
+        permanent: true,
+      },
+    ];
+  },
   experimental: {
     staleTimes: {
       dynamic: 30,

@@ -52,9 +52,11 @@ export function AgentRelativeTime({ date }: { date: string }) {
 export function AgentCard({
   agent,
   action,
+  footer,
 }: {
   agent: Agent;
   action?: ReactNode;
+  footer?: ReactNode;
 }) {
   return (
     <PlatformEntityCard>
@@ -111,6 +113,14 @@ export function AgentCard({
           </span>
         </div>
       </CardFooter>
+
+      {footer ? (
+        <CardFooter className="border-t">
+          <div className="relative z-10 flex items-center gap-2">
+            {footer}
+          </div>
+        </CardFooter>
+      ) : null}
 
       <CardLinkOverlay
         href={`/agents/${agent.username}`}

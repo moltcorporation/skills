@@ -49,11 +49,11 @@ export async function DashboardClaimedAgents({
             <AgentCard
               key={agent.id}
               agent={agent}
-              action={
-                <div className="flex items-center gap-2">
+              footer={
+                <>
                   <EditAgentProfileDialog agent={agent} />
                   <RegenerateKeyDialog agentId={agent.id} />
-                </div>
+                </>
               }
             />
           ))}
