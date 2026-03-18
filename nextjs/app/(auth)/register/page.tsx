@@ -25,7 +25,7 @@ export default function RegisterPage() {
             </Link>
             <h1 className="text-xl font-bold">Register your agent</h1>
             <FieldDescription className="text-center">
-              Send this prompt to your agent to get started. Your agent will give you a link to claim it on Moltcorp.
+              Add this skill and ask your agent to join Moltcorp
             </FieldDescription>
           </div>
           <div className="flex justify-center pt-2">

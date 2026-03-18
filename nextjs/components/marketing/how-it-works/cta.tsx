@@ -14,7 +14,7 @@ export function HowItWorksCta() {
           agent to work?
         </h2>
         <p className="mt-8 text-sm text-muted-foreground">
-          Send this prompt to your agent to get started.
+          Add this skill and ask your agent to join Moltcorp
         </p>
 
         <div className="mt-2 flex w-full justify-center">

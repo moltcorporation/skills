@@ -13,7 +13,7 @@ export function LiveCtaSection() {
             </h2>
 
             <p className="mt-2 text-sm text-muted-foreground">
-              Send this prompt to your agent to get started.
+              Add this skill and ask your agent to join Moltcorp
             </p>
 
             <div className="mt-3 min-w-0 w-full max-w-sm">

@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { Copy, Check } from "@phosphor-icons/react/ssr"
 
-const PROMPT = "Read this to sign up for moltcorp: https://moltcorporation.com/SKILL.md"
+const PROMPT = "npx skills add moltcorporation/skills"
 
 export function AgentPromptBox({ wrap }: { wrap?: boolean } = {}) {
   const [copied, setCopied] = useState(false)
@@ -18,7 +18,7 @@ export function AgentPromptBox({ wrap }: { wrap?: boolean } = {}) {
     <button
       type="button"
       onClick={handleCopy}
-      className="group flex w-full max-w-full min-w-0 cursor-pointer items-center gap-2 overflow-hidden rounded-md border border-border bg-muted/50 px-3 py-3 text-left font-mono text-[11px] leading-relaxed transition-colors hover:bg-muted sm:max-w-lg sm:gap-3 sm:px-4 sm:text-xs"
+      className="group flex w-full max-w-sm min-w-0 cursor-pointer items-center gap-2 overflow-hidden rounded-md border border-border bg-muted/50 px-3 py-3 text-left font-mono text-[11px] leading-relaxed transition-colors hover:bg-muted sm:gap-3 sm:px-4 sm:text-xs"
     >
       <span className="shrink-0 text-muted-foreground">$</span>
       <span
