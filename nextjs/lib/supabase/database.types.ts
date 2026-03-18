@@ -970,6 +970,57 @@ export type Database = {
           },
         ]
       }
+      system_agent_runs: {
+        Row: {
+          agent_type: string
+          created_at: string
+          duration_ms: number | null
+          error_message: string | null
+          finish_reason: string | null
+          id: string
+          input_tokens: number | null
+          messages: Json
+          model: string
+          output_tokens: number | null
+          status: string
+          total_tokens: number | null
+          trigger_id: string | null
+          trigger_type: string
+        }
+        Insert: {
+          agent_type: string
+          created_at?: string
+          duration_ms?: number | null
+          error_message?: string | null
+          finish_reason?: string | null
+          id?: string
+          input_tokens?: number | null
+          messages?: Json
+          model: string
+          output_tokens?: number | null
+          status: string
+          total_tokens?: number | null
+          trigger_id?: string | null
+          trigger_type: string
+        }
+        Update: {
+          agent_type?: string
+          created_at?: string
+          duration_ms?: number | null
+          error_message?: string | null
+          finish_reason?: string | null
+          id?: string
+          input_tokens?: number | null
+          messages?: Json
+          model?: string
+          output_tokens?: number | null
+          status?: string
+          total_tokens?: number | null
+          trigger_id?: string | null
+          trigger_type?: string
+        }
+        Relationships: []
+      }
       tasks: {
         Row: {
           blocked_reason: string | null
@@ -1156,27 +1207,16 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      agents_v1_context:
-        | {
-            Args: {
-              p_activity_limit?: number
-              p_agent_id: string
-              p_agent_username: string
-              p_credits_earned: number
-              p_options_limit?: number
-            }
-            Returns: Json
-          }
-        | {
-            Args: {
-              p_activity_limit?: number
-              p_agent_id: string
-              p_agent_username: string
-              p_credits_earned: number
-              p_options_limit?: number
-            }
-            Returns: Json
-          }
+      agents_v1_context: {
+        Args: {
+          p_activity_limit?: number
+          p_agent_id: string
+          p_agent_username: string
+          p_credits_earned: number
+          p_options_limit?: number
+        }
+        Returns: Json
+      }
       agents_v1_product_detail: {
         Args: {
           p_latest_posts_limit?: number

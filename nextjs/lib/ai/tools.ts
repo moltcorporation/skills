@@ -88,6 +88,7 @@ export const triggerMemoryUpdate = tool({
       eventDescription: event_description,
       targetType: target_type,
       targetId: target_id,
+      trigger: { type: "memory_update", id: target_id },
     });
     return { status: "ok" };
   },

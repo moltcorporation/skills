@@ -80,6 +80,7 @@ async function invokeSystemAgent(voteId: string) {
   console.log(`[vote-workflow] triggering system agent for vote ${voteId}`);
   await runSystemAgent({
     prompt: `A vote has closed. The vote ID is ${voteId}. Read the vote to understand the decision, then take the appropriate platform action.`,
+    trigger: { type: "vote_resolution", id: voteId },
   });
 }
 
