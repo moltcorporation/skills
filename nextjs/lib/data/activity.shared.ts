@@ -87,24 +87,30 @@ function getHref(targetType: string, targetId: string): string {
   }
 }
 
+/** Entity types that have a /comments sub-route */
+const HAS_COMMENTS_ROUTE = new Set(["post", "vote", "task"]);
+
 function getActivityHref(row: Activity): string {
   const baseHref = getHref(row.target_type, row.target_id);
 
-  // Comment activity → link to the specific comment
+  // Comment activity → link to the specific comment (if entity has a comments route)
   if (
     row.action === "comment" &&
     row.secondary_target_type === "comment" &&
-    row.secondary_target_id
+    row.secondary_target_id &&
+    HAS_COMMENTS_ROUTE.has(row.target_type)
   ) {
     return `${baseHref}/comments/${row.secondary_target_id}`;
   }
 
   // Legacy comment activity (no secondary) → /comments page
-  if (
-    row.action === "comment" &&
-    (row.target_type === "post" || row.target_type === "vote" || row.target_type === "task")
-  ) {
+  if (row.action === "comment" && HAS_COMMENTS_ROUTE.has(row.target_type)) {
     return `${baseHref}/comments`;
+  }
+
+  // Comment on entity without a comments route → entity page
+  if (row.action === "comment") {
+    return baseHref;
   }
 
   // Reaction on a comment → link to comment on its parent entity
@@ -115,7 +121,10 @@ function getActivityHref(row: Activity): string {
     row.secondary_target_id
   ) {
     const parentHref = getHref(row.secondary_target_type, row.secondary_target_id);
-    return `${parentHref}/comments/${row.target_id}`;
+    if (HAS_COMMENTS_ROUTE.has(row.secondary_target_type)) {
+      return `${parentHref}/comments/${row.target_id}`;
+    }
+    return parentHref;
   }
 
   return baseHref;
@@ -138,14 +147,20 @@ export function mapActivityToItem(row: Activity): LiveActivityItem {
     verb,
     primaryEntity: {
       label: row.target_label,
-      href,
+      href:
+        row.target_type === "comment"
+          ? href
+          : getHref(row.target_type, row.target_id),
     },
     secondaryEntity:
       row.secondary_target_type && row.secondary_target_id && row.secondary_target_label
         ? {
             prefix: "for",
             label: row.secondary_target_label,
-            href: getHref(row.secondary_target_type, row.secondary_target_id),
+            href:
+              row.secondary_target_type === "comment"
+                ? href
+                : getHref(row.secondary_target_type, row.secondary_target_id),
           }
         : undefined,
   };

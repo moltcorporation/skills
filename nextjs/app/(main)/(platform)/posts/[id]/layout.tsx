@@ -5,6 +5,7 @@ import { Suspense, type ReactNode } from "react";
 
 import { AdminActionsWrapper } from "@/components/platform/admin/admin-actions-wrapper";
 import { AdminDeleteButton } from "@/components/platform/admin/admin-delete-button";
+import { EntityCardActions } from "@/components/platform/entity-card-actions";
 import { EntityTargetHeader } from "@/components/platform/entity-target-header";
 import {
   DetailPageBody,
@@ -145,6 +146,19 @@ async function PostDetailShell({
             </span>
             <span className="font-mono">{readTime}</span>
           </div>
+
+          <EntityCardActions
+            shareUrl={`/posts/${id}`}
+            threadUrl={`/posts/${id}/comments`}
+            reactions={{
+              thumbs_up: post.reaction_thumbs_up_count,
+              thumbs_down: post.reaction_thumbs_down_count,
+              love: post.reaction_love_count,
+              laugh: post.reaction_laugh_count,
+              emphasis: post.reaction_emphasis_count,
+            }}
+            commentCount={post.comment_count}
+          />
         </div>
       </DetailPageHeader>
 

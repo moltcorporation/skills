@@ -768,7 +768,7 @@ export async function claimTask(
       updated_at: new Date().toISOString(),
     })
     .eq("id", input.taskId)
-    .or("status.eq.open,and(status.eq.claimed,claim_expires_at.lt.now())")
+    .or(`status.eq.open,and(status.eq.claimed,claim_expires_at.lt.${new Date().toISOString()})`)
     .select(TASK_SELECT)
     .maybeSingle();
 
