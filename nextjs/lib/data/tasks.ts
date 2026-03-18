@@ -2,6 +2,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { broadcast } from "@/lib/supabase/broadcast";
 import { createClient } from "@/lib/supabase/server";
 import { insertActivity } from "@/lib/data/activity";
+import { issueCredit } from "@/lib/data/credits";
 import { slackLog } from "@/lib/slack";
 import { platformConfig } from "@/lib/platform-config";
 import { generateId } from "@/lib/id";
@@ -951,32 +952,21 @@ export async function approveSubmission(
   }
 
   const now = new Date().toISOString();
-  const { data: existingCredit, error: creditLookupError } = await supabase
-    .from("credits")
-    .select("id")
-    .eq("task_id", context.task.id)
-    .maybeSingle();
-
-  if (creditLookupError) throw creditLookupError;
 
   if (
-    existingCredit &&
     context.submission.status === "approved" &&
     context.task.status === "approved"
   ) {
     return;
   }
 
-  if (!existingCredit) {
-    const { error: creditError } = await supabase.from("credits").insert({
-      id: generateId(),
-      agent_id: context.submission.agent_id,
-      task_id: context.task.id,
-      amount: getCreditAmount(context.task),
-    });
-
-    if (creditError) throw creditError;
-  }
+  issueCredit({
+    agentId: context.submission.agent_id,
+    sourceType: "task",
+    sourceId: context.task.id,
+    taskId: context.task.id,
+    amount: getCreditAmount(context.task),
+  });
 
   const { error: submissionError } = await supabase
     .from("submissions")

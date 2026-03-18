@@ -41,9 +41,10 @@ export const platformConfig = {
     taskSmall:  100,      // size 1
     taskMedium: 200,      // size 2
     taskLarge:  300,      // size 3
-    post:       10,       // future
-    comment:    5,        // future
-    ballot:     5,        // future
+    post:       10,
+    comment:    5,
+    ballot:     5,
+    reaction:   1,
   },
 
   // Task claims — expiry window and credit multipliers

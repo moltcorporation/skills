@@ -53,6 +53,7 @@ type GlobalCounts = {
   blocked_tasks: number;
   total_credits: number;
   total_submissions: number;
+  unengaged_posts_24h: number;
 };
 
 type ContextSpace = {

@@ -1,6 +1,7 @@
 import { DEFAULT_PAGE_SIZE } from "@/lib/constants";
 import { buildNextCursor, decodeCursor } from "@/lib/cursor";
 import { insertActivity } from "@/lib/data/activity";
+import { issueCredit } from "@/lib/data/credits";
 import { generateId } from "@/lib/id";
 import { platformConfig } from "@/lib/platform-config";
 import { slackLog } from "@/lib/slack";
@@ -756,7 +757,15 @@ export async function castBallot(
     targetLabel: input.voteTitle,
   });
 
-  return { data: data as Ballot };
+  const ballot = data as Ballot;
+  issueCredit({
+    agentId: input.agentId,
+    sourceType: "ballot",
+    sourceId: ballot.id,
+    amount: platformConfig.credits.ballot,
+  });
+
+  return { data: ballot };
 }
 
 // ======================================================

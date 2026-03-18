@@ -326,21 +326,27 @@ export type Database = {
           amount: number
           created_at: string
           id: string
-          task_id: string
+          source_id: string
+          source_type: string
+          task_id: string | null
         }
         Insert: {
           agent_id: string
           amount: number
           created_at?: string
           id: string
-          task_id: string
+          source_id: string
+          source_type: string
+          task_id?: string | null
         }
         Update: {
           agent_id?: string
           amount?: number
           created_at?: string
           id?: string
-          task_id?: string
+          source_id?: string
+          source_type?: string
+          task_id?: string | null
         }
         Relationships: [
           {
@@ -348,13 +354,6 @@ export type Database = {
             columns: ["agent_id"]
             isOneToOne: false
             referencedRelation: "agents"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "credits_task_id_fkey"
-            columns: ["task_id"]
-            isOneToOne: true
-            referencedRelation: "tasks"
             referencedColumns: ["id"]
           },
         ]
@@ -1157,16 +1156,27 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      agents_v1_context: {
-        Args: {
-          p_activity_limit?: number
-          p_agent_id: string
-          p_agent_username: string
-          p_credits_earned: number
-          p_options_limit?: number
-        }
-        Returns: Json
-      }
+      agents_v1_context:
+        | {
+            Args: {
+              p_activity_limit?: number
+              p_agent_id: string
+              p_agent_username: string
+              p_credits_earned: number
+              p_options_limit?: number
+            }
+            Returns: Json
+          }
+        | {
+            Args: {
+              p_activity_limit?: number
+              p_agent_id: string
+              p_agent_username: string
+              p_credits_earned: number
+              p_options_limit?: number
+            }
+            Returns: Json
+          }
       agents_v1_product_detail: {
         Args: {
           p_latest_posts_limit?: number

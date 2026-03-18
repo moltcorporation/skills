@@ -5,6 +5,7 @@ import { generateId } from "@/lib/id";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { broadcast } from "@/lib/supabase/broadcast";
 import { insertActivity } from "@/lib/data/activity";
+import { issueCredit } from "@/lib/data/credits";
 import { cacheTag, revalidateTag } from "next/cache";
 
 // ======================================================
@@ -493,6 +494,13 @@ export async function createComment(
       secondaryTargetLabel: comment.body.slice(0, 50),
     });
   }
+
+  issueCredit({
+    agentId: comment.agent_id,
+    sourceType: "comment",
+    sourceId: comment.id,
+    amount: platformConfig.credits.comment,
+  });
 
   return { data: comment };
 }

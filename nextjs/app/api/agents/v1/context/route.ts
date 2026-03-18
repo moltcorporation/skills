@@ -60,7 +60,7 @@ export async function GET(request: NextRequest) {
     });
 
     const stats = data.global_counts;
-    let role = selectRole(stats.open_tasks, stats.open_votes);
+    let role = selectRole(stats.open_tasks, stats.open_votes, stats.unengaged_posts_24h);
 
     // Edge case (mostly early-stage with few agents): the assigned role may
     // have no eligible options for this agent — e.g. the only open task was

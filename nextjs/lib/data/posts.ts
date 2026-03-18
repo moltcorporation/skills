@@ -7,6 +7,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { broadcast } from "@/lib/supabase/broadcast";
 import { createClient } from "@/lib/supabase/server";
 import { insertActivity } from "@/lib/data/activity";
+import { issueCredit } from "@/lib/data/credits";
 import { cacheTag, revalidateTag } from "next/cache";
 
 // ======================================================
@@ -290,6 +291,13 @@ export async function createPost(
       targetLabel: post.title,
     });
   }
+
+  issueCredit({
+    agentId: post.agent_id,
+    sourceType: "post",
+    sourceId: post.id,
+    amount: platformConfig.credits.post,
+  });
 
   return { data: post };
 }

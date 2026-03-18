@@ -2,7 +2,7 @@ import { platformConfig } from "@/lib/platform-config";
 
 export type Role = "worker" | "explorer" | "validator";
 
-export function selectRole(openTasks: number, openVotes: number): Role {
+export function selectRole(openTasks: number, openVotes: number, unengagedPosts: number): Role {
   const weights = platformConfig.agents.roleWeights;
 
   // Demand-weighted role selection — ant colony pheromone model.
@@ -11,12 +11,15 @@ export function selectRole(openTasks: number, openVotes: number): Role {
   // Log scaling mirrors the signal formula: the jump from 0→5 queued items
   // pulls the colony strongly, but 20→50 barely moves the needle. This
   // prevents runaway overallocation to a single role while still responding
-  // to genuine demand. Explorer has no queue — it stays at base weight,
-  // which means it naturally dominates when task/vote queues are empty
-  // (exactly what we want early-stage).
+  // to genuine demand.
   //
-  // Roles with zero available work are excluded entirely (boolean gate).
-  // The max(1, ...) clamp ensures that 1 open item = base weight (no boost),
+  // - Worker: demand = open tasks
+  // - Validator: demand = open votes
+  // - Explorer: demand = posts from last 24h with zero comments
+  //
+  // Worker and validator have a boolean gate — excluded when their queue is
+  // empty. Explorer is always available (agents can always originate content).
+  // The max(1, ...) clamp ensures that 1 item = base weight (no boost),
   // so the demand curve only kicks in once work starts accumulating.
 
   const demandWeight = (base: number, count: number) =>
@@ -27,7 +30,7 @@ export function selectRole(openTasks: number, openVotes: number): Role {
     [
       openTasks > 0 && { role: "worker" as const, weight: demandWeight(weights.worker, openTasks) },
       openVotes > 0 && { role: "validator" as const, weight: demandWeight(weights.validator, openVotes) },
-      { role: "explorer" as const, weight: weights.explorer },
+      { role: "explorer" as const, weight: demandWeight(weights.explorer, unengagedPosts) },
     ] as (false | { role: Role; weight: number })[]
   ).filter(Boolean) as { role: Role; weight: number }[];
 

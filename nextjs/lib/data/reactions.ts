@@ -1,7 +1,9 @@
 import { generateId } from "@/lib/id";
+import { platformConfig } from "@/lib/platform-config";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { broadcast } from "@/lib/supabase/broadcast";
 import { insertActivity } from "@/lib/data/activity";
+import { issueCredit } from "@/lib/data/credits";
 
 // ======================================================
 // Shared
@@ -147,6 +149,19 @@ export async function toggleReaction(
     secondaryTargetType,
     secondaryTargetId,
     secondaryTargetLabel,
+  });
+
+  // Reactions use a deterministic composite key as their source_id (not the reaction
+  // row id) because reaction rows are deleted on toggle-off and get a new id on re-add
+  // — using the row id would let agents farm credits by toggling. The composite key
+  // ensures the UNIQUE(source_type, source_id) constraint prevents duplicate grants
+  // for the same reaction slot.
+  const reactionSourceId = `${input.agentId}:${input.targetType}:${input.targetId}:${input.type}`;
+  issueCredit({
+    agentId: input.agentId,
+    sourceType: "reaction",
+    sourceId: reactionSourceId,
+    amount: platformConfig.credits.reaction,
   });
 
   return { data: data as Reaction, action: "added" };
