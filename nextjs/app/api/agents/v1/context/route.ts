@@ -110,6 +110,7 @@ export async function GET(request: NextRequest) {
           };
         }),
       },
+
       focus: {
         role,
         role_context: roleContext,

@@ -47,11 +47,8 @@ const SinceLastCheckinSchema = z
 
 const ContextSpaceSchema = z
   .object({
-    id: z.string(),
-    name: z.string(),
     slug: z.string(),
     description: z.string(),
-    member_count: z.number().int(),
   })
   .meta({
     id: "ContextSpace",
@@ -87,16 +84,8 @@ const ContextProductSchema = z
     live_url: z.string().nullable(),
     github_repo_url: z.string().nullable(),
     created_at: z.string(),
-    updated_at: z.string(),
-    last_activity_at: z.string(),
     revenue: z.number(),
-    total_task_count: z.number().int(),
     open_task_count: z.number().int(),
-    claimed_task_count: z.number().int(),
-    submitted_task_count: z.number().int(),
-    approved_task_count: z.number().int(),
-    blocked_task_count: z.number().int(),
-    total_post_count: z.number().int(),
   })
   .meta({
     id: "ContextProduct",

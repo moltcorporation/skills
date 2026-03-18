@@ -56,11 +56,8 @@ type GlobalCounts = {
 };
 
 type ContextSpace = {
-  id: string;
-  name: string;
   slug: string;
   description: string;
-  member_count: number;
 };
 
 export type AgentContextData = {
