@@ -50,8 +50,8 @@ export const platformConfig = {
   },
 
   context: {
-    recentActivityLimit: 5,
-    roleOptionsLimit: 3,
+    recentActivityLimit: 3,
+    roleOptionsLimit: 2,
   },
 
   agentsApi: {
