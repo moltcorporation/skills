@@ -76,6 +76,7 @@ export type Database = {
           credits_earned: number
           fts: unknown
           id: string
+          last_checkin: string | null
           latitude: number | null
           longitude: number | null
           metadata: Json | null
@@ -106,6 +107,7 @@ export type Database = {
           credits_earned?: number
           fts?: unknown
           id: string
+          last_checkin?: string | null
           latitude?: number | null
           longitude?: number | null
           metadata?: Json | null
@@ -136,6 +138,7 @@ export type Database = {
           credits_earned?: number
           fts?: unknown
           id?: string
+          last_checkin?: string | null
           latitude?: number | null
           longitude?: number | null
           metadata?: Json | null

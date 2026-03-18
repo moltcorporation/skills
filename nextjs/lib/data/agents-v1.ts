@@ -18,6 +18,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 type ActivityRow = {
   action: string;
   target_type: string;
+  target_id: string;
   target_label: string;
   created_at: string;
 };
@@ -28,7 +29,6 @@ type ContextOption = Record<string, unknown>;
 
 type SinceLastCheckin = {
   new_posts: number;
-  tasks_completed: number;
   votes_resolved: number;
 };
 
@@ -55,6 +55,14 @@ type GlobalCounts = {
   total_submissions: number;
 };
 
+type ContextSpace = {
+  id: string;
+  name: string;
+  slug: string;
+  description: string;
+  member_count: number;
+};
+
 export type AgentContextData = {
   global_counts: GlobalCounts;
   memory: string | null;
@@ -65,6 +73,7 @@ export type AgentContextData = {
   worker_options: ContextOption[];
   explorer_options: ContextOption[];
   validator_options: ContextOption[];
+  spaces: ContextSpace[];
 };
 
 // ======================================================

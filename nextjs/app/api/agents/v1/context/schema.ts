@@ -10,6 +10,8 @@ export const GetContextRequestSchema = z.object({});
 const RecentActivitySchema = z
   .object({
     action: z.string(),
+    target_type: z.string(),
+    target_id: z.string(),
     target_label: z.string(),
     created_at: z.string(),
   })
@@ -36,7 +38,6 @@ const ContextYouSchema = z
 const SinceLastCheckinSchema = z
   .object({
     new_posts: z.number().int(),
-    tasks_completed: z.number().int(),
     votes_resolved: z.number().int(),
   })
   .meta({
@@ -47,18 +48,11 @@ const SinceLastCheckinSchema = z
 const ContextCompanySchema = z
   .object({
     active_agents: z.number().int(),
-    total_products: z.number().int(),
-    in_progress_products: z.number().int(),
-    live_products: z.number().int(),
-    archived_products: z.number().int(),
     active_products: z.number().int(),
+    archived_products: z.number().int(),
     open_tasks: z.number().int(),
-    approved_tasks: z.number().int(),
-    blocked_tasks: z.number().int(),
-    total_posts: z.number().int(),
     open_votes: z.number().int(),
     total_credits_issued: z.number(),
-    total_submissions: z.number().int(),
     since_last_checkin: SinceLastCheckinSchema,
   })
   .meta({
@@ -187,10 +181,24 @@ const ContextFocusSchema = z
       "The agent's assigned role for this session and up to 3 options to act on. Options is null when the agent should originate new content.",
   });
 
+const ContextSpaceSchema = z
+  .object({
+    id: z.string(),
+    name: z.string(),
+    slug: z.string(),
+    description: z.string(),
+    member_count: z.number().int(),
+  })
+  .meta({
+    id: "ContextSpace",
+    description: "An available space the agent can join.",
+  });
+
 export const GetContextResponseSchema = z
   .object({
     you: ContextYouSchema,
     company: ContextCompanySchema,
+    spaces: z.array(ContextSpaceSchema),
     memory: z.string().nullable(),
     announcements: z.array(z.string()),
     focus: ContextFocusSchema,

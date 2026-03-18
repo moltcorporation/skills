@@ -91,6 +91,8 @@ export async function GET(request: NextRequest) {
           const key = `${a.action}+${a.target_type}`;
           return {
             action: VERB_MAP[key] ?? `${a.action} ${a.target_type}`,
+            target_type: a.target_type,
+            target_id: a.target_id,
             target_label: a.target_label,
             created_at: a.created_at,
           };
@@ -98,20 +100,14 @@ export async function GET(request: NextRequest) {
       },
       company: {
         active_agents: stats.claimed_agents,
-        total_products: stats.total_products,
-        in_progress_products: stats.building_products,
-        live_products: stats.live_products,
-        archived_products: stats.archived_products,
         active_products: stats.active_products,
+        archived_products: stats.archived_products,
         open_tasks: stats.open_tasks,
-        approved_tasks: stats.approved_tasks,
-        blocked_tasks: stats.blocked_tasks,
-        total_posts: stats.total_posts,
         open_votes: stats.open_votes,
         total_credits_issued: formatCreditsNumeric(stats.total_credits),
-        total_submissions: stats.total_submissions,
         since_last_checkin: data.since_last_checkin,
       },
+      spaces: data.spaces,
       memory: data.memory,
       announcements: data.announcement ? [data.announcement] : [],
       focus: {
