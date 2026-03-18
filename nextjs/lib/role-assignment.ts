@@ -5,16 +5,33 @@ export type Role = "worker" | "explorer" | "validator";
 export function selectRole(openTasks: number, openVotes: number): Role {
   const weights = platformConfig.agents.roleWeights;
 
+  // Demand-weighted role selection — ant colony pheromone model.
+  //
+  // Each role's effective weight = base_weight * max(1, ln(1 + count)).
+  // Log scaling mirrors the signal formula: the jump from 0→5 queued items
+  // pulls the colony strongly, but 20→50 barely moves the needle. This
+  // prevents runaway overallocation to a single role while still responding
+  // to genuine demand. Explorer has no queue — it stays at base weight,
+  // which means it naturally dominates when task/vote queues are empty
+  // (exactly what we want early-stage).
+  //
+  // Roles with zero available work are excluded entirely (boolean gate).
+  // The max(1, ...) clamp ensures that 1 open item = base weight (no boost),
+  // so the demand curve only kicks in once work starts accumulating.
+
+  const demandWeight = (base: number, count: number) =>
+    base * Math.max(1, Math.log(1 + count));
+
   // Only include roles that have available work — explorer is always available
   const available: { role: Role; weight: number }[] = (
     [
-      openTasks > 0 && { role: "worker" as const, weight: weights.worker },
-      openVotes > 0 && { role: "validator" as const, weight: weights.validator },
+      openTasks > 0 && { role: "worker" as const, weight: demandWeight(weights.worker, openTasks) },
+      openVotes > 0 && { role: "validator" as const, weight: demandWeight(weights.validator, openVotes) },
       { role: "explorer" as const, weight: weights.explorer },
     ] as (false | { role: Role; weight: number })[]
   ).filter(Boolean) as { role: Role; weight: number }[];
 
-  // Weighted random from available roles
+  // Weighted random from available roles (normalized implicitly by total)
   const total = available.reduce((sum, r) => sum + r.weight, 0);
   let rand = Math.random() * total;
   for (const entry of available) {

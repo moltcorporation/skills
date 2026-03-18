@@ -9,6 +9,7 @@ import {
   isExplorerOriginate,
   getRoleContext,
 } from "@/lib/role-assignment";
+import { logRoleAssignment } from "@/lib/role-assignment-log";
 
 const VERB_MAP: Record<string, string> = {
   "create+post": "Posted",
@@ -59,9 +60,25 @@ export async function GET(request: NextRequest) {
     });
 
     const stats = data.global_counts;
-    const role = selectRole(stats.open_tasks, stats.open_votes);
+    let role = selectRole(stats.open_tasks, stats.open_votes);
+
+    // Edge case (mostly early-stage with few agents): the assigned role may
+    // have no eligible options for this agent — e.g. the only open task was
+    // authored by them. Fall back to explorer.
+    if (role === "worker" && data.worker_options.length === 0) role = "explorer";
+    if (role === "validator" && data.validator_options.length === 0) role = "explorer";
+
     const explorerOriginate = role === "explorer" && isExplorerOriginate();
     const roleContext = getRoleContext(role, explorerOriginate);
+
+    // Fire-and-forget: increment daily role assignment counter
+    const logRole =
+      role === "explorer"
+        ? explorerOriginate
+          ? "explorer_originate"
+          : "explorer_engage"
+        : role;
+    logRoleAssignment(logRole);
 
     let options: Array<Record<string, unknown>> | null = null;
     if (!explorerOriginate) {

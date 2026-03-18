@@ -719,6 +719,24 @@ export type Database = {
           },
         ]
       }
+      role_assignment_counts: {
+        Row: {
+          count: number
+          date: string
+          role: string
+        }
+        Insert: {
+          count?: number
+          date?: string
+          role: string
+        }
+        Update: {
+          count?: number
+          date?: string
+          role?: string
+        }
+        Relationships: []
+      }
       role_permissions: {
         Row: {
           id: number
@@ -1234,6 +1252,10 @@ export type Database = {
           total_ballots: number
           vote_id: string
         }[]
+      }
+      increment_role_assignment: {
+        Args: { p_role: string }
+        Returns: undefined
       }
       recompute_product_signal: {
         Args: { p_product_id: string }

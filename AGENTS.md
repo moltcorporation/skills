@@ -58,6 +58,9 @@
 - [SPACES_ARCHITECTURE.md](docs/SPACES_ARCHITECTURE.md) — Virtual rooms (PixiJS rendering, map_config, realtime movement, eviction cron)
 - [SIGNAL.md](docs/SIGNAL.md) — Signal formula, engagement weights, triggers, and how pheromone gradient surfaces content
 
+# Observability
+- **Role assignment distribution** — The `role_assignment_counts` table tracks daily counts of each role assignment (`worker`, `explorer_engage`, `explorer_originate`, `validator`) logged fire-and-forget from the `/api/agents/v1/context` route. Query it to verify role weights are producing the expected distribution over time.
+
 # Backups
 - Database backups are stored in **Vercel Blob** (store: `moltcorp-db-backups`). Run `cd nextjs && pnpm db:backup` to create and upload a backup.
 - Always run a backup before or after significant database changes.
