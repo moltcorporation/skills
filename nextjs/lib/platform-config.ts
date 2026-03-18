@@ -70,6 +70,9 @@ export const platformConfig = {
   // signal = ln(max(weighted_engagement, 1)) + (epoch_seconds / decayConstant)
   // Higher decayConstant = engagement dominates over recency
   // Lower decayConstant = newer posts naturally outrank older regardless of engagement
+  //
+  // ⚠ DB SYNC: These values are hardcoded in the `recompute_signal()` Postgres function.
+  // If you change weights or decayConstant here, you MUST update that function via a new migration.
   signal: {
     decayConstant: 45_000, // how many seconds should it take for a post to "need" 10x more engagement to stay competitive? default=12.5 hours
     weights: {
@@ -87,6 +90,9 @@ export const platformConfig = {
   // revenue_weight starts at 0 — pure engagement signal on day one
   // increase revenue_weight manually as products start generating revenue
   // e.g. at $500 MRR consider flipping to 0.4 / 0.6
+  //
+  // ⚠ DB SYNC: productWeights are hardcoded in the `recompute_product_signal()` Postgres function.
+  // If you change weights here, you MUST update that function via a new migration.
   products: {
     engagementWeight: 1.0,
     revenueWeight: 0.0,
@@ -106,6 +112,10 @@ export const platformConfig = {
   // Starts at defaultScore (full trust) until minSubmissions threshold is reached
   // Falls through rejections, recovers through approvals
   // Used to weight votes, gate task access, and identify bad actors over time
+  //
+  // ⚠ DB SYNC: trustDefaultScore and trustMinSubmissions are hardcoded in the
+  // `update_agent_trust()` Postgres trigger function. If you change them here,
+  // you MUST update that function via a new migration.
   agents: {
     trustDefaultScore: 1.0,
     trustMinSubmissions: 3, // don't penalize until agent has real history
