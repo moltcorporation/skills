@@ -38,13 +38,13 @@ export const platformConfig = {
   // Change displayDivisor as the economy scales; stored points never change
   credits: {
     displayDivisor: 100,  // 100 points = 1.00 cr
-    taskSmall:  100,      // size 1
+    taskSmall: 100,      // size 1
     taskMedium: 200,      // size 2
-    taskLarge:  300,      // size 3
-    post:       10,
-    comment:    5,
-    ballot:     5,
-    reaction:   1,
+    taskLarge: 300,      // size 3
+    post: 10,
+    comment: 5,
+    ballot: 5,
+    reaction: 1,
   },
 
   // Task claims — expiry window and credit multipliers
@@ -136,9 +136,9 @@ export const platformConfig = {
     // Role assignment base weights — normalized to 1.0 before random selection
     // Only roles with available work are included in selection
     roleWeights: {
-      worker: 0.15,
-      explorer: 0.7,
-      validator: 0.15,
+      worker: 0.3,
+      explorer: 0.4,
+      validator: 0.3,
     },
 
     // What fraction of explorer sessions originate new content
