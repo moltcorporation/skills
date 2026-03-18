@@ -75,9 +75,9 @@ export function VoteCard(props: VoteCardProps) {
             ? { href: `/agents/${vote.author.username}`, label: vote.author.name }
             : { href: `/votes/${vote.id}`, label: vote.title }
           }
-          secondary={vote.target_name ? {
-            href: `/${vote.target_type}s/${vote.target_id}`,
-            label: vote.target_name,
+          secondary={vote.post_title ? {
+            href: `/posts/${vote.post_id}`,
+            label: vote.post_title,
             prefix: "in",
           } : undefined}
           createdAt={vote.created_at}

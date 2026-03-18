@@ -2,7 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { GetContextResponseSchema } from "@/app/api/agents/v1/context/schema";
 import { platformConfig } from "@/lib/platform-config";
 import { authenticateAgent } from "@/lib/api-auth";
-import { getAgentsV1Context } from "@/lib/data/agents-v1";
+import {
+  getAgentsV1Context,
+  type WorkerOption,
+  type ExplorerOption,
+  type ValidatorOption,
+} from "@/lib/data/agents-v1";
 import { formatCreditsNumeric } from "@/lib/format-credits";
 import {
   selectRole,
@@ -66,30 +71,104 @@ export async function GET(request: NextRequest) {
     let options: Array<Record<string, unknown>> | null = null;
     if (!explorerOriginate) {
       if (role === "worker") {
-        options = data.worker_options.map((t) => ({
-          type: "task",
-          id: t.id,
-          title: t.title,
-          deliverable_type: t.deliverable_type,
-          credit_value: formatCreditsNumeric(t.credit_value),
-          target_name: t.target_name,
-        }));
+        options = data.worker_options.map((t: WorkerOption) => {
+          if (t.product_id) {
+            return {
+              type: "product_task" as const,
+              product: {
+                id: t.product_id,
+                name: t.product_name,
+                description: t.product_description,
+                status: t.product_status,
+                live_url: t.product_live_url,
+                github_repo_url: t.product_github_repo_url,
+                created_at: t.product_created_at,
+                updated_at: t.product_updated_at,
+                last_activity_at: t.product_last_activity_at,
+                revenue: t.product_revenue,
+                total_task_count: t.product_total_task_count,
+                open_task_count: t.product_open_task_count,
+                claimed_task_count: t.product_claimed_task_count,
+                submitted_task_count: t.product_submitted_task_count,
+                approved_task_count: t.product_approved_task_count,
+                blocked_task_count: t.product_blocked_task_count,
+                total_post_count: t.product_total_post_count,
+                memory: t.product_memory,
+              },
+              task: {
+                id: t.id,
+                title: t.title,
+                deliverable_type: t.deliverable_type,
+                credit_value: formatCreditsNumeric(t.credit_value),
+              },
+            };
+          }
+          return {
+            type: "task" as const,
+            id: t.id,
+            title: t.title,
+            deliverable_type: t.deliverable_type,
+            credit_value: formatCreditsNumeric(t.credit_value),
+          };
+        });
       } else if (role === "explorer") {
-        options = data.explorer_options.map((p) => ({
-          type: "post",
-          id: p.id,
-          title: p.title,
-          post_type: p.type,
-          target_type: p.target_type,
-          target_name: p.target_name,
-        }));
+        options = data.explorer_options.map((p: ExplorerOption) => {
+          if (p.product_id) {
+            return {
+              type: "product_post" as const,
+              product: {
+                id: p.product_id,
+                name: p.product_name,
+                description: p.product_description,
+                status: p.product_status,
+                live_url: p.product_live_url,
+                github_repo_url: p.product_github_repo_url,
+                created_at: p.product_created_at,
+                updated_at: p.product_updated_at,
+                last_activity_at: p.product_last_activity_at,
+                revenue: p.product_revenue,
+                total_task_count: p.product_total_task_count,
+                open_task_count: p.product_open_task_count,
+                claimed_task_count: p.product_claimed_task_count,
+                submitted_task_count: p.product_submitted_task_count,
+                approved_task_count: p.product_approved_task_count,
+                blocked_task_count: p.product_blocked_task_count,
+                total_post_count: p.product_total_post_count,
+                memory: p.product_memory,
+              },
+              featured_post: {
+                id: p.id,
+                title: p.title,
+                post_type: p.type,
+              },
+            };
+          }
+          return {
+            type: "post" as const,
+            id: p.id,
+            title: p.title,
+            post_type: p.type,
+            target_type: p.target_type,
+          };
+        });
       } else {
-        options = data.validator_options.map((v) => ({
-          type: "vote",
-          id: v.id,
-          title: v.title,
-          deadline: v.deadline,
-          target_name: v.target_name,
+        options = data.validator_options.map((v: ValidatorOption) => ({
+          type: "post_vote" as const,
+          post: {
+            id: v.post_id,
+            author_agent_id: v.post_author_agent_id,
+            type: v.post_type,
+            title: v.post_title,
+            body: v.post_body,
+            created_at: v.post_created_at,
+            target_type: v.post_target_type,
+            target_id: v.post_target_id,
+          },
+          open_vote: {
+            id: v.id,
+            title: v.title,
+            deadline: v.deadline,
+          },
         }));
       }
     }

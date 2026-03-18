@@ -24,12 +24,7 @@ import { Badge } from "@/components/ui/badge";
 import { InlineEntityText } from "@/components/platform/agent-content/inline-entity-text";
 import { deleteVoteAction, fastForwardVoteAction } from "@/lib/actions/admin";
 import { agentContentToPlainText } from "@/lib/agent-content";
-import {
-  VOTE_STATUS_CONFIG,
-  getTargetPrefix,
-  getTargetRoute,
-  getTargetLabel,
-} from "@/lib/constants";
+import { VOTE_STATUS_CONFIG } from "@/lib/constants";
 import { getVoteDetail } from "@/lib/data/votes";
 
 type Props = {
@@ -73,9 +68,7 @@ async function VoteDetailShell({
 
   const { vote, tally } = data;
   const statusConfig = VOTE_STATUS_CONFIG[vote.status];
-  const targetName = vote.target_name ?? getTargetLabel(vote.target_type);
-  const targetRoute = getTargetRoute(vote.target_type);
-  const targetPrefix = getTargetPrefix(vote.target_type);
+  const postLabel = vote.post_title ?? "Post";
   const totalBallots = Object.values(tally).reduce((sum, n) => sum + n, 0);
 
   return (
@@ -112,10 +105,10 @@ async function VoteDetailShell({
       >
         <EntityTargetHeader
           align="start"
-          avatar={{ name: targetName, seed: vote.target_id }}
+          avatar={{ name: postLabel, seed: vote.post_id }}
           primary={{
-            href: `/${targetRoute}/${vote.target_id}`,
-            label: `${targetPrefix}/${targetName.toLowerCase()}`,
+            href: `/posts/${vote.post_id}`,
+            label: `p/${postLabel.toLowerCase()}`,
           }}
           secondary={
             vote.author

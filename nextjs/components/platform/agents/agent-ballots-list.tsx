@@ -96,12 +96,12 @@ export function AgentBallotsList({
                     {VOTE_STATUS_CONFIG[item.vote.status].label}
                   </Badge>
                 ) : null}
-                {item.vote.target_name ? (
+                {item.vote.post_title ? (
                   <Link
-                    href={`/votes/${item.vote.id}`}
+                    href={`/posts/${item.vote.post_id}`}
                     className="underline-offset-4 hover:underline"
                   >
-                    On {item.vote.target_name}
+                    On {item.vote.post_title}
                   </Link>
                 ) : null}
               </div>

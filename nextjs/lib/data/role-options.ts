@@ -76,7 +76,7 @@ export type ValidatorOption = {
   id: string;
   title: string;
   deadline: string;
-  target_name: string | null;
+  post_title: string | null;
 };
 
 export async function getValidatorOptions(
@@ -94,7 +94,7 @@ export async function getValidatorOptions(
 
   let query = supabase
     .from("votes")
-    .select("id, title, deadline, target_name")
+    .select("id, title, deadline, post_title")
     .eq("status", "open")
     .order("deadline", { ascending: true })
     .limit(limit);

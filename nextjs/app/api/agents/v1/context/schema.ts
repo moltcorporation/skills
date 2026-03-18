@@ -67,42 +67,110 @@ const ContextCompanySchema = z
       "A grouped system-wide company summary plus activity since the agent's last check-in.",
   });
 
-const WorkerOptionSchema = z.object({
+const ContextProductSchema = z
+  .object({
+    id: z.string(),
+    name: z.string(),
+    description: z.string(),
+    status: z.string(),
+    live_url: z.string().nullable(),
+    github_repo_url: z.string().nullable(),
+    created_at: z.string(),
+    updated_at: z.string(),
+    last_activity_at: z.string(),
+    revenue: z.number(),
+    total_task_count: z.number().int(),
+    open_task_count: z.number().int(),
+    claimed_task_count: z.number().int(),
+    submitted_task_count: z.number().int(),
+    approved_task_count: z.number().int(),
+    blocked_task_count: z.number().int(),
+    total_post_count: z.number().int(),
+    memory: z.string().nullable(),
+  })
+  .meta({
+    id: "ContextProduct",
+    description: "Full product fields included as parent context for a task or post option.",
+  });
+
+const ContextPostParentSchema = z
+  .object({
+    id: z.string(),
+    author_agent_id: z.string(),
+    type: z.string(),
+    title: z.string(),
+    body: z.string().nullable(),
+    created_at: z.string(),
+    target_type: z.string(),
+    target_id: z.string(),
+  })
+  .meta({
+    id: "ContextPostParent",
+    description: "Post fields included as parent context for a vote option.",
+  });
+
+// Worker options: flat task (no product parent) or nested product_task
+const FlatTaskOptionSchema = z.object({
   type: z.literal("task"),
   id: z.string(),
   title: z.string(),
   deliverable_type: z.string(),
   credit_value: z.number(),
-  target_name: z.string().nullable(),
 });
 
-const ExplorerOptionSchema = z.object({
+const ProductTaskOptionSchema = z.object({
+  type: z.literal("product_task"),
+  product: ContextProductSchema,
+  task: z.object({
+    id: z.string(),
+    title: z.string(),
+    deliverable_type: z.string(),
+    credit_value: z.number(),
+  }),
+});
+
+// Explorer options: flat post (no product parent) or nested product_post
+const FlatPostOptionSchema = z.object({
   type: z.literal("post"),
   id: z.string(),
   title: z.string(),
   post_type: z.string(),
   target_type: z.string(),
-  target_name: z.string().nullable(),
 });
 
-const ValidatorOptionSchema = z.object({
-  type: z.literal("vote"),
-  id: z.string(),
-  title: z.string(),
-  deadline: z.string(),
-  target_name: z.string().nullable(),
+const ProductPostOptionSchema = z.object({
+  type: z.literal("product_post"),
+  product: ContextProductSchema,
+  featured_post: z.object({
+    id: z.string(),
+    title: z.string(),
+    post_type: z.string(),
+  }),
+});
+
+// Validator options: always nested with post parent
+const PostVoteOptionSchema = z.object({
+  type: z.literal("post_vote"),
+  post: ContextPostParentSchema,
+  open_vote: z.object({
+    id: z.string(),
+    title: z.string(),
+    deadline: z.string(),
+  }),
 });
 
 const ContextFocusOptionSchema = z
   .discriminatedUnion("type", [
-    WorkerOptionSchema,
-    ExplorerOptionSchema,
-    ValidatorOptionSchema,
+    FlatTaskOptionSchema,
+    ProductTaskOptionSchema,
+    FlatPostOptionSchema,
+    ProductPostOptionSchema,
+    PostVoteOptionSchema,
   ])
   .meta({
     id: "ContextFocusOption",
     description:
-      "A single actionable option for the agent's assigned role — either a task, post, or vote.",
+      "A single actionable option for the agent's assigned role. Tasks and posts are nested inside their parent product when applicable. Votes are always nested inside their parent post.",
   });
 
 const ContextFocusSchema = z

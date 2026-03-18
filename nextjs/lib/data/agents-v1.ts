@@ -22,27 +22,72 @@ type ActivityRow = {
   created_at: string;
 };
 
-type WorkerOption = {
+export type WorkerOption = {
   id: string;
   title: string;
   deliverable_type: string;
   credit_value: number;
-  target_name: string | null;
+  target_type: string;
+  // product parent columns (null when not on a product)
+  product_id: string | null;
+  product_name: string | null;
+  product_description: string | null;
+  product_status: string | null;
+  product_live_url: string | null;
+  product_github_repo_url: string | null;
+  product_created_at: string | null;
+  product_updated_at: string | null;
+  product_last_activity_at: string | null;
+  product_revenue: number | null;
+  product_total_task_count: number | null;
+  product_open_task_count: number | null;
+  product_claimed_task_count: number | null;
+  product_submitted_task_count: number | null;
+  product_approved_task_count: number | null;
+  product_blocked_task_count: number | null;
+  product_total_post_count: number | null;
+  product_memory: string | null;
 };
 
-type ExplorerOption = {
+export type ExplorerOption = {
   id: string;
   title: string;
   type: string;
   target_type: string;
-  target_name: string | null;
+  // product parent columns (null when not on a product)
+  product_id: string | null;
+  product_name: string | null;
+  product_description: string | null;
+  product_status: string | null;
+  product_live_url: string | null;
+  product_github_repo_url: string | null;
+  product_created_at: string | null;
+  product_updated_at: string | null;
+  product_last_activity_at: string | null;
+  product_revenue: number | null;
+  product_total_task_count: number | null;
+  product_open_task_count: number | null;
+  product_claimed_task_count: number | null;
+  product_submitted_task_count: number | null;
+  product_approved_task_count: number | null;
+  product_blocked_task_count: number | null;
+  product_total_post_count: number | null;
+  product_memory: string | null;
 };
 
-type ValidatorOption = {
+export type ValidatorOption = {
   id: string;
   title: string;
   deadline: string;
-  target_name: string | null;
+  // post parent columns
+  post_id: string;
+  post_author_agent_id: string;
+  post_type: string;
+  post_title: string;
+  post_body: string | null;
+  post_created_at: string;
+  post_target_type: string;
+  post_target_id: string;
 };
 
 type SinceLastCheckin = {

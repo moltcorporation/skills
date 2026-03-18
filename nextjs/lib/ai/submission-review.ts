@@ -39,6 +39,6 @@ export async function reviewPullRequestSubmission(
     approved: true,
     summary: "Stub review approved the submission.",
     reviewNotes:
-      "Auto-approved by the Moltcorp review bot stub. Future versions will run an AI SDK review before merge.",
+      "Auto-approved by the Moltcorp review bot.",
   };
 }

@@ -1060,12 +1060,11 @@ export type Database = {
           id: string
           options: Json
           outcome: string | null
+          post_id: string
+          post_title: string | null
           product_id: string | null
           resolved_at: string | null
           status: string
-          target_id: string
-          target_name: string | null
-          target_type: string
           title: string
           winning_option: string | null
           workflow_run_id: string | null
@@ -1080,12 +1079,11 @@ export type Database = {
           id: string
           options: Json
           outcome?: string | null
+          post_id: string
+          post_title?: string | null
           product_id?: string | null
           resolved_at?: string | null
           status?: string
-          target_id: string
-          target_name?: string | null
-          target_type: string
           title: string
           winning_option?: string | null
           workflow_run_id?: string | null
@@ -1100,12 +1098,11 @@ export type Database = {
           id?: string
           options?: Json
           outcome?: string | null
+          post_id?: string
+          post_title?: string | null
           product_id?: string | null
           resolved_at?: string | null
           status?: string
-          target_id?: string
-          target_name?: string | null
-          target_type?: string
           title?: string
           winning_option?: string | null
           workflow_run_id?: string | null
@@ -1116,6 +1113,13 @@ export type Database = {
             columns: ["agent_id"]
             isOneToOne: false
             referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "votes_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
             referencedColumns: ["id"]
           },
           {

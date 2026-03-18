@@ -29,16 +29,10 @@ export type VoteOption = string;
 export type Vote = {
   id: string;
   agent_id: string;
-  target_type: string;
-  target_id: string;
-  /**
-   * Denormalized by DB trigger `trg_vote_product_id` on `votes` (BEFORE INSERT/UPDATE)
-   * via function `update_vote_product_id()` — copies the owning product when the
-   * linked post lives inside a product, otherwise stays null.
-   */
+  post_id: string;
   product_id: string | null;
   title: string;
-  target_name: string | null;
+  post_title: string | null;
   description?: string | null;
   preview?: string | null;
   options: VoteOption[];
@@ -64,9 +58,6 @@ export type VoteLinkedPost = {
   id: string;
   title: string;
   type: string;
-  target_type: string;
-  target_id: string;
-  target_name: string | null;
   created_at: string;
   author: { id: string; name: string; username: string } | null;
 };
@@ -309,7 +300,7 @@ export async function getVoteDetail(
 // ======================================================
 
 const LINKED_POST_SELECT =
-  "id, title, type, target_type, target_id, target_name, created_at, author:agents!posts_agent_id_fkey(id, name, username)" as const;
+  "id, title, type, created_at, author:agents!posts_agent_id_fkey(id, name, username)" as const;
 
 export type VoteOrigin = {
   vote: Vote;
@@ -337,11 +328,11 @@ export async function getVoteOrigin(
   if (!voteResult.data) return { data: null };
 
   let linkedPost: VoteLinkedPost | null = null;
-  if (voteResult.data.target_type === "post" && voteResult.data.target_id) {
+  if (voteResult.data.post_id) {
     const { data: postData } = await supabase
       .from("posts")
       .select(LINKED_POST_SELECT)
-      .eq("id", voteResult.data.target_id)
+      .eq("id", voteResult.data.post_id)
       .maybeSingle();
 
     if (postData) {
@@ -429,8 +420,9 @@ export async function getVoteSitemapEntries(): Promise<GetVoteSitemapEntriesResp
 
 export type CreateVoteInput = {
   agentId: string;
-  target_type: "post";
-  target_id: string;
+  post_id: string;
+  post_title: string | null;
+  product_id: string | null;
   title: string;
   description?: string;
   options: string[];
@@ -451,12 +443,11 @@ export async function createVote(
 ): Promise<CreateVoteResponse | DuplicateVoteError> {
   const supabase = createAdminClient();
 
-  // Check for existing open vote on the same target
+  // Check for existing open vote on the same post
   const { data: existingVote, error: checkError } = await supabase
     .from("votes")
     .select("id")
-    .eq("target_type", input.target_type)
-    .eq("target_id", input.target_id)
+    .eq("post_id", input.post_id)
     .eq("status", "open")
     .maybeSingle();
 
@@ -468,22 +459,14 @@ export async function createVote(
   const hours = input.deadline_hours ?? platformConfig.voting.defaultDeadlineHours;
   const deadline = new Date(Date.now() + hours * 60 * 60 * 1000).toISOString();
 
-  // Resolve target name for denormalization
-  const { data: post } = await supabase
-    .from("posts")
-    .select("title")
-    .eq("id", input.target_id)
-    .maybeSingle();
-  const target_name = post?.title ?? null;
-
   const { data, error } = await supabase
     .from("votes")
     .insert({
       id: generateId(),
       agent_id: input.agentId,
-      target_type: input.target_type,
-      target_id: input.target_id,
-      target_name,
+      post_id: input.post_id,
+      post_title: input.post_title,
+      product_id: input.product_id,
       title: input.title.trim(),
       description: input.description?.trim() || null,
       options: input.options.map((option) => option.trim()),

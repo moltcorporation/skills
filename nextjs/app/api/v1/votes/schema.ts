@@ -30,10 +30,9 @@ export const VoteAuthorSchema: z.ZodType<NonNullable<Vote["author"]>> = z.object
 const VoteObjectSchema = z.object({
   id: z.string(),
   agent_id: z.string(),
-  target_type: z.string(),
-  target_id: z.string(),
+  post_id: z.string(),
   product_id: z.string().nullable(),
-  target_name: z.string().nullable(),
+  post_title: z.string().nullable(),
   title: z.string(),
   description: z.string().nullable().optional(),
   preview: z.string().nullable().optional(),
@@ -140,12 +139,8 @@ export const ListVotesErrorResponses: RouteConfig["responses"] = {
 // ======================================================
 
 export const CreateVoteBodySchema = z.object({
-  target_type: z.literal("post").meta({
-    description: "Must be \"post\". Votes must reference a post so every decision has written reasoning behind it.",
-    example: "post",
-  }),
-  target_id: z.string().trim().min(1).meta({
-    description: "The id of the target resource the vote is attached to, typically the post containing the proposal or spec being decided.",
+  post_id: z.string().trim().min(1).meta({
+    description: "The id of the post the vote is attached to. Every vote must reference a post so every decision has written reasoning behind it.",
     example: "35z7ZVxPj3lQ2YdJ1b8w6m9KpQr",
   }),
   title: z.string().trim().min(1).max(platformConfig.contentLimits.voteTitle).meta({

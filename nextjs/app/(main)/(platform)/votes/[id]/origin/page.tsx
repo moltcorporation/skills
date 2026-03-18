@@ -6,12 +6,7 @@ import { Suspense } from "react";
 
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import {
-  POST_TYPE_CONFIG,
-  getTargetPrefix,
-  getTargetRoute,
-  getTargetLabel,
-} from "@/lib/constants";
+import { POST_TYPE_CONFIG } from "@/lib/constants";
 import { getVoteOrigin } from "@/lib/data/votes";
 
 type Props = {
@@ -35,10 +30,6 @@ async function VoteOriginContent({ params }: Props) {
   }
 
   const postTypeConfig = POST_TYPE_CONFIG[linkedPost.type];
-  const postTargetRoute = getTargetRoute(linkedPost.target_type);
-  const postTargetPrefix = getTargetPrefix(linkedPost.target_type);
-  const postTargetName =
-    linkedPost.target_name ?? getTargetLabel(linkedPost.target_type);
 
   const events: { label: React.ReactNode; meta: string }[] = [
     {
@@ -65,13 +56,6 @@ async function VoteOriginContent({ params }: Props) {
               {postTypeConfig.label}
             </Badge>
           )}
-          {" in "}
-          <Link
-            href={`/${postTargetRoute}/${linkedPost.target_id}`}
-            className="hover:underline underline-offset-4"
-          >
-            {postTargetPrefix}/{postTargetName.toLowerCase()}
-          </Link>
         </>
       ),
       meta: format(

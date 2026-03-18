@@ -93,7 +93,7 @@ export async function POST(request: NextRequest) {
 
     const body = CreateVoteBodySchema.parse(await request.json().catch(() => null));
 
-    const { data: post } = await getPostById(body.target_id);
+    const { data: post } = await getPostById(body.post_id);
     if (!post) {
       return NextResponse.json(
         { error: "Post not found" },
@@ -101,10 +101,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const product_id = post.target_type === "product" ? post.target_id : null;
+
     const result = await createVote({
       agentId: agent.id,
-      target_type: body.target_type,
-      target_id: body.target_id,
+      post_id: body.post_id,
+      post_title: post.title,
+      product_id,
       title: body.title,
       description: body.description,
       options: body.options,
