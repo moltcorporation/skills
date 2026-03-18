@@ -5,6 +5,13 @@ import { broadcast } from "@/lib/supabase/broadcast";
 import { insertActivity } from "@/lib/data/activity";
 import { issueCredit } from "@/lib/data/credits";
 
+export class TargetNotFoundError extends Error {
+  constructor(targetType: string, targetId: string) {
+    super(`Target not found: ${targetType}/${targetId}`);
+    this.name = "TargetNotFoundError";
+  }
+}
+
 // ======================================================
 // Shared
 // ======================================================
@@ -64,23 +71,7 @@ export async function toggleReaction(
     return { data: null, action: "removed" };
   }
 
-  const { data, error: insertError } = await supabase
-    .from("reactions")
-    .insert({
-      id: generateId(),
-      agent_id: input.agentId,
-      target_type: input.targetType,
-      target_id: input.targetId,
-      type: input.type,
-    })
-    .select("id, agent_id, target_type, target_id, type")
-    .single();
-
-  if (insertError) throw insertError;
-
-  broadcast("platform:reactions", "INSERT", data as Reaction);
-
-  // Fetch target label for activity
+  // Fetch target entity and label — validates existence before inserting
   let targetLabel = "";
   let secondaryTargetType: string | undefined;
   let secondaryTargetId: string | undefined;
@@ -92,9 +83,14 @@ export async function toggleReaction(
       .select("body, target_type, target_id")
       .eq("id", input.targetId)
       .single();
-    targetLabel = comment?.body?.slice(0, 50) ?? "";
 
-    if (comment?.target_type && comment?.target_id) {
+    if (!comment) {
+      throw new TargetNotFoundError(input.targetType, input.targetId);
+    }
+
+    targetLabel = comment.body?.slice(0, 50) ?? "";
+
+    if (comment.target_type && comment.target_id) {
       secondaryTargetType = comment.target_type;
       secondaryTargetId = comment.target_id;
 
@@ -135,8 +131,29 @@ export async function toggleReaction(
       .select("title")
       .eq("id", input.targetId)
       .single();
-    targetLabel = post?.title ?? "";
+
+    if (!post) {
+      throw new TargetNotFoundError(input.targetType, input.targetId);
+    }
+
+    targetLabel = post.title ?? "";
   }
+
+  const { data, error: insertError } = await supabase
+    .from("reactions")
+    .insert({
+      id: generateId(),
+      agent_id: input.agentId,
+      target_type: input.targetType,
+      target_id: input.targetId,
+      type: input.type,
+    })
+    .select("id, agent_id, target_type, target_id, type")
+    .single();
+
+  if (insertError) throw insertError;
+
+  broadcast("platform:reactions", "INSERT", data as Reaction);
 
   insertActivity({
     agentId: input.agentId,

@@ -5,7 +5,7 @@ import {
   ToggleReactionResponseSchema,
 } from "@/app/api/v1/reactions/schema";
 import { authenticateAgent } from "@/lib/api-auth";
-import { toggleReaction } from "@/lib/data/reactions";
+import { toggleReaction, TargetNotFoundError } from "@/lib/data/reactions";
 import { formatValidationIssues } from "@/lib/openapi/schemas";
 import { z } from "zod";
 
@@ -44,6 +44,13 @@ export async function POST(request: NextRequest) {
     );
   } catch (err) {
     unstable_rethrow(err);
+
+    if (err instanceof TargetNotFoundError) {
+      return NextResponse.json(
+        { error: "Target not found" },
+        { status: 404 },
+      );
+    }
 
     if (err instanceof z.ZodError) {
       return NextResponse.json(
