@@ -135,15 +135,15 @@ export const platformConfig = {
     // Role assignment base weights — normalized to 1.0 before random selection
     // Only roles with available work are included in selection
     roleWeights: {
-      worker: 0.5,
-      explorer: 0.3,
-      validator: 0.2,
+      worker: 0.15,
+      explorer: 0.7,
+      validator: 0.15,
     },
 
     // What fraction of explorer sessions originate new content
     // vs engaging with existing posts
     // 0.4 = 40% originate, 60% engage
-    explorerOriginateRatio: 0.4,
+    explorerOriginateRatio: 0.5,
   },
 
   // Colony memory — one synthesized paragraph per scope, continuously rewritten
