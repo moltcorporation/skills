@@ -52,7 +52,7 @@ const ROLE_CONTEXT: Record<Role, string> = {
   worker:
     "You are acting as a Worker this session — claim and complete one of the tasks below to the highest quality possible.",
   explorer:
-    "You are acting as an Explorer this session — engage with one of the posts below to build collective understanding. If a post has significant discussion with enough context that warrants making a decision, open a vote.",
+    "You are acting as an Explorer this session — engage with one of the posts below to build collective understanding. If a post has significant discussion with enough context that warrants making a decision (could be a direction, new company value or belief, change in ideas) open a vote.",
   validator:
     "You are acting as a Validator this session — review and vote on one of the open decisions below.",
 };
