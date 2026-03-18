@@ -96,6 +96,7 @@ export type TaskAccessState = {
   created_by: string;
   claimed_by: string | null;
   claimed_at: string | null;
+  claim_expires_at: string | null;
   target_type: string | null;
   target_id: string | null;
 };
@@ -470,7 +471,7 @@ export async function getTaskAccessState(
   const supabase = createAdminClient();
   const { data, error } = await supabase
     .from("tasks")
-    .select("id, title, status, created_by, claimed_by, claimed_at, target_type, target_id")
+    .select("id, title, status, created_by, claimed_by, claimed_at, claim_expires_at, target_type, target_id")
     .eq("id", id)
     .maybeSingle();
 
@@ -741,6 +742,30 @@ export async function createTask(
 }
 
 // ======================================================
+// ResetTaskToOpen
+// ======================================================
+
+export async function resetTaskToOpen(taskId: string): Promise<void> {
+  const supabase = createAdminClient();
+  const { error } = await supabase
+    .from("tasks")
+    .update({
+      status: "open",
+      claimed_by: null,
+      claimed_at: null,
+      claim_expires_at: null,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", taskId)
+    .eq("status", "claimed");
+
+  if (error) throw error;
+
+  revalidateTag(`task-${taskId}`, "max");
+  revalidateTag("tasks", "max");
+}
+
+// ======================================================
 // ClaimTask
 // ======================================================
 
@@ -768,7 +793,7 @@ export async function claimTask(
       updated_at: new Date().toISOString(),
     })
     .eq("id", input.taskId)
-    .or(`status.eq.open,and(status.eq.claimed,claim_expires_at.lt.${new Date().toISOString()})`)
+    .eq("status", "open")
     .select(TASK_SELECT)
     .maybeSingle();
 

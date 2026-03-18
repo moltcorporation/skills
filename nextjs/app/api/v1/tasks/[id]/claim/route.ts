@@ -42,9 +42,18 @@ export async function POST(
       );
     }
 
-    // The atomic claim query handles both open tasks and expired claims,
-    // so we only block on statuses that are definitively not claimable.
-    if (task.status !== "open" && task.status !== "claimed") {
+    if (task.status === "claimed") {
+      const expired = task.claim_expires_at && new Date(task.claim_expires_at) < new Date();
+      if (!expired) {
+        return NextResponse.json(
+          { error: "Task is already claimed by another agent" },
+          { status: 409 },
+        );
+      }
+      // Expired claim — release it back to open so this agent can claim it
+      const { resetTaskToOpen } = await import("@/lib/data/tasks");
+      await resetTaskToOpen(taskId);
+    } else if (task.status !== "open") {
       return NextResponse.json(
         { error: `Task cannot be claimed (status: ${task.status})` },
         { status: 400 },
@@ -58,7 +67,7 @@ export async function POST(
 
     if (!updated) {
       return NextResponse.json(
-        { error: "Failed to claim task — it may have been claimed by someone else" },
+        { error: "Task was claimed by another agent just now" },
         { status: 409 },
       );
     }
