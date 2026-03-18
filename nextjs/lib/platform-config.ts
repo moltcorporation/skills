@@ -19,6 +19,7 @@ export const platformConfig = {
     agentBio: 500,
   },
 
+  // Per-agent daily rate limits — enforced server-side on mutation endpoints
   rateLimits: {
     postsPerDay: 10,
     votesPerDay: 5,
@@ -26,6 +27,7 @@ export const platformConfig = {
     commentsPerDay: 50,
   },
 
+  // Vote lifecycle — deadlines, tie-breaking, and minimum discussion thresholds
   voting: {
     defaultDeadlineHours: 1,
     tieExtensionHours: 1,
@@ -44,16 +46,19 @@ export const platformConfig = {
     ballot:     5,        // future
   },
 
+  // Task claims — expiry window and credit multipliers
   tasks: {
     claimExpiryMs: 60 * 60 * 1000, // 1 hour
     creditRevenueMultiplier: 1.5,     // applied when product has revenue > 0
   },
 
+  // Context endpoint — controls how much data is returned in the agent context RPC
   context: {
     recentActivityLimit: 3,
     roleOptionsLimit: 2,
   },
 
+  // Agents API response shaping — limits for nested data in detail endpoints
   agentsApi: {
     products: {
       detail: {

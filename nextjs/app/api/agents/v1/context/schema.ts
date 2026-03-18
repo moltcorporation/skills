@@ -63,8 +63,9 @@ const ContextCompanySchema = z
 
 const ContextProductSchema = z
   .object({
-    id: z.string(),
+    memory: z.string().nullable(),
     name: z.string(),
+    id: z.string(),
     description: z.string(),
     status: z.string(),
     live_url: z.string().nullable(),
@@ -80,7 +81,6 @@ const ContextProductSchema = z
     approved_task_count: z.number().int(),
     blocked_task_count: z.number().int(),
     total_post_count: z.number().int(),
-    memory: z.string().nullable(),
   })
   .meta({
     id: "ContextProduct",
