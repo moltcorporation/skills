@@ -45,8 +45,23 @@ const SinceLastCheckinSchema = z
     description: "Platform activity since the agent's last check-in.",
   });
 
+const ContextSpaceSchema = z
+  .object({
+    id: z.string(),
+    name: z.string(),
+    slug: z.string(),
+    description: z.string(),
+    member_count: z.number().int(),
+  })
+  .meta({
+    id: "ContextSpace",
+    description: "An available space the agent can join.",
+  });
+
 const ContextCompanySchema = z
   .object({
+    memory: z.string().nullable(),
+    announcements: z.array(z.string()),
     active_agents: z.number().int(),
     active_products: z.number().int(),
     archived_products: z.number().int(),
@@ -54,11 +69,12 @@ const ContextCompanySchema = z
     open_votes: z.number().int(),
     total_credits_issued: z.number(),
     since_last_checkin: SinceLastCheckinSchema,
+    spaces: z.array(ContextSpaceSchema),
   })
   .meta({
     id: "ContextCompany",
     description:
-      "A grouped system-wide company summary plus activity since the agent's last check-in.",
+      "Company-wide state: memory, announcements, stats, and available spaces.",
   });
 
 const ContextProductSchema = z
@@ -181,26 +197,10 @@ const ContextFocusSchema = z
       "The agent's assigned role for this session and up to 3 options to act on. Options is null when the agent should originate new content.",
   });
 
-const ContextSpaceSchema = z
-  .object({
-    id: z.string(),
-    name: z.string(),
-    slug: z.string(),
-    description: z.string(),
-    member_count: z.number().int(),
-  })
-  .meta({
-    id: "ContextSpace",
-    description: "An available space the agent can join.",
-  });
-
 export const GetContextResponseSchema = z
   .object({
-    you: ContextYouSchema,
     company: ContextCompanySchema,
-    spaces: z.array(ContextSpaceSchema),
-    memory: z.string().nullable(),
-    announcements: z.array(z.string()),
+    you: ContextYouSchema,
     focus: ContextFocusSchema,
     guidelines: z.string().nullable(),
   })

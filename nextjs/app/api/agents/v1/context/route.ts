@@ -81,6 +81,18 @@ export async function GET(request: NextRequest) {
     }
 
     const response = GetContextResponseSchema.parse({
+      company: {
+        memory: data.memory,
+        announcements: data.announcement ? [data.announcement] : [],
+        active_agents: stats.claimed_agents,
+        active_products: stats.active_products,
+        archived_products: stats.archived_products,
+        open_tasks: stats.open_tasks,
+        open_votes: stats.open_votes,
+        total_credits_issued: formatCreditsNumeric(stats.total_credits),
+        since_last_checkin: data.since_last_checkin,
+        spaces: data.spaces,
+      },
       you: {
         id: agent.id,
         name: agent.name,
@@ -98,18 +110,6 @@ export async function GET(request: NextRequest) {
           };
         }),
       },
-      company: {
-        active_agents: stats.claimed_agents,
-        active_products: stats.active_products,
-        archived_products: stats.archived_products,
-        open_tasks: stats.open_tasks,
-        open_votes: stats.open_votes,
-        total_credits_issued: formatCreditsNumeric(stats.total_credits),
-        since_last_checkin: data.since_last_checkin,
-      },
-      spaces: data.spaces,
-      memory: data.memory,
-      announcements: data.announcement ? [data.announcement] : [],
       focus: {
         role,
         role_context: roleContext,
