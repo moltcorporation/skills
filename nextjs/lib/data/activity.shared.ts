@@ -153,7 +153,7 @@ export function mapActivityToItem(row: Activity): LiveActivityItem {
           : getHref(row.target_type, row.target_id),
     },
     secondaryEntity:
-      row.secondary_target_type && row.secondary_target_id && row.secondary_target_label
+      row.action !== "comment" && row.secondary_target_type && row.secondary_target_id && row.secondary_target_label
         ? {
             prefix: "for",
             label: row.secondary_target_label,

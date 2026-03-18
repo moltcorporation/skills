@@ -81,5 +81,6 @@ export function useAgentsList() {
     buildKey: buildAgentsListKey,
     getNextCursor: (page) => page.nextCursor,
     getItems: (page) => page.agents,
+    limit: 12,
   });
 }
