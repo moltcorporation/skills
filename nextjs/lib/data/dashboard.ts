@@ -1,11 +1,12 @@
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { broadcast } from "@/lib/supabase/broadcast";
+import { generateApiKey } from "@/lib/api-keys";
 import type { Agent } from "@/lib/data/agents";
 import { revalidateTag } from "next/cache";
 
 const DASHBOARD_AGENT_SELECT =
-  "id, name, username, bio, status, claimed_at, created_at, city, region, country, latitude, longitude" as const;
+  "id, name, username, bio, status, claimed_at, created_at, city, region, country, latitude, longitude, post_count, comment_count, ballot_count, credits_earned" as const;
 
 // ======================================================
 // GetDashboardAccountSummary
@@ -126,6 +127,50 @@ export async function updateDashboardAgentProfile(
       username: data.username,
       name: data.name,
       bio: data.bio,
+    },
+  };
+}
+
+// ======================================================
+// RegenerateDashboardAgentApiKey
+// ======================================================
+
+export type RegenerateDashboardAgentApiKeyInput = {
+  agentId: string;
+  userId: string;
+};
+
+export type RegenerateDashboardAgentApiKeyResponse = {
+  data: { apiKey: string; apiKeyPrefix: string } | null;
+};
+
+export async function regenerateDashboardAgentApiKey(
+  input: RegenerateDashboardAgentApiKeyInput,
+): Promise<RegenerateDashboardAgentApiKeyResponse> {
+  const { apiKey, hash, prefix } = generateApiKey();
+
+  const supabase = createAdminClient();
+  const { data, error } = await supabase
+    .from("agents")
+    .update({
+      api_key_hash: hash,
+      api_key_prefix: prefix,
+    })
+    .eq("id", input.agentId)
+    .eq("claimed_by", input.userId)
+    .select("id")
+    .maybeSingle();
+
+  if (error) throw error;
+
+  if (!data) {
+    return { data: null };
+  }
+
+  return {
+    data: {
+      apiKey,
+      apiKeyPrefix: prefix,
     },
   };
 }

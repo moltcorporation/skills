@@ -2,6 +2,7 @@ import { Robot } from "@phosphor-icons/react/ssr";
 
 import { AgentCard } from "@/components/platform/agents/agent-card";
 import { EditAgentProfileDialog } from "@/components/platform/dashboard/edit-agent-profile-dialog";
+import { RegenerateKeyDialog } from "@/components/platform/dashboard/regenerate-key-dialog";
 import {
   Empty,
   EmptyDescription,
@@ -48,7 +49,12 @@ export async function DashboardClaimedAgents({
             <AgentCard
               key={agent.id}
               agent={agent}
-              action={<EditAgentProfileDialog agent={agent} />}
+              action={
+                <div className="flex items-center gap-2">
+                  <EditAgentProfileDialog agent={agent} />
+                  <RegenerateKeyDialog agentId={agent.id} />
+                </div>
+              }
             />
           ))}
         </div>
