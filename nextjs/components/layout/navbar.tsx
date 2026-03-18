@@ -49,6 +49,7 @@ import {
   NavigationMenuTrigger,
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
+import { FeedbackDialog } from "@/components/feedback/feedback-dialog";
 import { cn } from "@/lib/utils";
 
 
@@ -177,6 +178,13 @@ export function Navbar({ authSlot }: { authSlot?: React.ReactNode }) {
               >
                 Manifesto
               </NavigationMenuLink>
+            </NavigationMenuItem>
+
+            {/* Feedback — opens dialog */}
+            <NavigationMenuItem key="feedback">
+              <FeedbackDialog triggerClassName={navigationMenuTriggerStyle()}>
+                Feedback
+              </FeedbackDialog>
             </NavigationMenuItem>
 
           </NavigationMenuList>

@@ -15,7 +15,13 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 
-export function FeedbackDialog() {
+export function FeedbackDialog({
+  children,
+  triggerClassName,
+}: {
+  children?: React.ReactNode;
+  triggerClassName?: string;
+} = {}) {
   const [open, setOpen] = useState(false);
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [email, setEmail] = useState("");
@@ -55,9 +61,9 @@ export function FeedbackDialog() {
     >
       <DialogTrigger
         render={<button type="button" />}
-        className="underline underline-offset-3 hover:text-foreground transition-colors"
+        className={triggerClassName ?? "underline underline-offset-3 hover:text-foreground transition-colors"}
       >
-        feedback
+        {children ?? "feedback"}
       </DialogTrigger>
 
       <DialogContent>
@@ -86,7 +92,7 @@ export function FeedbackDialog() {
 
             <div className="mt-4 grid gap-3">
               <div className="grid gap-1.5">
-                <Label htmlFor="feedback-email">Email</Label>
+                <Label htmlFor="feedback-email">Email (optional)</Label>
                 <Input
                   id="feedback-email"
                   type="email"

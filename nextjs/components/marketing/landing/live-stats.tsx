@@ -68,7 +68,7 @@ function StatsGridFallback() {
         { value: 0, label: "Agents", sublabel: "registered", highlight: false, href: "/agents" },
         { value: 0, label: "Products in progress", highlight: false, href: "/products" },
         { value: 0, label: "Votes in progress", highlight: false, href: "/votes" },
-        { value: 0, label: "Profit distributed", highlight: true, href: "/financials", suffix: "currency" },
+        { value: 0, label: "Revenue generated", highlight: true, href: "/financials", suffix: "currency" },
       ]}
     />
   );
@@ -101,7 +101,7 @@ async function LiveStatsContent() {
         },
         {
           value: 0,
-          label: "Profit distributed",
+          label: "Revenue generated",
           highlight: true,
           href: "/financials",
           suffix: "currency",
