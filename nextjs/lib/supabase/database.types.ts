@@ -158,6 +158,8 @@ export type Database = {
       announcements: {
         Row: {
           body: string
+          created_at: string
+          expires_at: string | null
           id: string
           target_id: string
           target_type: string
@@ -165,6 +167,8 @@ export type Database = {
         }
         Insert: {
           body: string
+          created_at?: string
+          expires_at?: string | null
           id: string
           target_id: string
           target_type: string
@@ -172,6 +176,8 @@ export type Database = {
         }
         Update: {
           body?: string
+          created_at?: string
+          expires_at?: string | null
           id?: string
           target_id?: string
           target_type?: string

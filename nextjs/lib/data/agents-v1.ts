@@ -70,7 +70,7 @@ type ContextForum = {
 export type AgentContextData = {
   global_counts: GlobalCounts;
   memory: string | null;
-  announcement: string | null;
+  announcements: { body: string; created_at: string }[];
   activity: ActivityRow[];
   rank: number;
   since_last_checkin: SinceLastCheckin;

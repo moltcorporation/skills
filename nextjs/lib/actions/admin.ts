@@ -5,7 +5,11 @@ import { revalidatePath, revalidateTag } from "next/cache";
 
 import { getIsAdmin } from "@/lib/admin";
 import { deleteAgent } from "@/lib/data/agents";
-import { upsertAnnouncement } from "@/lib/data/announcements";
+import {
+  createAnnouncement,
+  updateAnnouncement,
+  deleteAnnouncement,
+} from "@/lib/data/announcements";
 import { getMemory, upsertMemory } from "@/lib/data/memories";
 import { deletePost } from "@/lib/data/posts";
 import { deleteProduct } from "@/lib/data/products";
@@ -20,10 +24,17 @@ const UpdateMemorySchema = z.object({
   body: z.string().trim().min(1).max(platformConfig.contentLimits.postBody),
 });
 
-const UpdateAnnouncementSchema = z.object({
+const CreateAnnouncementSchema = z.object({
   targetType: z.enum(["product", "company"]),
   targetId: z.string().trim().min(1),
   body: z.string().trim().min(1).max(platformConfig.contentLimits.postBody),
+  expiresAt: z.string().nullable(),
+});
+
+const UpdateAnnouncementSchema = z.object({
+  id: z.string().trim().min(1),
+  body: z.string().trim().min(1).max(platformConfig.contentLimits.postBody),
+  expiresAt: z.string().nullable(),
 });
 
 export type UpdateMemoryActionState = {
@@ -31,7 +42,7 @@ export type UpdateMemoryActionState = {
   success: boolean;
 };
 
-export type UpdateAnnouncementActionState = {
+export type AnnouncementActionState = {
   error: string | null;
   success: boolean;
 };
@@ -151,49 +162,79 @@ export async function updateMemoryAction(
   }
 }
 
-export async function updateAnnouncementAction(
-  _prevState: UpdateAnnouncementActionState,
+export async function createAnnouncementAction(
+  _prevState: AnnouncementActionState,
   formData: FormData,
-): Promise<UpdateAnnouncementActionState> {
+): Promise<AnnouncementActionState> {
   const isAdmin = await getIsAdmin();
   if (!isAdmin) {
-    return {
-      error: "Unauthorized.",
-      success: false,
-    };
+    return { error: "Unauthorized.", success: false };
   }
 
-  const parsed = UpdateAnnouncementSchema.safeParse({
+  const parsed = CreateAnnouncementSchema.safeParse({
     targetType: formData.get("targetType"),
     targetId: formData.get("targetId"),
     body: formData.get("body"),
+    expiresAt: formData.get("expiresAt") || null,
   });
 
   if (!parsed.success) {
-    return {
-      error: "Enter a valid announcement value.",
-      success: false,
-    };
+    return { error: "Enter a valid announcement.", success: false };
   }
 
   try {
-    await upsertAnnouncement({
+    await createAnnouncement({
       targetType: parsed.data.targetType,
       targetId: parsed.data.targetId,
       body: parsed.data.body,
+      expiresAt: parsed.data.expiresAt,
     });
 
     revalidateAdminTarget(parsed.data.targetType, parsed.data.targetId);
 
-    return {
-      error: null,
-      success: true,
-    };
+    return { error: null, success: true };
+  } catch (err) {
+    console.error("[admin.createAnnouncement]", err);
+    return { error: "Unable to create announcement.", success: false };
+  }
+}
+
+export async function updateAnnouncementAction(
+  _prevState: AnnouncementActionState,
+  formData: FormData,
+): Promise<AnnouncementActionState> {
+  const isAdmin = await getIsAdmin();
+  if (!isAdmin) {
+    return { error: "Unauthorized.", success: false };
+  }
+
+  const parsed = UpdateAnnouncementSchema.safeParse({
+    id: formData.get("id"),
+    body: formData.get("body"),
+    expiresAt: formData.get("expiresAt") || null,
+  });
+
+  if (!parsed.success) {
+    return { error: "Enter a valid announcement.", success: false };
+  }
+
+  try {
+    await updateAnnouncement({
+      id: parsed.data.id,
+      body: parsed.data.body,
+      expiresAt: parsed.data.expiresAt,
+    });
+
+    return { error: null, success: true };
   } catch (err) {
     console.error("[admin.updateAnnouncement]", err);
-    return {
-      error: "Unable to save changes right now.",
-      success: false,
-    };
+    return { error: "Unable to update announcement.", success: false };
   }
+}
+
+export async function deleteAnnouncementAction(id: string) {
+  const isAdmin = await getIsAdmin();
+  if (!isAdmin) throw new Error("Unauthorized");
+
+  await deleteAnnouncement(id);
 }

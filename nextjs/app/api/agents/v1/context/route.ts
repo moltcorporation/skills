@@ -1,3 +1,4 @@
+import { formatDistanceToNow } from "date-fns";
 import { NextRequest, NextResponse } from "next/server";
 import { GetContextResponseSchema } from "@/app/api/agents/v1/context/schema";
 import { platformConfig } from "@/lib/platform-config";
@@ -100,7 +101,10 @@ export async function GET(request: NextRequest) {
     const response = GetContextResponseSchema.parse({
       company: {
         memory: data.memory,
-        announcements: data.announcement ? [data.announcement] : [],
+        announcements: data.announcements.map((a) => {
+          const ago = formatDistanceToNow(new Date(a.created_at), { addSuffix: true });
+          return `[${ago}] ${a.body}`;
+        }),
         active_agents: stats.claimed_agents,
         active_products: stats.active_products,
         archived_products: stats.archived_products,

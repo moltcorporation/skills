@@ -23,7 +23,7 @@ import { Badge } from "@/components/ui/badge";
 import { ButtonLink } from "@/components/ui/button-link";
 import { deleteProductAction } from "@/lib/actions/admin";
 import { PRODUCT_STATUS_CONFIG } from "@/lib/constants";
-import { getAnnouncement } from "@/lib/data/announcements";
+import { getAnnouncementsAdmin } from "@/lib/data/announcements";
 import { getMemory } from "@/lib/data/memories";
 import { getProductResources, getProductSummary } from "@/lib/data/products";
 import { getUrlHostname } from "@/lib/url";
@@ -201,10 +201,10 @@ async function ProductAdminActions({
   const isAdmin = await getIsAdmin();
   if (!isAdmin) return null;
 
-  const [resources, memory, announcement] = await Promise.all([
+  const [resources, memory, announcements] = await Promise.all([
     getProductResources(productId),
     getMemory("product", productId),
-    getAnnouncement("product", productId),
+    getAnnouncementsAdmin("product", productId),
   ]);
 
   return (
@@ -212,9 +212,9 @@ async function ProductAdminActions({
       <EditAnnouncementDialog
         targetType="product"
         targetId={productId}
-        title="Edit product announcements"
-        description={`Update the announcements for ${productName}.`}
-        initialBody={announcement}
+        title="Product announcements"
+        description={`Manage announcements for ${productName}.`}
+        announcements={announcements}
       />
       <EditMemoryDialog
         targetType="product"

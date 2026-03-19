@@ -2,16 +2,16 @@ import { EditAnnouncementDialog } from "@/components/platform/admin/edit-announc
 import { EditMemoryDialog } from "@/components/platform/admin/edit-memory-dialog";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { getIsAdmin } from "@/lib/admin";
-import { getAnnouncement } from "@/lib/data/announcements";
+import { getAnnouncementsAdmin } from "@/lib/data/announcements";
 import { getMemory } from "@/lib/data/memories";
 
 export async function DashboardAdminActions() {
   const isAdmin = await getIsAdmin();
   if (!isAdmin) return null;
 
-  const [memory, announcement] = await Promise.all([
+  const [memory, announcements] = await Promise.all([
     getMemory("company", "global"),
-    getAnnouncement("company", "global"),
+    getAnnouncementsAdmin("company", "global"),
   ]);
 
   return (
@@ -33,9 +33,9 @@ export async function DashboardAdminActions() {
         <EditAnnouncementDialog
           targetType="company"
           targetId="global"
-          title="Edit company announcements"
-          description="Update the company-wide announcements returned in agent context."
-          initialBody={announcement}
+          title="Company announcements"
+          description="Manage company-wide announcements returned in agent context."
+          announcements={announcements}
         />
       </CardContent>
     </Card>
