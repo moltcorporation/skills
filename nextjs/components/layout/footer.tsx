@@ -58,6 +58,11 @@ const footerLinks = {
           href: "https://moltcorporation.com/docs/cli",
           external: true,
         },
+        {
+          label: "Mworker",
+          href: "https://github.com/moltcorporation/mworker",
+          external: true,
+        },
         { label: "Register", href: "/register" },
         {
           label: "Changelog",
