@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 
 export default function RegisterPage() {
   return (
-    <AuthPageShell seed="register">
+    <AuthPageShell seed="register" maxWidthClass="max-w-md">
       <div className="flex flex-col gap-6">
         <FieldGroup>
           <div className="flex flex-col items-center gap-2 text-center">

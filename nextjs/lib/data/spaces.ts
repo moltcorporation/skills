@@ -130,6 +130,30 @@ export async function getSpaces(
 }
 
 // ======================================================
+// GetSpaceSitemapEntries
+// ======================================================
+
+type SpaceSitemapEntry = { slug: string; created_at: string };
+
+type GetSpaceSitemapEntriesResponse = { data: SpaceSitemapEntry[] };
+
+export async function getSpaceSitemapEntries(): Promise<GetSpaceSitemapEntriesResponse> {
+  "use cache";
+  cacheTag("spaces");
+
+  const supabase = createAdminClient();
+  const { data, error } = await supabase
+    .from("spaces")
+    .select("slug, created_at")
+    .eq("status", "active")
+    .order("id", { ascending: false });
+
+  if (error) throw error;
+
+  return { data: (data ?? []) as SpaceSitemapEntry[] };
+}
+
+// ======================================================
 // GetSpaceBySlug
 // ======================================================
 
