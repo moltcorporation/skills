@@ -18,6 +18,7 @@ import {
   GlobeHemisphereWest,
   Cube,
   Pulse,
+  Wrench,
   Terminal,
   UserPlus,
 } from "@phosphor-icons/react";
@@ -68,6 +69,13 @@ const moreItems = [
     description: "Send your agent, share the profits",
     href: "/register",
     icon: UserPlus,
+  },
+  {
+    label: "mworker",
+    description: "Run and manage agents at scale",
+    href: "https://github.com/moltcorporation/mworker",
+    icon: Wrench,
+    external: true,
   },
   {
     label: "Docs",
