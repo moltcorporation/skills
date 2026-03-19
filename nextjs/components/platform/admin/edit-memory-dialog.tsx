@@ -78,7 +78,7 @@ export function EditMemoryDialog({
         Memory
       </DialogTrigger>
 
-      <DialogContent>
+      <DialogContent className="sm:max-w-2xl">
         <form action={formAction}>
           <DialogHeader>
             <DialogTitle>{title}</DialogTitle>
@@ -97,7 +97,7 @@ export function EditMemoryDialog({
                 id={`${targetType}-${targetId}-memory`}
                 name="body"
                 defaultValue={initialBody}
-                rows={12}
+                rows={20}
                 required
               />
             </Field>

@@ -150,7 +150,7 @@ export const platformConfig = {
   // Colony memory — one synthesized paragraph per scope, continuously rewritten
   // System agent rewrites on significant events, never appends
   memory: {
-    maxWords: 300,
+    maxWords: 500,
     synthesisIntervalHours: 1,
   },
 

@@ -1,4 +1,5 @@
 import { getMemory, upsertMemory } from "@/lib/data/memories";
+import { platformConfig } from "@/lib/platform-config";
 import { tool } from "ai";
 import { z } from "zod";
 
@@ -15,7 +16,7 @@ export const readMemory = tool({
   },
 });
 
-export const writeMemory = tool({
+export const editMemory = tool({
   description:
     "Surgically edit a memory document by replacing an exact substring. Always read memory first to get the current content.",
   inputSchema: z.object({
@@ -29,8 +30,16 @@ export const writeMemory = tool({
   execute: async ({ target_type, target_id, old_str, new_str }) => {
     const current = await getMemory(target_type, target_id);
 
+    const maxWords = platformConfig.memory.maxWords;
+
     // Allow writing initial memory when old_str is empty and no memory exists
     if (old_str === "" && current === null) {
+      const wordCount = new_str.trim().split(/\s+/).length;
+      if (wordCount > maxWords) {
+        return {
+          error: `Memory exceeds ${maxWords}-word limit (currently ${wordCount} words). Compact the memory or shorten it without losing critical information.`,
+        };
+      }
       await upsertMemory({ targetType: target_type, targetId: target_id, body: new_str });
       return { status: "ok" };
     }
@@ -50,7 +59,34 @@ export const writeMemory = tool({
     }
 
     const updated = current.replace(old_str, new_str);
+    const wordCount = updated.trim().split(/\s+/).length;
+    if (wordCount > maxWords) {
+      return {
+        error: `Memory exceeds ${maxWords}-word limit (currently ${wordCount} words). Compact the memory or shorten it without losing critical information.`,
+      };
+    }
     await upsertMemory({ targetType: target_type, targetId: target_id, body: updated });
+    return { status: "ok" };
+  },
+});
+
+export const rewriteMemory = tool({
+  description:
+    "Fully replace a memory document with new content. Use this instead of editMemory when you need to rewrite or compact the entire memory.",
+  inputSchema: z.object({
+    target_type: z.string().describe("The entity type (e.g. 'product', 'company')"),
+    target_id: z.string().describe("The entity ID (e.g. product ID or 'global')"),
+    body: z.string().describe("The complete new memory content"),
+  }),
+  execute: async ({ target_type, target_id, body }) => {
+    const maxWords = platformConfig.memory.maxWords;
+    const wordCount = body.trim().split(/\s+/).length;
+    if (wordCount > maxWords) {
+      return {
+        error: `Memory exceeds ${maxWords}-word limit (currently ${wordCount} words). Compact the memory or shorten it without losing critical information.`,
+      };
+    }
+    await upsertMemory({ targetType: target_type, targetId: target_id, body });
     return { status: "ok" };
   },
 });

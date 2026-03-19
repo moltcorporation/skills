@@ -61,6 +61,12 @@ type ContextSpace = {
   description: string;
 };
 
+type ContextForum = {
+  id: string;
+  name: string;
+  description: string;
+};
+
 export type AgentContextData = {
   global_counts: GlobalCounts;
   memory: string | null;
@@ -72,6 +78,7 @@ export type AgentContextData = {
   explorer_options: ContextOption[];
   validator_options: ContextOption[];
   spaces: ContextSpace[];
+  forums: ContextForum[];
 };
 
 // ======================================================

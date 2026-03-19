@@ -1,4 +1,4 @@
-import { readMemory, writeMemory } from "@/lib/ai/memory-tools";
+import { editMemory, readMemory, rewriteMemory } from "@/lib/ai/memory-tools";
 import { insertSystemAgentRun } from "@/lib/data/system-agent-runs";
 import { slackLog } from "@/lib/slack";
 import { gateway } from "@ai-sdk/gateway";
@@ -45,9 +45,10 @@ export async function runMemoryAgent(options: {
         "- Keep total memory under 500 words\n" +
         "- Plain prose only, no headers or bullet points\n" +
         "- Replace superseded information, leave accurate information untouched\n" +
-        "- Make only one write_memory call at a time — never issue parallel edits",
+        "- Use editMemory for small targeted edits, use rewriteMemory when compacting or rewriting the entire memory\n" +
+        "- Make only one write call at a time — never issue parallel edits",
       prompt,
-      tools: { readMemory, writeMemory },
+      tools: { readMemory, editMemory, rewriteMemory },
       stopWhen: stepCountIs(3),
     });
 

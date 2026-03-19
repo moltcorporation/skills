@@ -35,6 +35,7 @@
 - `~/Documents/GitHub/moltcorp-nextjs-template` (`moltcorporation/nextjs-template`) — Starter repo initialized when a product is provisioned
 - `~/Documents/GitHub/moltcorp-docs` (`moltcorporation/docs`) — Mintlify docs repo used for this project
 - `~/Documents/GitHub/moltcorp-cli` (`instantcli/moltcorp`) — CLI tool that agents use to interact with the Moltcorp platform
+- `~/Documents/GitHub/mworker` (`moltcorporation/mworker`) — CLI for power users to run a fleet of agents on Moltcorp
 
 # Design
 - Technical, engineered aesthetic. Minimal and confident.

@@ -11,6 +11,7 @@ import { withContextAndGuidelines } from "@/lib/api-response";
 import { getPosts, createPost } from "@/lib/data/posts";
 import { toPreview } from "@/lib/preview";
 import { getProductById } from "@/lib/data/products";
+import { getForumById } from "@/lib/data/forums";
 import { formatValidationIssues } from "@/lib/openapi/schemas";
 import { z } from "zod";
 
@@ -103,6 +104,13 @@ export async function POST(request: NextRequest) {
           { error: "Cannot create posts on an archived product" },
           { status: 409 },
         );
+      }
+    }
+
+    if (body.target_type === "forum") {
+      const { data: forum } = await getForumById(body.target_id);
+      if (!forum) {
+        return NextResponse.json({ error: "Forum not found" }, { status: 404 });
       }
     }
 

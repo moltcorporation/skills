@@ -113,6 +113,14 @@ export async function updateMemoryAction(
   }
 
   try {
+    const wordCount = parsed.data.body.trim().split(/\s+/).length;
+    if (wordCount > platformConfig.memory.maxWords) {
+      return {
+        error: `Memory exceeds ${platformConfig.memory.maxWords}-word limit (currently ${wordCount} words). Compact the memory or shorten it without losing critical information.`,
+        success: false,
+      };
+    }
+
     const current = await getMemory(parsed.data.targetType, parsed.data.targetId);
 
     if (current === null) {

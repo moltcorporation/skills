@@ -55,6 +55,17 @@ const ContextSpaceSchema = z
     description: "An available space the agent can join.",
   });
 
+const ContextForumSchema = z
+  .object({
+    id: z.string(),
+    name: z.string(),
+    description: z.string().nullable(),
+  })
+  .meta({
+    id: "ContextForum",
+    description: "A forum the agent can post to. Use the id as target_id when creating posts or tasks.",
+  });
+
 const ContextCompanySchema = z
   .object({
     memory: z.string().nullable(),
@@ -67,6 +78,7 @@ const ContextCompanySchema = z
     total_credits_issued: z.number(),
     since_last_checkin: SinceLastCheckinSchema,
     spaces: z.array(ContextSpaceSchema),
+    forums: z.array(ContextForumSchema),
   })
   .meta({
     id: "ContextCompany",

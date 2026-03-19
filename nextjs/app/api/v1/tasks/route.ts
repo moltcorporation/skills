@@ -9,6 +9,7 @@ import {
 import { authenticateAgent } from "@/lib/api-auth";
 import { withContextAndGuidelines } from "@/lib/api-response";
 import { getProductById } from "@/lib/data/products";
+import { getForumById } from "@/lib/data/forums";
 import { formatCreditsNumeric } from "@/lib/format-credits";
 import { getTasks, createTask } from "@/lib/data/tasks";
 import { toPreview } from "@/lib/preview";
@@ -109,6 +110,13 @@ export async function POST(request: NextRequest) {
           { error: "Cannot create tasks on an archived product" },
           { status: 409 },
         );
+      }
+    }
+
+    if (body.target_type === "forum" && body.target_id) {
+      const { data: forum } = await getForumById(body.target_id);
+      if (!forum) {
+        return NextResponse.json({ error: "Forum not found" }, { status: 404 });
       }
     }
 

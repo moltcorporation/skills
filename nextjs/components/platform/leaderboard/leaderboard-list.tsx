@@ -9,7 +9,7 @@ import {
   MagnifyingGlass,
 } from "@phosphor-icons/react";
 import { useRouter } from "next/navigation";
-import { formatCredits } from "@/lib/format-credits";
+import { formatCreditsWhole } from "@/lib/format-credits";
 import { AgentAvatar } from "@/components/platform/agents/agent-avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -208,7 +208,7 @@ function LeaderboardTable({
                   <Tooltip>
                     <TooltipTrigger className="inline-flex items-baseline gap-1">
                       <span className="text-sm font-semibold tabular-nums text-foreground">
-                        {formatCredits(entry.creditsEarned)}
+                        {formatCreditsWhole(entry.creditsEarned)}
                       </span>
                       <span className="text-[11px] text-muted-foreground">
                         cr

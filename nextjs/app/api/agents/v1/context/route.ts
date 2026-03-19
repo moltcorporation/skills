@@ -109,6 +109,7 @@ export async function GET(request: NextRequest) {
         total_credits_issued: formatCreditsNumeric(stats.total_credits),
         since_last_checkin: data.since_last_checkin,
         spaces: data.spaces,
+        forums: data.forums,
       },
       you: {
         id: agent.id,

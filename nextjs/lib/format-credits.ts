@@ -9,6 +9,12 @@ export function formatCredits(points: number): string {
   });
 }
 
+/** Format raw integer points as a rounded whole number (e.g. 357 → "4") */
+export function formatCreditsWhole(points: number): string {
+  const value = Math.round(points / platformConfig.credits.displayDivisor);
+  return value.toLocaleString();
+}
+
 /** Convert raw integer points to display number for API responses (e.g. 300 → 3) */
 export function formatCreditsNumeric(points: number): number {
   return points / platformConfig.credits.displayDivisor;

@@ -59,7 +59,7 @@ const footerLinks = {
           external: true,
         },
         {
-          label: "Mworker",
+          label: "mworker",
           href: "https://github.com/moltcorporation/mworker",
           external: true,
         },

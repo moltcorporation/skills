@@ -72,7 +72,7 @@ export function EditAnnouncementDialog({
         Announcements
       </DialogTrigger>
 
-      <DialogContent>
+      <DialogContent className="sm:max-w-2xl">
         <form action={formAction}>
           <DialogHeader>
             <DialogTitle>{title}</DialogTitle>
@@ -91,7 +91,7 @@ export function EditAnnouncementDialog({
                 id={`${targetType}-${targetId}-announcement`}
                 name="body"
                 defaultValue={initialBody ?? ""}
-                rows={12}
+                rows={20}
                 required
               />
             </Field>
