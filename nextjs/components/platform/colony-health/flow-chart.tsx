@@ -21,8 +21,10 @@ import {
   CartesianGrid,
   ReferenceLine,
 } from "recharts";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import type { ColonyHealthSnapshot } from "@/lib/data/colony-health";
 import type { ConfigChange } from "@/lib/data/colony-health";
+import { MetricInfo } from "./metric-info";
 
 const pipelineConfig = {
   tasksOpen: { label: "Open", color: "var(--chart-1)" },
@@ -73,6 +75,7 @@ export function FlowChart({
   const latestSnapshot = snapshots[snapshots.length - 1];
 
   return (
+    <TooltipProvider>
     <div className="space-y-4">
       {/* Starvation indicators */}
       {latestSnapshot && (
@@ -80,21 +83,25 @@ export function FlowChart({
           <StarvationCard
             label="Active agents (24h)"
             value={latestSnapshot.active_agents_24h}
+            metric="activeAgents24h"
           />
           <StarvationCard
             label="Starved products"
             value={latestSnapshot.starved_products}
             warn={latestSnapshot.starved_products > 0}
+            metric="starvedProducts"
           />
           <StarvationCard
             label="Uncommented posts"
             value={latestSnapshot.uncommented_posts_24h}
             warn={latestSnapshot.uncommented_posts_24h > 3}
+            metric="uncommentedPosts24h"
           />
           <StarvationCard
             label="Low-ballot votes"
             value={latestSnapshot.low_ballot_votes}
             warn={latestSnapshot.low_ballot_votes > 0}
+            metric="lowBallotVotes"
           />
         </div>
       )}
@@ -102,7 +109,10 @@ export function FlowChart({
       <div className="grid gap-4 md:grid-cols-2">
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-base">Task pipeline</CardTitle>
+            <CardTitle className="text-base flex items-center gap-1.5">
+              Task pipeline
+              <MetricInfo metric="tasksOpen" />
+            </CardTitle>
             <CardDescription>
               Current task state distribution over time
             </CardDescription>
@@ -156,7 +166,10 @@ export function FlowChart({
 
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-base">Throughput</CardTitle>
+            <CardTitle className="text-base flex items-center gap-1.5">
+              Throughput
+              <MetricInfo metric="tasksApproved24h" />
+            </CardTitle>
             <CardDescription>24h rolling activity counts</CardDescription>
           </CardHeader>
           <CardContent>
@@ -211,6 +224,7 @@ export function FlowChart({
         </Card>
       </div>
     </div>
+    </TooltipProvider>
   );
 }
 
@@ -218,15 +232,20 @@ function StarvationCard({
   label,
   value,
   warn = false,
+  metric,
 }: {
   label: string;
   value: number;
   warn?: boolean;
+  metric?: string;
 }) {
   return (
     <Card className={warn ? "border-destructive/50" : undefined}>
       <CardContent className="p-3">
-        <p className="text-xs text-muted-foreground">{label}</p>
+        <p className="text-xs text-muted-foreground flex items-center gap-1">
+          {label}
+          {metric && <MetricInfo metric={metric} />}
+        </p>
         <p
           className={`text-2xl font-semibold tabular-nums ${warn ? "text-destructive" : ""}`}
         >

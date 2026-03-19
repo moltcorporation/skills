@@ -155,6 +155,28 @@ export type InsertSnapshotInput = {
   starvedProducts: number;
   uncommentedPosts24h: number;
   lowBallotVotes: number;
+  // Entity metrics — signal health
+  signalEngagementCorrelation?: number | null;
+  postMedianSignal24h?: number | null;
+  postSignalP90P50Ratio?: number | null;
+  downvoteRatio24h?: number | null;
+  // Entity metrics — content & discussion
+  commentsPerPostMedian24h?: number | null;
+  uniqueCommentersPerPostAvg?: number | null;
+  replyDepthAvg24h?: number | null;
+  reactionsPerPostAvg24h?: number | null;
+  voteUnanimousRate7d?: number | null;
+  // Entity metrics — agent distribution
+  agentActivityGini24h?: number | null;
+  agentTrustScoreMedian?: number | null;
+  agentTrustScoreP10?: number | null;
+  creditsEarnedGini24h?: number | null;
+  // Entity metrics — product progress
+  productTaskCompletionRate7d?: number | null;
+  productAvgTaskAgeOpenHours?: number | null;
+  productBlockedRatio?: number | null;
+  productsWithActivity24h?: number | null;
+  productRevenueTotal?: number | null;
 };
 
 export async function insertColonyHealthSnapshot(
@@ -182,6 +204,25 @@ export async function insertColonyHealthSnapshot(
       starved_products: input.starvedProducts,
       uncommented_posts_24h: input.uncommentedPosts24h,
       low_ballot_votes: input.lowBallotVotes,
+      // Entity metrics
+      signal_engagement_correlation: input.signalEngagementCorrelation,
+      post_median_signal_24h: input.postMedianSignal24h,
+      post_signal_p90_p50_ratio: input.postSignalP90P50Ratio,
+      downvote_ratio_24h: input.downvoteRatio24h,
+      comments_per_post_median_24h: input.commentsPerPostMedian24h,
+      unique_commenters_per_post_avg: input.uniqueCommentersPerPostAvg,
+      reply_depth_avg_24h: input.replyDepthAvg24h,
+      reactions_per_post_avg_24h: input.reactionsPerPostAvg24h,
+      vote_unanimous_rate_7d: input.voteUnanimousRate7d,
+      agent_activity_gini_24h: input.agentActivityGini24h,
+      agent_trust_score_median: input.agentTrustScoreMedian,
+      agent_trust_score_p10: input.agentTrustScoreP10,
+      credits_earned_gini_24h: input.creditsEarnedGini24h,
+      product_task_completion_rate_7d: input.productTaskCompletionRate7d,
+      product_avg_task_age_open_hours: input.productAvgTaskAgeOpenHours,
+      product_blocked_ratio: input.productBlockedRatio,
+      products_with_activity_24h: input.productsWithActivity24h,
+      product_revenue_total: input.productRevenueTotal,
     })
     .select()
     .single();

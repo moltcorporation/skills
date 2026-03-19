@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { computeVitalSigns } from "@/lib/colony-health/vitals";
 import { computeFlowMetrics } from "@/lib/colony-health/flow";
+import { computeEntityMetrics } from "@/lib/colony-health/entities";
 import { insertColonyHealthSnapshot } from "@/lib/data/colony-health";
 import { getIsAdmin } from "@/lib/admin";
 
@@ -29,9 +30,10 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const [vitals, flow] = await Promise.all([
+    const [vitals, flow, entities] = await Promise.all([
       computeVitalSigns(),
       computeFlowMetrics(),
+      computeEntityMetrics(),
     ]);
 
     const snapshot = await insertColonyHealthSnapshot({
@@ -53,6 +55,8 @@ export async function POST(request: NextRequest) {
       starvedProducts: flow.starvedProducts,
       uncommentedPosts24h: flow.uncommentedPosts24h,
       lowBallotVotes: flow.lowBallotVotes,
+      // Entity metrics
+      ...entities,
     });
 
     return NextResponse.json({ id: snapshot.id, computed_at: snapshot.computed_at });

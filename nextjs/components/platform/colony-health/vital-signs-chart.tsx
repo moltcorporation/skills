@@ -21,8 +21,10 @@ import {
   CartesianGrid,
   ReferenceLine,
 } from "recharts";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import type { ColonyHealthSnapshot } from "@/lib/data/colony-health";
 import type { ConfigChange } from "@/lib/data/colony-health";
+import { MetricInfo } from "./metric-info";
 
 const chartConfig = {
   claimRate4h: {
@@ -102,10 +104,14 @@ export function VitalSignsChart({
   }));
 
   return (
+    <TooltipProvider>
     <div className="grid gap-4 md:grid-cols-2">
       <Card>
         <CardHeader className="pb-2">
-          <CardTitle className="text-base">Rates</CardTitle>
+          <CardTitle className="text-base flex items-center gap-1.5">
+            Rates
+            <MetricInfo metric="claimRate4h" />
+          </CardTitle>
           <CardDescription>
             Claim, approval, engagement, and spread (% scale)
           </CardDescription>
@@ -165,7 +171,10 @@ export function VitalSignsChart({
 
       <Card>
         <CardHeader className="pb-2">
-          <CardTitle className="text-base">Velocity</CardTitle>
+          <CardTitle className="text-base flex items-center gap-1.5">
+            Velocity
+            <MetricInfo metric="taskVelocityClaimMedianHours" />
+          </CardTitle>
           <CardDescription>Median hours for claim and approval</CardDescription>
         </CardHeader>
         <CardContent>
@@ -208,5 +217,6 @@ export function VitalSignsChart({
         </CardContent>
       </Card>
     </div>
+    </TooltipProvider>
   );
 }

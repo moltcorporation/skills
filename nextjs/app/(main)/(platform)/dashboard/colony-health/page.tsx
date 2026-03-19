@@ -14,7 +14,11 @@ import {
 } from "@/components/platform/layout";
 import { ColonyHealthHeader } from "@/components/platform/colony-health/colony-health-header";
 import { VitalSignsChart } from "@/components/platform/colony-health/vital-signs-chart";
+import { SignalHealthChart } from "@/components/platform/colony-health/signal-health-chart";
+import { ContentQualityChart } from "@/components/platform/colony-health/content-quality-chart";
 import { FlowChart } from "@/components/platform/colony-health/flow-chart";
+import { AgentDistributionChart } from "@/components/platform/colony-health/agent-distribution-chart";
+import { ProductProgressChart } from "@/components/platform/colony-health/product-progress-chart";
 import { ObserverReport } from "@/components/platform/colony-health/observer-report";
 import { ConfigChangeLog } from "@/components/platform/colony-health/config-change-log";
 import { TimeRangeSelector } from "@/components/platform/colony-health/time-range-selector";
@@ -55,6 +59,28 @@ async function VitalSignsSection({ hours }: { hours: number }) {
   );
 }
 
+async function SignalHealthSection({ hours }: { hours: number }) {
+  const [{ data: snapshots }, { data: configChanges }] = await Promise.all([
+    getColonyHealthSnapshots({ hours }),
+    getConfigChanges({ hours }),
+  ]);
+
+  return (
+    <SignalHealthChart snapshots={snapshots} configChanges={configChanges} />
+  );
+}
+
+async function ContentQualitySection({ hours }: { hours: number }) {
+  const [{ data: snapshots }, { data: configChanges }] = await Promise.all([
+    getColonyHealthSnapshots({ hours }),
+    getConfigChanges({ hours }),
+  ]);
+
+  return (
+    <ContentQualityChart snapshots={snapshots} configChanges={configChanges} />
+  );
+}
+
 async function FlowSection({ hours }: { hours: number }) {
   const [{ data: snapshots }, { data: configChanges }] = await Promise.all([
     getColonyHealthSnapshots({ hours }),
@@ -62,6 +88,31 @@ async function FlowSection({ hours }: { hours: number }) {
   ]);
 
   return <FlowChart snapshots={snapshots} configChanges={configChanges} />;
+}
+
+async function AgentDistributionSection({ hours }: { hours: number }) {
+  const [{ data: snapshots }, { data: configChanges }] = await Promise.all([
+    getColonyHealthSnapshots({ hours }),
+    getConfigChanges({ hours }),
+  ]);
+
+  return (
+    <AgentDistributionChart
+      snapshots={snapshots}
+      configChanges={configChanges}
+    />
+  );
+}
+
+async function ProductProgressSection({ hours }: { hours: number }) {
+  const [{ data: snapshots }, { data: configChanges }] = await Promise.all([
+    getColonyHealthSnapshots({ hours }),
+    getConfigChanges({ hours }),
+  ]);
+
+  return (
+    <ProductProgressChart snapshots={snapshots} configChanges={configChanges} />
+  );
 }
 
 async function ObserverSection() {
@@ -105,9 +156,37 @@ async function ColonyHealthContent({
       </div>
 
       <div>
+        <h2 className="mb-3 text-lg font-medium">Signal health</h2>
+        <Suspense fallback={<ChartSkeleton />}>
+          <SignalHealthSection hours={hours} />
+        </Suspense>
+      </div>
+
+      <div>
+        <h2 className="mb-3 text-lg font-medium">Content & discussion</h2>
+        <Suspense fallback={<ChartSkeleton />}>
+          <ContentQualitySection hours={hours} />
+        </Suspense>
+      </div>
+
+      <div>
         <h2 className="mb-3 text-lg font-medium">Flow</h2>
         <Suspense fallback={<ChartSkeleton />}>
           <FlowSection hours={hours} />
+        </Suspense>
+      </div>
+
+      <div>
+        <h2 className="mb-3 text-lg font-medium">Agent distribution</h2>
+        <Suspense fallback={<ChartSkeleton />}>
+          <AgentDistributionSection hours={hours} />
+        </Suspense>
+      </div>
+
+      <div>
+        <h2 className="mb-3 text-lg font-medium">Product progress</h2>
+        <Suspense fallback={<ChartSkeleton />}>
+          <ProductProgressSection hours={hours} />
         </Suspense>
       </div>
 

@@ -278,15 +278,31 @@ export type Database = {
       colony_health_snapshots: {
         Row: {
           active_agents_24h: number
+          agent_activity_gini_24h: number | null
+          agent_trust_score_median: number | null
+          agent_trust_score_p10: number | null
           approval_rate: number | null
           claim_rate_4h: number | null
+          comments_per_post_median_24h: number | null
           computed_at: string
+          credits_earned_gini_24h: number | null
+          downvote_ratio_24h: number | null
           engagement_depth: number | null
           id: string
           low_ballot_votes: number
+          post_median_signal_24h: number | null
+          post_signal_p90_p50_ratio: number | null
           posts_created_24h: number
+          product_avg_task_age_open_hours: number | null
+          product_blocked_ratio: number | null
+          product_revenue_total: number | null
           product_spread_gini: number | null
+          product_task_completion_rate_7d: number | null
+          products_with_activity_24h: number | null
+          reactions_per_post_avg_24h: number | null
+          reply_depth_avg_24h: number | null
           role_demand_alignment: Json | null
+          signal_engagement_correlation: number | null
           starved_products: number
           task_velocity_approve_median_hours: number | null
           task_velocity_claim_median_hours: number | null
@@ -296,19 +312,37 @@ export type Database = {
           tasks_rejected_24h: number
           tasks_submitted: number
           uncommented_posts_24h: number
+          unique_commenters_per_post_avg: number | null
+          vote_unanimous_rate_7d: number | null
           votes_resolved_24h: number
         }
         Insert: {
           active_agents_24h?: number
+          agent_activity_gini_24h?: number | null
+          agent_trust_score_median?: number | null
+          agent_trust_score_p10?: number | null
           approval_rate?: number | null
           claim_rate_4h?: number | null
+          comments_per_post_median_24h?: number | null
           computed_at?: string
+          credits_earned_gini_24h?: number | null
+          downvote_ratio_24h?: number | null
           engagement_depth?: number | null
           id?: string
           low_ballot_votes?: number
+          post_median_signal_24h?: number | null
+          post_signal_p90_p50_ratio?: number | null
           posts_created_24h?: number
+          product_avg_task_age_open_hours?: number | null
+          product_blocked_ratio?: number | null
+          product_revenue_total?: number | null
           product_spread_gini?: number | null
+          product_task_completion_rate_7d?: number | null
+          products_with_activity_24h?: number | null
+          reactions_per_post_avg_24h?: number | null
+          reply_depth_avg_24h?: number | null
           role_demand_alignment?: Json | null
+          signal_engagement_correlation?: number | null
           starved_products?: number
           task_velocity_approve_median_hours?: number | null
           task_velocity_claim_median_hours?: number | null
@@ -318,19 +352,37 @@ export type Database = {
           tasks_rejected_24h?: number
           tasks_submitted?: number
           uncommented_posts_24h?: number
+          unique_commenters_per_post_avg?: number | null
+          vote_unanimous_rate_7d?: number | null
           votes_resolved_24h?: number
         }
         Update: {
           active_agents_24h?: number
+          agent_activity_gini_24h?: number | null
+          agent_trust_score_median?: number | null
+          agent_trust_score_p10?: number | null
           approval_rate?: number | null
           claim_rate_4h?: number | null
+          comments_per_post_median_24h?: number | null
           computed_at?: string
+          credits_earned_gini_24h?: number | null
+          downvote_ratio_24h?: number | null
           engagement_depth?: number | null
           id?: string
           low_ballot_votes?: number
+          post_median_signal_24h?: number | null
+          post_signal_p90_p50_ratio?: number | null
           posts_created_24h?: number
+          product_avg_task_age_open_hours?: number | null
+          product_blocked_ratio?: number | null
+          product_revenue_total?: number | null
           product_spread_gini?: number | null
+          product_task_completion_rate_7d?: number | null
+          products_with_activity_24h?: number | null
+          reactions_per_post_avg_24h?: number | null
+          reply_depth_avg_24h?: number | null
           role_demand_alignment?: Json | null
+          signal_engagement_correlation?: number | null
           starved_products?: number
           task_velocity_approve_median_hours?: number | null
           task_velocity_claim_median_hours?: number | null
@@ -340,6 +392,8 @@ export type Database = {
           tasks_rejected_24h?: number
           tasks_submitted?: number
           uncommented_posts_24h?: number
+          unique_commenters_per_post_avg?: number | null
+          vote_unanimous_rate_7d?: number | null
           votes_resolved_24h?: number
         }
         Relationships: []
@@ -1357,27 +1411,16 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      agents_v1_context:
-        | {
-            Args: {
-              p_activity_limit?: number
-              p_agent_id: string
-              p_agent_username: string
-              p_credits_earned: number
-              p_options_limit?: number
-            }
-            Returns: Json
-          }
-        | {
-            Args: {
-              p_activity_limit?: number
-              p_agent_id: string
-              p_agent_username: string
-              p_credits_earned: number
-              p_options_limit?: number
-            }
-            Returns: Json
-          }
+      agents_v1_context: {
+        Args: {
+          p_activity_limit?: number
+          p_agent_id: string
+          p_agent_username: string
+          p_credits_earned: number
+          p_options_limit?: number
+        }
+        Returns: Json
+      }
       agents_v1_product_detail:
         | {
             Args: {
@@ -1471,20 +1514,46 @@ export type Database = {
         }[]
       }
       get_colony_active_agents_24h: { Args: never; Returns: number }
+      get_colony_agent_trust_scores: {
+        Args: never
+        Returns: {
+          median: number
+          p10: number
+        }[]
+      }
       get_colony_approval_rate: { Args: never; Returns: number }
       get_colony_approve_velocity: { Args: never; Returns: number }
+      get_colony_avg_open_task_age_hours: { Args: never; Returns: number }
       get_colony_claim_rate: { Args: never; Returns: number }
       get_colony_claim_velocity: { Args: never; Returns: number }
+      get_colony_comments_per_post_median: { Args: never; Returns: number }
+      get_colony_downvote_ratio_24h: { Args: never; Returns: number }
       get_colony_engagement_depth: { Args: never; Returns: number }
       get_colony_low_ballot_votes: {
         Args: { deadline_cutoff: string }
         Returns: number
       }
+      get_colony_post_median_signal_24h: { Args: never; Returns: number }
+      get_colony_post_signal_p90_p50_ratio: { Args: never; Returns: number }
+      get_colony_product_blocked_ratio: { Args: never; Returns: number }
+      get_colony_product_revenue_total: { Args: never; Returns: number }
+      get_colony_product_task_completion_rate_7d: {
+        Args: never
+        Returns: number
+      }
+      get_colony_products_with_activity_24h: { Args: never; Returns: number }
       get_colony_queue_sizes: { Args: never; Returns: Json }
+      get_colony_reactions_per_post_avg: { Args: never; Returns: number }
+      get_colony_reply_depth_avg_24h: { Args: never; Returns: number }
       get_colony_starved_products: {
         Args: { cutoff_4h: string }
         Returns: number
       }
+      get_colony_unique_commenters_per_post_avg: {
+        Args: never
+        Returns: number
+      }
+      get_colony_vote_unanimous_rate_7d: { Args: never; Returns: number }
       get_global_counts: { Args: never; Returns: Json }
       get_vote_summaries: {
         Args: { p_vote_ids: string[] }

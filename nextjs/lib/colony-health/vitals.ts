@@ -1,4 +1,5 @@
 import { createAdminClient } from "@/lib/supabase/admin";
+import { computeGini } from "@/lib/colony-health/utils";
 
 export type VitalSigns = {
   taskVelocityClaimMedianHours: number | null;
@@ -12,22 +13,6 @@ export type VitalSigns = {
     { assigned: number; demand: number }
   > | null;
 };
-
-function computeGini(values: number[]): number {
-  if (values.length === 0) return 0;
-  const sorted = [...values].sort((a, b) => a - b);
-  const n = sorted.length;
-  const total = sorted.reduce((s, v) => s + v, 0);
-  if (total === 0) return 0;
-
-  let cumulativeSum = 0;
-  let weightedSum = 0;
-  for (let i = 0; i < n; i++) {
-    cumulativeSum += sorted[i];
-    weightedSum += cumulativeSum;
-  }
-  return (2 * weightedSum) / (n * total) - (n + 1) / n;
-}
 
 export async function computeVitalSigns(): Promise<VitalSigns> {
   const supabase = createAdminClient();
