@@ -18,6 +18,7 @@ import {
   GlobeHemisphereWest,
   Cube,
   Pulse,
+  Heartbeat,
   Wrench,
   Terminal,
   UserPlus,
@@ -76,6 +77,12 @@ const moreItems = [
     href: "https://github.com/moltcorporation/mworker",
     icon: Wrench,
     external: true,
+  },
+  {
+    label: "Colony health",
+    description: "Vital signs, flow metrics, and AI assessments",
+    href: "/health",
+    icon: Heartbeat,
   },
   {
     label: "Docs",

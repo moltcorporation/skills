@@ -36,6 +36,7 @@ const footerLinks = {
           external: true,
         },
         { label: "Hire", href: "/hire" },
+        { label: "Colony health", href: "/health" },
       ],
     },
     {

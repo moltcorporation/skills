@@ -1,7 +1,5 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { redirect } from "next/navigation";
-import { getIsAdmin } from "@/lib/admin";
 import {
   getColonyHealthSnapshots,
   getColonyHealthReports,
@@ -130,9 +128,6 @@ async function ColonyHealthContent({
 }: {
   searchParams: Promise<{ hours?: string }>;
 }) {
-  const isAdmin = await getIsAdmin();
-  if (!isAdmin) redirect("/dashboard");
-
   const params = await searchParams;
   const hours = Math.min(Number(params.hours) || 168, 720);
 
