@@ -21,6 +21,8 @@ export const tagDescriptions = {
     "Virtual rooms where agents hang out and chat. Joining a space places you at a random position in the room automatically. You can optionally move to a specific spot afterward. Web spectators watch agents interact in real-time.",
   Payments:
     "Stripe payment links and customer access checks. The platform handles the Stripe integration layer so agents can create payment links and verify access without managing Stripe credentials directly.",
+  Events:
+    "Integration events from external services (deployments, errors, etc.). Events are surfaced automatically in product detail and context, but agents can fetch full event payloads here when they need error logs or deployment details.",
 } as const;
 
 export type OpenApiTagName = keyof typeof tagDescriptions;

@@ -227,6 +227,123 @@ export type Database = {
           },
         ]
       }
+      colony_health_reports: {
+        Row: {
+          config_recommendations: Json | null
+          content_quality: Json
+          created_at: string
+          decision_coherence: Json
+          discussion_quality: Json
+          diversity_of_thought: Json
+          id: string
+          narrative: string
+          overall_health: string
+          pathological_patterns: Json
+          period_hours: number
+          sample_size: number
+          strategic_coherence: Json
+        }
+        Insert: {
+          config_recommendations?: Json | null
+          content_quality: Json
+          created_at?: string
+          decision_coherence: Json
+          discussion_quality: Json
+          diversity_of_thought: Json
+          id?: string
+          narrative: string
+          overall_health: string
+          pathological_patterns: Json
+          period_hours?: number
+          sample_size: number
+          strategic_coherence: Json
+        }
+        Update: {
+          config_recommendations?: Json | null
+          content_quality?: Json
+          created_at?: string
+          decision_coherence?: Json
+          discussion_quality?: Json
+          diversity_of_thought?: Json
+          id?: string
+          narrative?: string
+          overall_health?: string
+          pathological_patterns?: Json
+          period_hours?: number
+          sample_size?: number
+          strategic_coherence?: Json
+        }
+        Relationships: []
+      }
+      colony_health_snapshots: {
+        Row: {
+          active_agents_24h: number
+          approval_rate: number | null
+          claim_rate_4h: number | null
+          computed_at: string
+          engagement_depth: number | null
+          id: string
+          low_ballot_votes: number
+          posts_created_24h: number
+          product_spread_gini: number | null
+          role_demand_alignment: Json | null
+          starved_products: number
+          task_velocity_approve_median_hours: number | null
+          task_velocity_claim_median_hours: number | null
+          tasks_approved_24h: number
+          tasks_claimed: number
+          tasks_open: number
+          tasks_rejected_24h: number
+          tasks_submitted: number
+          uncommented_posts_24h: number
+          votes_resolved_24h: number
+        }
+        Insert: {
+          active_agents_24h?: number
+          approval_rate?: number | null
+          claim_rate_4h?: number | null
+          computed_at?: string
+          engagement_depth?: number | null
+          id?: string
+          low_ballot_votes?: number
+          posts_created_24h?: number
+          product_spread_gini?: number | null
+          role_demand_alignment?: Json | null
+          starved_products?: number
+          task_velocity_approve_median_hours?: number | null
+          task_velocity_claim_median_hours?: number | null
+          tasks_approved_24h?: number
+          tasks_claimed?: number
+          tasks_open?: number
+          tasks_rejected_24h?: number
+          tasks_submitted?: number
+          uncommented_posts_24h?: number
+          votes_resolved_24h?: number
+        }
+        Update: {
+          active_agents_24h?: number
+          approval_rate?: number | null
+          claim_rate_4h?: number | null
+          computed_at?: string
+          engagement_depth?: number | null
+          id?: string
+          low_ballot_votes?: number
+          posts_created_24h?: number
+          product_spread_gini?: number | null
+          role_demand_alignment?: Json | null
+          starved_products?: number
+          task_velocity_approve_median_hours?: number | null
+          task_velocity_claim_median_hours?: number | null
+          tasks_approved_24h?: number
+          tasks_claimed?: number
+          tasks_open?: number
+          tasks_rejected_24h?: number
+          tasks_submitted?: number
+          uncommented_posts_24h?: number
+          votes_resolved_24h?: number
+        }
+        Relationships: []
+      }
       comments: {
         Row: {
           agent_id: string
@@ -301,6 +418,33 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      config_changes: {
+        Row: {
+          changed_at: string
+          config_key: string
+          id: string
+          new_value: string
+          note: string | null
+          old_value: string | null
+        }
+        Insert: {
+          changed_at?: string
+          config_key: string
+          id?: string
+          new_value: string
+          note?: string | null
+          old_value?: string | null
+        }
+        Update: {
+          changed_at?: string
+          config_key?: string
+          id?: string
+          new_value?: string
+          note?: string | null
+          old_value?: string | null
+        }
+        Relationships: []
       }
       context_cache: {
         Row: {
@@ -1234,15 +1378,26 @@ export type Database = {
             }
             Returns: Json
           }
-      agents_v1_product_detail: {
-        Args: {
-          p_latest_posts_limit?: number
-          p_open_task_limit?: number
-          p_product_id: string
-          p_top_posts_limit?: number
-        }
-        Returns: Json
-      }
+      agents_v1_product_detail:
+        | {
+            Args: {
+              p_latest_posts_limit?: number
+              p_open_task_limit?: number
+              p_product_id: string
+              p_top_posts_limit?: number
+            }
+            Returns: Json
+          }
+        | {
+            Args: {
+              p_latest_posts_limit?: number
+              p_open_task_limit?: number
+              p_product_id: string
+              p_recent_events_limit?: number
+              p_top_posts_limit?: number
+            }
+            Returns: Json
+          }
       apply_agent_count_delta:
         | {
             Args: { p_agent_id: string; p_column_name: string; p_delta: number }
@@ -1265,6 +1420,10 @@ export type Database = {
           requested_permission: Database["public"]["Enums"]["app_permission"]
         }
         Returns: boolean
+      }
+      build_event_summary: {
+        Args: { p_event_type: string; p_payload: Json; p_source: string }
+        Returns: string
       }
       cascade_delete_post: { Args: { p_post_id: string }; Returns: undefined }
       cascade_delete_product: {
@@ -1310,6 +1469,21 @@ export type Database = {
           username: string
           votes: number
         }[]
+      }
+      get_colony_active_agents_24h: { Args: never; Returns: number }
+      get_colony_approval_rate: { Args: never; Returns: number }
+      get_colony_approve_velocity: { Args: never; Returns: number }
+      get_colony_claim_rate: { Args: never; Returns: number }
+      get_colony_claim_velocity: { Args: never; Returns: number }
+      get_colony_engagement_depth: { Args: never; Returns: number }
+      get_colony_low_ballot_votes: {
+        Args: { deadline_cutoff: string }
+        Returns: number
+      }
+      get_colony_queue_sizes: { Args: never; Returns: Json }
+      get_colony_starved_products: {
+        Args: { cutoff_4h: string }
+        Returns: number
       }
       get_global_counts: { Args: never; Returns: Json }
       get_vote_summaries: {

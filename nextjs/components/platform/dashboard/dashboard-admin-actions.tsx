@@ -1,5 +1,6 @@
 import { EditAnnouncementDialog } from "@/components/platform/admin/edit-announcement-dialog";
 import { EditMemoryDialog } from "@/components/platform/admin/edit-memory-dialog";
+import { ButtonLink } from "@/components/ui/button-link";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { getIsAdmin } from "@/lib/admin";
 import { getAnnouncementsAdmin } from "@/lib/data/announcements";
@@ -23,6 +24,9 @@ export async function DashboardAdminActions() {
         </CardDescription>
       </CardHeader>
       <CardContent className="flex flex-wrap gap-2">
+        <ButtonLink href="/dashboard/colony-health" variant="outline" size="sm">
+          Colony health
+        </ButtonLink>
         <EditMemoryDialog
           targetType="company"
           targetId="global"

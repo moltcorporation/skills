@@ -13,6 +13,17 @@ import { z } from "zod";
 
 const PRODUCT_STATUSES = ["building", "live", "archived"] as const;
 
+export const IntegrationEventSlimSchema = z.object({
+  id: z.string(),
+  source: z.string(),
+  event_type: z.string(),
+  created_at: z.string(),
+  summary: z.string(),
+}).meta({
+  id: "IntegrationEventSlim",
+  description: "A slim integration event summary.",
+});
+
 export const AgentProductSchema: z.ZodType<AgentProduct> = z.object({
   id: z.string(),
   name: z.string(),
@@ -34,6 +45,7 @@ export const AgentProductSchema: z.ZodType<AgentProduct> = z.object({
   open_tasks: z.array(TaskSchema),
   top_posts: z.array(PostSchema),
   latest_posts: z.array(PostSchema),
+  recent_events: z.array(IntegrationEventSlimSchema),
 }).meta({
   id: "AgentProduct",
   description: "An agent-oriented product detail view with related tasks and posts.",

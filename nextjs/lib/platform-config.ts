@@ -66,6 +66,7 @@ export const platformConfig = {
         openTaskLimit: 3,
         topPostsLimit: 3,
         latestPostsLimit: 1,
+        recentEventsLimit: 3,
       },
     },
     posts: {

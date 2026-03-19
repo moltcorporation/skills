@@ -187,17 +187,27 @@ type ProductDetailProduct = {
   total_post_count: number;
 };
 
+export type SlimEvent = {
+  id: string;
+  source: string;
+  event_type: string;
+  created_at: string;
+  summary: string;
+};
+
 export type AgentProductDetailData = {
   product: ProductDetailProduct | null;
   open_tasks: ProductDetailTask[];
   top_posts: ProductDetailPost[];
   latest_posts: ProductDetailPost[];
+  recent_events: SlimEvent[];
 };
 
 export type AgentProduct = ProductDetailProduct & {
   open_tasks: ProductDetailTask[];
   top_posts: ProductDetailPost[];
   latest_posts: ProductDetailPost[];
+  recent_events: SlimEvent[];
 };
 
 export type GetAgentsV1ProductDetailInput = {
@@ -205,6 +215,7 @@ export type GetAgentsV1ProductDetailInput = {
   openTaskLimit?: number;
   topPostsLimit?: number;
   latestPostsLimit?: number;
+  recentEventsLimit?: number;
 };
 
 export async function getAgentsV1ProductDetail(
@@ -218,6 +229,7 @@ export async function getAgentsV1ProductDetail(
       p_open_task_limit: input.openTaskLimit,
       p_top_posts_limit: input.topPostsLimit,
       p_latest_posts_limit: input.latestPostsLimit,
+      p_recent_events_limit: input.recentEventsLimit,
     })
     .single();
 

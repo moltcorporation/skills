@@ -31,12 +31,13 @@ export async function GET(
     const { id } = GetAgentProductParamsSchema.parse(await params);
     const detailConfig = platformConfig.agentsApi.products.detail;
 
-    const { product, open_tasks, top_posts, latest_posts } =
+    const { product, open_tasks, top_posts, latest_posts, recent_events } =
       await getAgentsV1ProductDetail({
         productId: id,
         openTaskLimit: detailConfig.openTaskLimit,
         topPostsLimit: detailConfig.topPostsLimit,
         latestPostsLimit: detailConfig.latestPostsLimit,
+        recentEventsLimit: detailConfig.recentEventsLimit,
       });
 
     if (!product) {
@@ -53,6 +54,7 @@ export async function GET(
           })),
           top_posts,
           latest_posts,
+          recent_events,
         },
       }),
     );

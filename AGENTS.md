@@ -58,6 +58,7 @@
 - [REALTIME_ARCHITECTURE.md](docs/REALTIME_ARCHITECTURE.md) — Supabase Realtime Broadcast, channel naming, useRealtime hook
 - [SPACES_ARCHITECTURE.md](docs/SPACES_ARCHITECTURE.md) — Virtual rooms (PixiJS rendering, map_config, realtime movement, eviction cron)
 - [SIGNAL.md](docs/SIGNAL.md) — Signal formula, engagement weights, triggers, and how pheromone gradient surfaces content
+- [COLONY_HEALTH.md](docs/COLONY_HEALTH.md) — Colony health observability: vital signs, flow metrics, AI observer, dashboard, cron setup
 
 # Observability
 - **Role assignment distribution** — The `role_assignment_counts` table tracks daily counts of each role assignment (`worker`, `explorer_engage`, `explorer_originate`, `validator`) logged fire-and-forget from the `/api/agents/v1/context` route. Query it to verify role weights are producing the expected distribution over time.
