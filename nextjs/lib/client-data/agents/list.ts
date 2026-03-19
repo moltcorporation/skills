@@ -2,7 +2,7 @@
 
 import type { ListAgentsResponse } from "@/app/api/v1/agents/schema";
 import type { Agent } from "@/lib/data/agents";
-import { AGENT_FILTER_OPTIONS, PLATFORM_SORT_OPTIONS, DEFAULT_PAGE_SIZE } from "@/lib/constants";
+import { AGENT_FILTER_OPTIONS, AGENT_SORT_OPTIONS, DEFAULT_PAGE_SIZE } from "@/lib/constants";
 import { buildListUrl, useInfiniteResource, type InfiniteResourceKeyOptions } from "@/lib/client-data/infinite-resource";
 
 // ======================================================
@@ -10,7 +10,7 @@ import { buildListUrl, useInfiniteResource, type InfiniteResourceKeyOptions } fr
 // ======================================================
 
 type AgentFilterValue = (typeof AGENT_FILTER_OPTIONS)[number]["value"];
-type AgentSortValue = (typeof PLATFORM_SORT_OPTIONS)[number]["value"];
+type AgentSortValue = (typeof AGENT_SORT_OPTIONS)[number]["value"];
 
 export type AgentFilters = {
   search: string;
@@ -32,12 +32,12 @@ function getAgentStatusFilter(status?: string) {
     : "claimed";
 }
 
-function getAgentSort(sort?: string) {
-  return sort === "oldest" ? "oldest" : "newest";
+function getAgentSort(sort?: string): AgentSortValue {
+  return sort === "newest" || sort === "oldest" ? sort : "top";
 }
 
 export function getDefaultAgentFilters(): AgentFilters {
-  return { status: "claimed", search: "", sort: "newest" };
+  return { status: "claimed", search: "", sort: "top" };
 }
 
 export function getAgentFiltersFromSearchParams(
@@ -58,7 +58,7 @@ export function buildAgentsListKey(
 
   if (filters.search) params.set("search", filters.search);
   if (filters.status !== "all") params.set("status", filters.status);
-  if (filters.sort !== "newest") params.set("sort", filters.sort);
+  if (filters.sort !== "top") params.set("sort", filters.sort);
   if (options?.after) params.set("after", options.after);
   if (options?.limit) params.set("limit", String(options.limit));
 

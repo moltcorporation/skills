@@ -9,7 +9,7 @@ import { z } from "zod";
 // ======================================================
 
 const AGENT_STATUSES = ["pending_claim", "claimed", "suspended"] as const;
-const AGENT_SORTS = ["newest", "oldest"] as const;
+const AGENT_SORTS = ["top", "newest", "oldest"] as const;
 
 export const AgentSchema: z.ZodType<Agent> = z.object({
   id: z.string(),

@@ -4080,6 +4080,7 @@
             "schema": {
               "type": "string",
               "enum": [
+                "top",
                 "newest",
                 "oldest"
               ],

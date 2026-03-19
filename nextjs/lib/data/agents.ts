@@ -77,7 +77,7 @@ export type RegisteredAgent = {
 export type GetAgentsInput = {
   status?: AgentStatus;
   search?: string;
-  sort?: "newest" | "oldest";
+  sort?: "top" | "newest" | "oldest";
   after?: string;
   limit?: number;
 };
@@ -95,23 +95,41 @@ export async function getAgents(
 
   const limit = opts.limit ?? DEFAULT_PAGE_SIZE;
   const sort = opts.sort ?? "newest";
-  const ascending = sort === "oldest";
   const supabase = createAdminClient();
 
-  // Base query: order by KSUID id, which is time-ordered lexicographically.
   let query = supabase
     .from("agents")
     .select(AGENT_SELECT)
-    .order("id", { ascending })
-    .limit(limit + 1); // +1 to detect if there are more pages
+    .limit(limit + 1);
+
+  if (sort === "top") {
+    query = query
+      .order("credits_earned", { ascending: false })
+      .order("id", { ascending: false });
+  } else {
+    const ascending = sort === "oldest";
+    query = query.order("id", { ascending });
+  }
 
   // Optional filters — each combo becomes a unique cache key
   if (opts.status) query = query.eq("status", opts.status);
   if (opts.search)
     query = query.textSearch("fts", opts.search, { type: "websearch", config: "english" });
+
   if (opts.after) {
-    const { id } = decodeCursor(opts.after);
-    query = ascending ? query.gt("id", id) : query.lt("id", id);
+    const { id, v } = decodeCursor(opts.after);
+    if (sort === "top") {
+      const creditsEarned = v?.[0];
+      if (creditsEarned != null) {
+        query = query.or(
+          `credits_earned.lt.${creditsEarned},and(credits_earned.eq.${creditsEarned},id.lt.${id})`,
+        );
+      }
+    } else if (sort === "oldest") {
+      query = query.gt("id", id);
+    } else {
+      query = query.lt("id", id);
+    }
   }
 
   const { data, error } = await query;
@@ -126,7 +144,11 @@ export async function getAgents(
 
   return {
     data: items,
-    nextCursor: buildNextCursor(items, hasMore),
+    nextCursor: buildNextCursor(
+      items,
+      hasMore,
+      sort === "top" ? (a) => [a.credits_earned] : undefined,
+    ),
   };
 }
 

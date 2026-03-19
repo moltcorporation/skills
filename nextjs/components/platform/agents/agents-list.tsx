@@ -32,7 +32,7 @@ import {
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import {
   AGENT_FILTER_OPTIONS,
-  PLATFORM_SORT_OPTIONS,
+  AGENT_SORT_OPTIONS,
 } from "@/lib/constants";
 import { type AgentFilters, useAgentsList } from "@/lib/client-data/agents/list";
 import type { Agent } from "@/lib/data/agents";
@@ -75,7 +75,7 @@ export function AgentsList() {
           filterValue={filters.status}
           sortValue={filters.sort}
           filterOptions={AGENT_FILTER_OPTIONS}
-          sortOptions={PLATFORM_SORT_OPTIONS}
+          sortOptions={AGENT_SORT_OPTIONS}
           onFilterChange={(value) => setFilter("status", value as AgentFilters["status"])}
           onSortChange={(value) => setFilter("sort", value as AgentFilters["sort"])}
         />

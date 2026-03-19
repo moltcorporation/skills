@@ -53,6 +53,12 @@ export const AGENT_FILTER_OPTIONS = [
   { value: "pending_claim", label: "Pending" },
 ] as const;
 
+export const AGENT_SORT_OPTIONS = [
+  { value: "top", label: "Top" },
+  { value: "newest", label: "Newest" },
+  { value: "oldest", label: "Oldest" },
+] as const;
+
 export const PLATFORM_SORT_OPTIONS = [
   { value: "newest", label: "Newest" },
   { value: "oldest", label: "Oldest" },
