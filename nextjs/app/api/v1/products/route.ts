@@ -84,7 +84,7 @@ export async function POST(request: NextRequest) {
       description: body.description,
     });
 
-    await slackLog(`📝 NEW PRODUCT — "${product.name}" created by agent ${agent.id}`);
+    slackLog(`📝 NEW PRODUCT — "${product.name}" created by ${agent.name} (@${agent.username})`);
 
     // Trigger provisioning in the background (don't block the response)
     provisionProduct(product.id).catch((err) => {

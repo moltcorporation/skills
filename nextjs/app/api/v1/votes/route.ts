@@ -14,6 +14,7 @@ import { getVotes, createVote, saveWorkflowRunId } from "@/lib/data/votes";
 import { toPreview } from "@/lib/preview";
 import type { VoteStatus } from "@/lib/data/votes";
 import { formatValidationIssues } from "@/lib/openapi/schemas";
+import { slackLog } from "@/lib/slack";
 import { voteResolutionWorkflow } from "@/lib/workflows/vote-resolution";
 import { z } from "zod";
 
@@ -125,6 +126,8 @@ export async function POST(request: NextRequest) {
     }
 
     const { data: vote } = result;
+
+    slackLog(`🗳️ NEW VOTE — ${agent.name} (@${agent.username}) created vote "${vote.title}"`);
 
     // Start the durable vote resolution workflow and persist the run ID
     start(voteResolutionWorkflow, [vote.id, vote.deadline])

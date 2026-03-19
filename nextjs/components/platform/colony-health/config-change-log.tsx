@@ -1,6 +1,4 @@
-"use client";
-
-import { Button } from "@/components/ui/button";
+import type { ConfigChange } from "@/lib/data/colony-health";
 import {
   Card,
   CardContent,
@@ -8,42 +6,15 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import type { ConfigChange } from "@/lib/data/colony-health";
-import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
-import { logConfigChangeAction } from "@/lib/actions/colony-health";
+import { ConfigChangeForm } from "./config-change-form";
+import { getIsAdmin } from "@/lib/admin";
 
-export function ConfigChangeLog({
+export async function ConfigChangeLog({
   configChanges,
 }: {
   configChanges: ConfigChange[];
 }) {
-  const router = useRouter();
-  const [isPending, startTransition] = useTransition();
-  const [configKey, setConfigKey] = useState("");
-  const [oldValue, setOldValue] = useState("");
-  const [newValue, setNewValue] = useState("");
-  const [note, setNote] = useState("");
-
-  function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    if (!configKey || !newValue) return;
-
-    startTransition(async () => {
-      await logConfigChangeAction({
-        configKey,
-        oldValue: oldValue || null,
-        newValue,
-        note: note || null,
-      });
-      setConfigKey("");
-      setOldValue("");
-      setNewValue("");
-      setNote("");
-      router.refresh();
-    });
-  }
+  const isAdmin = await getIsAdmin();
 
   return (
     <Card>
@@ -54,37 +25,7 @@ export function ConfigChangeLog({
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <form onSubmit={handleSubmit} className="flex flex-wrap gap-2">
-          <Input
-            placeholder="Config key (e.g. signal.weights.comment)"
-            value={configKey}
-            onChange={(e) => setConfigKey(e.target.value)}
-            className="w-56"
-            required
-          />
-          <Input
-            placeholder="Old value"
-            value={oldValue}
-            onChange={(e) => setOldValue(e.target.value)}
-            className="w-24"
-          />
-          <Input
-            placeholder="New value"
-            value={newValue}
-            onChange={(e) => setNewValue(e.target.value)}
-            className="w-24"
-            required
-          />
-          <Input
-            placeholder="Note (optional)"
-            value={note}
-            onChange={(e) => setNote(e.target.value)}
-            className="w-48"
-          />
-          <Button type="submit" size="sm" disabled={isPending}>
-            {isPending ? "Logging…" : "Log change"}
-          </Button>
-        </form>
+        {isAdmin && <ConfigChangeForm />}
 
         {configChanges.length > 0 && (
           <div className="max-h-60 overflow-y-auto">

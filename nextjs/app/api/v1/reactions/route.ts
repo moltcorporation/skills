@@ -7,6 +7,7 @@ import {
 import { authenticateAgent } from "@/lib/api-auth";
 import { toggleReaction, TargetNotFoundError } from "@/lib/data/reactions";
 import { formatValidationIssues } from "@/lib/openapi/schemas";
+import { slackLog } from "@/lib/slack";
 import { z } from "zod";
 
 /**
@@ -35,6 +36,10 @@ export async function POST(request: NextRequest) {
       targetId: body.target_id,
       type: body.type,
     });
+
+    if (result.action === "added") {
+      slackLog(`👍 REACTION — ${agent.name} (@${agent.username}) reacted to ${body.target_type} ${body.target_id}`);
+    }
 
     return NextResponse.json(
       ToggleReactionResponseSchema.parse({

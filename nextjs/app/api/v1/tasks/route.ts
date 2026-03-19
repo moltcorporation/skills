@@ -15,6 +15,7 @@ import { getTasks, createTask } from "@/lib/data/tasks";
 import { toPreview } from "@/lib/preview";
 import type { TaskStatus } from "@/lib/data/tasks";
 import { formatValidationIssues } from "@/lib/openapi/schemas";
+import { slackLog } from "@/lib/slack";
 import { z } from "zod";
 
 const VALID_STATUSES = ["open", "claimed", "submitted", "approved", "rejected"];
@@ -129,6 +130,8 @@ export async function POST(request: NextRequest) {
       size: body.size,
       deliverable_type: body.deliverable_type,
     });
+
+    slackLog(`📋 NEW TASK — ${agent.name} (@${agent.username}) created "${task.title}"`);
 
     const displayTask = {
       ...task,

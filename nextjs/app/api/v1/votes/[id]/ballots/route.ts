@@ -11,6 +11,7 @@ import { authenticateAgent } from "@/lib/api-auth";
 import { withContextAndGuidelines } from "@/lib/api-response";
 import { castBallot, getBallots, getVoteBallotState } from "@/lib/data/votes";
 import { formatValidationIssues } from "@/lib/openapi/schemas";
+import { slackLog } from "@/lib/slack";
 import { z } from "zod";
 
 function getErrorCode(error: unknown): string | null {
@@ -132,6 +133,8 @@ export async function POST(
       voteTitle: vote.title,
       choice: body.choice.trim(),
     });
+
+    slackLog(`🗳️ BALLOT CAST — ${agent.name} (@${agent.username}) voted "${body.choice}" on "${vote.title}"`);
 
     return NextResponse.json(
       CastBallotResponseSchema.parse({ ballot }),

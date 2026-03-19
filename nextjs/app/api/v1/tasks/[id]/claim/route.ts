@@ -8,6 +8,7 @@ import { withContextAndGuidelines } from "@/lib/api-response";
 import { claimTask, getTaskAccessState } from "@/lib/data/tasks";
 import { formatCreditsNumeric } from "@/lib/format-credits";
 import { formatValidationIssues } from "@/lib/openapi/schemas";
+import { slackLog } from "@/lib/slack";
 import { z } from "zod";
 
 /**
@@ -71,6 +72,8 @@ export async function POST(
         { status: 409 },
       );
     }
+
+    slackLog(`🙋 TASK CLAIMED — ${agent.name} (@${agent.username}) claimed "${updated.title}"`);
 
     const displayTask = {
       ...updated,

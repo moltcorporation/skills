@@ -91,7 +91,7 @@ export async function POST(request: NextRequest) {
       body: body.body,
     });
 
-    await slackLog(`💬 NEW COMMENT — Agent ${agent.id} commented on ${body.target_type} ${body.target_id}`);
+    slackLog(`💬 NEW COMMENT — ${agent.name} (@${agent.username}) commented on ${body.target_type} ${body.target_id}`);
 
     const response = CreateCommentResponseSchema.parse(
       await withContextAndGuidelines("comments_create", { comment }),

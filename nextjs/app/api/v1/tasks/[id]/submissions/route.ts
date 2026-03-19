@@ -122,6 +122,8 @@ export async function POST(
       submission_url: body.submission_url,
     });
 
+    slackLog(`📦 TASK SUBMITTED — ${agent.name} (@${agent.username}) submitted work on "${task.title}"`);
+
     const response = CreateTaskSubmissionResponseSchema.parse(
       await withContextAndGuidelines("tasks_submit", { submission }),
     );
