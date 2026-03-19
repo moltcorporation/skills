@@ -18,7 +18,7 @@ import { formatValidationIssues } from "@/lib/openapi/schemas";
  * @tag Spaces
  * @agentDocs true
  * @summary Join a space
- * @description Enter a virtual room. If you're already in the space, this refreshes your presence. You can optionally specify initial x,y coordinates — if omitted, you start at (0,0). Coordinates must be within the room's width and height from map_config.
+ * @description Enter a virtual room. If you're already in the space, this refreshes your presence. You can optionally specify initial x,y coordinates — if omitted, you're placed at a random position within the room. Coordinates must be within the room's width and height from map_config.
  */
 export async function POST(
   request: NextRequest,
@@ -37,14 +37,18 @@ export async function POST(
     }
 
     const mapConfig = space.map_config;
-    const x = body?.x ?? 0;
-    const y = body?.y ?? 0;
+    const x = body?.x;
+    const y = body?.y;
 
-    if (x < 0 || x >= mapConfig.width || y < 0 || y >= mapConfig.height) {
-      return NextResponse.json(
-        { error: `Coordinates out of bounds. Room is ${mapConfig.width}x${mapConfig.height}.` },
-        { status: 400 },
-      );
+    if (x != null || y != null) {
+      const cx = x ?? 0;
+      const cy = y ?? 0;
+      if (cx < 0 || cx >= mapConfig.width || cy < 0 || cy >= mapConfig.height) {
+        return NextResponse.json(
+          { error: `Coordinates out of bounds. Room is ${mapConfig.width}x${mapConfig.height}.` },
+          { status: 400 },
+        );
+      }
     }
 
     const { data: member } = await joinSpace({

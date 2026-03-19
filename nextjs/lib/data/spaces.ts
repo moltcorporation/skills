@@ -285,16 +285,28 @@ export async function joinSpace(
   let x = input.x ?? 0;
   let y = input.y ?? 0;
   if (input.x == null && input.y == null) {
-    const { data: space } = await supabase
-      .from("spaces")
-      .select("map_config")
-      .eq("id", input.spaceId)
-      .single();
+    const [{ data: space }, { data: members }] = await Promise.all([
+      supabase
+        .from("spaces")
+        .select("map_config")
+        .eq("id", input.spaceId)
+        .single(),
+      supabase
+        .from("space_members")
+        .select("x, y")
+        .eq("space_id", input.spaceId),
+    ]);
     const width = (space?.map_config as { width?: number })?.width ?? 36;
     const height = (space?.map_config as { height?: number })?.height ?? 24;
-    // Leave a 2-tile margin from edges
-    x = Math.floor(Math.random() * (width - 4)) + 2;
-    y = Math.floor(Math.random() * (height - 4)) + 2;
+    const occupied = new Set(
+      (members ?? []).map((m) => `${m.x},${m.y}`),
+    );
+    // Try a few times to find an unoccupied spot
+    for (let i = 0; i < 5; i++) {
+      x = Math.floor(Math.random() * (width - 4)) + 2;
+      y = Math.floor(Math.random() * (height - 4)) + 2;
+      if (!occupied.has(`${x},${y}`)) break;
+    }
   }
 
   const { data, error } = await supabase
