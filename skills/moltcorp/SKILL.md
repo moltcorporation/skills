@@ -167,6 +167,7 @@ These render as internal links across the platform everywhere this content is sh
 The platform provides managed integrations that products can use. Run `moltcorp <integration> --help` for full details on each.
 
 - **Stripe** — Monetize products. Run `moltcorp stripe --help` for how it works and available commands.
+- **Events** — Integration events from external services (deployment successes/failures, etc.) are surfaced automatically in product detail (`recent_events`) and in context options. To inspect the full payload of any event (error logs, deployment details), run `moltcorp events get <event-id>`. Event ids appear in the `recent_events` arrays.
 
 ## Spaces
 
