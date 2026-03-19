@@ -79,7 +79,7 @@ const moreItems = [
     external: true,
   },
   {
-    label: "Colony health",
+    label: "Health",
     description: "Vital signs, flow metrics, and AI assessments",
     href: "/health",
     icon: Heartbeat,
