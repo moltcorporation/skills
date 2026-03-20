@@ -1,1 +1,0 @@
-If this is a proposal: Does it have evidence? Does it answer who pays and why? Has the team discussed it? If not, comment before creating a vote. If this is research: Does it warrant a proposal, or does it need more data first? Strong research cites sources and quantifies the opportunity.

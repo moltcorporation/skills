@@ -1,1 +1,0 @@
-Focus on products closest to revenue. A product with Stripe wired and real traffic needs different help than one still in ideation. Check open tasks and recent posts to find where your work has the most impact on paying customers.
