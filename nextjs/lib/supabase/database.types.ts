@@ -59,6 +59,70 @@ export type Database = {
         }
         Relationships: []
       }
+      agent_feedback: {
+        Row: {
+          agent_id: string
+          body: string
+          category: string
+          created_at: string
+          id: string
+          session_id: string | null
+        }
+        Insert: {
+          agent_id: string
+          body: string
+          category: string
+          created_at?: string
+          id: string
+          session_id?: string | null
+        }
+        Update: {
+          agent_id?: string
+          body?: string
+          category?: string
+          created_at?: string
+          id?: string
+          session_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agent_feedback_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      agent_sessions: {
+        Row: {
+          agent_id: string
+          created_at: string
+          id: string
+          role: string
+        }
+        Insert: {
+          agent_id: string
+          created_at?: string
+          id?: string
+          role: string
+        }
+        Update: {
+          agent_id?: string
+          created_at?: string
+          id?: string
+          role?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agent_sessions_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       agents: {
         Row: {
           api_key_hash: string
@@ -302,6 +366,10 @@ export type Database = {
           reactions_per_post_avg_24h: number | null
           reply_depth_avg_24h: number | null
           role_demand_alignment: Json | null
+          role_explorer_engage_count_24h: number | null
+          role_explorer_originate_count_24h: number | null
+          role_validator_count_24h: number | null
+          role_worker_count_24h: number | null
           signal_engagement_correlation: number | null
           starved_products: number
           task_velocity_approve_median_hours: number | null
@@ -311,7 +379,9 @@ export type Database = {
           tasks_open: number
           tasks_rejected_24h: number
           tasks_submitted: number
+          total_checkins_24h: number | null
           uncommented_posts_24h: number
+          unique_agents_checkins_24h: number | null
           unique_commenters_per_post_avg: number | null
           vote_unanimous_rate_7d: number | null
           votes_resolved_24h: number
@@ -342,6 +412,10 @@ export type Database = {
           reactions_per_post_avg_24h?: number | null
           reply_depth_avg_24h?: number | null
           role_demand_alignment?: Json | null
+          role_explorer_engage_count_24h?: number | null
+          role_explorer_originate_count_24h?: number | null
+          role_validator_count_24h?: number | null
+          role_worker_count_24h?: number | null
           signal_engagement_correlation?: number | null
           starved_products?: number
           task_velocity_approve_median_hours?: number | null
@@ -351,7 +425,9 @@ export type Database = {
           tasks_open?: number
           tasks_rejected_24h?: number
           tasks_submitted?: number
+          total_checkins_24h?: number | null
           uncommented_posts_24h?: number
+          unique_agents_checkins_24h?: number | null
           unique_commenters_per_post_avg?: number | null
           vote_unanimous_rate_7d?: number | null
           votes_resolved_24h?: number
@@ -382,6 +458,10 @@ export type Database = {
           reactions_per_post_avg_24h?: number | null
           reply_depth_avg_24h?: number | null
           role_demand_alignment?: Json | null
+          role_explorer_engage_count_24h?: number | null
+          role_explorer_originate_count_24h?: number | null
+          role_validator_count_24h?: number | null
+          role_worker_count_24h?: number | null
           signal_engagement_correlation?: number | null
           starved_products?: number
           task_velocity_approve_median_hours?: number | null
@@ -391,7 +471,9 @@ export type Database = {
           tasks_open?: number
           tasks_rejected_24h?: number
           tasks_submitted?: number
+          total_checkins_24h?: number | null
           uncommented_posts_24h?: number
+          unique_agents_checkins_24h?: number | null
           unique_commenters_per_post_avg?: number | null
           vote_unanimous_rate_7d?: number | null
           votes_resolved_24h?: number
@@ -921,24 +1003,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
-      }
-      role_assignment_counts: {
-        Row: {
-          count: number
-          date: string
-          role: string
-        }
-        Insert: {
-          count?: number
-          date?: string
-          role: string
-        }
-        Update: {
-          count?: number
-          date?: string
-          role?: string
-        }
-        Relationships: []
       }
       role_permissions: {
         Row: {
@@ -1545,6 +1609,17 @@ export type Database = {
       get_colony_queue_sizes: { Args: never; Returns: Json }
       get_colony_reactions_per_post_avg: { Args: never; Returns: number }
       get_colony_reply_depth_avg_24h: { Args: never; Returns: number }
+      get_colony_session_stats_24h: {
+        Args: never
+        Returns: {
+          role_explorer_engage: number
+          role_explorer_originate: number
+          role_validator: number
+          role_worker: number
+          total_checkins: number
+          unique_agents: number
+        }[]
+      }
       get_colony_starved_products: {
         Args: { cutoff_4h: string }
         Returns: number
@@ -1562,10 +1637,6 @@ export type Database = {
           total_ballots: number
           vote_id: string
         }[]
-      }
-      increment_role_assignment: {
-        Args: { p_role: string }
-        Returns: undefined
       }
       recompute_product_signal: {
         Args: { p_product_id: string }

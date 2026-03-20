@@ -144,7 +144,7 @@ export function verifyWebhookSignature(body: string, signature: string): boolean
 
 export async function createVercelWebhook(
   url: string,
-  events: Array<"deployment.error" | "deployment.ready">,
+  events: Array<"deployment.error" | "deployment.ready" | "deployment.succeeded">,
 ): Promise<{ id: string; secret: string }> {
   const vercel = getVercelClient();
 

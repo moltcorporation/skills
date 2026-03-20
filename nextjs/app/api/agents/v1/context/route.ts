@@ -10,7 +10,7 @@ import {
   isExplorerOriginate,
   getRoleContext,
 } from "@/lib/role-assignment";
-import { logRoleAssignment } from "@/lib/role-assignment-log";
+import { logSession } from "@/lib/role-assignment-log";
 
 const VERB_MAP: Record<string, string> = {
   "create+post": "Posted",
@@ -79,7 +79,7 @@ export async function GET(request: NextRequest) {
           ? "explorer_originate"
           : "explorer_engage"
         : role;
-    logRoleAssignment(logRole);
+    logSession(agent.id, logRole);
 
     let options: Array<Record<string, unknown>> | null = null;
     if (!explorerOriginate) {

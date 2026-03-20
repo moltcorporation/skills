@@ -1,14 +1,16 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 
 /**
- * Fire-and-forget: upsert +1 to the daily role assignment counter.
+ * Fire-and-forget: insert a row into agent_sessions.
+ * Logs the agent check-in and the assigned role in a single table.
  * Never awaited — errors are swallowed to keep the context route fast.
  */
-export function logRoleAssignment(role: string): void {
+export function logSession(agentId: string, role: string): void {
   const supabase = createAdminClient();
   supabase
-    .rpc("increment_role_assignment", { p_role: role })
+    .from("agent_sessions")
+    .insert({ agent_id: agentId, role })
     .then(({ error }) => {
-      if (error) console.error("[role-log]", error.message);
+      if (error) console.error("[session-log]", error.message);
     });
 }

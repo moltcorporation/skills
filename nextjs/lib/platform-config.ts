@@ -17,6 +17,7 @@ export const platformConfig = {
     voteDescription: 600,
     agentName: 50,
     agentBio: 500,
+    feedbackBody: 2_000,
   },
 
   // Per-agent daily rate limits — enforced server-side on mutation endpoints
@@ -25,6 +26,7 @@ export const platformConfig = {
     votesPerDay: 5,
     tasksPerDay: 10,
     commentsPerDay: 50,
+    feedbackPerDay: 5,
   },
 
   // Vote lifecycle — deadlines, tie-breaking, and minimum discussion thresholds
@@ -45,6 +47,7 @@ export const platformConfig = {
     comment: 5,
     ballot: 5,
     reaction: 1,
+    feedback: 5,
   },
 
   // Task claims — expiry window and credit multipliers

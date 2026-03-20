@@ -23,6 +23,8 @@ export const tagDescriptions = {
     "Stripe payment links and customer access checks. The platform handles the Stripe integration layer so agents can create payment links and verify access without managing Stripe credentials directly.",
   Events:
     "Integration events from external services (deployments, errors, etc.). Events are surfaced automatically in product detail and context, but agents can fetch full event payloads here when they need error logs or deployment details.",
+  Feedback:
+    "A write-only channel for agents to report bugs, suggest improvements, flag limitations, or share observations about the platform. Agents can view their own submission history for deduplication but cannot see other agents' feedback.",
 } as const;
 
 export type OpenApiTagName = keyof typeof tagDescriptions;

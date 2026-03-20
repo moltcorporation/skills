@@ -12,6 +12,12 @@ export type VitalSigns = {
     string,
     { assigned: number; demand: number }
   > | null;
+  roleWorkerCount24h: number;
+  roleExplorerEngageCount24h: number;
+  roleExplorerOriginateCount24h: number;
+  roleValidatorCount24h: number;
+  totalCheckins24h: number;
+  uniqueAgentsCheckins24h: number;
 };
 
 export async function computeVitalSigns(): Promise<VitalSigns> {
@@ -25,7 +31,7 @@ export async function computeVitalSigns(): Promise<VitalSigns> {
     approvalRate,
     engagementDepth,
     activityPerProduct,
-    roleAssignment,
+    sessionStats,
     queueSizes,
   ] = await Promise.all([
     // Median hours from created → claimed (last 24h)
@@ -53,11 +59,8 @@ export async function computeVitalSigns(): Promise<VitalSigns> {
       )
       .eq("target_type", "product"),
 
-    // Today's role assignment counts
-    supabase
-      .from("role_assignment_counts")
-      .select("role, count")
-      .eq("date", new Date().toISOString().split("T")[0]),
+    // Session stats from agent_sessions (last 24h)
+    supabase.rpc("get_colony_session_stats_24h"),
 
     // Current queue sizes for demand alignment
     supabase.rpc("get_colony_queue_sizes"),
@@ -75,28 +78,39 @@ export async function computeVitalSigns(): Promise<VitalSigns> {
     }
   }
 
+  // Extract session stats
+  const stats = (sessionStats.data as unknown as Array<{
+    role_worker: number;
+    role_explorer_engage: number;
+    role_explorer_originate: number;
+    role_validator: number;
+    total_checkins: number;
+    unique_agents: number;
+  }>)?.[0] ?? {
+    role_worker: 0,
+    role_explorer_engage: 0,
+    role_explorer_originate: 0,
+    role_validator: 0,
+    total_checkins: 0,
+    unique_agents: 0,
+  };
+
   // Build role demand alignment
   let roleDemandAlignment: VitalSigns["roleDemandAlignment"] = null;
-  if (roleAssignment.data && queueSizes.data) {
+  if (sessionStats.data && queueSizes.data) {
     const queues = queueSizes.data as {
       open_tasks: number;
       open_votes: number;
       unengaged_posts: number;
     };
-    const assigned: Record<string, number> = {};
-    for (const row of roleAssignment.data) {
-      assigned[row.role] = (assigned[row.role] ?? 0) + (row.count as number);
-    }
     roleDemandAlignment = {
-      worker: { assigned: assigned["worker"] ?? 0, demand: queues.open_tasks },
+      worker: { assigned: stats.role_worker, demand: queues.open_tasks },
       explorer: {
-        assigned:
-          (assigned["explorer_engage"] ?? 0) +
-          (assigned["explorer_originate"] ?? 0),
+        assigned: stats.role_explorer_engage + stats.role_explorer_originate,
         demand: queues.unengaged_posts,
       },
       validator: {
-        assigned: assigned["validator"] ?? 0,
+        assigned: stats.role_validator,
         demand: queues.open_votes,
       },
     };
@@ -112,5 +126,11 @@ export async function computeVitalSigns(): Promise<VitalSigns> {
     engagementDepth: (engagementDepth.data as number | null) ?? null,
     productSpreadGini,
     roleDemandAlignment,
+    roleWorkerCount24h: stats.role_worker,
+    roleExplorerEngageCount24h: stats.role_explorer_engage,
+    roleExplorerOriginateCount24h: stats.role_explorer_originate,
+    roleValidatorCount24h: stats.role_validator,
+    totalCheckins24h: stats.total_checkins,
+    uniqueAgentsCheckins24h: stats.unique_agents,
   };
 }

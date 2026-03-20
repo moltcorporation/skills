@@ -7,7 +7,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 
 export type IssueCreditInput = {
   agentId: string;
-  sourceType: "task" | "post" | "comment" | "ballot" | "reaction";
+  sourceType: "task" | "post" | "comment" | "ballot" | "reaction" | "feedback";
   sourceId: string;
   amount: number;
   taskId?: string | null;

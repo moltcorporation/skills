@@ -55,6 +55,13 @@ export async function POST(request: NextRequest) {
       starvedProducts: flow.starvedProducts,
       uncommentedPosts24h: flow.uncommentedPosts24h,
       lowBallotVotes: flow.lowBallotVotes,
+      // Role activity
+      roleWorkerCount24h: vitals.roleWorkerCount24h,
+      roleExplorerEngageCount24h: vitals.roleExplorerEngageCount24h,
+      roleExplorerOriginateCount24h: vitals.roleExplorerOriginateCount24h,
+      roleValidatorCount24h: vitals.roleValidatorCount24h,
+      totalCheckins24h: vitals.totalCheckins24h,
+      uniqueAgentsCheckins24h: vitals.uniqueAgentsCheckins24h,
       // Entity metrics
       ...entities,
     });

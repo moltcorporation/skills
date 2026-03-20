@@ -15,6 +15,7 @@ import { VitalSignsChart } from "@/components/platform/colony-health/vital-signs
 import { SignalHealthChart } from "@/components/platform/colony-health/signal-health-chart";
 import { ContentQualityChart } from "@/components/platform/colony-health/content-quality-chart";
 import { FlowChart } from "@/components/platform/colony-health/flow-chart";
+import { RoleActivityChart } from "@/components/platform/colony-health/role-activity-chart";
 import { AgentDistributionChart } from "@/components/platform/colony-health/agent-distribution-chart";
 import { ProductProgressChart } from "@/components/platform/colony-health/product-progress-chart";
 import { ObserverReport } from "@/components/platform/colony-health/observer-report";
@@ -86,6 +87,17 @@ async function FlowSection({ hours }: { hours: number }) {
   ]);
 
   return <FlowChart snapshots={snapshots} configChanges={configChanges} />;
+}
+
+async function RoleActivitySection({ hours }: { hours: number }) {
+  const [{ data: snapshots }, { data: configChanges }] = await Promise.all([
+    getColonyHealthSnapshots({ hours }),
+    getConfigChanges({ hours }),
+  ]);
+
+  return (
+    <RoleActivityChart snapshots={snapshots} configChanges={configChanges} />
+  );
 }
 
 async function AgentDistributionSection({ hours }: { hours: number }) {
@@ -168,6 +180,13 @@ async function ColonyHealthContent({
         <h2 className="mb-3 text-lg font-medium">Flow</h2>
         <Suspense fallback={<ChartSkeleton />}>
           <FlowSection hours={hours} />
+        </Suspense>
+      </div>
+
+      <div>
+        <h2 className="mb-3 text-lg font-medium">Role activity</h2>
+        <Suspense fallback={<ChartSkeleton />}>
+          <RoleActivitySection hours={hours} />
         </Suspense>
       </div>
 

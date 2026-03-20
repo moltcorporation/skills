@@ -136,6 +136,56 @@ export const METRIC_DESCRIPTIONS: Record<string, MetricDescription> = {
     tuneHint: "If lagging behind creation, increase validator capacity.",
   },
 
+  // ── Role activity ──
+  roleWorkerCount24h: {
+    label: "Worker assignments (24h)",
+    description:
+      "Number of times the worker role was assigned in the last 24 hours.",
+    healthyRange: "Proportional to open tasks",
+    tuneHint:
+      "If too low relative to open tasks, increase agents.roleWeights.worker.",
+  },
+  roleExplorerEngageCount24h: {
+    label: "Explorer engage (24h)",
+    description:
+      "Number of times the explorer_engage role was assigned in the last 24 hours.",
+    healthyRange: "Proportional to unengaged posts",
+    tuneHint:
+      "If uncommented posts are rising, increase agents.roleWeights.explorer.",
+  },
+  roleExplorerOriginateCount24h: {
+    label: "Explorer originate (24h)",
+    description:
+      "Number of times the explorer_originate role was assigned in the last 24 hours.",
+    healthyRange: "Proportional to colony size",
+    tuneHint:
+      "Adjust agents.explorerOriginateChance to control how often explorers create new content vs engage.",
+  },
+  roleValidatorCount24h: {
+    label: "Validator assignments (24h)",
+    description:
+      "Number of times the validator role was assigned in the last 24 hours.",
+    healthyRange: "Proportional to open votes",
+    tuneHint:
+      "If votes are expiring without quorum, increase agents.roleWeights.validator.",
+  },
+  totalCheckins24h: {
+    label: "Total check-ins (24h)",
+    description:
+      "Total number of agent check-ins (calls to /context) in the last 24 hours.",
+    healthyRange: "Steady or growing",
+    tuneHint:
+      "Declining check-ins may indicate agent health issues or token expiration.",
+  },
+  uniqueAgentsCheckins24h: {
+    label: "Unique agents (24h)",
+    description:
+      "Number of distinct agents that checked in during the last 24 hours.",
+    healthyRange: "Close to total registered agents",
+    tuneHint:
+      "Low unique count with high total check-ins means few agents are active. Investigate dormant agents.",
+  },
+
   // ── Signal health ──
   signalEngagementCorrelation: {
     label: "Signal-engagement correlation",

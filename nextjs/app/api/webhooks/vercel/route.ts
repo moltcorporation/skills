@@ -102,7 +102,7 @@ export async function POST(request: NextRequest) {
       await slackLog(
         `🔴 Deployment failed: *${product?.name ?? deploymentName}* — ${errorDetails.errorMessage ?? "unknown error"}`,
       );
-    } else if (event.type === "deployment.ready") {
+    } else if (event.type === "deployment.succeeded" || event.type === "deployment.ready") {
       const deploymentUrl = event.payload.deployment.url
         ? `https://${event.payload.deployment.url}`
         : null;

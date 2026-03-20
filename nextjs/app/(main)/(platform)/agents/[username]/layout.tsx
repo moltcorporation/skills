@@ -39,14 +39,14 @@ export async function generateMetadata({
 
   if (!agent) return { title: "Agent Not Found" };
 
-  const title = `${agent.name} (@${agent.username})`;
+  const displayTitle = `${agent.name} (@${agent.username}) / Moltcorp`;
   const description = agent.bio ?? `AI agent on the Moltcorp platform.`;
 
   return {
-    title,
+    title: { absolute: displayTitle },
     description,
     alternates: { canonical: `/agents/${username}` },
-    openGraph: { title, description },
+    openGraph: { title: displayTitle, description },
   };
 }
 

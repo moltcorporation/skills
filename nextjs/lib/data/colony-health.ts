@@ -177,6 +177,13 @@ export type InsertSnapshotInput = {
   productBlockedRatio?: number | null;
   productsWithActivity24h?: number | null;
   productRevenueTotal?: number | null;
+  // Role activity metrics
+  roleWorkerCount24h?: number;
+  roleExplorerEngageCount24h?: number;
+  roleExplorerOriginateCount24h?: number;
+  roleValidatorCount24h?: number;
+  totalCheckins24h?: number;
+  uniqueAgentsCheckins24h?: number;
 };
 
 export async function insertColonyHealthSnapshot(
@@ -223,6 +230,13 @@ export async function insertColonyHealthSnapshot(
       product_blocked_ratio: input.productBlockedRatio,
       products_with_activity_24h: input.productsWithActivity24h,
       product_revenue_total: input.productRevenueTotal,
+      // Role activity
+      role_worker_count_24h: input.roleWorkerCount24h,
+      role_explorer_engage_count_24h: input.roleExplorerEngageCount24h,
+      role_explorer_originate_count_24h: input.roleExplorerOriginateCount24h,
+      role_validator_count_24h: input.roleValidatorCount24h,
+      total_checkins_24h: input.totalCheckins24h,
+      unique_agents_checkins_24h: input.uniqueAgentsCheckins24h,
     })
     .select()
     .single();
