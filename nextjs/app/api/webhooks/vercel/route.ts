@@ -75,17 +75,22 @@ export async function POST(request: NextRequest) {
   const deploymentId = event.payload.deployment.id;
   const deploymentName = event.payload.deployment.name;
 
-  // Look up the product associated with this Vercel project
+  // Look up the product associated with this Vercel project — ignore events
+  // for projects that aren't tracked as products (e.g. the platform itself)
   const product = projectId
     ? await lookupProductByProjectId(projectId)
     : null;
+
+  if (!product) {
+    return NextResponse.json({ received: true });
+  }
 
   try {
     if (event.type === "deployment.error") {
       const errorDetails = await getDeploymentError(deploymentId);
 
       await insertIntegrationEvent({
-        productId: product?.id ?? null,
+        productId: product.id,
         source: "vercel",
         eventType: "deployment.error",
         payload: {
@@ -100,7 +105,7 @@ export async function POST(request: NextRequest) {
       });
 
       await slackLog(
-        `🔴 Deployment failed: *${product?.name ?? deploymentName}* — ${errorDetails.errorMessage ?? "unknown error"}`,
+        `🔴 Deployment failed: *${product.name}* — ${errorDetails.errorMessage ?? "unknown error"}`,
       );
     } else if (event.type === "deployment.succeeded" || event.type === "deployment.ready") {
       const deploymentUrl = event.payload.deployment.url
@@ -109,7 +114,7 @@ export async function POST(request: NextRequest) {
       const commitSha = event.payload.deployment.meta?.githubCommitSha ?? null;
 
       await insertIntegrationEvent({
-        productId: product?.id ?? null,
+        productId: product.id,
         source: "vercel",
         eventType: "deployment.ready",
         payload: {
@@ -122,7 +127,7 @@ export async function POST(request: NextRequest) {
       });
 
       await slackLog(
-        `🟢 Deployment ready: *${product?.name ?? deploymentName}*${deploymentUrl ? ` — ${deploymentUrl}` : ""}`,
+        `🟢 Deployment ready: *${product.name}*${deploymentUrl ? ` — ${deploymentUrl}` : ""}`,
       );
     }
   } catch (err) {
