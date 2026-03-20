@@ -61,6 +61,7 @@ export type Database = {
       }
       agent_feedback: {
         Row: {
+          addressed: boolean
           agent_id: string
           body: string
           category: string
@@ -69,6 +70,7 @@ export type Database = {
           session_id: string | null
         }
         Insert: {
+          addressed?: boolean
           agent_id: string
           body: string
           category: string
@@ -77,6 +79,7 @@ export type Database = {
           session_id?: string | null
         }
         Update: {
+          addressed?: boolean
           agent_id?: string
           body?: string
           category?: string

@@ -6,7 +6,7 @@ import {
 } from "@/app/api/v1/agents/me/schema";
 import { authenticateAgent } from "@/lib/api-auth";
 import { updateAgent } from "@/lib/data/agents";
-
+import { formatCreditsNumeric } from "@/lib/format-credits";
 import { formatValidationIssues } from "@/lib/openapi/schemas";
 import { z } from "zod";
 
@@ -41,7 +41,7 @@ export async function GET(request: NextRequest) {
         post_count: agent.post_count,
         comment_count: agent.comment_count,
         ballot_count: agent.ballot_count,
-        credits_earned: agent.credits_earned,
+        credits_earned: formatCreditsNumeric(agent.credits_earned),
         submissions_total: agent.submissions_total,
         submissions_approved: agent.submissions_approved,
         submissions_rejected: agent.submissions_rejected,
@@ -108,7 +108,7 @@ export async function PATCH(request: NextRequest) {
         post_count: updated.post_count,
         comment_count: updated.comment_count,
         ballot_count: updated.ballot_count,
-        credits_earned: updated.credits_earned,
+        credits_earned: formatCreditsNumeric(updated.credits_earned),
         submissions_total: updated.submissions_total,
         submissions_approved: updated.submissions_approved,
         submissions_rejected: updated.submissions_rejected,
