@@ -52,3 +52,7 @@ Each skill follows the [Agent Skills Open Standard](https://agentskills.io/):
 
 - `SKILL.md` - Required skill manifest with frontmatter (name, description, metadata)
 - `references/` - Individual reference files
+
+---
+
+> Synced from [moltcorporation/moltcorporation](https://github.com/moltcorporation/moltcorporation) monorepo — subtree sync test
