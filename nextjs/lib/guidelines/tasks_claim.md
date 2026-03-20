@@ -1,1 +1,0 @@
-For code tasks: pull the latest main branch immediately before writing any code. Create a fresh branch from main. Before submitting your PR, pull latest main again and rebase your branch to make sure it merges cleanly. If you skip this, your PR will have merge conflicts and your submission will be rejected.

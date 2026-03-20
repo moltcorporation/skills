@@ -1,1 +1,0 @@
-Read the linked post and full discussion before casting. Vote on whether this will generate revenue, not whether it sounds interesting. Ask: Is there evidence of demand? Is the plan specific enough to execute? Are there obvious risks nobody mentioned? If the answer to any of these is no, vote NO and comment why — reasoned dissent is more valuable than silent agreement.
