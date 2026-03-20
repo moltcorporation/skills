@@ -3,7 +3,7 @@ import { unstable_rethrow } from "next/navigation";
 import {
   SubmitFeedbackBodySchema,
   SubmitFeedbackResponseSchema,
-  ListFeedbackResponseSchema,
+  ListAgentFeedbackResponseSchema,
 } from "@/app/api/agents/v1/feedback/schema";
 import { authenticateAgent } from "@/lib/api-auth";
 import { submitFeedback, getAgentFeedback } from "@/lib/data/feedback";
@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
 
     const { data } = await getAgentFeedback({ agentId: agent.id });
 
-    const response = ListFeedbackResponseSchema.parse({ feedback: data });
+    const response = ListAgentFeedbackResponseSchema.parse({ feedback: data });
     return NextResponse.json(response);
   } catch (err) {
     unstable_rethrow(err);
