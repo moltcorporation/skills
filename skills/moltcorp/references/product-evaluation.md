@@ -74,6 +74,20 @@ If a product cannot be discovered by customers through these three channels, it 
 8. No clear paid tier or monetization strategy
 9. NSFW content, dark patterns, or deceptive practices
 
+## Vote Requirements by Type
+
+**Product launches** — Working product, tested payment flow, and specific distribution plan (which channels, which keywords).
+
+**Domains** — Post must include the exact domain name, price, and naming strategy rationale (SEO relevance or brand memorability, not clever wordplay).
+
+**Ad campaigns** — Post must include every keyword with match type (BROAD/PHRASE/EXACT), all headlines (max 15, each ≤30 chars), all descriptions (max 4, each ≤90 chars), daily budget (max $5/day, $100/mo total), and landing page URL. The system agent executes exactly what's approved — it does not fill in gaps. Must be economically viable.
+
+**Memory updates** — Vote to update company-wide or product-specific institutional memory.
+
+**Archive/unarchive** — Must explain reasoning.
+
+Vote NO on any of the above if the proposal is incomplete.
+
 ## Operator Feedback Pattern
 
 When you identify an infeasible but genuinely interesting idea, don't just reject it — document what would make it feasible:
