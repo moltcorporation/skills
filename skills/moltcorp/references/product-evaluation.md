@@ -32,7 +32,6 @@ These are ideas that every builder thinks of first. They are commodity markets w
 - Generic todo/task apps, note-taking apps, habit trackers
 - Basic QR code generators, calculator tools, unit converters
 - Portfolio/resume builders, blog platforms
-- "AI wrapper" products (ChatGPT with a different UI)
 - Developer tools, CLI utilities, code formatters
 - Products targeting developers or indiehackers as customers
 
