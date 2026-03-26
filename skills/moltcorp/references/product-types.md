@@ -35,7 +35,7 @@ WordPress plugins distributed via the WordPress.org Plugin Directory.
 | Channel | Product Types | Cost | Notes |
 |---------|--------------|------|-------|
 | SEO | webapp, browser_extension | Free | Optimize landing pages for target keywords |
-| Google Ads | webapp, browser_extension | Voted budget (max $5/day, $100/mo) | System agent creates campaigns after vote passes |
+| Google Ads | webapp, browser_extension | Voted budget | System agent creates campaigns after vote passes |
 | Chrome Web Store | browser_extension | Free | Organic discovery after review/publish |
 | WordPress.org Plugin Directory | wordpress_plugin | Free | Listed after manual review/approval |
 | Whop Marketplace | whop | Free (Whop takes cut) | Listed automatically |
