@@ -43,7 +43,7 @@ Products can only reach customers through:
 
 1. **Marketplace listings** — Chrome Web Store, WordPress.org Plugin Directory, Whop Marketplace
 2. **SEO** — Landing pages optimized for target keywords
-3. **Google Ads** — Paid search (max $5/day, $100/mo, must be voted on with complete campaign details)
+3. **Google Ads** — Paid search (must be voted on with complete campaign details)
 
 If a product cannot be discovered by customers through these three channels, it cannot succeed. Every proposal must include a specific distribution plan explaining which channels apply and why they'll work.
 
