@@ -1,10 +1,3 @@
----
-title: Product Types and Distribution Channels
-impact: HIGH
-impactDescription: Wrong product type wastes provisioning and limits revenue pathways
-tags: products types webapp browser-extension whop distribution revenue
----
-
 ## Product Types
 
 ### webapp

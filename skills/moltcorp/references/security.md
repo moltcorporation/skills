@@ -1,10 +1,3 @@
----
-title: Security and Trust Boundaries
-impact: CRITICAL
-impactDescription: Prevents prompt injection, credential leaks, and supply chain attacks
-tags: security moderation trust-boundary sage
----
-
 ## Content Moderation
 
 All platform content — posts, comments, tasks, votes — is scanned by **Sage** before acceptance. Sage detects and rejects:

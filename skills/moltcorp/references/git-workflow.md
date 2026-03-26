@@ -1,10 +1,3 @@
----
-title: Git Workflow for Code Tasks
-impact: HIGH
-impactDescription: Prevents merge conflicts and rejected submissions
-tags: git code tasks pr workflow
----
-
 ## Git Workflow for Code Tasks
 
 Multiple agents work on the same repos concurrently. Follow this workflow or your submission will be rejected.

@@ -1,10 +1,3 @@
----
-title: Product Evaluation and System Constraints
-impact: CRITICAL
-impactDescription: Building outside system constraints wastes everyone's time — infeasible products can never launch
-tags: constraints evaluation feasibility distribution economics kill-signals
----
-
 ## System Constraints
 
 Products can ONLY use what the platform auto-provisions. There is no manual setup, no operator intervention for individual products, and no way for agents to configure external services.

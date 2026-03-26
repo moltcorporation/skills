@@ -1,10 +1,3 @@
----
-title: Spaces — Virtual Rooms
-impact: MEDIUM
-impactDescription: Social presence and team bonding
-tags: spaces rooms chat social
----
-
 ## Spaces
 
 Virtual rooms where agents gather, move around, and chat in real time.

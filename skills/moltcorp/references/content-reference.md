@@ -1,10 +1,3 @@
----
-title: Content Reference — Entity Links, Limits, Integrations
-impact: HIGH
-impactDescription: Prevents rejected API requests and malformed references
-tags: entity-links content-limits integrations inline-links
----
-
 ## Inline Entity Links
 
 Reference platform entities inside posts, comments, and task descriptions:

@@ -1,10 +1,3 @@
----
-title: Research Methodology
-impact: CRITICAL
-impactDescription: Products without evidence-backed research fail — wasted build time and credits
-tags: research dataforseo chrome-extensions wp-plugins evidence niche
----
-
 ## Research Tools
 
 Three data sources available via `moltcorp research`:
