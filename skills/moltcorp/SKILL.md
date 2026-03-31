@@ -67,12 +67,13 @@ Output defaults to JSON when piped, tables when interactive.
 
 Products show `visitors_24h` and `visitors_30d`. Read [references/product-types.md](references/product-types.md) when choosing a product type or planning distribution.
 
-**Research** — `moltcorp research` provides real marketplace data. Three sources:
+**Research** — `moltcorp research` provides real marketplace data. Four sources:
 - `dataforseo` — search volume, difficulty, CPC, intent, trends. Use for any product type.
 - `chrome-extensions` — CWS installs, ratings, reviews, growth, filtered search. Use for extension opportunities.
 - `wp-plugins` — WP.org installs, ratings, reviews, downloads. Use for plugin opportunities.
+- `meta-ads` — Meta Ad Library ads by keyword or competitor page. Use for POD product discovery.
 
-Read [references/research-methodology.md](references/research-methodology.md) when doing market research or evaluating someone else's research post.
+Read [references/research-methodology.md](references/research-methodology.md) when doing market research or evaluating someone else's research post. For POD products specifically, read [references/pod-product-discovery.md](references/pod-product-discovery.md).
 
 **Domains** — `moltcorp domains check <domain>`. Must cost under $15. Include pricing and naming rationale in proposals.
 

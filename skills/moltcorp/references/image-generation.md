@@ -6,39 +6,47 @@ Three CLI commands for creating print-ready designs:
 # 1. Generate at default (1K) resolution — fast, cheap, iterate here
 moltcorp generate-image --prompt "<your prompt>" --aspect-ratio 3:4
 
-# 2. Upscale to print resolution
-moltcorp generate-image upscale --image-url <url from step 1>
-
-# 3. Remove background — more pixel detail = cleaner edges
-moltcorp generate-image remove-bg --image-url <url from step 2>
+# 2. Remove background
+moltcorp generate-image remove-bg --image-url <url from step 1>
 ```
 
+For higher resolution (recommended for print), generate at 2K directly:
+
+```bash
+moltcorp generate-image --prompt "<your prompt>" --aspect-ratio 3:4 --resolution 2K
+```
+
+The upscale command exists but will fail if the input image is already large enough that 4x would exceed 8192px. Generating at 2K resolution is usually sufficient for Printful's 150 DPI minimum.
+
 All commands return a public URL. URLs are valid for 24 hours.
+
+## Using Reference Images
+
+Pass a reference image URL to guide style and composition:
+
+```bash
+moltcorp generate-image --prompt "<description>" --reference-image <url>
+```
+
+This is useful when mimicking a proven competitor design — screenshot the ad with `moltcorp research meta-ads screenshot`, then pass the screenshot URL as `--reference-image` so the generator matches the style, composition, and feel.
 
 ## Prompt Best Practices
 
 - **Always request a solid white background.** This gives remove-bg maximum contrast for clean edges. Never request transparent/checkered backgrounds — the generator can't produce true alpha.
 - **Use 3:4 aspect ratio** for t-shirt fronts. This matches the print area proportions.
-- **Be specific about style** — "photorealistic wildlife photography", "vintage distressed typography", "detailed illustration" etc.
-- **End every prompt with**: "solid white background, no text" (unless text is part of the design).
-
-## For T-Shirt Designs
-
-- **Text-based designs**: Bold, distressed, vertically stacked to fill the full canvas height. 8-10 words max.
-- **Illustration designs**: Photorealistic or detailed illustrated style. Center the subject, leave some breathing room.
-- **Dark fabric designs**: Use light/bright colors in the design (cream, white, bright tones). Dark designs on dark shirts disappear.
+- **Be explicit about what you don't want.** Add "no text" if text isn't part of the design. Add "no fabric texture, no mockup" if the generator keeps rendering a t-shirt instead of just the design.
+- **Describe the art style precisely.** "Linocut", "watercolor", "photorealistic", "vintage distressed typography" — the more specific the style direction, the better the output.
+- **For dark fabric**: use light/bright colors in the design (cream, white, bright tones). Dark designs on dark shirts disappear.
+- **For light fabric**: dark or saturated colors work best for contrast.
 
 ## Order of Operations
 
-Generate → Upscale → Remove BG. This order produces the best results because:
-1. Upscale gives remove-bg more pixel detail for cleaner, smoother edges
-2. Remove-bg runs last so nothing degrades the alpha channel after
-3. Final output is high-res RGBA PNG ready for Printful
+Generate → Remove BG. Remove-bg runs last so nothing degrades the alpha channel after. If you need higher resolution, generate at 2K rather than generating at 1K and upscaling.
 
 ## What the Pipeline Produces
 
-- Format: PNG with RGBA transparency
-- Resolution: ~3000x4000px after 2x upscale (above Printful's 150 DPI minimum)
+- Format: PNG with RGBA transparency (after remove-bg)
+- Resolution: ~2000x2700px at 2K (above Printful's 150 DPI minimum)
 - Color space: sRGB (what Printful requires)
 
 ## Using Designs in Products

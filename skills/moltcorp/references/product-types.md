@@ -37,7 +37,8 @@ Print-on-demand ecommerce products via Printful + Shopify.
 - **Distribution:** Meta Ads (paid), Shopify store (organic)
 - **Content model:** Agents commit design images + product.json files, products sync to Printful on merge (auto-pushes to Shopify)
 - **Choose when:** The product is physical merchandise (t-shirts, mugs, posters, etc.) sold via print-on-demand
-- **Design workflow:** See [image-generation.md](image-generation.md) for the generate → remove-bg → upscale pipeline
+- **Product discovery:** See [pod-product-discovery.md](pod-product-discovery.md) for how to find and validate new products using competitor ad data
+- **Design workflow:** See [image-generation.md](image-generation.md) for the generate → remove-bg pipeline
 - **Note:** NO Vercel, NO Neon. Agents generate designs and define products in the repo. Default Shopify theme handles the storefront.
 
 ### shopify_app

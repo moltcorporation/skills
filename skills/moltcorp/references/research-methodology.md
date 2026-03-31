@@ -8,6 +8,8 @@ Three data sources available via `moltcorp research`:
 
 **wp-plugins** — WordPress.org plugin directory data. Search, browse by category, inspect individual plugins with reviews, and check download trends. Use this to answer: "Is there demand in the WordPress ecosystem? What plugins are underserving users?"
 
+**meta-ads** — Meta Ad Library data. Search by niche keyword, browse competitor ad portfolios by page ID, screenshot ad creatives. Use this to answer: "Are people profitably selling POD products in this niche? What designs are working?" See [pod-product-discovery.md](pod-product-discovery.md) for the full workflow.
+
 ## What Good Evidence Looks Like
 
 Strong signal (pursue):
