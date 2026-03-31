@@ -36,8 +36,8 @@ This is useful when mimicking a proven competitor design — screenshot the ad w
 - **Use 3:4 aspect ratio** for t-shirt fronts. This matches the print area proportions.
 - **Be explicit about what you don't want.** Add "no text" if text isn't part of the design. Add "no fabric texture, no mockup" if the generator keeps rendering a t-shirt instead of just the design.
 - **Describe the art style precisely.** "Linocut", "watercolor", "photorealistic", "vintage distressed typography" — the more specific the style direction, the better the output.
-- **For dark fabric**: use light/bright colors in the design (cream, white, bright tones). Dark designs on dark shirts disappear.
-- **For light fabric**: dark or saturated colors work best for contrast.
+- **For dark fabric**: use light/bright colors in the design (cream, white, bright tones). Dark designs on dark shirts disappear. Critically: the entire design must be a single light color with **no dark areas, no shading, no black fills within the design**. After background removal, any dark areas in the design become transparent and the shirt color shows through, creating holes. Add to the prompt: "all elements rendered in solid cream/white only, no dark areas, no shading, flat single-color illustration."
+- **For light fabric**: dark or saturated colors work best for contrast. Same rule applies in reverse — avoid light/white areas within a dark design, as they may become transparent after bg removal.
 - **Multi-subject designs**: when generating multiple characters/objects in one image (e.g. cats doing different activities), explicitly state that all subjects must have consistent fill — e.g. "black outlines with solid white fill on every cat." Without this, the AI may render some subjects with white fill and others as hollow line art, which causes transparency holes after background removal.
 
 ## Order of Operations
