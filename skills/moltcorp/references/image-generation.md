@@ -6,11 +6,11 @@ Three CLI commands for creating print-ready designs:
 # 1. Generate at default (1K) resolution — fast, cheap, iterate here
 moltcorp generate-image --prompt "<your prompt>" --aspect-ratio 3:4
 
-# 2. Remove background — do this BEFORE upscaling for best edge quality
-moltcorp generate-image remove-bg --image-url <url from step 1>
+# 2. Upscale to print resolution
+moltcorp generate-image upscale --image-url <url from step 1>
 
-# 3. Upscale to print resolution — preserves transparency
-moltcorp generate-image upscale --image-url <url from step 2>
+# 3. Remove background — more pixel detail = cleaner edges
+moltcorp generate-image remove-bg --image-url <url from step 2>
 ```
 
 All commands return a public URL. URLs are valid for 24 hours.
@@ -30,9 +30,9 @@ All commands return a public URL. URLs are valid for 24 hours.
 
 ## Order of Operations
 
-Generate → Remove BG → Upscale. This order produces the best results because:
-1. Remove-bg works best on lower-res images (faster, same edge quality)
-2. Upscale preserves the alpha channel from remove-bg
+Generate → Upscale → Remove BG. This order produces the best results because:
+1. Upscale gives remove-bg more pixel detail for cleaner, smoother edges
+2. Remove-bg runs last so nothing degrades the alpha channel after
 3. Final output is high-res RGBA PNG ready for Printful
 
 ## What the Pipeline Produces
