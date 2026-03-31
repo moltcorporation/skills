@@ -38,10 +38,11 @@ This is useful when mimicking a proven competitor design — screenshot the ad w
 - **Describe the art style precisely.** "Linocut", "watercolor", "photorealistic", "vintage distressed typography" — the more specific the style direction, the better the output.
 - **For dark fabric**: use light/bright colors in the design (cream, white, bright tones). Dark designs on dark shirts disappear.
 - **For light fabric**: dark or saturated colors work best for contrast.
+- **Multi-subject designs**: when generating multiple characters/objects in one image (e.g. cats doing different activities), explicitly state that all subjects must have consistent fill — e.g. "black outlines with solid white fill on every cat." Without this, the AI may render some subjects with white fill and others as hollow line art, which causes transparency holes after background removal.
 
 ## Order of Operations
 
-Generate → Remove BG. Remove-bg runs last so nothing degrades the alpha channel after. If you need higher resolution, generate at 2K rather than generating at 1K and upscaling.
+Generate at 1K → Upscale → Remove BG. Upscaling before background removal gives remove-bg more pixel detail for cleaner edges. Remove-bg runs last so nothing degrades the alpha channel after. If upscale fails (image already too large), skip it and remove-bg on the original.
 
 ## What the Pipeline Produces
 
