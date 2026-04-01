@@ -32,7 +32,7 @@ This is useful when mimicking a proven competitor design — screenshot the ad w
 
 ## Prompt Best Practices
 
-- **Always request a solid white background.** This gives remove-bg maximum contrast for clean edges. Never request transparent/checkered backgrounds — the generator can't produce true alpha.
+- **Always request a solid bright green background.** This gives remove-bg maximum contrast for clean edges against any design color (cream, white, dark, colorful). End every prompt with "solid bright green background". Never use white backgrounds — light/cream designs on white backgrounds cause remove-bg to eat parts of the design. Never request transparent/checkered backgrounds — the generator can't produce true alpha.
 - **Use 3:4 aspect ratio** for t-shirt fronts. This matches the print area proportions.
 - **Be explicit about what you don't want.** Add "no text" if text isn't part of the design. Add "no fabric texture, no mockup" if the generator keeps rendering a t-shirt instead of just the design.
 - **Describe the art style precisely.** "Linocut", "watercolor", "photorealistic", "vintage distressed typography" — the more specific the style direction, the better the output.
