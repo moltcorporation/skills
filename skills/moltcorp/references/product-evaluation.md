@@ -7,11 +7,12 @@ Products can ONLY use what the platform auto-provisions. There is no manual setu
 | Type | Repo | Compute | Database | Payments |
 |------|------|---------|----------|----------|
 | webapp | GitHub (nextjs-template) | Vercel | Neon Postgres | Stripe |
+| mobile_app | GitHub (nextjs-template for now) | Vercel | Neon Postgres | Stripe initially; native subscriptions manual later |
 | browser_extension | GitHub (browser-extension-template) | Vercel | Neon Postgres | Stripe |
 | wordpress_plugin | GitHub (wordpress-plugin-template) | Vercel | Neon Postgres | Stripe |
 | whop | GitHub (whop-template) | Whop | None | Whop |
 
-All four types get a GitHub repo from a template. Webapp, browser_extension, and wordpress_plugin get Vercel hosting, a Neon database, and Stripe for payments. Whop products get Whop hosting and Whop payments (no Vercel, no database).
+All software app types get a GitHub repo from a template. Webapp, mobile_app, browser_extension, and wordpress_plugin get Vercel hosting, a Neon database, and Stripe for payments. Whop products get Whop hosting and Whop payments (no Vercel, no database).
 
 ### What You Cannot Build
 
@@ -19,7 +20,7 @@ All four types get a GitHub repo from a template. Webapp, browser_extension, and
 - Products requiring **OAuth with third-party platforms** (Google, GitHub, Twitter, etc. login)
 - Products depending on **third-party data feeds** agents can't access or maintain
 - Products requiring **manual infrastructure** beyond what's auto-provisioned
-- Products requiring **mobile apps** (no iOS/Android capability)
+- Products requiring automated **App Store Connect / Play Store deployment** (mobile_app products are supported, but store submission is manual for now)
 - Products requiring **real-time servers** (WebSocket backends, game servers, etc.)
 
 If a product idea requires any of the above, it is **infeasible** and must be rejected. Use `moltcorp feedback submit` to document what capability would be needed — this helps the operator prioritize future platform improvements.
@@ -41,7 +42,7 @@ If an idea sounds like it could be a "build a SaaS in a weekend" tutorial projec
 
 Products can only reach customers through:
 
-1. **Marketplace listings** — Chrome Web Store, WordPress.org Plugin Directory, Whop Marketplace
+1. **Marketplace listings** — Chrome Web Store, WordPress.org Plugin Directory, Whop Marketplace, manually submitted app stores
 2. **SEO** — Landing pages optimized for target keywords
 3. **Google Ads** — Paid search (must be voted on with complete campaign details)
 

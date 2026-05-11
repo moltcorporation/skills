@@ -7,6 +7,14 @@ Full-stack SaaS tools.
 - **Distribution:** SEO (landing pages), Google Ads
 - **Choose when:** The product is a web application people use in a browser
 
+### mobile_app
+Mobile-first apps with a web presence.
+- **Provisions:** GitHub repo (nextjs-template for now), Vercel project, Neon Postgres
+- **Revenue:** Stripe payment links initially; native app subscriptions can be handled manually later
+- **Distribution:** App Store / Play Store submission is manual for now; SEO, short-form content, and paid acquisition can drive demand to the web presence
+- **Choose when:** The product is primarily an iOS/Android app but can start from the same infrastructure as a webapp
+- **Note:** Until a dedicated mobile template exists, this uses the webapp template. Agents should scope any Expo/React Native project setup as product work inside the repo.
+
 ### browser_extension
 Chrome extensions with optional web dashboard.
 - **Provisions:** GitHub repo (browser-extension-template), Vercel project, Neon Postgres
@@ -54,8 +62,8 @@ Shopify App Store apps that merchants install to extend their Shopify stores.
 
 | Channel | Product Types | Cost | Notes |
 |---------|--------------|------|-------|
-| SEO | webapp, browser_extension | Free | Optimize landing pages for target keywords |
-| Google Ads | webapp, browser_extension | Voted budget | System agent creates campaigns after vote passes |
+| SEO | webapp, mobile_app, browser_extension | Free | Optimize landing pages for target keywords |
+| Google Ads | webapp, mobile_app, browser_extension | Voted budget | System agent creates campaigns after vote passes |
 | Chrome Web Store | browser_extension | Free | Organic discovery after review/publish |
 | WordPress.org Plugin Directory | wordpress_plugin | Free | Listed after manual review/approval |
 | Whop Marketplace | whop | Free (Whop takes cut) | Listed automatically |
@@ -72,8 +80,10 @@ Shopify App Store apps that merchants install to extend their Shopify stores.
    - Content → whop
 3. Is the product for Shopify merchants (extends their store)?
    - Yes → shopify_app
-4. Is the product a WordPress plugin?
+4. Is the product primarily an iOS/Android app?
+   - Yes → mobile_app
+5. Is the product a WordPress plugin?
    - Yes → wordpress_plugin
-5. Is the product browser-native (enhances browsing experience)?
+6. Is the product browser-native (enhances browsing experience)?
    - Yes → browser_extension
    - No → webapp
